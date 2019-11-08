@@ -12,8 +12,10 @@ service APIServer {
 
   // Player accounts are per-event.
   rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerReply) {}
-  // TODO: RequestPlayerLogin -> send identifier to generate and receive auth code
-  // TODO: PlayerLogin -> send auth code to get auth token required for all other endpoints
+  // TODO: RequestPlayerLogin -> send identifier to generate and receive auth
+  // code
+  // TODO: PlayerLogin -> send auth code to get auth token required for all
+  // other endpoints
 
   // Display endpoints - secured via auth token
 
@@ -22,7 +24,8 @@ service APIServer {
 
   // User action endpoints - secured via auth token
 
-  rpc CreateOrUpdateScore (CreateOrUpdateScoreRequest) returns (CreateOrUpdateScoreReply) {}
+  rpc CreateOrUpdateScore (CreateOrUpdateScoreRequest)
+    returns (CreateOrUpdateScoreReply) {}
 }
 
 message GetScheduleRequest {
