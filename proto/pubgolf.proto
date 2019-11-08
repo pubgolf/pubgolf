@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "announcement.proto";
+import "score.proto";
+import "venue.proto";
+
+package PubGolf;
+
+service APIServer {
+
+  // Auth endpoints - accessible without auth token
+
+  // Player accounts are per-event.
+  rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerReply) {}
+  // TODO: RequestPlayerLogin -> send identifier to generate and receive auth code
+  // TODO: PlayerLogin -> send auth code to get auth token required for all other endpoints
+
+  // Display endpoints - secured via auth token
+
+  rpc GetSchedule (GetScheduleRequest) returns (GetScheduleReply) {}
+  rpc GetScores (GetScoresRequest) returns (GetScoresReply) {}
+
+  // User action endpoints - secured via auth token
+
+  rpc CreateOrUpdateScore (CreateOrUpdateScoreRequest) returns (CreateOrUpdateScoreReply) {}
+}
+
+message GetScheduleRequest {
+  string eventKey = 1;
+}
+
+message GetScheduleReply {
+  VenueList venueList = 1;
+}
+
+message GetScoresRequest {
+  string eventKey = 1;
+}
+
+message GetScoresReply {
+  repeated ScoreList scoreLists = 1;
+}
+
+message RegisterPlayerRequest {
+  string eventKey = 1;
+  string name = 2;
+  // TODO: More fields...
+}
+
+message RegisterPlayerReply {}
+
+message CreateOrUpdateScoreRequest {
+  uint32 venueID = 1;
+  uint32 playerID = 2;
+  int32 strokes = 3;
+
+  // TODO: Figure out how to handle bonus and penalty. I think we can probably
+  // include this field in the proto, share it across the player server and the
+  // admin server and just ignore it in the player-facing endpoints.
+  // sint32 adjustments = 4;
+
+  // TODO: Comments?
+}
+
+message CreateOrUpdateScoreReply {}

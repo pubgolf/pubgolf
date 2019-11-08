@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package PubGolf;
+
+message Venue {
+  uint32 venueID = 1;
+  string name = 2;
+  string address = 3;
+  // Primary image suitable for display. Stored as URL.
+  string image = 4;
+  string startTime = 5;
+}
+
+message VenueStop {
+  uint32 stopID = 1;
+  Venue venue = 2;
+}
+
+message VenueList {
+  repeated VenueStop venues = 1;
+}
