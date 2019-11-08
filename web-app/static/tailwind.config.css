@@ -22,4 +22,8 @@
   @apply border-blue-800 text-blue-800;
 }
 
+.input {
+  @apply border-2 border-blue-400 p-1;
+}
+
 @tailwind utilities;

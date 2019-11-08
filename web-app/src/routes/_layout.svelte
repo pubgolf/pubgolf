@@ -1,5 +1,5 @@
 <script>
-  export let segment;
+  // TODO: transition between pages
 </script>
 
 <style>
