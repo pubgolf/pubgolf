@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package PubGolf;
+
+message Score {
+  string label = 1;
+  int32 points = 2;
+  sint32 adjustments = 3;
+  int32 total = 4;
+  int32 ranking = 5;
+
+  // Generic holder for navigating to the "profile" view of whatever entity each
+  // row represents (user, venue, etc).
+  int32 entityID = 6;
+}
+
+message ScoreList {
+  string label = 1;
+  repeated Score scores = 2;
+}

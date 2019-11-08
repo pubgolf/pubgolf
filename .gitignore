@@ -1,3 +1,6 @@
 # User-specific stuff
 .idea/
 .vscode/
+
+# Generated proto files
+web-app/src/proto/
