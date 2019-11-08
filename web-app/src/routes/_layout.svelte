@@ -1,22 +1,28 @@
 <script>
-  import Nav from '../components/Nav.svelte';
-
   export let segment;
 </script>
 
 <style>
   main {
-    position: relative;
-    max-width: 56em;
+    display: grid;
+    grid-template:
+      "image  " min-content
+      "heading" 1fr
+      "content" 50% /
+       1fr;
+    height: 100%;
     background-color: white;
     padding: 2em;
     margin: 0 auto;
-    box-sizing: border-box;
   }
 </style>
 
-<Nav {segment}/>
-
 <main>
-  <slot></slot>
+  <img alt="Borat" src="great-success.png">
+
+  <h1 class="text-center">Pub Golf</h1>
+
+  <div class="flex flex-col w-2/3 mx-auto">
+    <slot></slot>
+  </div>
 </main>
