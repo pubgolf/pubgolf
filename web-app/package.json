@@ -1,6 +1,6 @@
 {
-  "name": "TODO",
-  "description": "TODO",
+  "name": "pubgolf-web",
+  "description": "Pub Golf Web App",
   "version": "0.0.1",
   "scripts": {
     "dev": "sapper dev",
