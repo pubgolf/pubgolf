@@ -18,5 +18,6 @@ Instructions for compiling the protos for use in the other build targets.
 
 ```
 cd ../web-app
-protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto
+protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto
+```
 ```
