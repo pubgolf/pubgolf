@@ -16,7 +16,7 @@
   <title>Sign into Pub Golf</title>
 </svelte:head>
 
-<form on:submit|preventDefault={submit}>
+<form on:submit|preventDefault="{submit}" class="w-2/3 mx-auto">
   <label for="signin-phone">
     Enter your mobile number
   </label>
@@ -24,13 +24,14 @@
     id="signin-phone"
     class="input w-full"
     type="tel"
+    name="phone"
+    autocomplete="tel"
     placeholder="(123) 555-1234"
-    bind:value={phone}
+    bind:value="{phone}"
+    required
   >
 
   <button class="btn btn-primary w-full mt-4">
     Send code
   </button>
 </form>
-
-

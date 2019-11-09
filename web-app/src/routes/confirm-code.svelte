@@ -9,7 +9,7 @@
 <style>
 </style>
 
-<form on:submit|preventDefault={submit}>
+<form on:submit|preventDefault="{submit}" class="w-2/3 mx-auto">
   <label for="confirm-code">
     Enter the code you received
   </label>
@@ -17,13 +17,13 @@
     id="confirm-code"
     class="input w-full"
     type="tel"
+    autocomplete="none"
     placeholder="123456"
-    bind:value={code}
+    bind:value="{code}"
+    required
   >
 
   <button class="btn btn-primary w-full mt-4">
     Submit
   </button>
 </form>
-
-

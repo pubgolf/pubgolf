@@ -15,6 +15,19 @@
     padding: 2em;
     margin: 0 auto;
   }
+
+  h1 {
+    font-size: 2.8em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0 0 0.5em 0;
+  }
+
+  img {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 0 1em 0;
+  }
 </style>
 
 <main>
@@ -22,7 +35,7 @@
 
   <h1 class="text-center">Pub Golf</h1>
 
-  <div class="flex flex-col w-2/3 mx-auto">
+  <div class="flex flex-col w-full mx-auto">
     <slot></slot>
   </div>
 </main>
