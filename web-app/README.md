@@ -4,13 +4,43 @@ PWA client for event app, located at `app.$DOMAIN`.
 
 ## Getting started
 
+### Using Tailwind
+
+[Tailwind](https://tailwindcss.com/) is a collection 
+of [CSS utility classes](https://tailwindcss.com/docs/utility-first)
+but can also be composed into component classes for commonly used
+groups of styles like so
+```css
+/* web-app/static/tailwind.config.css */
+@tailwind base;
+
+@tailwind components;
+
+/*
+ Classes like this should be added directly after the @tailwind components
+ directive to avoid specificity issues.
+*/
+.my-awesome-button {
+  @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+}
+
+@tailwind utilities;
+```
+
+Any time you change `web-app/static/tailwind.config.css`,
+make sure to re-build the output
+```bash
+cd web-app
+npm run tailwind
+```
+
 ### Running the project
 
 However you get the code, you can install dependencies and run the project in development mode with:
 
 ```bash
-cd my-app
-npm install # or yarn
+cd web-app
+npm install
 npm run dev
 ```
 
