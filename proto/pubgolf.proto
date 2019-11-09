@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "announcement.proto";
+//import "announcement.proto";
 import "score.proto";
 import "venue.proto";
 
