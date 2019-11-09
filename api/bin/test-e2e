@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Silence output to reduce noise, in case the proto files have already been
+# cleaned up.
+bin/clean-protos 2> /dev/null
+
+bin/compile-protos
+go run main.go &
+go run test-client.go
+
+kill "$(lsof -ti :50051)"
+bin/clean-protos
