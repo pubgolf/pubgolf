@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
+    "protoc": "protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
     "dev": "sapper dev",
     "build": "sapper build",
     "export": "sapper export",
@@ -11,7 +12,7 @@
     "cy:run": "cypress run",
     "cy:open": "cypress open",
     "test": "run-p --race dev cy:run",
-    "postinstall": "run-s tailwind"
+    "postinstall": "run-p tailwind protoc"
   },
   "dependencies": {
     "compression": "^1.7.1",
