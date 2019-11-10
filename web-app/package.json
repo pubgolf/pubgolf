@@ -3,16 +3,21 @@
   "description": "Pub Golf Web App",
   "version": "0.0.1",
   "scripts": {
-    "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
-    "protoc": "protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
-    "dev": "sapper dev",
-    "build": "sapper build",
-    "export": "sapper export",
-    "start": "node __sapper__/build",
+    "build": "run-s protoc sapper:build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "test": "run-p --race dev cy:run",
-    "postinstall": "run-p tailwind protoc"
+    "dev": "run-s protoc sapper:dev",
+    "export": "sapper export",
+    "postinstall": "run-p tailwind protoc",
+    "prettier": "prettier --write ./src/**/*.{js,svelte}",
+    "protoc": "run-s protoc:clean protoc:build",
+    "protoc:build": "protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
+    "protoc:clean": "rm -f ./src/proto/*",
+    "sapper:build": "sapper build",
+    "sapper:dev": "sapper dev",
+    "start": "node __sapper__/build",
+    "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
+    "test": "run-p --race dev cy:run"
   },
   "dependencies": {
     "compression": "^1.7.1",
@@ -25,6 +30,8 @@
   "devDependencies": {
     "browserify": "^16.2.2",
     "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1",
+    "prettier-plugin-svelte": "^0.7.0",
     "sapper": "^0.27.0",
     "svelte": "^3.0.0",
     "svelte-loader": "^2.9.0",
