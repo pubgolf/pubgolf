@@ -1,5 +1,5 @@
 <script>
-  import { goto } from "@sapper/app";
+  import { goto } from '@sapper/app';
 
   let name = '';
   let phone = '';
@@ -17,12 +17,12 @@
   form {
     display: grid;
     grid-template:
-      "label-name  input-name " auto
-      "label-phone input-phone" auto
-      "league      league-opts" auto
-      "tags        tags       " auto
-      "submit      submit     " auto /
-       1fr        1fr;
+      'label-name  input-name ' auto
+      'label-phone input-phone' auto
+      'league      league-opts' auto
+      'tags        tags       ' auto
+      'submit      submit     ' auto /
+      1fr 1fr;
     grid-gap: 0.5rem;
   }
   .TAGS {
@@ -37,10 +37,8 @@
   <title>Register for Pub Golf</title>
 </svelte:head>
 
-<form on:submit|preventDefault="{submit}">
-  <label for="register-name" class="font-bold">
-    Name:
-  </label>
+<form on:submit|preventDefault={submit}>
+  <label for="register-name" class="font-bold">Name:</label>
   <input
     id="register-name"
     class="input w-full mb-2"
@@ -48,13 +46,10 @@
     name="name"
     autocomplete="name"
     placeholder="Full Name"
-    bind:value="{name}"
-    required
-  >
+    bind:value={name}
+    required />
 
-  <label for="register-phone" class="font-bold">
-    Mobile Phone:
-  </label>
+  <label for="register-phone" class="font-bold">Mobile Phone:</label>
   <input
     id="register-phone"
     class="input w-full mb-2"
@@ -62,28 +57,17 @@
     name="phone"
     autocomplete="tel"
     placeholder="(123) 555-1234"
-    bind:value="{phone}"
-    required
-  >
+    bind:value={phone}
+    required />
 
   <span class="font-bold p-1">League:</span>
   <div class="flex">
     <label class="flex-grow input text-center text-blue-400 mr-2">
-      <input
-        type="radio"
-        name="league"
-        value="pga"
-        bind:group="{league}"
-      >
+      <input type="radio" name="league" value="pga" bind:group={league} />
       PGA
     </label>
     <label class="flex-grow input text-center text-blue-400">
-      <input
-        type="radio"
-        name="league"
-        value="lpga"
-        bind:group="{league}"
-      >
+      <input type="radio" name="league" value="lpga" bind:group={league} />
       LPGA
     </label>
   </div>
@@ -93,7 +77,5 @@
     <!--  TODO: add options  -->
   </div>
 
-  <button class="SUBMIT btn btn-primary mt-2">
-    Register
-  </button>
+  <button class="SUBMIT btn btn-primary mt-2">Register</button>
 </form>
