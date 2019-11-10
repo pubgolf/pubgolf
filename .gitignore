@@ -1,3 +1,5 @@
+.env
+
 # User-specific stuff
 .idea/
 .vscode/
@@ -5,3 +7,6 @@
 # Generated proto files
 web-app/src/proto/
 api/proto/
+
+# Temp data
+api/data/

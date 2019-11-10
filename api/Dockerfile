@@ -44,5 +44,3 @@ FROM alpine:latest
 COPY --from=0 /go/bin/app .
 
 CMD ["./app"]
-
-EXPOSE 50051
