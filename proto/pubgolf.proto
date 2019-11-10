@@ -1,12 +1,11 @@
 syntax = "proto3";
 
-import "announcement.proto";
 import "score.proto";
 import "venue.proto";
 
 package PubGolf;
 
-service APIServer {
+service API {
 
   // Auth endpoints - accessible without auth token
 
