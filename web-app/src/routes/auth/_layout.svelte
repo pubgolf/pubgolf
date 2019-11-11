@@ -1,14 +1,15 @@
 <script>
   // TODO: transition between pages
+  export let segment;
 </script>
 
 <style>
-  main {
+  .MAIN {
     display: grid;
     grid-template:
       "image  " min-content
-      "heading" 1fr
-      "content" 50% /
+      "heading" min-content
+      "content" 1fr /
        1fr;
     height: 100%;
     background-color: white;
@@ -16,24 +17,24 @@
     margin: 0 auto;
   }
 
-  h1 {
+  .HEADING {
     font-size: 2.8em;
     text-transform: uppercase;
     font-weight: 700;
     margin: 0 0 0.5em 0;
   }
 
-  img {
+  .IMAGE {
     width: 100%;
     max-width: 400px;
     margin: 0 0 1em 0;
   }
 </style>
 
-<main>
-  <img alt="Borat" src="great-success.png">
+<main class="MAIN">
+  <img class="IMAGE" alt="Borat" src="great-success.png">
 
-  <h1 class="text-center">Pub Golf</h1>
+  <h1 class="HEADING">Pub Golf</h1>
 
   <div class="flex flex-col w-full mx-auto">
     <slot></slot>

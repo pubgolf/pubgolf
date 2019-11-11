@@ -1,4 +1,4 @@
-import { readable } from 'svelte/store';
+import { readable, writable } from 'svelte/store';
 
 /**
  * Global stores that can be subscribed to from anywhere in the app
