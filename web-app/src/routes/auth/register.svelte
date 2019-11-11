@@ -1,12 +1,13 @@
 <script>
-  import { goto } from "@sapper/app";
+  import { goto } from '@sapper/app';
+
 
   let name = '';
   let phone = '';
   let league = '';
   let tags = [];
 
-  function submit() {
+  function submit () {
     console.log('Registering', { name, phone, league, tags });
 
     goto('auth/confirm-code');
@@ -16,18 +17,20 @@
 <style>
   form {
     display: grid;
-    grid-template:
+    grid-template: /* @formatter:off */
       "label-name  input-name " auto
       "label-phone input-phone" auto
       "league      league-opts" auto
       "tags        tags       " auto
       "submit      submit     " auto /
-       1fr        1fr;
+       1fr        1fr; /* @formatter:on */
     grid-gap: 0.5rem;
   }
+
   .TAGS {
     grid-area: tags;
   }
+
   .SUBMIT {
     grid-area: submit;
   }

@@ -9,12 +9,12 @@ import { readable, writable } from 'svelte/store';
  * The current time
  * @type {Readable<Date>}
  */
-export const time = readable(new Date(), function start(set) {
+export const time = readable(new Date(), function start (set) {
   const interval = setInterval(() => {
     set(new Date());
   }, 1000);
 
-  return function stop() {
+  return function stop () {
     clearInterval(interval);
   };
 });
