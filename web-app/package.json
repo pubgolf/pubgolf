@@ -11,7 +11,7 @@
     "postinstall": "run-p tailwind protoc",
     "prettier": "prettier --write ./src/**/*.{js,svelte}",
     "protoc": "run-s protoc:clean protoc:build",
-    "protoc:build": "protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
+    "protoc:build": "protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
     "protoc:clean": "rm -f ./src/proto/*",
     "sapper:build": "sapper build",
     "sapper:dev": "sapper dev",
