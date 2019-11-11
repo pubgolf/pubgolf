@@ -1,8 +1,11 @@
 <script>
+  import { goto } from "@sapper/app";
   let code = '';
 
-  function submit() {
+  function submit () {
     console.log('Verifying', code);
+
+    goto('app');
   }
 </script>
 

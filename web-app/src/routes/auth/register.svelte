@@ -9,7 +9,7 @@
   function submit() {
     console.log('Registering', { name, phone, league, tags });
 
-    goto('confirm-code');
+    goto('auth/confirm-code');
   }
 </script>
 

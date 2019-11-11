@@ -8,7 +8,7 @@
   function submit() {
     console.log(`Sending SMS to ${phone}`);
 
-    goto('confirm-code');
+    goto('auth/confirm-code');
   }
 </script>
 
