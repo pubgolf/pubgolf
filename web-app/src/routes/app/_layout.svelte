@@ -1,1 +1,8 @@
-<!-- TODO: override the default layout -->
+<script>
+</script>
+
+<svelte:head>
+  <title>Pub Golf</title>
+</svelte:head>
+
+<slot></slot>
