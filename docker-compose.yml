@@ -1,0 +1,41 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./api/Dockerfile
+    image: pubgolf/api-server
+    ports:
+      - "50051:50051"
+    links:
+      - db
+  envoy:
+    build:
+      context: ./envoy/
+    image: pubgolf/envoy
+    volumes:
+      - "${PWD}/envoy/config.yaml:/etc/envoy/config.yaml"
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    links:
+      - api
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - "${PWD}/api/data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_NAME: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+  testdb:
+    image: postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_NAME: pubgolf_test
+      POSTGRES_USER: pubgolf_test
+      POSTGRES_PASSWORD: pubgolf_test
