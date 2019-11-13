@@ -23,7 +23,7 @@
       "league      league-opts" auto
       "tags        tags       " auto
       "submit      submit     " auto /
-       1fr        1fr; /* @formatter:on */
+       1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
   }
 
