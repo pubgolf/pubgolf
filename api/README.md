@@ -14,12 +14,12 @@ Install the following:
 
 Native
 ```
-go run
+bin/run
 ```
 
 ### Tests
 
 E2E Tests
 ```
-go run ./e2e
+bin/test-e2e
 ```
