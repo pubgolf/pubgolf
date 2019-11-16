@@ -1,3 +1,5 @@
 #!/bin/bash
 
-rm ./proto/pubgolf/*.pb.go
+# Silence output to reduce noise, in case the proto files have already been
+# cleaned up.
+rm ./proto/pubgolf/*.pb.go 2> /dev/null
