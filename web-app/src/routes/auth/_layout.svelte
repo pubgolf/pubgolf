@@ -6,11 +6,11 @@
 <style>
   .MAIN {
     display: grid;
-    grid-template:
+    grid-template: /* @formatter:off */
       "image  " min-content
       "heading" min-content
       "content" 1fr /
-       1fr;
+       1fr; /* @formatter:on */
     height: 100%;
     background-color: white;
     padding: 2em;

@@ -1,5 +1,7 @@
 <script>
-  import { goto } from "@sapper/app";
+  import { goto } from '@sapper/app';
+
+
   let code = '';
 
   function submit () {
