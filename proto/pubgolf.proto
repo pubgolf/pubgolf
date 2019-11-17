@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "player.proto";
 import "score.proto";
 import "venue.proto";
 
@@ -11,10 +12,9 @@ service API {
 
   // Player accounts are per-event.
   rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerReply) {}
-  // TODO: RequestPlayerLogin -> send identifier to generate and receive auth
-  // code
-  // TODO: PlayerLogin -> send auth code to get auth token required for all
-  // other endpoints
+  rpc RequestPlayerLogin (RequestPlayerLoginRequest)
+    returns (RequestPlayerLoginReply) {}
+  rpc PlayerLogin (PlayerLoginRequest) returns (PlayerLoginReply) {}
 
   // Display endpoints - secured via auth token
 
@@ -26,6 +26,44 @@ service API {
   rpc CreateOrUpdateScore (CreateOrUpdateScoreRequest)
     returns (CreateOrUpdateScoreReply) {}
 }
+
+// Auth endpoints - accessible without auth token
+
+message RegisterPlayerRequest {
+  string eventKey = 1;
+
+  // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phoneNumber = 2;
+
+  string name = 3;
+  League league = 4;
+}
+
+message RegisterPlayerReply {}
+
+message RequestPlayerLoginRequest {
+  string eventKey = 1;
+
+  // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phoneNumber = 2;
+}
+
+message RequestPlayerLoginReply {}
+
+message PlayerLoginRequest {
+  string eventKey = 1;
+
+  // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phoneNumber = 2;
+
+  uint32 authCode = 3;
+}
+
+message PlayerLoginReply {
+  string authToken = 1;
+}
+
+// Display endpoints - secured via auth token
 
 message GetScheduleRequest {
   string eventKey = 1;
@@ -43,13 +81,7 @@ message GetScoresReply {
   repeated ScoreList scoreLists = 1;
 }
 
-message RegisterPlayerRequest {
-  string eventKey = 1;
-  string name = 2;
-  // TODO: More fields...
-}
-
-message RegisterPlayerReply {}
+// User action endpoints - secured via auth token
 
 message CreateOrUpdateScoreRequest {
   string venueID = 1;
