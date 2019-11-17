@@ -3,7 +3,7 @@ syntax = "proto3";
 package PubGolf;
 
 message Venue {
-  uint32 venueID = 1;
+  string venueID = 1;
   string name = 2;
   string address = 3;
   // Primary image suitable for display. Stored as URL.
@@ -12,7 +12,7 @@ message Venue {
 }
 
 message VenueStop {
-  uint32 stopID = 1;
+  string stopID = 1;
   Venue venue = 2;
 }
 

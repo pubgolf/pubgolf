@@ -52,8 +52,8 @@ message RegisterPlayerRequest {
 message RegisterPlayerReply {}
 
 message CreateOrUpdateScoreRequest {
-  uint32 venueID = 1;
-  uint32 playerID = 2;
+  string venueID = 1;
+  string playerID = 2;
   int32 strokes = 3;
 
   // TODO: Figure out how to handle bonus and penalty. I think we can probably
