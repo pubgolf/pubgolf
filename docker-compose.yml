@@ -10,6 +10,10 @@ services:
     networks:
       - proxy_pass
       - data_access
+    environment:
+      PUBGOLF_ENV: "DOCKER_DEV"
+    env_file:
+      - .env
   envoy:
     build:
       context: ./envoy/

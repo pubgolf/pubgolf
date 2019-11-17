@@ -10,3 +10,6 @@ api/proto/
 
 # Temp data
 api/data/
+
+# API binary
+api/api
