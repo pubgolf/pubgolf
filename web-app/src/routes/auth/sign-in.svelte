@@ -1,11 +1,12 @@
 <script>
-  import { goto } from "@sapper/app";
+  import { goto } from '@sapper/app';
+
 
   let phone = '';
   // TODO: format phone as they type
   // TODO: validation
 
-  function submit() {
+  function submit () {
     console.log(`Sending SMS to ${phone}`);
 
     goto('auth/confirm-code');

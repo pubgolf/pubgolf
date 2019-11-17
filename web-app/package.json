@@ -3,15 +3,21 @@
   "description": "Pub Golf Web App",
   "version": "0.0.1",
   "scripts": {
-    "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
-    "protoc": "protoc -I=../proto pubgolf.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
-    "dev": "sapper dev",
-    "build": "sapper build",
-    "export": "sapper export",
-    "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
+    "protoc": "run-s protoc:clean protoc:build",
+    "protoc:build": "protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./src/proto",
+    "protoc:clean": "rm -f ./src/proto/*",
+    "sapper:build": "sapper build",
+    "sapper:dev": "sapper dev",
+
+    "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
+    "build": "run-s protoc sapper:build",
+    "dev": "run-s protoc sapper:dev",
+    "export": "sapper export",
+    "start": "node __sapper__/build",
     "test": "run-p --race dev cy:run",
+
     "postinstall": "run-p tailwind protoc"
   },
   "dependencies": {

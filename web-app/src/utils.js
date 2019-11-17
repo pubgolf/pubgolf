@@ -19,7 +19,7 @@ export function dateDelta (startDate, endDate) {
   const minutesTotal = Math.floor(secondsTotal / S_IN_M);
   const hoursTotal = Math.floor(minutesTotal / M_IN_H);
   const daysTotal = Math.floor(hoursTotal / H_IN_D);
-  
+
   return {
     days: daysTotal,
     hours: hoursTotal % H_IN_D,
