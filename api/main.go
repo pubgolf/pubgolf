@@ -99,6 +99,8 @@ func main() {
 	loadEnv()
 
 	db := initDb(getDbConnectionString())
+	defer db.Close()
+
 	server := initServer(db)
 	port := os.Getenv("API_PORT")
 	if port == "" {
