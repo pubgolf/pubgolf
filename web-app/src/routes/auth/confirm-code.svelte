@@ -1,13 +1,27 @@
 <script>
   import { goto } from '@sapper/app';
 
+  import { DEFAULT_CLIENT } from '../../api';
+  import { player } from '../../stores';
+
+
+  // TODO: There should be a way to pass this through the URL instead
+  if (!$player || !$player.phone) {
+    goto('auth');
+  }
 
   let code = '';
 
   function submit () {
     console.log('Verifying', code);
 
-    goto('app');
+    DEFAULT_CLIENT.playerLogin(
+      $player.phone,
+      Number(code),
+    ).then((response) => {
+      debugger;
+      goto('app');
+    });
   }
 </script>
 
