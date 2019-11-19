@@ -7,6 +7,8 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"sort"
+	"strconv"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -23,9 +25,19 @@ func printHelp() {
 	fmt.Println("Enter number to select RPC method to test")
 	fmt.Println("(or type 'q' to quit)")
 	fmt.Println("-----------------------------------------")
-	for label, fn := range funcMap {
-		fmt.Printf("%s: %s\n", label,
-			strings.Split(runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name(), ".")[1])
+	labelInts := make([]int, 0, len(funcMap))
+	for label := range funcMap {
+		labelInt, _ := strconv.Atoi(label)
+		labelInts = append(labelInts, labelInt)
+	}
+	sort.Ints(labelInts)
+	for _, labelInt := range labelInts {
+		label := strconv.Itoa(labelInt)
+		fn := funcMap[label]
+		pointer := reflect.ValueOf(fn).Pointer()
+		fnFullName := runtime.FuncForPC(pointer).Name()
+		fnName := strings.Split(fnFullName, ".")[1]
+		fmt.Printf("%s: %s\n", label, fnName)
 	}
 	fmt.Print("> ")
 }
