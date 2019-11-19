@@ -13,7 +13,7 @@ VALUES
 ((SELECT id FROM events WHERE key = 'current'), 80, 30),
 ((SELECT id FROM events WHERE key = 'current'), 90, 30);
 
-INSERT INTO venues(event_id, order_num, is_active, name, address, storefront_image)
+INSERT INTO venues(event_id, order_num, is_active, name, address, image_url)
 VALUES
 ((SELECT id FROM events WHERE key = 'current'), 10, TRUE,  'House Rules',  '2227 Polk St, San Francisco, CA 94109',  '1.jpg'),
 ((SELECT id FROM events WHERE key = 'current'), 20, TRUE, 'Green Sports Bar', '2239 Polk St, San Francisco, CA 94109', '2.jpg'),

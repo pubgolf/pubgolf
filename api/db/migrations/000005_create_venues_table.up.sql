@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS venues (
   is_active boolean NOT NULL DEFAULT false,
   name character varying(255) NOT NULL,
   address character varying(255) NOT NULL,
-  storefront_image character varying(255) NOT NULL,
+  image_url character varying(255) NOT NULL,
 
   PRIMARY KEY (id)
 );
