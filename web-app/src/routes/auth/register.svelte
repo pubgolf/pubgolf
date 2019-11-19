@@ -1,16 +1,22 @@
 <script>
   import { goto } from '@sapper/app';
 
+  import { LEAGUE, DEFAULT_CLIENT } from '../../api';
+  import { player } from '../../stores';
+
 
   let name = '';
   let phone = '';
   let league = '';
-  let tags = [];
 
   function submit () {
-    console.log('Registering', { name, phone, league, tags });
+    $player = { name, phone, league };
 
-    goto('auth/confirm-code');
+    console.log('Registering', $player);
+
+    DEFAULT_CLIENT.registerPlayer($player).then(() => {
+      goto('auth/confirm-code');
+    });
   }
 </script>
 
@@ -21,14 +27,9 @@
       "label-name  input-name " auto
       "label-phone input-phone" auto
       "league      league-opts" auto
-      "tags        tags       " auto
       "submit      submit     " auto /
        1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
-  }
-
-  .TAGS {
-    grid-area: tags;
   }
 
   .SUBMIT {
@@ -71,11 +72,12 @@
 
   <span class="font-bold p-1">League:</span>
   <div class="flex">
+    <!--  TODO: give these an empty state  -->
     <label class="flex-grow input text-center text-blue-400 mr-2">
       <input
         type="radio"
         name="league"
-        value="pga"
+        value="{LEAGUE.PGA}"
         bind:group="{league}"
       >
       PGA
@@ -84,16 +86,11 @@
       <input
         type="radio"
         name="league"
-        value="lpga"
+        value="{LEAGUE.LPGA}"
         bind:group="{league}"
       >
       LPGA
     </label>
-  </div>
-
-  <div class="TAGS p-1">
-    <span class="font-bold">Tags:</span>
-    <!--  TODO: add options  -->
   </div>
 
   <button class="SUBMIT btn btn-primary mt-2">

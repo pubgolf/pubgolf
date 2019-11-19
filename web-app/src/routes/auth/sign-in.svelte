@@ -1,15 +1,22 @@
 <script>
   import { goto } from '@sapper/app';
 
+  import { DEFAULT_CLIENT } from '../../api';
+  import { player } from '../../stores';
+
 
   let phone = '';
   // TODO: format phone as they type
   // TODO: validation
 
   function submit () {
-    console.log(`Sending SMS to ${phone}`);
+    $player = { phone };
 
-    goto('auth/confirm-code');
+    console.log(`Requesting login for ${phone}`);
+
+    DEFAULT_CLIENT.requestPlayerLogin(phone).then(() => {
+      goto('auth/confirm-code');
+    });
   }
 </script>
 
