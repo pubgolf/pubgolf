@@ -2,8 +2,5 @@
 
 bin/clean-protos
 bin/compile-protos
-go run main.go &
-go run test-client.go
-
-kill "$(lsof -ti :50051)"
+go run .
 bin/clean-protos

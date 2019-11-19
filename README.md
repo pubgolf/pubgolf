@@ -14,11 +14,45 @@ Start background services:
 docker-compose up --build -d
 ```
 
+Accessing logs (`SERVICE_NAME` is either `api` or `envoy`):
+
+```
+docker-compose logs SERVICE_NAME
+```
+
 Shut down background services:
 
 ```
 docker-compose down
 ```
+
+## Running the API Locally (for Backend Dev)
+
+Install the following:
+* Docker
+* Docker Compose
+
+Get a `.env` file (`cp .env.example .env`), but set `API_HOST=docker.for.mac.localhost` to pass API requests through to the local (non-dockerized) version of the API.
+
+Start background services (database and proxy):
+
+```
+docker-compose up --build -d envoy db
+```
+
+Start local instance of API:
+```
+cd api
+bin/run
+```
+
+Shut down background services:
+
+```
+docker-compose down
+```
+
+
 ## Deployment
 
 TODO
