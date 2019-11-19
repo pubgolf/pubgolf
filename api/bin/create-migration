@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+  echo 'Usage: bin/create-migration NAME_OF_MIGRATION'
+  exit 0
+fi
+
+migrate create -ext sql -dir db/migrations -seq "$1"
