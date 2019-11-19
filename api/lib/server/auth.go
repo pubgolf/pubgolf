@@ -18,12 +18,13 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 
 	tx, err := server.DB.Begin()
 	if err != nil {
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	eventID, err := db.GetEventID(tx, &req.EventKey)
 	if err != nil {
-		return nil, err
+		tx.Rollback()
+		return nil, temporaryServerError(err)
 	}
 	if eventID == "" {
 		tx.Rollback()
@@ -32,7 +33,8 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 
 	userExists, err := db.CheckPlayerExists(tx, &eventID, &req.PhoneNumber)
 	if err != nil {
-		return nil, err
+		tx.Rollback()
+		return nil, temporaryServerError(err)
 	}
 	if userExists {
 		tx.Rollback()
@@ -42,20 +44,20 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 	authCode, err := generateAuthCode()
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	err = db.CreatePlayer(tx, &eventID, &req.Name, req.League, &req.PhoneNumber,
 		authCode)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	err = sms.SendAuthCodeSms(&req.PhoneNumber, authCode)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	tx.Commit()
@@ -70,12 +72,13 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 
 	tx, err := server.DB.Begin()
 	if err != nil {
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	eventID, err := db.GetEventID(tx, &req.EventKey)
 	if err != nil {
-		return nil, err
+		tx.Rollback()
+		return nil, temporaryServerError(err)
 	}
 	if eventID == "" {
 		tx.Rollback()
@@ -85,19 +88,19 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 	authCode, err := generateAuthCode()
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	err = db.SetAuthCode(tx, &eventID, &req.PhoneNumber, authCode)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	err = sms.SendAuthCodeSms(&req.PhoneNumber, authCode)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	tx.Commit()
@@ -113,12 +116,13 @@ func (server *APIServer) PlayerLogin(ctx context.Context,
 
 	tx, err := server.DB.Begin()
 	if err != nil {
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	eventID, err := db.GetEventID(tx, &req.EventKey)
 	if err != nil {
-		return nil, err
+		tx.Rollback()
+		return nil, temporaryServerError(err)
 	}
 	if eventID == "" {
 		tx.Rollback()
@@ -128,7 +132,8 @@ func (server *APIServer) PlayerLogin(ctx context.Context,
 	authCodeValid, err := db.ValidateAuthCode(tx, &eventID, &req.PhoneNumber,
 		req.AuthCode)
 	if err != nil {
-		return nil, err
+		tx.Rollback()
+		return nil, temporaryServerError(err)
 	}
 	if !authCodeValid {
 		tx.Rollback()
@@ -138,13 +143,13 @@ func (server *APIServer) PlayerLogin(ctx context.Context,
 	err = db.GenerateAuthToken(tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	authToken, err := db.GetAuthToken(tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, temporaryServerError(err)
 	}
 
 	tx.Commit()

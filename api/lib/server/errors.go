@@ -28,3 +28,8 @@ func userAlreadyExistsError(eventKey *string, phoneNumber *string) error {
 	return status.New(codes.AlreadyExists, fmt.Sprintf(errorMsg, *eventKey,
 		*phoneNumber)).Err()
 }
+
+func temporaryServerError(err error) error {
+	errorMsg := "Server error: %s."
+	return status.New(codes.Unavailable, fmt.Sprintf(errorMsg, err)).Err()
+}
