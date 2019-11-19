@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS players (
   auth_code_created_at timestamp(6) without time zone,
   auth_token uuid,
   
-  CHECK (auth_code IS NULL OR auth_token IS NULL),
+  CHECK ((auth_code IS NULL AND auth_token IS NOT NULL) OR
+         (auth_code IS NOT NULL AND auth_token IS NULL)),
   PRIMARY KEY (id)
 );
 
