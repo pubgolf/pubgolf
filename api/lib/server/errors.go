@@ -9,12 +9,13 @@ import (
 
 func invalidArgumentError(request interface{}) error {
 	errorMsg := "Missing or invalid argument in request: %s."
-	return status.New(codes.NotFound, fmt.Sprintf(errorMsg, request)).Err()
+	return status.New(codes.InvalidArgument, fmt.Sprintf(errorMsg, request)).Err()
+}
 }
 
 func invalidAuthError() error {
 	errorMsg := "Invalid or expired authorization."
-	return status.New(codes.PermissionDenied, errorMsg).Err()
+	return status.New(codes.Unauthenticated, errorMsg).Err()
 }
 
 func eventNotFoundError(eventKey *string) error {
