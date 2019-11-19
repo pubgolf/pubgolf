@@ -111,3 +111,17 @@ func GetAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) (string, err
 	err := authTokenRow.Scan(&authToken)
 	return authToken, err
 }
+
+func ValidateAuthToken(tx *sql.Tx, authToken *string) (string, string, error) {
+	var eventID, playerID string
+	row := tx.QueryRow(`
+		SELECT event_id, id
+		FROM players
+		WHERE auth_token = $1
+		`, authToken)
+	err := row.Scan(&eventID, &playerID)
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+	return eventID, playerID, err
+}

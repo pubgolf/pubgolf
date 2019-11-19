@@ -1,10 +1,38 @@
 package server
 
 import (
+	"context"
 	"crypto/rand"
+	"log"
 	"math/big"
 	"regexp"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
+
+func getAuthTokenFromHeader(ctx context.Context) (string, error) {
+	metadata, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", status.Errorf(codes.DataLoss, "Error reading 'authorization' header.")
+	}
+
+	authHeader, ok := metadata["authorization"]
+	if !ok || len(authHeader) != 1 {
+		return "", insufficientPermissionsError()
+	}
+
+	validFormat, err := regexp.MatchString(
+		"^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+		authHeader[0])
+	if !validFormat || err != nil {
+		log.Printf("err: %s", err)
+		return "", insufficientPermissionsError()
+	}
+
+	return authHeader[0], nil
+}
 
 func generateAuthCode() (uint32, error) {
 	randNum, err := rand.Int(rand.Reader, big.NewInt(899999))

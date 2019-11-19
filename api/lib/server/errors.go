@@ -11,6 +11,10 @@ func invalidArgumentError(request interface{}) error {
 	errorMsg := "Missing or invalid argument in request: %s."
 	return status.New(codes.InvalidArgument, fmt.Sprintf(errorMsg, request)).Err()
 }
+
+func insufficientPermissionsError() error {
+	errorMsg := "Lacking sufficent authorization for request."
+	return status.New(codes.PermissionDenied, errorMsg).Err()
 }
 
 func invalidAuthError() error {
