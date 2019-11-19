@@ -39,6 +39,11 @@ func CheckPlayerExists(tx *sql.Tx, eventID *string, phoneNumber *string) (
 		`, eventID, phoneNumber)
 	var userCount int
 	err := userCountRow.Scan(&userCount)
+
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+
 	return userCount == 1, err
 }
 
@@ -67,6 +72,11 @@ func ValidateAuthCode(tx *sql.Tx, eventID *string, phoneNumber *string,
 		`, eventID, phoneNumber, authCode)
 	var authCodeCreatedAt time.Time
 	err := authCodeCreatedAtRow.Scan(&authCodeCreatedAt)
+
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+
 	if err != nil {
 		return false, err
 	}
