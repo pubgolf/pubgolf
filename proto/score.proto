@@ -11,7 +11,7 @@ message Score {
 
   // Generic holder for navigating to the "profile" view of whatever entity each
   // row represents (user, venue, etc).
-  int32 entityID = 6;
+  string entityID = 6;
 }
 
 message ScoreList {

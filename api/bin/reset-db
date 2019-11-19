@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export $(egrep -v '^#' '../.env' | xargs) 
+migrate -path db/migrations -database \
+"postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST:-localhost}:${DB_PORT:-5432}/"\
+"${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" down
+
+bin/migrate
