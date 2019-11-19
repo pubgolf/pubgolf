@@ -1,68 +1,108 @@
 package main
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"log"
-	"math/rand"
 	"net"
-	"time"
+	"os"
+	"strings"
 
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
+	"github.com/escavelo/pubgolf/api/lib/server"
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
 const (
-	PORT = ":50051"
+	DEFAULT_PORT = "50051"
 )
 
-type server struct {
-	pg.UnimplementedAPIServer
-}
-
-func makeImg() string {
-	return fmt.Sprintf("https://via.placeholder.com/640x480/%02x%02x%02x"+
-		"?text=Bottle%%20Open%%20NYC%%202019", rand.Intn(255), rand.Intn(255),
-		rand.Intn(255))
-}
-
-func (s *server) GetSchedule(ctx context.Context,
-	req *pg.GetScheduleRequest) (*pg.GetScheduleReply, error) {
-	log.Printf("Returning schedule for Event Key: %s", req.GetEventKey())
-	if req.GetEventKey() != "nyc-2019" {
-		return nil, status.Error(codes.NotFound, "eventKey was not found")
+func loadEnv() {
+	env := os.Getenv("PUBGOLF_ENV")
+	if "" == env {
+		env = "dev"
 	}
 
-	var venueList pg.VenueList
-	for i := uint32(1); i < 10; i++ {
-		venue := pg.VenueStop{
-			StopID: i,
-			Venue: &pg.Venue{
-				VenueID:   i,
-				Name:      fmt.Sprintf("Foo Bar (Heh) %d", i),
-				Address:   fmt.Sprintf("%d Address St, City ST, USA", rand.Intn(9899)+100),
-				Image:     makeImg(),
-				StartTime: string(time.Now().Format(time.RFC3339)),
-			},
+	log.Printf("Running as PUBGOLF_ENV of %s", env)
+
+	// In dev, we assume we're running in the monorepo, in which case the .env is
+	// at the repo root. Otherwise, we're probably in the docker environment and
+	// can access values as real env vars.
+	if strings.ToLower(env) == "dev" {
+		if err := godotenv.Load("../.env"); err != nil {
+			log.Fatal("Error loading .env file")
 		}
-		venueList.Venues = append(venueList.Venues, &venue)
+	}
+}
+
+func getDbConnectionString() string {
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	if password != "" {
+		password = ":" + password
+	}
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		port = "5432"
+	}
+	database := os.Getenv("DB_NAME")
+	if database == "" {
+		database = user
+	}
+	sslmode := os.Getenv("DB_SSL_MODE")
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+	return fmt.Sprintf("postgres://%s%s@%s:%s/%s?sslmode=%s", user, password,
+		host, port, database, sslmode)
+}
+
+func initDb(connStr string) *sql.DB {
+	log.Printf("Connecting to DB: %s", connStr)
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
+
+func initServer(db *sql.DB) *grpc.Server {
+	grpcServer := grpc.NewServer()
+	pg.RegisterAPIServer(grpcServer, &server.APIServer{DB: db})
+	return grpcServer
+}
+
+func bindServer(server *grpc.Server, port string) {
+	log.Printf("Listening on port %s", port)
+	portListener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
 	}
 
-	return &pg.GetScheduleReply{VenueList: &venueList}, nil
+	log.Printf("Serving on port %s", port)
+	if err := server.Serve(portListener); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
 
 func main() {
 	log.SetPrefix("[API Server] ")
-	lis, err := net.Listen("tcp", PORT)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	log.Println("Starting API server...")
+
+	loadEnv()
+
+	db := initDb(getDbConnectionString())
+	server := initServer(db)
+	port := os.Getenv("API_PORT")
+	if port == "" {
+		port = DEFAULT_PORT
 	}
-	s := grpc.NewServer()
-	pg.RegisterAPIServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	bindServer(server, port)
 }
