@@ -24,7 +24,7 @@ const MESSAGES = {
   [StatusCode.INVALID_ARGUMENT]: 'Invalid input',
 };
 
-export class API {
+class API {
   constructor (eventKey, metadata = {}) {
     this.eventKey = eventKey;
     this.client = new APIPromiseClient('http://127.0.0.1:8080');
@@ -149,4 +149,9 @@ export class API {
   }
 }
 
-export const DEFAULT_CLIENT = new API('sf-2019');
+export let API_CLIENT;
+
+export function initClient (...args) {
+  API_CLIENT = new API(...args);
+  return API_CLIENT;
+}

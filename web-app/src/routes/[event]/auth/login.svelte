@@ -1,7 +1,8 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { DEFAULT_CLIENT } from '../../api';
+  import { API_CLIENT } from '../../../api';
+  import { event } from '../../../stores';
   import FormError from './_FormError';
 
   // TODO: format phone as they type
@@ -17,8 +18,9 @@
     console.log(`Requesting login for ${phone}`);
 
     error = null;
-    DEFAULT_CLIENT.requestPlayerLogin(phone).then(() => {
-      goto(`auth/confirm?phone=${phone}`);
+    API_CLIENT.requestPlayerLogin(phone).then(() => {
+      // TODO: figure out how to get relative urls
+      goto(`${$event}/auth/confirm?phone=${phone}`);
     }, (apiError) => {
       error = apiError;
     });
