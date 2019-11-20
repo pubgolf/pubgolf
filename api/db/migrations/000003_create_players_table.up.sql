@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS players (
   
   name character varying(255) NOT NULL,
   -- In E.164 format: https://www.twilio.com/docs/glossary/what-e164
-  phone_number character varying(16) NOT NULL UNIQUE,
+  phone_number character varying(16) NOT NULL,
   league enum_league NOT NULL DEFAULT 'NONE',
   
   phone_number_confirmed boolean NOT NULL DEFAULT false,
