@@ -44,8 +44,6 @@ export class API {
     request.setPhonenumber(`+1${playerInfo.phone}`);
     request.setLeague(playerInfo.league);
 
-    console.log(request.toObject());
-
     return this.unWrap(this.client.registerPlayer(request, {}));
   }
 
@@ -57,7 +55,7 @@ export class API {
   requestPlayerLogin (phone) {
     const request = new RequestPlayerLoginRequest();
     request.setEventkey(this.eventKey);
-    request.setPhonenumber(phone);
+    request.setPhonenumber(`+1${phone}`);
 
     return this.unWrap(this.client.requestPlayerLogin(request, {}));
   }
@@ -71,7 +69,7 @@ export class API {
   playerLogin (phone, code) {
     const request = new PlayerLoginRequest();
     request.setEventkey(this.eventKey);
-    request.setPhonenumber(phone);
+    request.setPhonenumber(`+1${phone}`);
     request.setAuthcode(code);
 
     return this.unWrap(this.client.playerLogin(request, {}));

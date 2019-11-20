@@ -3,19 +3,26 @@
 
   import { LEAGUE, DEFAULT_CLIENT } from '../../api';
   import { player } from '../../stores';
+  import FormError from './_FormError';
 
 
   let name = '';
   let phone = '';
   let league = '';
 
+  // reset error to null if the form changes
+  $: error = Boolean(name && phone && league) && null;
+
   function submit () {
     $player = { name, phone, league };
 
     console.log('Registering', $player);
 
+    error = null;
     DEFAULT_CLIENT.registerPlayer($player).then(() => {
       goto('auth/confirm-code');
+    }, (apiError) => {
+      error = apiError;
     });
   }
 </script>
@@ -38,8 +45,10 @@
 </style>
 
 <svelte:head>
-  <title>Register for Pub Golf</title>
+  <title>Register | Pub Golf</title>
 </svelte:head>
+
+<FormError {error}/>
 
 <form on:submit|preventDefault="{submit}">
   <label for="register-name" class="font-bold">
@@ -79,6 +88,7 @@
         name="league"
         value="{LEAGUE.PGA}"
         bind:group="{league}"
+        required
       >
       PGA
     </label>
@@ -88,6 +98,7 @@
         name="league"
         value="{LEAGUE.LPGA}"
         bind:group="{league}"
+        required
       >
       LPGA
     </label>
