@@ -3,18 +3,19 @@ package server
 import (
 	"context"
 	"crypto/rand"
-	"log"
+	"database/sql"
 	"math/big"
 	"regexp"
 
+	"github.com/escavelo/pubgolf/api/lib/db"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
-const authTokenFormat regexp.Regexp = regexp.MustCompile(
+var authTokenFormat *regexp.Regexp = regexp.MustCompile(
 	"^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
-const phoneNumberFormat regexp.Regexp = regexp.MustCompile(
+var phoneNumberFormat *regexp.Regexp = regexp.MustCompile(
 	"^\\+[1-9]\\d{1,14}$")
 
 func getAuthTokenFromHeader(ctx context.Context) (string, error) {
@@ -29,9 +30,8 @@ func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 		return "", insufficientPermissionsError()
 	}
 
-	validFormat, err := authTokenFormat.MatchString(authHeader[0])
-	if !validFormat || err != nil {
-		log.Printf("err: %s", err)
+	validFormat := authTokenFormat.MatchString(authHeader[0])
+	if !validFormat {
 		return "", insufficientPermissionsError()
 	}
 
@@ -52,8 +52,8 @@ func isEmpty(arg *string) bool {
 }
 
 func invalidPhoneNumberFormat(phoneNumber *string) bool {
-	isValid, err := phoneNumberFormat.MatchString(*phoneNumber)
-	return !isValid || err != nil
+	isValid := phoneNumberFormat.MatchString(*phoneNumber)
+	return !isValid
 }
 
 func invalidAuthCodeFormat(authCode uint32) bool {
