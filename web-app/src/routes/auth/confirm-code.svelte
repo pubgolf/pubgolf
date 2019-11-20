@@ -20,15 +20,12 @@
     console.log('Verifying', code);
 
     error = null;
-    DEFAULT_CLIENT.playerLogin(
-      $player.phone,
-      Number(code),
-    ).then((response) => {
-      debugger;
-      goto('app');
-    }, (apiError) => {
-      error = apiError;
-    });
+    DEFAULT_CLIENT.playerLogin($player.phone, Number(code))
+      .then(() => {
+        goto('app');
+      }, (apiError) => {
+        error = apiError;
+      });
   }
 </script>
 
