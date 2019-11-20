@@ -3,6 +3,7 @@ syntax = "proto3";
 package PubGolf;
 
 enum League {
-  PGA = 0;
-  LPGA = 1;
+  NONE = 0;
+  PGA = 1;
+  LPGA = 2;
 }
