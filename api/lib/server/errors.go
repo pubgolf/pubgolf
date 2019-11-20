@@ -11,7 +11,6 @@ func invalidArgumentError(request interface{}) error {
 	errorMsg := "Missing or invalid argument in request: %s."
 	return status.New(codes.InvalidArgument, fmt.Sprintf(errorMsg, request)).Err()
 }
-}
 
 func invalidAuthError() error {
 	errorMsg := "Invalid or expired authorization."
