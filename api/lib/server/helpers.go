@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var authTokenFormat *regexp.Regexp = regexp.MustCompile(
+var uuidFormat *regexp.Regexp = regexp.MustCompile(
 	"^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 var phoneNumberFormat *regexp.Regexp = regexp.MustCompile(
 	"^\\+[1-9]\\d{1,14}$")
@@ -98,7 +98,7 @@ func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 		return "", insufficientPermissionsError()
 	}
 
-	validFormat := authTokenFormat.MatchString(authHeader[0])
+	validFormat := uuidFormat.MatchString(authHeader[0])
 	if !validFormat {
 		return "", insufficientPermissionsError()
 	}
@@ -121,6 +121,11 @@ func isEmpty(arg *string) bool {
 
 func invalidPhoneNumberFormat(phoneNumber *string) bool {
 	isValid := phoneNumberFormat.MatchString(*phoneNumber)
+	return !isValid
+}
+
+func invalidIDFormat(id *string) bool {
+	isValid := uuidFormat.MatchString(*id)
 	return !isValid
 }
 
