@@ -6,6 +6,6 @@ docker run -v "${PWD}/api/db/migrations:/migrations" \
 --network host \
 migrate/migrate \
 -path=/migrations/ \
--database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST:-localhost}:"\
+-database "postgres://${DB_USER}:${DB_PASSWORD}@localhost:"\
 "${DB_PORT:-5432}/${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" \
 up
