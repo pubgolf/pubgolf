@@ -18,6 +18,74 @@ var authTokenFormat *regexp.Regexp = regexp.MustCompile(
 var phoneNumberFormat *regexp.Regexp = regexp.MustCompile(
 	"^\\+[1-9]\\d{1,14}$")
 
+func validateAuthenticatedRequest(server *APIServer, ctx context.Context,
+	eventKey *string) (*sql.Tx, string, string, error) {
+	if isEmpty(eventKey) {
+		return nil, "", "", invalidArgumentError()
+	}
+
+	authHeader, err := getAuthTokenFromHeader(ctx)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	tx, err := server.DB.Begin()
+	if err != nil {
+		return nil, "", "", temporaryServerError(err)
+	}
+
+	playerEventID, playerID, err := db.ValidateAuthToken(tx, &authHeader)
+	if err != nil {
+		tx.Rollback()
+		return nil, "", "", temporaryServerError(err)
+	}
+	if playerEventID == "" || playerID == "" {
+		tx.Rollback()
+		return nil, "", "", insufficientPermissionsError()
+	}
+
+	eventID, err := db.GetEventID(tx, eventKey)
+	if err != nil {
+		tx.Rollback()
+		return nil, "", "", temporaryServerError(err)
+	}
+	if eventID == "" {
+		tx.Rollback()
+		return nil, "", "", eventNotFoundError(eventKey)
+	}
+
+	if playerEventID != eventID {
+		tx.Rollback()
+		return nil, "", "", insufficientPermissionsError()
+	}
+
+	return tx, eventID, playerID, nil
+}
+
+func validateUnauthenticatedRequest(server *APIServer, eventKey *string) (
+	*sql.Tx, string, error) {
+	if isEmpty(eventKey) {
+		return nil, "", invalidArgumentError()
+	}
+
+	tx, err := server.DB.Begin()
+	if err != nil {
+		return nil, "", temporaryServerError(err)
+	}
+
+	eventID, err := db.GetEventID(tx, eventKey)
+	if err != nil {
+		tx.Rollback()
+		return nil, "", temporaryServerError(err)
+	}
+	if eventID == "" {
+		tx.Rollback()
+		return nil, "", eventNotFoundError(eventKey)
+	}
+
+	return tx, eventID, nil
+}
+
 func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 	metadata, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

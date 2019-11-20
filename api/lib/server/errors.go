@@ -7,9 +7,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func invalidArgumentError(request interface{}) error {
-	errorMsg := "Missing or invalid argument in request: %s."
-	return status.New(codes.InvalidArgument, fmt.Sprintf(errorMsg, request)).Err()
+func invalidArgumentError() error {
+	errorMsg := "Missing or invalid argument in request."
+	return status.New(codes.InvalidArgument, errorMsg).Err()
 }
 
 func insufficientPermissionsError() error {

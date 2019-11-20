@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 
@@ -11,24 +12,13 @@ import (
 
 func (server *APIServer) RegisterPlayer(ctx context.Context,
 	req *pg.RegisterPlayerRequest) (*pg.RegisterPlayerReply, error) {
-	if isEmpty(&req.EventKey) || isEmpty(&req.Name) ||
-		invalidPhoneNumberFormat(&req.PhoneNumber) {
-		return nil, invalidArgumentError(req)
+	if isEmpty(&req.Name) || invalidPhoneNumberFormat(&req.PhoneNumber) {
+		return nil, invalidArgumentError()
 	}
 
-	tx, err := server.DB.Begin()
+	tx, eventID, err := validateUnauthenticatedRequest(server, &req.EventKey)
 	if err != nil {
-		return nil, temporaryServerError(err)
-	}
-
-	eventID, err := db.GetEventID(tx, &req.EventKey)
-	if err != nil {
-		tx.Rollback()
-		return nil, temporaryServerError(err)
-	}
-	if eventID == "" {
-		tx.Rollback()
-		return nil, eventNotFoundError(&req.EventKey)
+		return nil, err
 	}
 
 	userExists, err := db.CheckPlayerExists(tx, &eventID, &req.PhoneNumber)
@@ -50,6 +40,7 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 	err = db.CreatePlayer(tx, &eventID, &req.Name, req.League, &req.PhoneNumber,
 		authCode)
 	if err != nil {
+		log.Printf("%s - %s", eventID, req)
 		tx.Rollback()
 		return nil, temporaryServerError(err)
 	}
@@ -66,23 +57,13 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 
 func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 	req *pg.RequestPlayerLoginRequest) (*pg.RequestPlayerLoginReply, error) {
-	if isEmpty(&req.EventKey) || invalidPhoneNumberFormat(&req.PhoneNumber) {
-		return nil, invalidArgumentError(req)
+	if invalidPhoneNumberFormat(&req.PhoneNumber) {
+		return nil, invalidArgumentError()
 	}
 
-	tx, err := server.DB.Begin()
+	tx, eventID, err := validateUnauthenticatedRequest(server, &req.EventKey)
 	if err != nil {
-		return nil, temporaryServerError(err)
-	}
-
-	eventID, err := db.GetEventID(tx, &req.EventKey)
-	if err != nil {
-		tx.Rollback()
-		return nil, temporaryServerError(err)
-	}
-	if eventID == "" {
-		tx.Rollback()
-		return nil, eventNotFoundError(&req.EventKey)
+		return nil, err
 	}
 
 	authCode, err := generateAuthCode()
@@ -109,24 +90,14 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 
 func (server *APIServer) PlayerLogin(ctx context.Context,
 	req *pg.PlayerLoginRequest) (*pg.PlayerLoginReply, error) {
-	if isEmpty(&req.EventKey) || invalidPhoneNumberFormat(&req.PhoneNumber) ||
+	if invalidPhoneNumberFormat(&req.PhoneNumber) ||
 		invalidAuthCodeFormat(req.AuthCode) {
-		return nil, invalidArgumentError(req)
+		return nil, invalidArgumentError()
 	}
 
-	tx, err := server.DB.Begin()
+	tx, eventID, err := validateUnauthenticatedRequest(server, &req.EventKey)
 	if err != nil {
-		return nil, temporaryServerError(err)
-	}
-
-	eventID, err := db.GetEventID(tx, &req.EventKey)
-	if err != nil {
-		tx.Rollback()
-		return nil, temporaryServerError(err)
-	}
-	if eventID == "" {
-		tx.Rollback()
-		return nil, eventNotFoundError(&req.EventKey)
+		return nil, err
 	}
 
 	authCodeValid, err := db.ValidateAuthCode(tx, &eventID, &req.PhoneNumber,
@@ -153,7 +124,5 @@ func (server *APIServer) PlayerLogin(ctx context.Context,
 	}
 
 	tx.Commit()
-	return &pg.PlayerLoginReply{
-		AuthToken: authToken,
-	}, nil
+	return &pg.PlayerLoginReply{AuthToken: authToken}, nil
 }
