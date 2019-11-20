@@ -1,9 +1,5 @@
 <script>
   export let error;
-
-  $: if (error && process.env.NODE_ENV === 'development') {
-    console.error(error);
-  }
 </script>
 
 {#if error}

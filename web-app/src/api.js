@@ -1,3 +1,5 @@
+import { StatusCode } from 'grpc-web';
+
 import { EVENT_KEY } from './constants';
 
 
@@ -17,6 +19,13 @@ const {
 
 export const LEAGUE = League;
 
+// Optional override messages for GRPC status codes
+// https://github.com/grpc/grpc/blob/master/doc/statuscodes.md
+const MESSAGES = {
+  [StatusCode.UNKNOWN]: 'Unexpected server error',
+  [StatusCode.INVALID_ARGUMENT]: 'Invalid input',
+};
+
 export class API {
   constructor (eventKey) {
     this.eventKey = eventKey;
@@ -29,7 +38,21 @@ export class API {
    * @returns {Object}
    */
   unWrap (promise) {
-    return promise.then(instance => instance.toObject());
+    return promise.then(
+      instance => instance.toObject(),
+      error => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error(error);
+        }
+
+        // Replace the top-level message with something user-presentable.
+        // The original message is still preserved in error.metadata
+        if (error.code && error.code in MESSAGES) {
+          error.message = MESSAGES[error.code];
+        }
+        throw error;
+      },
+    );
   }
 
   /**
