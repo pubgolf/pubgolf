@@ -10,5 +10,10 @@ func GetEventID(tx *sql.Tx, eventKey *string) (string, error) {
 		`, eventKey)
 	var eventID string
 	err := eventIDRow.Scan(&eventID)
+
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+
 	return eventID, err
 }
