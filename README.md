@@ -10,7 +10,7 @@ Get a `.env` file (`cp .env.example .env`).
 
 Start background services:
 ```
-docker-compose up --build -d db envoy
+docker-compose up -d db envoy
 bin/migrate
 docker-compose up --build -d api
 ```
@@ -40,7 +40,7 @@ Get a `.env` file (`cp .env.example .env`), but set `API_HOST=docker.for.mac.loc
 
 Start background services (database and proxy):
 ```
-docker-compose up --build -d envoy db
+docker-compose up -d envoy db
 ```
 
 Start local instance of API:

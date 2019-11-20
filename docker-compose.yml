@@ -35,7 +35,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - "5433:5432"
+      - "${DB_PORT}:${DB_PORT}"
     networks:
       - data_access
     volumes:
@@ -44,16 +44,18 @@ services:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_PORT: "${DB_PORT}"
   testdb:
     image: postgres
     ports:
-      - "5434:5432"
+      - "${TEST_DB_PORT}:${TEST_DB_PORT}"
     networks:
       - data_access
     environment:
       POSTGRES_NAME: pubgolf_test
       POSTGRES_USER: pubgolf_test
       POSTGRES_PASSWORD: pubgolf_test
+      POSTGRES_PORT: "${TEST_DB_PORT}"
 networks:
   proxy_pass:
   data_access:
