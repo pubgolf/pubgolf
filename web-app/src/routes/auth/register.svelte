@@ -1,16 +1,29 @@
 <script>
   import { goto } from '@sapper/app';
 
+  import { LEAGUE, DEFAULT_CLIENT } from '../../api';
+  import { player } from '../../stores';
+  import FormError from './_FormError';
+
 
   let name = '';
   let phone = '';
   let league = '';
-  let tags = [];
+
+  // reset error to null if the form changes
+  $: error = Boolean(name && phone && league) && null;
 
   function submit () {
-    console.log('Registering', { name, phone, league, tags });
+    $player = { name, phone, league };
 
-    goto('auth/confirm-code');
+    console.log('Registering', $player);
+
+    error = null;
+    DEFAULT_CLIENT.registerPlayer($player).then(() => {
+      goto('auth/confirm-code');
+    }, (apiError) => {
+      error = apiError;
+    });
   }
 </script>
 
@@ -21,14 +34,9 @@
       "label-name  input-name " auto
       "label-phone input-phone" auto
       "league      league-opts" auto
-      "tags        tags       " auto
       "submit      submit     " auto /
        1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
-  }
-
-  .TAGS {
-    grid-area: tags;
   }
 
   .SUBMIT {
@@ -37,8 +45,10 @@
 </style>
 
 <svelte:head>
-  <title>Register for Pub Golf</title>
+  <title>Register | Pub Golf</title>
 </svelte:head>
+
+<FormError {error}/>
 
 <form on:submit|preventDefault="{submit}">
   <label for="register-name" class="font-bold">
@@ -71,12 +81,14 @@
 
   <span class="font-bold p-1">League:</span>
   <div class="flex">
+    <!--  TODO: give these an empty state  -->
     <label class="flex-grow input text-center text-blue-400 mr-2">
       <input
         type="radio"
         name="league"
-        value="pga"
+        value="{LEAGUE.PGA}"
         bind:group="{league}"
+        required
       >
       PGA
     </label>
@@ -84,16 +96,12 @@
       <input
         type="radio"
         name="league"
-        value="lpga"
+        value="{LEAGUE.LPGA}"
         bind:group="{league}"
+        required
       >
       LPGA
     </label>
-  </div>
-
-  <div class="TAGS p-1">
-    <span class="font-bold">Tags:</span>
-    <!--  TODO: add options  -->
   </div>
 
   <button class="SUBMIT btn btn-primary mt-2">
