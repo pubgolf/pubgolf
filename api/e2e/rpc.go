@@ -30,7 +30,7 @@ func GetSchedule(client pg.APIClient) {
 }
 
 func RegisterPlayer(client pg.APIClient) {
-	eventKey := getInput("eventKey", "nyc-2019")
+	eventKey := getInput("eventKey", "starts-in-30m")
 	phoneNumber := getInput("phoneNumber", "+5551231234")
 	name := getInput("name", "Eric Morris")
 
@@ -54,7 +54,7 @@ func RegisterPlayer(client pg.APIClient) {
 }
 
 func RequestPlayerLogin(client pg.APIClient) {
-	eventKey := getInput("eventKey", "nyc-2019")
+	eventKey := getInput("eventKey", "starts-in-30m")
 	phoneNumber := getInput("phoneNumber", "+5551231234")
 
 	log.Println("Making call to RequestPlayerLogin")
@@ -68,9 +68,9 @@ func RequestPlayerLogin(client pg.APIClient) {
 }
 
 func PlayerLogin(client pg.APIClient) {
-	eventKey := getInput("eventKey", "nyc-2019")
+	eventKey := getInput("eventKey", "starts-in-30m")
 	phoneNumber := getInput("phoneNumber", "+5551231234")
-	authCode, err := getInputAsUInt32("authCode", 000000)
+	authCode, err := getInputAsUInt32("authCode", 111111)
 	if err != nil {
 		log.Printf("Could not parse input as a number: %s", err)
 		return
