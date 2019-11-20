@@ -29,22 +29,23 @@ func CreatePlayer(tx *sql.Tx, eventID *string, name *string, league pg.League,
 	return err
 }
 
-func CheckPlayerExists(tx *sql.Tx, eventID *string, phoneNumber *string) (
+func CheckPlayerExistsByPhoneNumber(tx *sql.Tx, eventID *string,
+	phoneNumber *string) (
 	bool, error) {
-	userCountRow := tx.QueryRow(`
+	playerCountRow := tx.QueryRow(`
 		SELECT COUNT(*)
 		FROM players
 		WHERE event_id = $1
 			AND phone_number = $2
 		`, eventID, phoneNumber)
-	var userCount int
-	err := userCountRow.Scan(&userCount)
+	var playerCount int
+	err := playerCountRow.Scan(&playerCount)
 
 	if err == sql.ErrNoRows {
 		err = nil
 	}
 
-	return userCount == 1, err
+	return playerCount == 1, err
 }
 
 func GetPlayerName(tx *sql.Tx, eventID *string, playerID *string) (

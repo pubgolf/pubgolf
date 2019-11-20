@@ -21,12 +21,13 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 		return nil, err
 	}
 
-	userExists, err := db.CheckPlayerExists(tx, &eventID, &req.PhoneNumber)
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID,
+		&req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)
 	}
-	if userExists {
+	if playerExists {
 		tx.Rollback()
 		return nil, playerAlreadyExistsError(&req.EventKey, &req.PhoneNumber)
 	}
@@ -66,14 +67,15 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 		return nil, err
 	}
 
-	userExists, err := db.CheckPlayerExists(tx, &eventID, &req.PhoneNumber)
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID,
+		&req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)
 	}
-	if !userExists {
+	if !playerExists {
 		// Player doesn't exist, so don't send an SMS, but return a success code to
-		// avoid exposing what users do/don't exist.
+		// avoid exposing what players do/don't exist.
 		tx.Rollback()
 		return &pg.RequestPlayerLoginReply{}, nil
 	}
