@@ -12,10 +12,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const authTokenFormat regexp.Regexp = regexp.MustCompile(
+	"^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
+const phoneNumberFormat regexp.Regexp = regexp.MustCompile(
+	"^\\+[1-9]\\d{1,14}$")
+
 func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 	metadata, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Errorf(codes.DataLoss, "Error reading 'authorization' header.")
+		return "", status.Errorf(codes.DataLoss,
+			"Error reading 'authorization' header.")
 	}
 
 	authHeader, ok := metadata["authorization"]
@@ -23,9 +29,7 @@ func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 		return "", insufficientPermissionsError()
 	}
 
-	validFormat, err := regexp.MatchString(
-		"^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-		authHeader[0])
+	validFormat, err := authTokenFormat.MatchString(authHeader[0])
 	if !validFormat || err != nil {
 		log.Printf("err: %s", err)
 		return "", insufficientPermissionsError()
@@ -48,7 +52,7 @@ func isEmpty(arg *string) bool {
 }
 
 func invalidPhoneNumberFormat(phoneNumber *string) bool {
-	isValid, err := regexp.MatchString("^\\+[1-9]\\d{1,14}$", *phoneNumber)
+	isValid, err := phoneNumberFormat.MatchString(*phoneNumber)
 	return !isValid || err != nil
 }
 
