@@ -10,23 +10,11 @@ import (
 )
 
 var funcMap map[string]func(pg.APIClient) = map[string]func(pg.APIClient){
-	"1": GetSchedule,
-	"2": RegisterPlayer,
-	"3": RequestPlayerLogin,
-	"4": PlayerLogin,
-}
-
-func GetSchedule(client pg.APIClient) {
-	authToken := getInput("authToken", "4de3e04c-eff3-4631-a493-c5156cb94153")
-	eventKey := getInput("eventKey", "nyc-2019")
-
-	log.Println("Making call to GetSchedule")
-	header := metadata.New(map[string]string{"authorization": authToken})
-	ctx := metadata.NewOutgoingContext(context.Background(), header)
-	r, err := client.GetSchedule(ctx, &pg.GetScheduleRequest{
-		EventKey: eventKey,
-	})
-	logResponse(r, err)
+	"1": RegisterPlayer,
+	"2": RequestPlayerLogin,
+	"3": PlayerLogin,
+	"4": GetSchedule,
+	"5": GetScores,
 }
 
 func RegisterPlayer(client pg.APIClient) {
@@ -83,6 +71,32 @@ func PlayerLogin(client pg.APIClient) {
 		EventKey:    eventKey,
 		PhoneNumber: phoneNumber,
 		AuthCode:    authCode,
+	})
+	logResponse(r, err)
+}
+
+func GetSchedule(client pg.APIClient) {
+	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
+	eventKey := getInput("eventKey", "current")
+
+	log.Println("Making call to GetSchedule")
+	header := metadata.New(map[string]string{"authorization": authToken})
+	ctx := metadata.NewOutgoingContext(context.Background(), header)
+	r, err := client.GetSchedule(ctx, &pg.GetScheduleRequest{
+		EventKey: eventKey,
+	})
+	logResponse(r, err)
+}
+
+func GetScores(client pg.APIClient) {
+	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
+	eventKey := getInput("eventKey", "current")
+
+	log.Println("Making call to GetScores")
+	header := metadata.New(map[string]string{"authorization": authToken})
+	ctx := metadata.NewOutgoingContext(context.Background(), header)
+	r, err := client.GetScores(ctx, &pg.GetScoresRequest{
+		EventKey: eventKey,
 	})
 	logResponse(r, err)
 }
