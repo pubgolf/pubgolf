@@ -66,6 +66,18 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 		return nil, err
 	}
 
+	userExists, err := db.CheckPlayerExists(tx, &eventID, &req.PhoneNumber)
+	if err != nil {
+		tx.Rollback()
+		return nil, temporaryServerError(err)
+	}
+	if !userExists {
+		// Player doesn't exist, so don't send an SMS, but return a success code to
+		// avoid exposing what users do/don't exist.
+		tx.Rollback()
+		return &pg.RequestPlayerLoginReply{}, nil
+	}
+
 	authCode, err := generateAuthCode()
 	if err != nil {
 		tx.Rollback()
