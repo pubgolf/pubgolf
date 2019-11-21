@@ -34,7 +34,7 @@
     error = null;
     API_CLIENT.playerLogin(phone, Number(code))
       .then(() => {
-        goto(`${$event}/app`);
+        goto(`${$event}/home`);
       }, (apiError) => {
         error = apiError;
       });
