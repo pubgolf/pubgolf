@@ -28,7 +28,7 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 	}
 	if userExists {
 		tx.Rollback()
-		return nil, userAlreadyExistsError(&req.EventKey, &req.PhoneNumber)
+		return nil, playerAlreadyExistsError(&req.EventKey, &req.PhoneNumber)
 	}
 
 	authCode, err := generateAuthCode()

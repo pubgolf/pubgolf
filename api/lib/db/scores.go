@@ -7,6 +7,108 @@ import (
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
+func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) (
+	[]*pg.Score, error) {
+	scores := make([]*pg.Score, 0)
+	rows, err := tx.Query(`
+		WITH event_timeslots AS (
+	    SELECT *,
+	    	ROW_NUMBER() OVER (ORDER BY order_num)
+	    FROM timeslots
+	    WHERE event_id = $1
+	  )
+
+	 , event_venues AS (
+	    SELECT *,
+	    ROW_NUMBER() OVER (ORDER BY order_num)
+	    FROM venues
+	    WHERE is_active = TRUE
+	      AND event_id = $1
+	  )
+
+	  , venue_stops AS (
+	    SELECT
+	      V.id
+	      , V.order_num
+	      , T.duration_minutes
+	    FROM
+	      (SELECT * FROM event_timeslots) AS T
+	    LEFT JOIN
+	      (SELECT * FROM event_venues) AS V
+	    ON T.row_number = V.row_number
+	  )
+
+	  , venue_end_times AS (
+	    SELECT
+	      V1.id
+	      , V1.order_num
+	      , (SELECT start_time FROM events WHERE id = $1)
+	        + ( SUM(V2.duration_minutes) * interval '1 minute' ) AS end_time
+	    FROM
+	      (SELECT * FROM venue_stops) AS V1
+	      JOIN (SELECT * FROM venue_stops) AS V2
+	        ON V2.order_num <= V1.order_num
+	    GROUP BY
+	      V1.id
+	      , V1.order_num
+	    ORDER BY SUM(V2.duration_minutes)
+	  )
+
+	  , best_of_9_active_and_visted_venues AS (
+	    SELECT
+	      V.id
+	      , V.order_num
+	    FROM (SELECT * FROM venue_end_times) V
+	    WHERE
+	      V.end_time < TIMEZONE('utc', NOW())
+	  )
+
+	  SELECT
+	  	V.name
+	  	, S.strokes
+	  	, S.adjustments
+	  	, S.strokes + S.adjustments AS total
+	  	, V.id
+	  FROM best_of_9_active_and_visted_venues AV
+	  LEFT JOIN venues V
+	    ON AV.id = V.id
+	  LEFT JOIN (
+	      SELECT * FROM scores WHERE player_id = $2
+	    ) S
+	  ON AV.id = S.venue_id
+  	  ORDER BY V.order_num
+	  `, eventID, playerID)
+	if err != nil {
+		return scores, err
+	}
+
+	var points, adjustments, total sql.NullInt32
+
+	for rows.Next() {
+		score := pg.Score{}
+
+		if err := rows.Scan(&score.Label, &points, &adjustments,
+			&total, &score.EntityID); err != nil {
+			return scores, err
+		}
+
+		if points.Valid {
+			score.Points = points.Int32
+		}
+
+		if adjustments.Valid {
+			score.Adjustments = adjustments.Int32
+		}
+
+		if total.Valid {
+			score.Total = total.Int32
+		}
+
+		scores = append(scores, &score)
+	}
+	return scores, nil
+}
+
 func GetScoreboardBestOf9(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	return getScoreboard(tx, eventID, `
 		SELECT

@@ -47,6 +47,24 @@ func CheckPlayerExists(tx *sql.Tx, eventID *string, phoneNumber *string) (
 	return userCount == 1, err
 }
 
+func GetPlayerName(tx *sql.Tx, eventID *string, playerID *string) (
+	string, error) {
+	nameRow := tx.QueryRow(`
+		SELECT name
+		FROM players
+		WHERE event_id = $1
+			AND id = $2
+		`, eventID, playerID)
+	var name string
+	err := nameRow.Scan(&name)
+
+	if err == sql.ErrNoRows {
+		err = nil
+	}
+
+	return name, err
+}
+
 func SetAuthCode(tx *sql.Tx, eventID *string, phoneNumber *string,
 	authCode uint32) error {
 	_, err := tx.Exec(`

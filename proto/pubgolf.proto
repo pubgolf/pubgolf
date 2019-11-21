@@ -20,6 +20,8 @@ service API {
 
   rpc GetSchedule (GetScheduleRequest) returns (GetScheduleReply) {}
   rpc GetScores (GetScoresRequest) returns (GetScoresReply) {}
+  rpc GetScoresForPlayer (GetScoresForPlayerRequest)
+    returns (GetScoresForPlayerReply) {}
 
   // User action endpoints - secured via auth token
 
@@ -78,6 +80,15 @@ message GetScoresRequest {
 }
 
 message GetScoresReply {
+  repeated ScoreList scoreLists = 1;
+}
+
+message GetScoresForPlayerRequest {
+  string eventKey = 1;
+  string playerID = 2;
+}
+
+message GetScoresForPlayerReply {
   repeated ScoreList scoreLists = 1;
 }
 

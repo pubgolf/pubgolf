@@ -27,8 +27,13 @@ func eventNotFoundError(eventKey *string) error {
 	return status.New(codes.NotFound, fmt.Sprintf(errorMsg, *eventKey)).Err()
 }
 
-func userAlreadyExistsError(eventKey *string, phoneNumber *string) error {
-	errorMsg := "User already exists for event '%s' with phone number '%s'."
+func playerNotFoundError(playerID *string) error {
+	errorMsg := "No player found with ID '%s'."
+	return status.New(codes.NotFound, fmt.Sprintf(errorMsg, *playerID)).Err()
+}
+
+func playerAlreadyExistsError(eventKey *string, phoneNumber *string) error {
+	errorMsg := "Player already exists for event '%s' with phone number '%s'."
 	return status.New(codes.AlreadyExists, fmt.Sprintf(errorMsg, *eventKey,
 		*phoneNumber)).Err()
 }

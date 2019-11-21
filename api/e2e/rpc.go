@@ -15,6 +15,7 @@ var funcMap map[string]func(pg.APIClient) = map[string]func(pg.APIClient){
 	"3": PlayerLogin,
 	"4": GetSchedule,
 	"5": GetScores,
+	"6": GetScoresForPlayer,
 }
 
 func RegisterPlayer(client pg.APIClient) {
@@ -97,6 +98,21 @@ func GetScores(client pg.APIClient) {
 	ctx := metadata.NewOutgoingContext(context.Background(), header)
 	r, err := client.GetScores(ctx, &pg.GetScoresRequest{
 		EventKey: eventKey,
+	})
+	logResponse(r, err)
+}
+
+func GetScoresForPlayer(client pg.APIClient) {
+	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
+	eventKey := getInput("eventKey", "current")
+	playerID := getInput("eventKey", "00000000-0000-4000-a000-200000000000")
+
+	log.Println("Making call to GetScoresForPlayer")
+	header := metadata.New(map[string]string{"authorization": authToken})
+	ctx := metadata.NewOutgoingContext(context.Background(), header)
+	r, err := client.GetScoresForPlayer(ctx, &pg.GetScoresForPlayerRequest{
+		EventKey: eventKey,
+		PlayerID: playerID,
 	})
 	logResponse(r, err)
 }

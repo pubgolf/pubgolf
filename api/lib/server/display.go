@@ -67,12 +67,39 @@ func (server *APIServer) GetScores(ctx context.Context,
 
 func (server *APIServer) GetScoresForPlayer(ctx context.Context,
 	req *pg.GetScoresForPlayerRequest) (*pg.GetScoresForPlayerReply, error) {
-	tx, _, _, err := validateAuthenticatedRequest(server, ctx,
+	if invalidIDFormat(&req.PlayerID) {
+		return nil, invalidArgumentError()
+	}
+
+	tx, eventID, _, err := validateAuthenticatedRequest(server, ctx,
 		&req.EventKey)
 	if err != nil {
 		return nil, err
 	}
 
+	playerName, err := db.GetPlayerName(tx, &eventID, &req.PlayerID)
+	if err != nil {
+		tx.Rollback()
+		return nil, temporaryServerError(err)
+	}
+	if playerName == "" {
+		// Player doesn't exist.
+		tx.Rollback()
+		return nil, playerNotFoundError(&req.PlayerID)
+	}
+
+	playerScores, err := db.GetPlayerScores(tx, &eventID, &req.PlayerID)
+	if err != nil {
+		return nil, temporaryServerError(err)
+	}
+
 	tx.Commit()
-	return &pg.GetScoresForPlayerReply{}, nil
+	return &pg.GetScoresForPlayerReply{
+		ScoreLists: []*pg.ScoreList{
+			{
+				Label:  playerName,
+				Scores: playerScores,
+			},
+		},
+	}, nil
 }
