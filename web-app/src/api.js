@@ -103,7 +103,7 @@ export class API {
     )).then(({ authtoken }) => {
       this.metadata = {
         ...this.metadata,
-        Authorization: `Bearer ${authtoken}`,
+        authorization: authtoken,
       };
     });
   }
