@@ -13,7 +13,7 @@
 
     "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
     "build": "run-s protoc sapper:build",
-    "dev": "run-s protoc sapper:dev",
+    "dev": "run-s protoc tailwind sapper:dev",
     "export": "sapper export",
     "start": "node __sapper__/build",
     "test": "run-p --race dev cy:run",

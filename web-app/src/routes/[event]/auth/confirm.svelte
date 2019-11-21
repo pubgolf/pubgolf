@@ -14,7 +14,8 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { DEFAULT_CLIENT } from '../../api';
+  import { API_CLIENT } from '../../../api';
+  import { event } from '../../../stores';
   import FormError from './_FormError';
 
 
@@ -31,9 +32,9 @@
     console.log('Verifying', code);
 
     error = null;
-    DEFAULT_CLIENT.playerLogin(phone, Number(code))
+    API_CLIENT.playerLogin(phone, Number(code))
       .then(() => {
-        goto('app');
+        goto(`${$event}/home`);
       }, (apiError) => {
         error = apiError;
       });

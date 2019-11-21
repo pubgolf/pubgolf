@@ -18,3 +18,5 @@ export const time = readable(new Date(), function start (set) {
     clearInterval(interval);
   };
 });
+
+export const event = writable('');
