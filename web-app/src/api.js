@@ -1,7 +1,5 @@
 import { StatusCode } from 'grpc-web';
 
-import { EVENT_KEY } from './constants';
-
 
 const {
   CreateOrUpdateScoreRequest,
@@ -27,9 +25,10 @@ const MESSAGES = {
 };
 
 export class API {
-  constructor (eventKey) {
+  constructor (eventKey, metadata = {}) {
     this.eventKey = eventKey;
     this.client = new APIPromiseClient('http://127.0.0.1:8080');
+    this.metadata = metadata;
   }
 
   /**
@@ -37,7 +36,7 @@ export class API {
    *
    * @returns {Object}
    */
-  unWrap (promise) {
+  _unWrap (promise) {
     return promise.then(
       instance => instance.toObject(),
       error => {
@@ -67,7 +66,7 @@ export class API {
     request.setPhonenumber(`+1${playerInfo.phone}`);
     request.setLeague(playerInfo.league);
 
-    return this.unWrap(this.client.registerPlayer(request, {}));
+    return this._unWrap(this.client.registerPlayer(request, this.metadata));
   }
 
   /**
@@ -80,7 +79,10 @@ export class API {
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
 
-    return this.unWrap(this.client.requestPlayerLogin(request, {}));
+    return this._unWrap(this.client.requestPlayerLogin(
+      request,
+      this.metadata,
+    ));
   }
 
   /**
@@ -95,7 +97,15 @@ export class API {
     request.setPhonenumber(`+1${phone}`);
     request.setAuthcode(code);
 
-    return this.unWrap(this.client.playerLogin(request, {}));
+    return this._unWrap(this.client.playerLogin(
+      request,
+      this.metadata,
+    )).then(({ authtoken }) => {
+      this.metadata = {
+        ...this.metadata,
+        authorization: authtoken,
+      };
+    });
   }
 
   /**
@@ -105,7 +115,7 @@ export class API {
     const request = new GetScheduleRequest();
     request.setEventkey(this.eventKey);
 
-    return this.unWrap(this.client.getSchedule(request, {}));
+    return this._unWrap(this.client.getSchedule(request, this.metadata));
   }
 
   /**
@@ -115,7 +125,7 @@ export class API {
     const request = new GetScoresRequest();
     request.setEventkey(this.eventKey);
 
-    return this.unWrap(this.client.getScores(request, {}));
+    return this._unWrap(this.client.getScores(request, this.metadata));
   }
 
   /**
@@ -132,8 +142,11 @@ export class API {
     request.setVenueid(venueId);
     request.setStrokes(strokes);
 
-    return this.unWrap(this.client.createOrUpdateScore(request, {}));
+    return this._unWrap(this.client.createOrUpdateScore(
+      request,
+      this.metadata,
+    ));
   }
 }
 
-export const DEFAULT_CLIENT = new API(EVENT_KEY.NYC);
+export const DEFAULT_CLIENT = new API('sf-2019');

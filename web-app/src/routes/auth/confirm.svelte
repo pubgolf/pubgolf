@@ -1,16 +1,27 @@
+<script context="module">
+  export async function preload (page) {
+    if (!page.query.phone) {
+      this.redirect(302, 'auth');
+    }
+
+    return {
+      phone: page.query.phone,
+    };
+  }
+</script>
+
+
 <script>
   import { goto } from '@sapper/app';
 
   import { DEFAULT_CLIENT } from '../../api';
-  import { player } from '../../stores';
   import FormError from './_FormError';
 
 
-  // TODO: There should be a way to pass this through the URL instead
-  if (!$player || !$player.phone) {
-    goto('auth');
-  }
+  // props
+  export let phone;
 
+  // Local state
   let code = '';
 
   // reset error to null if the form changes
@@ -20,15 +31,12 @@
     console.log('Verifying', code);
 
     error = null;
-    DEFAULT_CLIENT.playerLogin(
-      $player.phone,
-      Number(code),
-    ).then((response) => {
-      debugger;
-      goto('app');
-    }, (apiError) => {
-      error = apiError;
-    });
+    DEFAULT_CLIENT.playerLogin(phone, Number(code))
+      .then(() => {
+        goto('app');
+      }, (apiError) => {
+        error = apiError;
+      });
   }
 </script>
 
