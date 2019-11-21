@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"google.golang.org/grpc/metadata"
 )
 
 var funcMap map[string]func(pg.APIClient) = map[string]func(pg.APIClient){
@@ -16,11 +17,12 @@ var funcMap map[string]func(pg.APIClient) = map[string]func(pg.APIClient){
 }
 
 func GetSchedule(client pg.APIClient) {
+	authToken := getInput("authToken", "4de3e04c-eff3-4631-a493-c5156cb94153")
 	eventKey := getInput("eventKey", "nyc-2019")
 
 	log.Println("Making call to GetSchedule")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
+	header := metadata.New(map[string]string{"authorization": authToken})
+	ctx := metadata.NewOutgoingContext(context.Background(), header)
 	r, err := client.GetSchedule(ctx, &pg.GetScheduleRequest{
 		EventKey: eventKey,
 	})
