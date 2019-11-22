@@ -10,16 +10,10 @@
     pastStops,
   } from '../../../stores';
 
-  // If not authenticated, this page isn't accessible
-  const redirectIfUnauthorized = () => {
-    if (!$api.isLoggedIn()) {
-      goto(`${$event}/auth`);
-    }
-  };
-
   let fetching = true;
 
   $: if ($event) {
+    // If not authenticated, this page isn't accessible
     if (!$api.isLoggedIn()) {
       goto(`${$event}/auth`);
     } else {
@@ -60,7 +54,7 @@
       <p>
         Time Remaining
       </p>
-      <p class="text-red-600">
+      <p class="text-orange">
         <Countdown to="{$nextStop.start}"/>
       </p>
       <p class="text-2xl mt-32">
