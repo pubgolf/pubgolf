@@ -41,3 +41,7 @@ export function dateDelta (startDate, endDate) {
 export function zeroPad (num, minLength = 2) {
   return `${num}`.padStart(minLength, '0');
 }
+
+export function isDev () {
+  return process.env.NODE_ENV === 'development';
+}

@@ -1,6 +1,9 @@
 import { StatusCode } from 'grpc-web';
 
 
+const Cookies = require('js-cookie');
+
+
 const {
   CreateOrUpdateScoreRequest,
   GetScheduleRequest,
@@ -24,11 +27,54 @@ const MESSAGES = {
   [StatusCode.INVALID_ARGUMENT]: 'Invalid input',
 };
 
+// Wrapper for handling cookies so it's abstracted from the rest of the application
+export const getCookieJar = () => {
+  return {
+    get (name) {
+      return Cookies.get(name);
+    },
+    set (name, value, attributes) {
+      Cookies.set(name, value, attributes);
+    },
+    remove (name, attributes) {
+      Cookies.remove(name, attributes);
+    },
+  };
+};
+
+const TOKEN_COOKIE = 'pg-token';
+
 class API {
   constructor (eventKey, metadata = {}) {
+    this._cookieJar = getCookieJar();
     this.eventKey = eventKey;
     this.client = new APIPromiseClient('http://127.0.0.1:8080');
     this.metadata = metadata;
+
+    if (!metadata.authorization) {
+      // TODO: this'll get wonky if you switch events
+      this._logIn(this._cookieJar.get(TOKEN_COOKIE));
+
+    }
+  }
+
+  isLoggedIn () {
+    return Boolean(this.metadata && this.metadata.authorization);
+  }
+
+  _logIn (token) {
+    if (!token) return;
+
+    this.metadata = {
+      ...this.metadata,
+      authorization: token,
+    };
+    this._cookieJar.set(TOKEN_COOKIE, token);
+  }
+
+  _logOut () {
+    delete this.metadata.authorization;
+    this._cookieJar.remove(TOKEN_COOKIE);
   }
 
   /**
@@ -60,6 +106,7 @@ class API {
    * @returns {Promise<RegisterPlayerReply>}
    */
   registerPlayer (playerInfo) {
+    this._logOut();
     const request = new RegisterPlayerRequest();
     request.setEventkey(this.eventKey);
     request.setName(playerInfo.name);
@@ -75,6 +122,7 @@ class API {
    * @returns {Promise<RequestPlayerLoginReply>}
    */
   requestPlayerLogin (phone) {
+    this._logOut();
     const request = new RequestPlayerLoginRequest();
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
@@ -92,6 +140,7 @@ class API {
    * @returns {Promise<PlayerLoginReply>}
    */
   playerLogin (phone, code) {
+    this._logOut();
     const request = new PlayerLoginRequest();
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
@@ -101,10 +150,7 @@ class API {
       request,
       this.metadata,
     )).then(({ authtoken }) => {
-      this.metadata = {
-        ...this.metadata,
-        authorization: authtoken,
-      };
+      this._logIn(authtoken);
     });
   }
 
@@ -149,9 +195,11 @@ class API {
   }
 }
 
-export let API_CLIENT;
+let SHARED_CLIENT;
 
-export function initClient (...args) {
-  API_CLIENT = new API(...args);
-  return API_CLIENT;
+export function getAPI (eventKey, metadata) {
+  if (!SHARED_CLIENT || SHARED_CLIENT.eventKey !== eventKey) {
+    SHARED_CLIENT = new API(eventKey, metadata);
+  }
+  return SHARED_CLIENT;
 }
