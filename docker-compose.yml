@@ -19,8 +19,8 @@ services:
       context: ./envoy/
     image: pubgolf/envoy
     volumes:
-      - "${PWD}/envoy/config.yaml.tmpl:/etc/envoy/config.yaml.tmpl"
-      - "${PWD}/envoy/entrypoint.sh:/etc/envoy/entrypoint.sh"
+      - "./envoy/config.yaml.tmpl:/etc/envoy/config.yaml.tmpl"
+      - "./envoy/entrypoint.sh:/etc/envoy/entrypoint.sh"
     ports:
       - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
@@ -35,11 +35,11 @@ services:
     image: postgres
     restart: always
     ports:
-      - "${HOST_DB_PORT}:${DB_PORT}"
+      - "${HOST_DB_PORT}:5432"
     networks:
       - data_access
     volumes:
-      - "${PWD}/api/data:/var/lib/postgresql/data"
+      - "./api/data:/var/lib/postgresql/data"
     environment:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
@@ -47,7 +47,7 @@ services:
   testdb:
     image: postgres
     ports:
-      - "${TEST_DB_PORT}:5432"
+      - "${HOST_TEST_DB_PORT}:5432"
     networks:
       - data_access
     environment:
