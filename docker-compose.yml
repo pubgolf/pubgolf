@@ -4,23 +4,18 @@ services:
     build:
       context: ./
       dockerfile: ./api/Dockerfile
-    image: pubgolf/api-server
+    image: "escavelo/pubgolf-api${API_DOCKER_LABEL}"
     ports:
       - "${API_PORT}:${API_PORT}"
     networks:
       - proxy_pass
       - data_access
-    environment:
-      PUBGOLF_ENV: "DOCKER_DEV"
     env_file:
       - .env
   envoy:
     build:
-      context: ./envoy/
-    image: pubgolf/envoy
-    volumes:
-      - "./envoy/config.yaml.tmpl:/etc/envoy/config.yaml.tmpl"
-      - "./envoy/entrypoint.sh:/etc/envoy/entrypoint.sh"
+      context: ./
+    image:  "escavelo/pubgolf-envoy${ENVOY_DOCKER_LABEL}"
     ports:
       - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
@@ -39,7 +34,7 @@ services:
     networks:
       - data_access
     volumes:
-      - "./api/data:/var/lib/postgresql/data"
+      - "${HOST_DB_DATA_PATH}:/var/lib/postgresql/data"
     environment:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
@@ -57,4 +52,3 @@ services:
 networks:
   proxy_pass:
   data_access:
-
