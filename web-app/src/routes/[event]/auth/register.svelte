@@ -1,8 +1,11 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { LEAGUE, API_CLIENT } from '../../../api';
-  import { event } from '../../../stores';
+  import { LEAGUE } from '../../../api';
+  import {
+    api,
+    event,
+  } from '../../../stores';
   import FormError from './_FormError';
 
 
@@ -20,7 +23,7 @@
     console.log('Registering', player);
 
     error = null;
-    API_CLIENT.registerPlayer(player).then(() => {
+    $api.registerPlayer(player).then(() => {
       goto(`${$event}/auth/confirm?phone=${phone}`);
     }, (apiError) => {
       error = apiError;

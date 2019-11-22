@@ -1,7 +1,7 @@
 <script context="module">
   export async function preload (page) {
     if (!page.query.phone) {
-      this.redirect(302, 'auth');
+      this.redirect(302, `${page.params.event}/auth`);
     }
 
     return {
@@ -14,8 +14,10 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { API_CLIENT } from '../../../api';
-  import { event } from '../../../stores';
+  import {
+    api,
+    event,
+  } from '../../../stores';
   import FormError from './_FormError';
 
 
@@ -32,7 +34,7 @@
     console.log('Verifying', code);
 
     error = null;
-    API_CLIENT.playerLogin(phone, Number(code))
+    $api.playerLogin(phone, Number(code))
       .then(() => {
         goto(`${$event}/home`);
       }, (apiError) => {
