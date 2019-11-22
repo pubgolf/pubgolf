@@ -48,7 +48,7 @@
 
 <FormError {error}/>
 
-<form on:submit|preventDefault="{submit}" class="w-2/3 mx-auto">
+<form on:submit|preventDefault="{submit}">
   <label for="confirm-code">
     Enter the code you received
   </label>
