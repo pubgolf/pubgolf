@@ -48,7 +48,7 @@ class API {
   constructor (eventKey, metadata = {}) {
     this._cookieJar = getCookieJar();
     this.eventKey = eventKey;
-    this.client = new APIPromiseClient('http://api.pubgolf.co');
+    this.client = new APIPromiseClient('http://127.0.0.1:8080');
     this.metadata = metadata;
 
     if (!metadata.authorization) {
