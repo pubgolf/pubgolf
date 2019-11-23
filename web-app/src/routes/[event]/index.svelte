@@ -1,6 +1,6 @@
 <script context="module">
   export function preload (page) {
-    this.redirect(301, `${page.path}/auth`);
+    this.redirect(302, `${page.params.event}/auth`);
   }
 
   // Looking for where the API gets initialized?
