@@ -72,16 +72,16 @@ services:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
-  testdb:
-    image: postgres
-    ports:
-      - "${HOST_TEST_DB_PORT}:5432"
-    networks:
-      - data_access
-    environment:
-      POSTGRES_NAME: pubgolf_test
-      POSTGRES_USER: pubgolf_test
-      POSTGRES_PASSWORD: pubgolf_test
+  # testdb:
+  #   image: postgres
+  #   ports:
+  #     - "${HOST_TEST_DB_PORT}:5432"
+  #   networks:
+  #     - data_access
+  #   environment:
+  #     POSTGRES_NAME: pubgolf_test
+  #     POSTGRES_USER: pubgolf_test
+  #     POSTGRES_PASSWORD: pubgolf_test
 networks:
   proxy_pass:
   data_access:
