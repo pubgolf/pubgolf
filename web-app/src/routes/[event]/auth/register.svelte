@@ -41,6 +41,7 @@
       "submit      submit     " auto /
        1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
+    align-items: baseline;
   }
 
   .SUBMIT {
@@ -55,7 +56,7 @@
 <FormError {error}/>
 
 <form on:submit|preventDefault="{submit}">
-  <label for="register-name" class="font-bold">
+  <label for="register-name" class="text-2xl">
     Name:
   </label>
   <input
@@ -69,7 +70,7 @@
     required
   >
 
-  <label for="register-phone" class="font-bold">
+  <label for="register-phone" class="text-2xl">
     Mobile Phone:
   </label>
   <input
@@ -83,10 +84,10 @@
     required
   >
 
-  <span class="font-bold p-1">League:</span>
+  <span class="text-2xl">League:</span>
   <div class="flex">
     <!--  TODO: give these an empty state  -->
-    <label class="flex-grow input text-center text-blue-400 mr-2">
+    <label class="flex-grow input text-center text-orange mr-2">
       <input
         type="radio"
         name="league"
@@ -96,7 +97,7 @@
       >
       PGA
     </label>
-    <label class="flex-grow input text-center text-blue-400">
+    <label class="flex-grow input text-center text-orange">
       <input
         type="radio"
         name="league"
