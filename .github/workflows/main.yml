@@ -17,7 +17,6 @@ jobs:
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./api/Dockerfile
-        workdir: /
         tag_names: master
     - name: Publish Envoy to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
@@ -26,7 +25,6 @@ jobs:
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./envoy/Dockerfile
-        workdir: /
         tag_names: master
     - name: Publish Nginx to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
@@ -35,7 +33,6 @@ jobs:
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./nginx/Dockerfile
-        workdir: /
         tag_names: master
     - name: Copy docker-compose.yml via SCP
       uses: appleboy/scp-action@master
