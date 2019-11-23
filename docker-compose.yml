@@ -20,11 +20,11 @@ services:
     image: "escavelo/pubgolf-web-app${DOCKER_LABEL}"
     restart: "${RESTART_POLICY:-unless-stopped}"
     ports:
-      - "${WEBAPP_PORT}:${WEBAPP_PORT}"
+      - "${WEB_APP_PORT}:${WEB_APP_PORT}"
     networks:
       - proxy_pass
     environment:
-      PORT: "${WEBAPP_PORT}"
+      PORT: "${WEB_APP_PORT}"
     env_file:
       - .env
   envoy:

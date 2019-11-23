@@ -71,7 +71,7 @@ server {
   }
 
   location / {
-    proxy_pass http://web-app:${WEBAPP_PORT};
+    proxy_pass http://web-app:${WEB_APP_PORT};
     proxy_http_version 1.1;
   }
 }
