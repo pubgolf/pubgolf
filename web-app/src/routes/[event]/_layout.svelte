@@ -19,16 +19,16 @@
       text: 'Home',
       icon: require('./_icons/beer.svg'),
     },
-    {
-      segment: 'leaderboard',
-      text: 'Scores',
-      icon: require('./_icons/leaderboard.svg'),
-    },
-    {
-      segment: 'admin',
-      text: 'Admin',
-      icon: require('./_icons/clipboard.svg'),
-    },
+    // {
+    //   segment: 'leaderboard',
+    //   text: 'Scores',
+    //   icon: require('./_icons/leaderboard.svg'),
+    // },
+    // {
+    //   segment: 'admin',
+    //   text: 'Admin',
+    //   icon: require('./_icons/clipboard.svg'),
+    // },
   ];
 
   onMount(() => {

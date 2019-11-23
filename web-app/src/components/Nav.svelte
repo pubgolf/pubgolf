@@ -40,7 +40,7 @@
   }
 </style>
 
-{#if links && links.length}
+{#if links && links.length > 1}
   <nav class="flex-grow-0 flex-shrink-0 bg-gray-200 font-light">
     <ul class="LIST">
       {#each links as link (link.segment)}
