@@ -46,5 +46,6 @@ jobs:
           api/db/migrations/* deployer@pubgolf.co:~/pubgolf/db/migrations/
           api/db/seeds/prod-* deployer@pubgolf.co:~/pubgolf/db/seeds/
         ssh_after: |
+          cd /User/home/deployer/pubgolf
           sudo docker-compose pull
           sudo docker-compose up -d
