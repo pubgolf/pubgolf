@@ -45,16 +45,16 @@
 </style>
 
 {#if fetching}
-  <div class="flex h-full items-center text-center text-6xl">
+  <div class="flex h-full items-center text-center text-white text-6xl">
     Fetching Schedule
   </div>
 {:else}
-  <div class="HOME text-center text-4xl pt-32">
+  <div class="HOME text-white text-center text-4xl pt-32">
     {#if $nextStop}
       <p>
         Time Remaining
       </p>
-      <p class="text-orange">
+      <p class="text-orange-light">
         <Countdown to="{$nextStop.start}"/>
       </p>
       <p class="text-2xl mt-32">
@@ -62,17 +62,17 @@
         <a
           href="https://www.google.com/maps/place/{$nextStop.address}"
           target="_blank"
-          class="text-blue-400 underline text-xl"
+          class="text-blue-300 underline text-xl"
         >
           {$nextStop.address}
         </a>
       </p>
-      <a
+      <!--<a
         href="{$event}/home/add-score"
         class="block btn btn-primary w-2/3 my-16 mx-auto"
       >
         Add your Score
-      </a>
+      </a>-->
     {:else if $stops.length}
       <p class="text-6xl">
         Thanks for Playing!
@@ -85,16 +85,16 @@
       {#each $pastStops as stop, i (stop.stopid)}
         <li class="{ i ? 'border-t-2 ' : ''}border-gray-500 px-1">
           {#if i === 0 && $nextStop !== null}
-            <span class="text-green-500 italic">Current:</span>
+            <span class="text-extrabold uppercase">Current:</span>
           {/if}
           {stop.name}<br>
-          <a
+          <!--<a
             href="https://www.google.com/maps/place/{stop.address}"
             target="_blank"
             class="text-blue-400 underline"
-          >
+          >-->
             {stop.address}
-          </a>
+            <!--</a>-->
         </li>
       {/each}
     </ol>

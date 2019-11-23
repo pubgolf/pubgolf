@@ -42,25 +42,13 @@ export const getCookieJar = () => {
   };
 };
 
-function getAPIHostname () {
-  const hostNames = {
-    dev: 'http://127.0.0.1:8080',
-    prod: 'https://api.pubgolf.co',
-    staging: 'https://api-staging.pubgolf.co',
-  };
-  if (process.env.PUBGOLF_ENV) {
-    return hostNames[process.env.PUBGOLF_ENV];
-  }
-  return hostNames.dev;
-}
-
 const TOKEN_COOKIE = 'pg-token';
 
 class API {
-  constructor (eventKey, metadata = {}) {
+  constructor (eventKey, host, metadata = {}) {
     this._cookieJar = getCookieJar();
     this.eventKey = eventKey;
-    this.client = new APIPromiseClient(getAPIHostname());
+    this.client = new APIPromiseClient('https://api.pubgolf.co');
     this.metadata = metadata;
 
     if (!metadata.authorization) {
@@ -217,9 +205,9 @@ class API {
 
 let SHARED_CLIENT;
 
-export function getAPI (eventKey, metadata) {
+export function getAPI (eventKey, ...args) {
   if (!SHARED_CLIENT || SHARED_CLIENT.eventKey !== eventKey) {
-    SHARED_CLIENT = new API(eventKey, metadata);
+    SHARED_CLIENT = new API(eventKey, ...args);
   }
   return SHARED_CLIENT;
 }

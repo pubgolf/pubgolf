@@ -49,12 +49,12 @@
     height: 100%;
   }
 
-  .LAYOUT-MAIN {
+  .MAIN-WRAPPER {
     flex: 1 1 auto;
     overflow-y: scroll;
   }
 
-  .NAV {
+  .NAV-WRAPPER {
     flex: 0 0 auto;
   }
 </style>
@@ -63,9 +63,11 @@
   <slot></slot>
 {:else}
   <div class="EVENT-LAYOUT">
-    <div class="LAYOUT-MAIN">
+    <div class="MAIN-WRAPPER">
       <slot></slot>
     </div>
-    <Nav class="NAV" basePath="{$event}" {links} {segment}/>
+    <div class="NAV-WRAPPER">
+      <Nav basePath="{$event}" {links} {segment}/>
+    </div>
   </div>
 {/if}

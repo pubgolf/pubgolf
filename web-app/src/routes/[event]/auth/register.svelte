@@ -1,7 +1,11 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { LEAGUE } from '../../../api';
+  // import { LEAGUE } from '../../../api';
+  import {
+    applyInsertions,
+    onlyDigits,
+  } from '../../../phone-handler';
   import {
     api,
     event,
@@ -17,14 +21,32 @@
   // reset error to null if the form changes
   $: error = Boolean(name && phone && league) && null;
 
-  function submit () {
-    const player = { name, phone, league };
+  function handlePhone (inputEvent) {
+    const target = inputEvent.target;
+    phone = applyInsertions(target.value);
 
-    console.log('Registering', player);
+    // puts cursor back to the position where addition or deletion was done
+    // otherwise it always jumps back to the end.
+    let position = target.selectionEnd;
+    const digit = target.value[position - 1];
+    target.value = applyInsertions(target.value);
+    while (position < target.value.length && target.value.charAt(position - 1) !== digit) {
+      position += 1;
+    }
+    setTimeout(() => {
+      target.selectionStart = position;
+      target.selectionEnd = position;
+    }, 0);
+  }
+
+  function submit () {
+    const player = { name, phone: onlyDigits(phone), league };
+
+    // console.log('Registering', player);
 
     error = null;
     $api.registerPlayer(player).then(() => {
-      goto(`${$event}/auth/confirm?phone=${phone}`);
+      goto(`${$event}/auth/confirm?phone=${player.phone}`);
     }, (apiError) => {
       error = apiError;
     });
@@ -37,7 +59,7 @@
     grid-template: /* @formatter:off */
       "label-name  input-name " auto
       "label-phone input-phone" auto
-      "league      league-opts" auto
+      /*"league      league-opts" auto*/
       "submit      submit     " auto /
        1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
@@ -57,7 +79,7 @@
 
 <form on:submit|preventDefault="{submit}">
   <label for="register-name" class="text-2xl">
-    Name:
+    Full Name:
   </label>
   <input
     id="register-name"
@@ -80,13 +102,15 @@
     name="phone"
     autocomplete="tel"
     placeholder="(123) 555-1234"
+    maxlength="14"
     bind:value="{phone}"
+    on:input="{handlePhone}"
     required
   >
 
-  <span class="text-2xl">League:</span>
+  <!--<span class="text-2xl">League:</span>
   <div class="flex">
-    <!--  TODO: give these an empty state  -->
+    &lt;!&ndash;  TODO: give these an empty state  &ndash;&gt;
     <label class="flex-grow input text-center text-orange mr-2">
       <input
         type="radio"
@@ -107,7 +131,7 @@
       >
       LPGA
     </label>
-  </div>
+  </div>-->
 
   <button class="SUBMIT btn btn-primary mt-2">
     Register
