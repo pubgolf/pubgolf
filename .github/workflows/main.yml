@@ -1,9 +1,11 @@
-name: CI
+name: Deploy to Prod
 
 on:
   push:
     branches:   
       - master  
+  schedule:
+    - cron: '0 2 * * 0' # Weekly on Sundays at 02:00
 
 jobs:
   build:
@@ -13,70 +15,42 @@ jobs:
     - name: Publish API to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
       with:
-        name: escavelo/pubgolf-api
+        name: escavelo/pubgolf-api:master
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./api/Dockerfile
-        tag_names: master
+        tag_names: true
+        cache: ${{ github.event_name != 'schedule' }}
     - name: Publish Envoy to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
       with:
-        name: escavelo/pubgolf-envoy
+        name: escavelo/pubgolf-envoy:master
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./envoy/Dockerfile
-        tag_names: master
+        tag_names: true
+        cache: ${{ github.event_name != 'schedule' }}
     - name: Publish Nginx to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
       with:
-        name: escavelo/pubgolf-nginx
+        name: escavelo/pubgolf-nginx:master
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./nginx/Dockerfile
-        tag_names: master
-    - name: Copy docker-compose.yml via SCP
-      uses: appleboy/scp-action@master
+        tag_names: true
+        cache: ${{ github.event_name != 'schedule' }}
+    - name: Copy files via SCP and Update Docker Compose
+      uses: alinz/ssh-scp-action@master
       with:
-        host: pubgolf.co
-        username: deployer
         key: ${{ secrets.SSH_KEY_PROD }}
-        source: "docker-compose.yml"
-        target: "~/pubgolf/"
-    - name: Copy bin scripts via SCP
-      uses: appleboy/scp-action@master
-      with:
         host: pubgolf.co
-        username: deployer
-        key: ${{ secrets.SSH_KEY_PROD }}
-        source: "bin/*"
-        target: "~/pubgolf/bin/"
-    - name: Copy DB migrations via SCP
-      uses: appleboy/scp-action@master
-      with:
-        host: pubgolf.co
-        username: deployer
-        key: ${{ secrets.SSH_KEY_PROD }}
-        source: "api/db/migrations/*"
-        target: "~/pubgolf/db/migrations/"
-    - name: Copy DB seeds via SCP
-      uses: appleboy/scp-action@master
-      with:
-        host: pubgolf.co
-        username: deployer
-        key: ${{ secrets.SSH_KEY_PROD }}
-        source: "api/db/seeds/prod-*"
-        target: "~/pubgolf/db/seeds/"
-    - name: Pull New Docker Images on Host
-      uses: appleboy/ssh-action@master
-      with:
-        host: pubgolf.co
-        username: deployer
-        key: ${{ secrets.SSH_KEY_PROD }}
-        script: sudo docker-compose pull
-    - name: Update Docker Compose on Host
-      uses: appleboy/ssh-action@master
-      with:
-        host: pubgolf.co
-        username: deployer
-        key: ${{ secrets.SSH_KEY_PROD }}
-        script: sudo docker-compose up -d
+        user: deployer
+        scp: |
+          docker-compose.yml deployer@pubgolf.co:~/pubgolf/
+          bin/* deployer@pubgolf.co:~/pubgolf/bin/
+          api/db/migrations/* deployer@pubgolf.co:~/pubgolf/db/migrations/
+          api/db/seeds/prod-* deployer@pubgolf.co:~/pubgolf/db/seeds/
+        ssh_after: |
+          cd /home/deployer/pubgolf
+          sudo docker-compose pull
+          sudo docker-compose up -d
