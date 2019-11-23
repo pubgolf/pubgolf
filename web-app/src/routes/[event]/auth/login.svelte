@@ -35,7 +35,7 @@
 
 <FormError {error}/>
 
-<form on:submit|preventDefault="{submit}" class="w-2/3 mx-auto">
+<form on:submit|preventDefault="{submit}">
   <label for="signin-phone">
     Enter your mobile number
   </label>

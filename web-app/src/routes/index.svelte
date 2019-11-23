@@ -19,7 +19,7 @@
     </h1>
 
     <ul class="text-xl list-disc pl-8">
-      {#each events as event}
+      {#each events as event (event.key)}
         <li class="mb-4">
           <a class="text-blue-400 underline" rel=prefetch href="{event.key}">
             {event.text}

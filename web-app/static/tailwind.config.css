@@ -2,28 +2,40 @@
 
 @tailwind components;
 
+.text-orange {
+  color: #EF753D;
+}
+
+.bg-orange {
+  background-color: #EF753D;
+}
+
 .btn {
-  @apply border-2 border-blue-400 text-center p-1;
+  @apply text-center text-xl rounded p-3;
 }
 
 .btn-primary {
-  @apply bg-blue-400 text-white;
+  @apply text-white font-light;
+  background-color: #EF753D;
 }
 
 .btn-primary:active {
-  @apply bg-blue-800;
+  background-color: #F2913D;
 }
 
 .btn-secondary {
-  @apply bg-white text-blue-400;
+  @apply bg-white font-bold;
+  color: #EF753D;
 }
 
 .btn-secondary:active {
-  @apply border-blue-800 text-blue-800;
+  @apply bg-gray-200;
+  color: #F2913D;
 }
 
 .input {
-  @apply border-2 border-blue-400 p-1;
+  @apply bg-white text-xl rounded p-3;
+  color: black;
 }
 
 @tailwind utilities;

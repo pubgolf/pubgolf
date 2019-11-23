@@ -42,13 +42,25 @@ export const getCookieJar = () => {
   };
 };
 
+function getAPIHostname () {
+  const hostNames = {
+    dev: 'http://127.0.0.1:8080',
+    prod: 'https://api.pubgolf.co',
+    staging: 'https://api-staging.pubgolf.co',
+  };
+  if (process.env.PUBGOLF_ENV) {
+    return hostNames[process.env.PUBGOLF_ENV];
+  }
+  return hostNames.dev;
+}
+
 const TOKEN_COOKIE = 'pg-token';
 
 class API {
   constructor (eventKey, metadata = {}) {
     this._cookieJar = getCookieJar();
     this.eventKey = eventKey;
-    this.client = new APIPromiseClient('http://127.0.0.1:8080');
+    this.client = new APIPromiseClient(getAPIHostname());
     this.metadata = metadata;
 
     if (!metadata.authorization) {
@@ -161,7 +173,15 @@ class API {
     const request = new GetScheduleRequest();
     request.setEventkey(this.eventKey);
 
-    return this._unWrap(this.client.getSchedule(request, this.metadata));
+    return this._unWrap(this.client.getSchedule(
+      request,
+      this.metadata,
+    )).then(response => response, (error) => {
+      if (error.code === StatusCode.PERMISSION_DENIED) {
+        this._logOut();
+      }
+      throw error;
+    });
   }
 
   /**

@@ -4,6 +4,10 @@
 </script>
 
 <style>
+  :global(body) {
+    background-color: #50AF4F;
+  }
+
   .MAIN {
     display: grid;
     grid-template: /* @formatter:off */
@@ -11,34 +15,33 @@
       "heading" min-content
       "content" 1fr /
        1fr; /* @formatter:on */
-    grid-gap: 1em;
+    grid-gap: 0.5em;
     height: 100%;
-    background-color: white;
-    padding: 2em;
+    color: white;
+    padding: 1em;
     margin: 0 auto;
-  }
-
-  .HEADING {
-    font-size: 2.8em;
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: 700;
-    margin: 0;
   }
 
   .IMAGE {
     width: 100%;
-    max-width: 400px;
+    max-width: 250px;
     margin: 0 auto;
+  }
+
+  .HEADING {
+    font-size: 3em;
+    text-align: center;
+    font-weight: 700;
+    margin: 0;
   }
 </style>
 
 <main class="MAIN">
-  <img class="IMAGE" alt="Borat" src="great-success.png">
+  <img class="IMAGE" alt="Cheers" src="social-beer--green.png">
 
-  <h1 class="HEADING">Pub Golf</h1>
+  <h1 class="HEADING">Pub Golf NYC 2k19</h1>
 
-  <div class="flex flex-col w-full mx-auto">
+  <div class="flex flex-col w-full text-xl mt-8 mx-auto">
     <slot></slot>
   </div>
 </main>

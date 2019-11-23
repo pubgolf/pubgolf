@@ -1,10 +1,10 @@
 {
-  "background_color": "#ffffff",
-  "theme_color": "#333333",
+  "background_color": "#50AF4F",
+  "theme_color": "#EF753D",
   "name": "Pub Golf",
   "short_name": "PubG",
   "display": "minimal-ui",
-  "start_url": "/",
+  "start_url": "/nyc-2019/auth",
   "icons": [
     {
       "src": "logo-192.png",

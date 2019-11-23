@@ -43,5 +43,7 @@ export function zeroPad (num, minLength = 2) {
 }
 
 export function isDev () {
-  return process.env.NODE_ENV === 'development';
+  return process.env.PUBGOLF_ENV
+    ? process.env.PUBGOLF_ENV === 'dev'
+    : process.env.NODE_ENV === 'development';
 }
