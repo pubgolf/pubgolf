@@ -5,6 +5,7 @@ import {
 } from 'svelte/store';
 
 import { getAPI } from './api';
+import { getHost } from './routes/get-api-host.json';
 
 /**
  * Global stores that can be subscribed to from anywhere in the app
@@ -26,9 +27,10 @@ export const time = readable(new Date(), function start (set) {
 });
 
 export const event = writable('');
+export const host = writable('');
 export const api = derived(
   event,
-  $event => getAPI($event),
+  ($event) => getAPI($event, getHost()),
 );
 
 export const stops = writable([]);
@@ -39,8 +41,7 @@ export const nextStop = derived(
   ],
   // TODO: Use a lazier timer
   ([$time, $stops]) => (
-    ($stops && $stops.length
-    )
+    $stops && $stops.length
       ? $stops.find(stop => stop.start > $time)
       : null
   ),

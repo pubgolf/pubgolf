@@ -9,16 +9,17 @@
     "protoc:build": "protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:./src/proto",
     "protoc:clean": "rm -f ./src/proto/*",
     "sapper:build": "sapper build",
-    "sapper:dev": "sapper dev",
-
+    "sapper:dev": "cross-env PUBGOLF_ENV=dev sapper dev",
     "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
-    "build": "run-s protoc sapper:build",
-    "dev": "run-s protoc tailwind sapper:dev",
+    "prepare-deps": "run-p tailwind protoc",
+
+    "build": "run-s prepare-deps sapper:build",
+    "dev": "run-s prepare-deps sapper:dev",
     "export": "sapper export",
-    "start": "node __sapper__/build",
+    "start": "cross-env PUBGOLF_ENV=prod node __sapper__/build",
     "test": "run-p --race dev cy:run",
 
-    "postinstall": "run-p tailwind protoc"
+    "postinstall": "run-s prepare-deps"
   },
   "dependencies": {
     "compression": "^1.7.1",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "browserify": "^16.2.2",
+    "cross-env": "^6.0.3",
     "npm-run-all": "^4.1.5",
     "sapper": "^0.27.0",
     "svelte": "^3.0.0",

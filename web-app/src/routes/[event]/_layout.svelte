@@ -5,6 +5,7 @@
   import {
     api,
     event,
+    host,
   } from '../../stores';
   import { isDev } from '../../utils';
   import Nav from '../../components/Nav.svelte';
@@ -31,10 +32,18 @@
     // },
   ];
 
-  onMount(() => {
+  onMount(async () => {
     const { params } = $page;
 
     $event = params.event;
+
+    try {
+      const { host: host_ } = await fetch('/get-api-host.json')
+        .then(res => res.json());
+      $host = host_;
+    } catch (e) {
+      console.error(e);
+    }
 
     if (isDev()) {
       window.$api = $api;
@@ -49,12 +58,12 @@
     height: 100%;
   }
 
-  .LAYOUT-MAIN {
+  .MAIN-WRAPPER {
     flex: 1 1 auto;
     overflow-y: scroll;
   }
 
-  .NAV {
+  .NAV-WRAPPER {
     flex: 0 0 auto;
   }
 </style>
@@ -63,9 +72,11 @@
   <slot></slot>
 {:else}
   <div class="EVENT-LAYOUT">
-    <div class="LAYOUT-MAIN">
+    <div class="MAIN-WRAPPER">
       <slot></slot>
     </div>
-    <Nav class="NAV" basePath="{$event}" {links} {segment}/>
+    <div class="NAV-WRAPPER">
+      <Nav basePath="{$event}" {links} {segment}/>
+    </div>
   </div>
 {/if}

@@ -3,7 +3,7 @@
   export let links;
   export let segment;
 
-  $: console.log(segment);
+  // $: console.log(segment);
 </script>
 
 <style>

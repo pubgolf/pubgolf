@@ -20,7 +20,7 @@
   function submit () {
     const player = { name, phone, league };
 
-    console.log('Registering', player);
+    // console.log('Registering', player);
 
     error = null;
     $api.registerPlayer(player).then(() => {

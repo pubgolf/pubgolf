@@ -31,7 +31,7 @@
   $: error = Boolean(code) && null;
 
   function submit () {
-    console.log('Verifying', code);
+    // console.log('Verifying', code);
 
     error = null;
     $api.playerLogin(phone, Number(code))
