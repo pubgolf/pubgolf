@@ -17,7 +17,7 @@
   $: error = Boolean(phone) && null;
 
   function submit () {
-    console.log(`Requesting login for ${phone}`);
+    // console.log(`Requesting login for ${phone}`);
 
     error = null;
     $api.requestPlayerLogin(phone).then(() => {

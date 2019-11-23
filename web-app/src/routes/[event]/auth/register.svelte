@@ -20,7 +20,7 @@
   function submit () {
     const player = { name, phone, league };
 
-    console.log('Registering', player);
+    // console.log('Registering', player);
 
     error = null;
     $api.registerPlayer(player).then(() => {
@@ -37,7 +37,7 @@
     grid-template: /* @formatter:off */
       "label-name  input-name " auto
       "label-phone input-phone" auto
-      "league      league-opts" auto
+      /*"league      league-opts" auto*/
       "submit      submit     " auto /
        1fr         1fr; /* @formatter:on */
     grid-gap: 0.5rem;
@@ -57,7 +57,7 @@
 
 <form on:submit|preventDefault="{submit}">
   <label for="register-name" class="text-2xl">
-    Name:
+    Full Name:
   </label>
   <input
     id="register-name"
@@ -84,9 +84,9 @@
     required
   >
 
-  <span class="text-2xl">League:</span>
+  <!--<span class="text-2xl">League:</span>
   <div class="flex">
-    <!--  TODO: give these an empty state  -->
+    &lt;!&ndash;  TODO: give these an empty state  &ndash;&gt;
     <label class="flex-grow input text-center text-orange mr-2">
       <input
         type="radio"
@@ -107,7 +107,7 @@
       >
       LPGA
     </label>
-  </div>
+  </div>-->
 
   <button class="SUBMIT btn btn-primary mt-2">
     Register
