@@ -21,6 +21,15 @@ jobs:
         dockerfile: ./api/Dockerfile
         tag_names: true
         cache: ${{ github.event_name != 'schedule' }}
+    - name: Publish Web App to Docker Hub
+      uses: elgohr/Publish-Docker-Github-Action@2.8
+      with:
+        name: escavelo/pubgolf-web-app:master
+        username: thedeerchild
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./api/Dockerfile
+        tag_names: true
+        cache: ${{ github.event_name != 'schedule' }}
     - name: Publish Envoy to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
       with:
