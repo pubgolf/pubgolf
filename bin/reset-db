@@ -2,7 +2,13 @@
 
 export $(egrep -v '^#' '.env' | xargs) 
 
-docker run -v "${PWD}/api/db/migrations:/migrations" \
+if [ -z ${PWD+x} ]; then
+  RELATIVE_PATH_PREFIX=""
+else
+  RELATIVE_PATH_PREFIX="${PWD}/"
+fi
+
+docker run -v "${RELATIVE_PATH_PREFIX}${DB_MIGRATIONS_PATH}:/migrations" \
 --network host \
 migrate/migrate \
 -path=/migrations/ \
