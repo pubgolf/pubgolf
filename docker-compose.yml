@@ -4,7 +4,8 @@ services:
     build:
       context: ./
       dockerfile: ./api/Dockerfile
-    image: "escavelo/pubgolf-api${API_DOCKER_LABEL}"
+    image: "escavelo/pubgolf-api${DOCKER_LABEL}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
     ports:
       - "${API_PORT}:${API_PORT}"
     networks:
@@ -12,11 +13,26 @@ services:
       - data_access
     env_file:
       - .env
+  web-app:
+    build:
+      context: ./
+      dockerfile: ./web-app/Dockerfile
+    image: "escavelo/pubgolf-web-app${DOCKER_LABEL}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${WEBAPP_PORT}:${WEBAPP_PORT}"
+    networks:
+      - proxy_pass
+    environment:
+      PORT: "${WEBAPP_PORT}"
+    env_file:
+      - .env
   envoy:
     build:
       context: ./
       dockerfile: ./envoy/Dockerfile
-    image:  "escavelo/pubgolf-envoy${ENVOY_DOCKER_LABEL}"
+    image:  "escavelo/pubgolf-envoy${DOCKER_LABEL}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
     ports:
       - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
@@ -31,7 +47,8 @@ services:
     build:
       context: ./
       dockerfile: ./nginx/Dockerfile
-    image: "escavelo/pubgolf-nginx${NGINX_DOCKER_LABEL}"
+    image: "escavelo/pubgolf-nginx${DOCKER_LABEL}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
     ports:
       - "80:80"
       - "443:443"
@@ -44,7 +61,7 @@ services:
       - .env
   db:
     image: postgres
-    restart: always
+    restart: "${RESTART_POLICY:-unless-stopped}"
     ports:
       - "${HOST_DB_PORT}:5432"
     networks:
