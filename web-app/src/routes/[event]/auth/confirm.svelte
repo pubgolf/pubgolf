@@ -1,11 +1,14 @@
 <script context="module">
+  import { onlyDigits } from '../../../phone-handler';
+
+
   export async function preload (page) {
     if (!page.query.phone) {
       this.redirect(302, `${page.params.event}/auth`);
     }
 
     return {
-      phone: page.query.phone,
+      phone: onlyDigits(page.query.phone),
     };
   }
 </script>
@@ -56,7 +59,7 @@
     id="confirm-code"
     class="input w-full"
     type="tel"
-    autocomplete="none"
+    autocomplete="off"
     placeholder="123456"
     bind:value="{code}"
     required
