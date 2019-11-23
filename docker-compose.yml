@@ -14,6 +14,19 @@ services:
       PUBGOLF_ENV: "DOCKER_DEV"
     env_file:
       - .env
+  web-app:
+    build:
+      context: ./
+      dockerfile: ./web-app/Dockerfile
+    image: pubgolf/web-app
+    ports:
+      - "${WEB_APP_PORT}:${WEB_APP_PORT}"
+    networks:
+      - proxy_pass
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
   envoy:
     build:
       context: ./envoy/
