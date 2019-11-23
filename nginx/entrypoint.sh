@@ -6,7 +6,7 @@
 # Required for env var support in the Nginx config file.
 envsubst ''\
 "\$GRPC_WEB_PORT,"\
-"\$WEBAPP_UPSTREAM_HOST"\
+"\$WEBAPP_PORT"\
 < /etc/nginx/conf.d/proxy.conf.tmpl > /etc/nginx/conf.d/proxy.conf
 
 nginx -g "daemon off;"
