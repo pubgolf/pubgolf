@@ -4,6 +4,10 @@
 </script>
 
 <style>
+  :global(body) {
+    background-color: #50AF4F;
+  }
+
   .MAIN {
     display: grid;
     grid-template: /* @formatter:off */
@@ -13,7 +17,6 @@
        1fr; /* @formatter:on */
     grid-gap: 0.5em;
     height: 100%;
-    background-color: #50AF4F;
     color: white;
     padding: 1em;
     margin: 0 auto;
