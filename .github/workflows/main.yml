@@ -39,6 +39,7 @@ jobs:
         key: ${{ secrets.SSH_KEY_PROD }}
         source: "docker-compose.yml"
         target: "~/pubgolf/"
+        timeout: 1m
         command_timeout: 3m
         overwrite: true
     - name: Copy bin scripts via SCP
@@ -49,6 +50,7 @@ jobs:
         key: ${{ secrets.SSH_KEY_PROD }}
         source: "bin/*"
         target: "~/pubgolf/bin/"
+        timeout: 1m
         command_timeout: 3m
         overwrite: true
     - name: Copy DB migrations via SCP
@@ -59,6 +61,7 @@ jobs:
         key: ${{ secrets.SSH_KEY_PROD }}
         source: "api/db/migrations/*"
         target: "~/pubgolf/db/migrations/"
+        timeout: 1m
         command_timeout: 3m
         overwrite: true
     - name: Copy DB seeds via SCP
@@ -69,6 +72,7 @@ jobs:
         key: ${{ secrets.SSH_KEY_PROD }}
         source: "api/db/seeds/prod-*"
         target: "~/pubgolf/db/seeds/"
+        timeout: 1m
         command_timeout: 3m
         overwrite: true
     - name: Pull New Docker Images on Host
