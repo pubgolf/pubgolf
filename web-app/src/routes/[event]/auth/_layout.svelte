@@ -4,9 +4,6 @@
 </script>
 
 <style>
-  :global(body) {
-    background-color: #50AF4F;
-  }
 
   .MAIN {
     display: grid;
