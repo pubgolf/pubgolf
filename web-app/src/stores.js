@@ -30,3 +30,27 @@ export const api = derived(
   event,
   $event => getAPI($event),
 );
+
+export const stops = writable([]);
+export const nextStop = derived(
+  [
+    time,
+    stops,
+  ],
+  // TODO: Use a lazier timer
+  ([$time, $stops]) => (
+    ($stops && $stops.length
+    )
+      ? $stops.find(stop => stop.start > $time)
+      : null
+  ),
+);
+export const pastStops = derived(
+  [
+    stops,
+    nextStop,
+  ],
+  ([$stops, $nextStop]) => (
+    $nextStop ? $stops.slice(0, $nextStop.index).reverse() : $stops.reverse()
+  ),
+);
