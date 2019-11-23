@@ -13,6 +13,20 @@ services:
       - data_access
     env_file:
       - .env
+  web-app:
+    build:
+      context: ./
+      dockerfile: ./web-app/Dockerfile
+    image: "escavelo/pubgolf-web-app${DOCKER_LABEL}"
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${WEBAPP_PORT}:${WEBAPP_PORT}"
+    networks:
+      - proxy_pass
+    environment:
+      PORT: "${WEBAPP_PORT}"
+    env_file:
+      - .env
   envoy:
     build:
       context: ./
