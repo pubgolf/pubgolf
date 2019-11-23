@@ -15,6 +15,7 @@ services:
   envoy:
     build:
       context: ./
+      dockerfile: ./envoy/Dockerfile
     image:  "escavelo/pubgolf-envoy${ENVOY_DOCKER_LABEL}"
     ports:
       - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
@@ -26,6 +27,21 @@ services:
       GRPC_WEB_INBOUND_PORT: "${GRPC_WEB_PORT}"
       API_UPSTREAM_HOST: "${API_HOST}"
       API_UPSTREAM_PORT: "${API_PORT}"
+  nginx:
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    image: "escavelo/pubgolf-nginx${NGINX_DOCKER_LABEL}"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - proxy_pass
+    volumes:
+      - ./certs:/etc/cloudflare/certs
+      - ./data/certbot/conf:/etc/letsencrypt
+    env_file:
+      - .env
   db:
     image: postgres
     restart: always
