@@ -5,7 +5,7 @@
   "scripts": {
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "protoc": "mkdir -p ./src/proto && run-s protoc:clean protoc:build",
+    "protoc": "mkdir -p src/proto/ && run-s protoc:clean protoc:build",
     "protoc:build": "protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:./src/proto",
     "protoc:clean": "rm -f ./src/proto/*",
     "sapper:build": "sapper build",
