@@ -1,11 +1,15 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { LEAGUE, DEFAULT_CLIENT } from '../../api';
-  import { player } from '../../stores';
+  import { LEAGUE } from '../../../api';
+  import {
+    api,
+    event,
+  } from '../../../stores';
   import FormError from './_FormError';
 
 
+  // Local state
   let name = '';
   let phone = '';
   let league = '';
@@ -14,13 +18,13 @@
   $: error = Boolean(name && phone && league) && null;
 
   function submit () {
-    $player = { name, phone, league };
+    const player = { name, phone, league };
 
-    console.log('Registering', $player);
+    console.log('Registering', player);
 
     error = null;
-    DEFAULT_CLIENT.registerPlayer($player).then(() => {
-      goto('auth/confirm-code');
+    $api.registerPlayer(player).then(() => {
+      goto(`${$event}/auth/confirm?phone=${phone}`);
     }, (apiError) => {
       error = apiError;
     });

@@ -1,6 +1,6 @@
-import * as sapper from '@sapper/app';
+import { start } from '@sapper/app';
 
 
-sapper.start({
+start({
   target: document.querySelector('#sapper'),
 });

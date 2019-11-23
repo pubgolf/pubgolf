@@ -4,23 +4,19 @@ services:
     build:
       context: ./
       dockerfile: ./api/Dockerfile
-    image: pubgolf/api-server
+    image: "escavelo/pubgolf-api${API_DOCKER_LABEL}"
     ports:
       - "${API_PORT}:${API_PORT}"
     networks:
       - proxy_pass
       - data_access
-    environment:
-      PUBGOLF_ENV: "DOCKER_DEV"
     env_file:
       - .env
   envoy:
     build:
-      context: ./envoy/
-    image: pubgolf/envoy
-    volumes:
-      - "${PWD}/envoy/config.yaml.tmpl:/etc/envoy/config.yaml.tmpl"
-      - "${PWD}/envoy/entrypoint.sh:/etc/envoy/entrypoint.sh"
+      context: ./
+      dockerfile: ./envoy/Dockerfile
+    image:  "escavelo/pubgolf-envoy${ENVOY_DOCKER_LABEL}"
     ports:
       - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
@@ -31,32 +27,44 @@ services:
       GRPC_WEB_INBOUND_PORT: "${GRPC_WEB_PORT}"
       API_UPSTREAM_HOST: "${API_HOST}"
       API_UPSTREAM_PORT: "${API_PORT}"
+  nginx:
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    image: "escavelo/pubgolf-nginx${NGINX_DOCKER_LABEL}"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - proxy_pass
+    volumes:
+      - ./certs:/etc/cloudflare/certs
+      - ./data/certbot/conf:/etc/letsencrypt
+    env_file:
+      - .env
   db:
     image: postgres
     restart: always
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${HOST_DB_PORT}:5432"
     networks:
       - data_access
     volumes:
-      - "${PWD}/api/data:/var/lib/postgresql/data"
+      - "${HOST_DB_DATA_PATH}:/var/lib/postgresql/data"
     environment:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      POSTGRES_PORT: "${DB_PORT}"
   testdb:
     image: postgres
     ports:
-      - "${TEST_DB_PORT}:${TEST_DB_PORT}"
+      - "${HOST_TEST_DB_PORT}:5432"
     networks:
       - data_access
     environment:
       POSTGRES_NAME: pubgolf_test
       POSTGRES_USER: pubgolf_test
       POSTGRES_PASSWORD: pubgolf_test
-      POSTGRES_PORT: "${TEST_DB_PORT}"
 networks:
   proxy_pass:
   data_access:
-

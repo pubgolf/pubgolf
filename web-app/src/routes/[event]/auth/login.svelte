@@ -1,26 +1,28 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import { DEFAULT_CLIENT } from '../../api';
-  import { player } from '../../stores';
+  import {
+    api,
+    event,
+  } from '../../../stores';
   import FormError from './_FormError';
 
-
-  let phone = '';
   // TODO: format phone as they type
   // TODO: validation
+
+  // Local state
+  let phone = '';
 
   // reset error to null if the form changes
   $: error = Boolean(phone) && null;
 
   function submit () {
-    $player = { phone };
-
     console.log(`Requesting login for ${phone}`);
 
     error = null;
-    DEFAULT_CLIENT.requestPlayerLogin(phone).then(() => {
-      goto('auth/confirm-code');
+    $api.requestPlayerLogin(phone).then(() => {
+      // TODO: figure out how to get relative urls
+      goto(`${$event}/auth/confirm?phone=${phone}`);
     }, (apiError) => {
       error = apiError;
     });
@@ -28,7 +30,7 @@
 </script>
 
 <svelte:head>
-  <title>Log in | Pub Golf</title>
+  <title>Log In | Pub Golf</title>
 </svelte:head>
 
 <FormError {error}/>

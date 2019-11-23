@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:   
+      - master  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Publish API to Docker Hub
+      uses: elgohr/Publish-Docker-Github-Action@2.8
+      with:
+        name: escavelo/pubgolf-api
+        username: thedeerchild
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./api/Dockerfile
+        workdir: /
+        tag_names: master
+    - name: Publish Envoy to Docker Hub
+      uses: elgohr/Publish-Docker-Github-Action@2.8
+      with:
+        name: escavelo/pubgolf-envoy
+        username: thedeerchild
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./envoy/Dockerfile
+        workdir: /
+        tag_names: master
+    - name: Publish Nginx to Docker Hub
+      uses: elgohr/Publish-Docker-Github-Action@2.8
+      with:
+        name: escavelo/pubgolf-nginx
+        username: thedeerchild
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./nginx/Dockerfile
+        workdir: /
+        tag_names: master
+    - name: Copy docker-compose.yml via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        source: "docker-compose.yml"
+        target: "~/pubgolf/"
+    - name: Copy bin scripts via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        source: "bin/*"
+        target: "~/pubgolf/bin/"
+    - name: Copy DB migrations via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        source: "api/db/migrations/*"
+        target: "~/pubgolf/db/migrations/"
+    - name: Copy DB seeds via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        source: "api/db/seeds/prod-*"
+        target: "~/pubgolf/db/seeds/"
+    - name: Pull New Docker Images on Host
+      uses: appleboy/ssh-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        script: sudo docker-compose pull
+    - name: Update Docker Compose on Host
+      uses: appleboy/ssh-action@master
+      with:
+        host: pubgolf.co
+        username: deployer
+        key: ${{ secrets.SSH_KEY_PROD }}
+        script: sudo docker-compose up -d

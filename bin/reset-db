@@ -2,12 +2,18 @@
 
 export $(egrep -v '^#' '.env' | xargs) 
 
-docker run -v "${PWD}/api/db/migrations:/migrations" \
+if [ -z ${PWD+x} ]; then
+  RELATIVE_PATH_PREFIX=""
+else
+  RELATIVE_PATH_PREFIX="${PWD}/"
+fi
+
+docker run -v "${RELATIVE_PATH_PREFIX}${DB_MIGRATIONS_PATH}:/migrations" \
 --network host \
 migrate/migrate \
 -path=/migrations/ \
 -database "postgres://${DB_USER}:${DB_PASSWORD}@localhost:"\
-"${DB_PORT:-5432}/${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" \
+"${HOST_DB_PORT:-5432}/${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" \
 down -all=true
 
 bin/migrate

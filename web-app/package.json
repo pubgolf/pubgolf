@@ -13,7 +13,7 @@
 
     "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
     "build": "run-s protoc sapper:build",
-    "dev": "run-s protoc sapper:dev",
+    "dev": "run-s protoc tailwind sapper:dev",
     "export": "sapper export",
     "start": "node __sapper__/build",
     "test": "run-p --race dev cy:run",
@@ -24,6 +24,7 @@
     "compression": "^1.7.1",
     "google-protobuf": "^3.6.1",
     "grpc-web": "^1.0.0",
+    "js-cookie": "^2.2.1",
     "polka": "next",
     "sirv": "^0.4.0",
     "tailwindcss": "^1.1.3"

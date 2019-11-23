@@ -1,4 +1,10 @@
-import { readable, writable } from 'svelte/store';
+import {
+  derived,
+  readable,
+  writable,
+} from 'svelte/store';
+
+import { getAPI } from './api';
 
 /**
  * Global stores that can be subscribed to from anywhere in the app
@@ -19,4 +25,8 @@ export const time = readable(new Date(), function start (set) {
   };
 });
 
-export const player = writable(null);
+export const event = writable('');
+export const api = derived(
+  event,
+  $event => getAPI($event),
+);

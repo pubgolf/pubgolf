@@ -11,7 +11,7 @@
   $: delta = dateDelta($time, to);
 </script>
 
-{#if delta.hours > 0}
+{#if delta.days > 0 || delta.hours > 0}
   {delta.days}d {delta.hours}h {delta.minutes}m
 {:else}
   {delta.minutes}:{zeroPad(delta.seconds)}

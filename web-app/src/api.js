@@ -1,6 +1,7 @@
 import { StatusCode } from 'grpc-web';
 
-import { EVENT_KEY } from './constants';
+
+const Cookies = require('js-cookie');
 
 
 const {
@@ -26,10 +27,54 @@ const MESSAGES = {
   [StatusCode.INVALID_ARGUMENT]: 'Invalid input',
 };
 
-export class API {
-  constructor (eventKey) {
+// Wrapper for handling cookies so it's abstracted from the rest of the application
+export const getCookieJar = () => {
+  return {
+    get (name) {
+      return Cookies.get(name);
+    },
+    set (name, value, attributes) {
+      Cookies.set(name, value, attributes);
+    },
+    remove (name, attributes) {
+      Cookies.remove(name, attributes);
+    },
+  };
+};
+
+const TOKEN_COOKIE = 'pg-token';
+
+class API {
+  constructor (eventKey, metadata = {}) {
+    this._cookieJar = getCookieJar();
     this.eventKey = eventKey;
     this.client = new APIPromiseClient('http://127.0.0.1:8080');
+    this.metadata = metadata;
+
+    if (!metadata.authorization) {
+      // TODO: this'll get wonky if you switch events
+      this._logIn(this._cookieJar.get(TOKEN_COOKIE));
+
+    }
+  }
+
+  isLoggedIn () {
+    return Boolean(this.metadata && this.metadata.authorization);
+  }
+
+  _logIn (token) {
+    if (!token) return;
+
+    this.metadata = {
+      ...this.metadata,
+      authorization: token,
+    };
+    this._cookieJar.set(TOKEN_COOKIE, token);
+  }
+
+  _logOut () {
+    delete this.metadata.authorization;
+    this._cookieJar.remove(TOKEN_COOKIE);
   }
 
   /**
@@ -37,7 +82,7 @@ export class API {
    *
    * @returns {Object}
    */
-  unWrap (promise) {
+  _unWrap (promise) {
     return promise.then(
       instance => instance.toObject(),
       error => {
@@ -61,13 +106,14 @@ export class API {
    * @returns {Promise<RegisterPlayerReply>}
    */
   registerPlayer (playerInfo) {
+    this._logOut();
     const request = new RegisterPlayerRequest();
     request.setEventkey(this.eventKey);
     request.setName(playerInfo.name);
     request.setPhonenumber(`+1${playerInfo.phone}`);
     request.setLeague(playerInfo.league);
 
-    return this.unWrap(this.client.registerPlayer(request, {}));
+    return this._unWrap(this.client.registerPlayer(request, this.metadata));
   }
 
   /**
@@ -76,11 +122,15 @@ export class API {
    * @returns {Promise<RequestPlayerLoginReply>}
    */
   requestPlayerLogin (phone) {
+    this._logOut();
     const request = new RequestPlayerLoginRequest();
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
 
-    return this.unWrap(this.client.requestPlayerLogin(request, {}));
+    return this._unWrap(this.client.requestPlayerLogin(
+      request,
+      this.metadata,
+    ));
   }
 
   /**
@@ -90,12 +140,18 @@ export class API {
    * @returns {Promise<PlayerLoginReply>}
    */
   playerLogin (phone, code) {
+    this._logOut();
     const request = new PlayerLoginRequest();
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
     request.setAuthcode(code);
 
-    return this.unWrap(this.client.playerLogin(request, {}));
+    return this._unWrap(this.client.playerLogin(
+      request,
+      this.metadata,
+    )).then(({ authtoken }) => {
+      this._logIn(authtoken);
+    });
   }
 
   /**
@@ -105,7 +161,7 @@ export class API {
     const request = new GetScheduleRequest();
     request.setEventkey(this.eventKey);
 
-    return this.unWrap(this.client.getSchedule(request, {}));
+    return this._unWrap(this.client.getSchedule(request, this.metadata));
   }
 
   /**
@@ -115,7 +171,7 @@ export class API {
     const request = new GetScoresRequest();
     request.setEventkey(this.eventKey);
 
-    return this.unWrap(this.client.getScores(request, {}));
+    return this._unWrap(this.client.getScores(request, this.metadata));
   }
 
   /**
@@ -132,8 +188,18 @@ export class API {
     request.setVenueid(venueId);
     request.setStrokes(strokes);
 
-    return this.unWrap(this.client.createOrUpdateScore(request, {}));
+    return this._unWrap(this.client.createOrUpdateScore(
+      request,
+      this.metadata,
+    ));
   }
 }
 
-export const DEFAULT_CLIENT = new API(EVENT_KEY.NYC);
+let SHARED_CLIENT;
+
+export function getAPI (eventKey, metadata) {
+  if (!SHARED_CLIENT || SHARED_CLIENT.eventKey !== eventKey) {
+    SHARED_CLIENT = new API(eventKey, metadata);
+  }
+  return SHARED_CLIENT;
+}
