@@ -27,7 +27,7 @@ jobs:
         name: escavelo/pubgolf-web-app:master
         username: thedeerchild
         password: ${{ secrets.DOCKER_PASSWORD }}
-        dockerfile: ./api/Dockerfile
+        dockerfile: ./web-app/Dockerfile
         tag_names: true
         cache: ${{ github.event_name != 'schedule' }}
     - name: Publish Envoy to Docker Hub
