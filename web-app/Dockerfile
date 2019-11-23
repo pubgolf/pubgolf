@@ -19,7 +19,7 @@ WORKDIR /
 COPY ./proto ./proto
 COPY ./web-app ./web-app
 WORKDIR ./web-app
-RUN npm install -g npx && \
+RUN modified -p ./web-app/arc/proto/ && npm install -g npx && \
     npm install && \
     npm run sapper:build
 
