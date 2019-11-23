@@ -29,7 +29,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: ./web-app/Dockerfile
         tag_names: true
-        cache: ${{ github.event_name != 'schedule' }}
     - name: Publish Envoy to Docker Hub
       uses: elgohr/Publish-Docker-Github-Action@2.8
       with:
