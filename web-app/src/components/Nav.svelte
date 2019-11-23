@@ -1,76 +1,59 @@
 <script>
+  export let basePath;
+  export let links;
   export let segment;
+
+  $: console.log(segment);
 </script>
 
 <style>
-  nav {
-    border-bottom: 1px solid rgba(255, 62, 0, 0.1);
-    font-weight: 300;
-    padding: 0 1em;
-  }
-
-  ul {
+  .LIST {
+    display: flex;
     margin: 0;
     padding: 0;
+    -webkit-box-shadow: 0px -5px 10px 0px rgba(136, 136, 136, 0.3);
+    -moz-box-shadow: 0px -5px 10px 0px rgba(136, 136, 136, 0.3);
+    box-shadow: 0px -5px 10px 0px rgba(136, 136, 136, 0.3);
   }
 
   /* clearfix */
-  ul::after {
+  .LIST:after {
     content: '';
     display: block;
     clear: both;
   }
 
-  li {
-    display: block;
-    float: left;
+  .LIST > * {
+    flex-grow: 1;
   }
 
-  .selected {
-    position: relative;
-    display: inline-block;
+  .LINK {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
-  .selected::after {
-    position: absolute;
-    content: '';
-    width: calc(100% - 1em);
-    height: 2px;
-    background-color: rgb(255, 62, 0);
-    display: block;
-    bottom: -1px;
-  }
-
-  a {
-    text-decoration: none;
-    padding: 1em 0.5em;
-    display: block;
+  .ICON {
+    width: 1.8rem;
+    margin: 0.25rem 0 0;
   }
 </style>
 
-<nav>
-  <ul>
-    <li>
-      <a class='{segment === undefined ? "selected" : ""}' href=".">
-        home
-      </a>
-    </li>
-    <li>
-      <a class='{segment === "about" ? "selected" : ""}' href="about">
-        about
-      </a>
-    </li>
-
-    <!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
-         the blog data when we hover over the link or tap it on a touchscreen -->
-    <li>
-      <a
-        rel=prefetch
-        class='{segment === "blog" ? "selected" : ""}'
-        href="blog"
-      >
-        blog
-      </a>
-    </li>
-  </ul>
-</nav>
+{#if links && links.length > 1}
+  <nav class="flex-grow-0 flex-shrink-0 bg-gray-200 font-light">
+    <ul class="LIST">
+      {#each links as link (link.segment)}
+        <li>
+          <a
+            class="LINK{segment === link.segment ? ' bg-orange text-white' : ''}"
+            href="{basePath}/{link.segment}"
+          >
+            <div class="ICON">{@html link.icon}</div>
+            {link.text}
+          </a>
+        </li>
+      {/each}
+    </ul>
+  </nav>
+{/if}

@@ -173,7 +173,15 @@ class API {
     const request = new GetScheduleRequest();
     request.setEventkey(this.eventKey);
 
-    return this._unWrap(this.client.getSchedule(request, this.metadata));
+    return this._unWrap(this.client.getSchedule(
+      request,
+      this.metadata,
+    )).then(response => response, (error) => {
+      if (error.code === StatusCode.PERMISSION_DENIED) {
+        this._logOut();
+      }
+      throw error;
+    });
   }
 
   /**
