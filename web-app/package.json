@@ -5,20 +5,20 @@
   "scripts": {
     "cy:run": "cypress run",
     "cy:open": "cypress open",
+    "deps:make": "run-p tailwind protoc",
     "protoc": "mkdir -p src/proto/ && run-s protoc:clean protoc:build",
     "protoc:build": "protoc -I=../proto ../proto/*.proto --js_out=import_style=commonjs:./src/proto --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:./src/proto",
     "protoc:clean": "rm -f ./src/proto/*",
     "sapper:build": "sapper build",
     "sapper:dev": "sapper dev",
-
+    "sapper:export": "sapper export",
     "tailwind": "npx tailwind build static/tailwind.config.css -o static/tailwind.css",
-    "build": "run-s protoc sapper:build",
-    "dev": "run-s protoc tailwind sapper:dev",
-    "export": "sapper export",
-    "start": "node __sapper__/build",
-    "test": "run-p --race dev cy:run",
 
-    "postinstall": "run-p tailwind protoc"
+    "build": "run-s deps:make sapper:build",
+    "dev": "run-s deps:make sapper:dev",
+    "export": "run-s deps:make sapper:export",
+    "start": "node __sapper__/build",
+    "test": "run-p --race dev cy:run"
   },
   "dependencies": {
     "compression": "^1.7.1",
