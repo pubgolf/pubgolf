@@ -5,8 +5,10 @@
 .vscode/
 
 # Generated proto files
-web-app/src/proto/
-api/proto/
+web-app/src/proto/*
+!web-app/src/proto/.gitkeep
+api/proto/*
+!api/proto/.gitkeep
 
 # Temp data
 api/data/
