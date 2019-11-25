@@ -4,23 +4,22 @@ RUN apt-get -qq update && apt-get -qq install -y \
   unzip
 
 WORKDIR /tmp
-
-RUN curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v3.8.0/\
-protoc-3.8.0-linux-x86_64.zip -o protoc.zip && \
+ENV PB_VER 3.8.0
+RUN curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v${PB_VER}/\
+protoc-${PB_VER}-linux-x86_64.zip -o protoc.zip && \
   unzip -qq protoc.zip && \
   cp ./bin/protoc /usr/local/bin/protoc
 
-RUN curl -sSL https://github.com/grpc/grpc-web/releases/download/1.0.7/\
-protoc-gen-grpc-web-1.0.7-linux-x86_64 -o /usr/local/bin/protoc-gen-grpc-web && \
+ENV GRPC_VER 1.0.7
+RUN curl -sSL https://github.com/grpc/grpc-web/releases/download/${GRPC_VER}/\
+protoc-gen-grpc-web-${GRPC_VER}-linux-x86_64 -o /usr/local/bin/protoc-gen-grpc-web && \
   chmod +x /usr/local/bin/protoc-gen-grpc-web
 
-WORKDIR /
+COPY ./proto /home/node/proto
+COPY ./web-app /home/node/web-app
 
-COPY ./proto ./proto
-COPY ./web-app ./web-app
-WORKDIR ./web-app
-RUN mkdir -p ./web-app/arc/proto/ && mkdir -p ./web-app/arc/protos/ && npm install -g npx && \
-    npm install && \
-    npm run sapper:build
+WORKDIR /home/node/web-app
+RUN npm install -g npx && npm install --unsafe-perm
+RUN npm run sapper:build
 
 CMD ["node", "__sapper__/build/index.js"]
