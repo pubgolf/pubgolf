@@ -10,6 +10,9 @@ web-app/src/proto/*
 api/proto/*
 !api/proto/.gitkeep
 
+# Generated CSS framework files
+web-app/src/assets/css/tailwind.css
+
 # Temp data
 api/data/
 

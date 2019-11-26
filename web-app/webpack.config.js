@@ -1,7 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
+const glob = require('glob-all')
 const config = require('sapper/config/webpack.js');
 const pkg = require('./package.json');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const PurifyCSSPlugin = require('purifycss-webpack');
 
 const mode = process.env.NODE_ENV || 'production';
 const dev = mode === 'development';
@@ -31,7 +34,16 @@ module.exports = {
         {
           test: /\.svg$/,
           loader: 'svg-inline-loader'
-        }
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+          ],
+        },
       ]
     },
     mode,
@@ -41,6 +53,17 @@ module.exports = {
       new webpack.DefinePlugin({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode)
+      }),
+      new MiniCssExtractPlugin({
+        filename: '[hash]/[name].css',
+        chunkFilename: '[hash]/[id].css',
+      }),
+      new PurifyCSSPlugin({
+        paths: glob.sync([
+          path.join(__dirname, 'src/**/*.html'),
+          path.join(__dirname, 'src/**/*.svelte')
+        ]),
+        minimize: !dev
       }),
     ].filter(Boolean),
     devtool: dev && 'inline-source-map'
@@ -68,7 +91,16 @@ module.exports = {
         {
           test: /\.svg$/,
           loader: 'svg-inline-loader'
-        }
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+          ],
+        },
       ]
     },
     mode,
