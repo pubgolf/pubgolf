@@ -36,6 +36,13 @@ module.exports = {
           loader: 'svg-inline-loader'
         },
         {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[hash].[ext]',
+          },
+        },
+        {
           test: /\.css$/i,
           use: [
             {
@@ -91,6 +98,14 @@ module.exports = {
         {
           test: /\.svg$/,
           loader: 'svg-inline-loader'
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[hash].[ext]',
+            publicPath: 'client/',
+          },
         },
         {
           test: /\.css$/i,

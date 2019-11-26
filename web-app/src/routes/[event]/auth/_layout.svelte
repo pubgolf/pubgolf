@@ -1,4 +1,6 @@
 <script>
+  import Icon from '../../../assets/images/social-beer--green.png';
+
   // TODO: transition between pages
   export let segment;
 </script>
@@ -34,7 +36,7 @@
 </style>
 
 <main class="MAIN">
-  <img class="IMAGE" alt="Cheers" src="social-beer--green.png">
+  <img class="IMAGE" alt="Cheers" src={Icon}>
 
   <h1 class="HEADING">Pub Golf NYC 2k19</h1>
 
