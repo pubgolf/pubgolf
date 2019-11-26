@@ -5,6 +5,7 @@ const config = require('sapper/config/webpack.js');
 const pkg = require('./package.json');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 const mode = process.env.NODE_ENV || 'production';
 const dev = mode === 'development';
@@ -72,6 +73,29 @@ module.exports = {
         ]),
         minimize: !dev
       }),
+      new WebpackPwaManifest({
+        // Config
+        filename: "manifest.json",
+        inject: false,
+        publicPath: '/client',
+
+        // Manifest properties
+        "background_color": "#50AF4F",
+        "theme_color": "#EF753D",
+        "name": "Pub Golf",
+        "short_name": "PubG",
+        "display": "minimal-ui",
+        "start_url": "/nyc-2019/auth",
+
+        // Dynamic image generation
+        icons: [
+          {
+            src: path.resolve('src/assets/images/social-beer--green.png'),
+            sizes: [96, 128, 192, 256, 384, 512, 1024],
+            destination: 'images',
+          }
+        ],
+      })
     ].filter(Boolean),
     devtool: dev && 'inline-source-map'
   },
