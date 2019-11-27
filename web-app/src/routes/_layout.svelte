@@ -1,5 +1,5 @@
 <script>
-  import FaviconUrl from '../assets/images/favicon.png'
+  import FaviconUrl from 'src/assets/images/favicon.png'
 </script>
 
 <svelte:head>
