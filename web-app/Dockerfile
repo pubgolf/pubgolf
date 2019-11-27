@@ -19,7 +19,7 @@ COPY ./proto /home/node/proto
 COPY ./web-app /home/node/web-app
 
 WORKDIR /home/node/web-app
-RUN npm install -g npx && npm install --unsafe-perm
-RUN npm run sapper:build
+RUN npm install -g npx && npm install
+RUN npm run build
 
 CMD ["node", "__sapper__/build/index.js"]
