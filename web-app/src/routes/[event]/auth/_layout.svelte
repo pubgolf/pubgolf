@@ -36,7 +36,7 @@
 </style>
 
 <main class="MAIN">
-  <img class="IMAGE" alt="Cheers" src={Icon}>
+  <img class="IMAGE" alt="Cheers" src="{Icon}">
 
   <h1 class="HEADING">Pub Golf NYC 2k19</h1>
 
