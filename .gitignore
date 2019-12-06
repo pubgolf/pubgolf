@@ -13,7 +13,7 @@ api/proto/*
 !api/proto/.gitkeep
 
 # Un-vendored dependencies
-web-app/node_modules/
+node_modules
 web-app/src/assets/css/tailwind.css
 
 # Temp data
