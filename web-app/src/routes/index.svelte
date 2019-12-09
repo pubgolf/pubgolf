@@ -1,5 +1,5 @@
 <script>
-  let events = [
+  const events = [
     { key: 'nyc-2019', text: 'NYC 2019' },
   ];
   if (process.env.NODE_ENV === 'development') {

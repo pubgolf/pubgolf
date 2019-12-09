@@ -1,28 +1,28 @@
 <script>
   import { goto } from '@sapper/app';
 
-  // import { LEAGUE } from '../../../api';
+  // import { LEAGUE } from 'src/api';
   import {
     applyInsertions,
     onlyDigits,
-  } from '../../../phone-handler';
+  } from 'src/phone-handler';
   import {
     api,
     event,
-  } from '../../../stores';
+  } from 'src/stores';
   import FormError from './_FormError';
 
 
   // Local state
   let name = '';
   let phone = '';
-  let league = '';
+  const league = '';
 
   // reset error to null if the form changes
   $: error = Boolean(name && phone && league) && null;
 
   function handlePhone (inputEvent) {
-    const target = inputEvent.target;
+    const { target } = inputEvent;
     phone = applyInsertions(target.value);
 
     // puts cursor back to the position where addition or deletion was done

@@ -1,0 +1,5 @@
+__sapper__
+node_modules
+cypress
+proto
+service-worker.js

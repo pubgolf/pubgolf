@@ -5,14 +5,14 @@
   import {
     api,
     event,
-  } from '../../stores';
-  import { isDev } from '../../utils';
-  import Nav from '../../components/Nav.svelte';
+  } from 'src/stores';
+  import { isDev } from 'src/utils';
+  import Nav from 'src/components/Nav.svelte';
 
 
   export let segment;
 
-  const { page, session } = stores();
+  const { page } = stores();
   const links = [
     {
       segment: 'home',
