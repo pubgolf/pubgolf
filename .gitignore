@@ -3,6 +3,8 @@
 # User-specific stuff
 .idea/
 .vscode/
+.DS_Store
+yarn-error.log
 
 # Generated proto files
 web-app/src/proto/*
@@ -10,8 +12,15 @@ web-app/src/proto/*
 api/proto/*
 !api/proto/.gitkeep
 
+# Un-vendored dependencies
+node_modules
+web-app/src/assets/css/tailwind.css
+
 # Temp data
 api/data/
+web-app/cypress/screenshots/
+web-app/src/node_modules/@sapper/
 
-# API binary
+# Build Output
 api/api
+web-app/__sapper__/

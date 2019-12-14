@@ -1,12 +1,19 @@
 const webpack = require('webpack');
 const path = require('path');
+const glob = require('glob-all')
 const config = require('sapper/config/webpack.js');
 const pkg = require('./package.json');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const PurifyCSSPlugin = require('purifycss-webpack');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 
-const mode = process.env.NODE_ENV;
+const mode = process.env.NODE_ENV || 'production';
 const dev = mode === 'development';
 
-const alias = { svelte: path.resolve('node_modules', 'svelte') };
+const alias = { 
+  svelte: path.resolve('node_modules', 'svelte'),
+  src: path.resolve('src'),
+};
 const extensions = ['.mjs', '.js', '.json', '.svelte', '.html'];
 const mainFields = ['svelte', 'module', 'browser', 'main'];
 
@@ -31,7 +38,23 @@ module.exports = {
         {
           test: /\.svg$/,
           loader: 'svg-inline-loader'
-        }
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[hash].[ext]',
+          },
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+          ],
+        },
       ]
     },
     mode,
@@ -42,6 +65,40 @@ module.exports = {
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode)
       }),
+      new MiniCssExtractPlugin({
+        filename: '[hash]/[name].css',
+        chunkFilename: '[hash]/[id].css',
+      }),
+      new PurifyCSSPlugin({
+        paths: glob.sync([
+          path.join(__dirname, 'src/**/*.html'),
+          path.join(__dirname, 'src/**/*.svelte')
+        ]),
+        minimize: !dev
+      }),
+      new WebpackPwaManifest({
+        // Config
+        filename: "manifest.json",
+        inject: false,
+        publicPath: '/client',
+
+        // Manifest properties
+        "background_color": "#50AF4F",
+        "theme_color": "#EF753D",
+        "name": "Pub Golf",
+        "short_name": "PubG",
+        "display": "minimal-ui",
+        "start_url": "/nyc-2019/auth",
+
+        // Dynamic image generation
+        icons: [
+          {
+            src: path.resolve('src/assets/images/social-beer--green.png'),
+            sizes: [96, 128, 192, 256, 384, 512, 1024],
+            destination: 'images',
+          }
+        ],
+      })
     ].filter(Boolean),
     devtool: dev && 'inline-source-map'
   },
@@ -68,10 +125,27 @@ module.exports = {
         {
           test: /\.svg$/,
           loader: 'svg-inline-loader'
-        }
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[hash].[ext]',
+            publicPath: 'client/',
+          },
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            'css-loader',
+          ],
+        },
       ]
     },
-    mode: process.env.NODE_ENV,
+    mode,
     performance: {
       hints: false // it doesn't matter if server.js is large
     }
@@ -80,6 +154,6 @@ module.exports = {
   serviceworker: {
     entry: config.serviceworker.entry(),
     output: config.serviceworker.output(),
-    mode: process.env.NODE_ENV
+    mode,
   }
 };
