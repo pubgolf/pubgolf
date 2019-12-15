@@ -4,11 +4,11 @@
   import {
     applyInsertions,
     onlyDigits,
-  } from '../../../phone-handler';
+  } from 'src/phone-handler';
   import {
     api,
     event,
-  } from '../../../stores';
+  } from 'src/stores';
   import FormError from './_FormError';
 
   // TODO: format phone as they type
@@ -21,7 +21,7 @@
   $: error = Boolean(phone) && null;
 
   function handlePhone (inputEvent) {
-    const target = inputEvent.target;
+    const { target } = inputEvent;
     phone = applyInsertions(target.value);
 
     // puts cursor back to the position where addition or deletion was done

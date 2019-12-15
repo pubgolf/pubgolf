@@ -1,18 +1,20 @@
 const webpack = require('webpack');
 const path = require('path');
-const glob = require('glob-all')
+const glob = require('glob-all');
 const config = require('sapper/config/webpack.js');
-const pkg = require('./package.json');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 
+const pkg = require('./package.json');
+
+
 const mode = process.env.NODE_ENV || 'production';
 const dev = mode === 'development';
 
-const alias = { 
-  svelte: path.resolve('node_modules', 'svelte'),
-  src: path.resolve('src'),
+const alias = {
+  svelte: path.resolve(__dirname, 'node_modules', 'svelte'),
+  src: path.resolve(__dirname, 'src'),
 };
 const extensions = ['.mjs', '.js', '.json', '.svelte', '.html'];
 const mainFields = ['svelte', 'module', 'browser', 'main'];
@@ -31,13 +33,13 @@ module.exports = {
             options: {
               dev,
               hydratable: true,
-              hotReload: false // pending https://github.com/sveltejs/svelte/issues/2377
-            }
-          }
+              hotReload: false, // pending https://github.com/sveltejs/svelte/issues/2377
+            },
+          },
         },
         {
           test: /\.svg$/,
-          loader: 'svg-inline-loader'
+          loader: 'svg-inline-loader',
         },
         {
           test: /\.(png|jpg|gif)$/,
@@ -55,7 +57,7 @@ module.exports = {
             'css-loader',
           ],
         },
-      ]
+      ],
     },
     mode,
     plugins: [
@@ -63,7 +65,7 @@ module.exports = {
       // dev && new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         'process.browser': true,
-        'process.env.NODE_ENV': JSON.stringify(mode)
+        'process.env.NODE_ENV': JSON.stringify(mode),
       }),
       new MiniCssExtractPlugin({
         filename: '[hash]/[name].css',
@@ -72,23 +74,23 @@ module.exports = {
       new PurifyCSSPlugin({
         paths: glob.sync([
           path.join(__dirname, 'src/**/*.html'),
-          path.join(__dirname, 'src/**/*.svelte')
+          path.join(__dirname, 'src/**/*.svelte'),
         ]),
-        minimize: !dev
+        minimize: !dev,
       }),
       new WebpackPwaManifest({
         // Config
-        filename: "manifest.json",
+        filename: 'manifest.json',
         inject: false,
         publicPath: '/client',
 
         // Manifest properties
-        "background_color": "#50AF4F",
-        "theme_color": "#EF753D",
-        "name": "Pub Golf",
-        "short_name": "PubG",
-        "display": "minimal-ui",
-        "start_url": "/nyc-2019/auth",
+        background_color: '#50AF4F',
+        theme_color: '#EF753D',
+        name: 'Pub Golf',
+        short_name: 'PubG',
+        display: 'minimal-ui',
+        start_url: '/nyc-2019/auth',
 
         // Dynamic image generation
         icons: [
@@ -96,11 +98,11 @@ module.exports = {
             src: path.resolve('src/assets/images/social-beer--green.png'),
             sizes: [96, 128, 192, 256, 384, 512, 1024],
             destination: 'images',
-          }
+          },
         ],
-      })
+      }),
     ].filter(Boolean),
-    devtool: dev && 'inline-source-map'
+    devtool: dev && 'inline-source-map',
   },
 
   server: {
@@ -118,13 +120,13 @@ module.exports = {
             options: {
               css: false,
               generate: 'ssr',
-              dev
-            }
-          }
+              dev,
+            },
+          },
         },
         {
           test: /\.svg$/,
-          loader: 'svg-inline-loader'
+          loader: 'svg-inline-loader',
         },
         {
           test: /\.(png|jpg|gif)$/,
@@ -143,17 +145,17 @@ module.exports = {
             'css-loader',
           ],
         },
-      ]
+      ],
     },
     mode,
     performance: {
-      hints: false // it doesn't matter if server.js is large
-    }
+      hints: false, // it doesn't matter if server.js is large
+    },
   },
 
   serviceworker: {
     entry: config.serviceworker.entry(),
     output: config.serviceworker.output(),
     mode,
-  }
+  },
 };

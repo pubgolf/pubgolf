@@ -1,18 +1,18 @@
 <script>
-  import {
-    api,
-    event,
-    stops,
-    pastStops,
-  } from '../../../stores';
-
-
-  let venueId = $pastStops[0].venueid;
-  let strokes = null;
-  let comments = '';
-
-  function submit () {
-  }
+  // import {
+  //   api,
+  //   event,
+  //   stops,
+  //   pastStops,
+  // } from 'src/stores';
+  //
+  //
+  // let venueId = $pastStops[0].venueid;
+  // let strokes = null;
+  // let comments = '';
+  //
+  // function submit () {
+  // }
 </script>
 
 <svelte:head>

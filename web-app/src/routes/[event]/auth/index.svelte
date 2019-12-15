@@ -1,5 +1,5 @@
 <script>
-  import { event } from '../../../stores';
+  import { event } from 'src/stores';
 </script>
 
 <svelte:head>
