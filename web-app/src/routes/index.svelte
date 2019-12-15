@@ -1,8 +1,12 @@
 <script>
+  import { stores } from '@sapper/app';
+  const { session } = stores();
+
   let events = [
     { key: 'nyc-2019', text: 'NYC 2019' },
   ];
-  if (process.env.NODE_ENV === 'development') {
+  
+  if ($session.config.PUBGOLF_ENV.endsWith('dev')) {
     events.push(
       { key: 'sf-2019', text: 'SF 2019' },
       { key: 'current', text: 'Current' },

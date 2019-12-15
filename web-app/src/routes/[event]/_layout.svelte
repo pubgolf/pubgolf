@@ -5,9 +5,9 @@
   import {
     api,
     event,
-  } from '../../stores';
-  import { isDev } from '../../utils';
-  import Nav from '../../components/Nav.svelte';
+  } from 'src/stores';
+  import { isDev } from 'src/utils';
+  import Nav from 'src/components/Nav.svelte';
 
 
   export let segment;
@@ -36,7 +36,7 @@
 
     $event = params.event;
 
-    if (isDev()) {
+    if (isDev($session.config.PUBGOLF_ENV)) {
       window.$api = $api;
     }
   });

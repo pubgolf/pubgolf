@@ -1,8 +1,12 @@
 <script>
+  import { isDev } from 'src/utils';
+  import { stores } from '@sapper/app';
+
   export let status;
   export let error;
 
-  const dev = process.env.NODE_ENV === 'development';
+  const { session } = stores();
+  const showErrors = isDev($session.config.PUBGOLF_ENV);
 </script>
 
 <style>
@@ -35,6 +39,6 @@
 
 <p>{error.message}</p>
 
-{#if dev && error.stack}
+{#if showErrors && error.stack}
   <pre>{error.stack}</pre>
 {/if}
