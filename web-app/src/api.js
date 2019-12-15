@@ -1,6 +1,5 @@
 import { StatusCode } from 'grpc-web';
 
-
 const Cookies = require('js-cookie');
 
 
@@ -86,9 +85,7 @@ class API {
     return promise.then(
       instance => instance.toObject(),
       error => {
-        if (process.env.NODE_ENV === 'development') {
-          console.error(error);
-        }
+        console.error(error);
 
         // Replace the top-level message with something user-presentable.
         // The original message is still preserved in error.metadata
