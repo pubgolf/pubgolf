@@ -12,7 +12,7 @@
 
   export let segment;
 
-  const { page } = stores();
+  const { page, session } = stores();
   const links = [
     {
       segment: 'home',
