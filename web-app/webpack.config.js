@@ -3,7 +3,7 @@ const path = require('path');
 const glob = require('glob-all');
 const config = require('sapper/config/webpack.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const PurifyCSSPlugin = require('purifycss-webpack');
+const PurgeCssPlugin = require('purgecss-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 const pkg = require('./package.json');
@@ -71,12 +71,11 @@ module.exports = {
         filename: '[hash]/[name].css',
         chunkFilename: '[hash]/[id].css',
       }),
-      new PurifyCSSPlugin({
+      new PurgeCssPlugin({
         paths: glob.sync([
           path.join(__dirname, 'src/**/*.html'),
           path.join(__dirname, 'src/**/*.svelte'),
         ]),
-        minimize: !dev,
       }),
       new WebpackPwaManifest({
         // Config
