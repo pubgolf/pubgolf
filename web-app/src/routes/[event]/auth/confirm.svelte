@@ -1,5 +1,5 @@
 <script context="module">
-  import { onlyDigits } from '../../../phone-handler';
+  import { onlyDigits } from 'src/phone-handler';
 
 
   export async function preload (page) {
@@ -20,7 +20,7 @@
   import {
     api,
     event,
-  } from '../../../stores';
+  } from 'src/stores';
   import FormError from './_FormError';
 
 

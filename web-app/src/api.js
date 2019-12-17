@@ -27,7 +27,7 @@ const MESSAGES = {
 };
 
 // Wrapper for handling cookies so it's abstracted from the rest of the application
-export const getCookieJar = () => {
+export const getCookieJar = () => { // eslint-disable-line arrow-body-style
   return {
     get (name) {
       return Cookies.get(name);
@@ -43,6 +43,31 @@ export const getCookieJar = () => {
 
 const TOKEN_COOKIE = 'pg-token';
 
+
+/**
+ * @param promise
+ *
+ * @returns {Object}
+ */
+function _unWrap (promise) {
+  return promise.then(
+    instance => instance.toObject(),
+    (error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(error);
+      }
+
+      // Replace the top-level message with something user-presentable.
+      // The original message is still preserved in error.metadata
+      if (error.code && error.code in MESSAGES) {
+        error.message = MESSAGES[error.code];
+      }
+      throw error;
+    },
+  );
+}
+
+
 class API {
   constructor (eventKey, host, metadata = {}) {
     this._cookieJar = getCookieJar();
@@ -53,7 +78,6 @@ class API {
     if (!metadata.authorization) {
       // TODO: this'll get wonky if you switch events
       this._logIn(this._cookieJar.get(TOKEN_COOKIE));
-
     }
   }
 
@@ -77,27 +101,6 @@ class API {
   }
 
   /**
-   * @param promise
-   *
-   * @returns {Object}
-   */
-  _unWrap (promise) {
-    return promise.then(
-      instance => instance.toObject(),
-      error => {
-        console.error(error);
-
-        // Replace the top-level message with something user-presentable.
-        // The original message is still preserved in error.metadata
-        if (error.code && error.code in MESSAGES) {
-          error.message = MESSAGES[error.code];
-        }
-        throw error;
-      },
-    );
-  }
-
-  /**
    * @param {Object} playerInfo
    *
    * @returns {Promise<RegisterPlayerReply>}
@@ -110,7 +113,7 @@ class API {
     request.setPhonenumber(`+1${playerInfo.phone}`);
     request.setLeague(playerInfo.league);
 
-    return this._unWrap(this.client.registerPlayer(request, this.metadata));
+    return _unWrap(this.client.registerPlayer(request, this.metadata));
   }
 
   /**
@@ -124,7 +127,7 @@ class API {
     request.setEventkey(this.eventKey);
     request.setPhonenumber(`+1${phone}`);
 
-    return this._unWrap(this.client.requestPlayerLogin(
+    return _unWrap(this.client.requestPlayerLogin(
       request,
       this.metadata,
     ));
@@ -143,7 +146,7 @@ class API {
     request.setPhonenumber(`+1${phone}`);
     request.setAuthcode(code);
 
-    return this._unWrap(this.client.playerLogin(
+    return _unWrap(this.client.playerLogin(
       request,
       this.metadata,
     )).then(({ authtoken }) => {
@@ -158,7 +161,7 @@ class API {
     const request = new GetScheduleRequest();
     request.setEventkey(this.eventKey);
 
-    return this._unWrap(this.client.getSchedule(
+    return _unWrap(this.client.getSchedule(
       request,
       this.metadata,
     )).then(response => response, (error) => {
@@ -176,7 +179,7 @@ class API {
     const request = new GetScoresRequest();
     request.setEventkey(this.eventKey);
 
-    return this._unWrap(this.client.getScores(request, this.metadata));
+    return _unWrap(this.client.getScores(request, this.metadata));
   }
 
   /**
@@ -193,7 +196,7 @@ class API {
     request.setVenueid(venueId);
     request.setStrokes(strokes);
 
-    return this._unWrap(this.client.createOrUpdateScore(
+    return _unWrap(this.client.createOrUpdateScore(
       request,
       this.metadata,
     ));

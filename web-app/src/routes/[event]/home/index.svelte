@@ -1,14 +1,15 @@
 <script>
   import { goto } from '@sapper/app';
 
-  import Countdown from '../../../components/Countdown';
+  import Countdown from 'src/components/Countdown';
   import {
     api,
     event,
     stops,
     nextStop,
     pastStops,
-  } from '../../../stores';
+  } from 'src/stores';
+
 
   let fetching = true;
 
@@ -20,12 +21,13 @@
       $api.getSchedule().then((schedule) => {
         $stops = schedule.venuelist.venuesList.map(
           ({ stopid, venue: { starttime, ...venue } }, index) => ({
-              stopid,
-              ...venue,
-              start: new Date(starttime),
-              index,
-            }
-          ));
+            stopid,
+            ...venue,
+            start: new Date(starttime),
+            index,
+          }
+          ),
+        );
         fetching = false;
       }, () => {
         if (!$api.isLoggedIn()) {
