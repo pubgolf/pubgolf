@@ -36,7 +36,7 @@
 
     $event = params.event;
 
-    if (isDev()) {
+    if (isDev($session.config.PUBGOLF_ENV)) {
       window.$api = $api;
     }
   });

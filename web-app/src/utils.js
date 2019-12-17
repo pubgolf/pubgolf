@@ -42,8 +42,6 @@ export function zeroPad (num, minLength = 2) {
   return `${num}`.padStart(minLength, '0');
 }
 
-export function isDev () {
-  return process.env.PUBGOLF_ENV
-    ? process.env.PUBGOLF_ENV === 'dev'
-    : process.env.NODE_ENV === 'development';
+export function isDev(env = '') {
+  return env.endsWith('dev');
 }
