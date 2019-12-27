@@ -10,17 +10,17 @@ import (
 )
 
 var funcMap map[string]func(pg.APIClient) = map[string]func(pg.APIClient){
-	"1": RegisterPlayer,
-	"2": RequestPlayerLogin,
-	"3": PlayerLogin,
-	"4": GetSchedule,
-	"5": GetScores,
-	"6": GetScoresForPlayer,
+	"1": registerPlayer,
+	"2": requestPlayerLogin,
+	"3": playerLogin,
+	"4": getSchedule,
+	"5": getScores,
+	"6": getScoresForPlayer,
 }
 
-func RegisterPlayer(client pg.APIClient) {
+func registerPlayer(client pg.APIClient) {
 	eventKey := getInput("eventKey", "starts-in-30m")
-	phoneNumber := getInput("phoneNumber", "+5551231234")
+	phoneNumber := getInput("phoneNumber", "+15551231234")
 	name := getInput("name", "Eric Morris")
 
 	league := pg.League_NONE
@@ -42,9 +42,9 @@ func RegisterPlayer(client pg.APIClient) {
 	logResponse(r, err)
 }
 
-func RequestPlayerLogin(client pg.APIClient) {
+func requestPlayerLogin(client pg.APIClient) {
 	eventKey := getInput("eventKey", "starts-in-30m")
-	phoneNumber := getInput("phoneNumber", "+5551231234")
+	phoneNumber := getInput("phoneNumber", "+15551231234")
 
 	log.Println("Making call to RequestPlayerLogin")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -56,9 +56,9 @@ func RequestPlayerLogin(client pg.APIClient) {
 	logResponse(r, err)
 }
 
-func PlayerLogin(client pg.APIClient) {
+func playerLogin(client pg.APIClient) {
 	eventKey := getInput("eventKey", "starts-in-30m")
-	phoneNumber := getInput("phoneNumber", "+5551231234")
+	phoneNumber := getInput("phoneNumber", "+15551231234")
 	authCode, err := getInputAsUInt32("authCode", 111111)
 	if err != nil {
 		log.Printf("Could not parse input as a number: %s", err)
@@ -76,7 +76,7 @@ func PlayerLogin(client pg.APIClient) {
 	logResponse(r, err)
 }
 
-func GetSchedule(client pg.APIClient) {
+func getSchedule(client pg.APIClient) {
 	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
 	eventKey := getInput("eventKey", "current")
 
@@ -89,7 +89,7 @@ func GetSchedule(client pg.APIClient) {
 	logResponse(r, err)
 }
 
-func GetScores(client pg.APIClient) {
+func getScores(client pg.APIClient) {
 	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
 	eventKey := getInput("eventKey", "current")
 
@@ -102,7 +102,7 @@ func GetScores(client pg.APIClient) {
 	logResponse(r, err)
 }
 
-func GetScoresForPlayer(client pg.APIClient) {
+func getScoresForPlayer(client pg.APIClient) {
 	authToken := getInput("authToken", "00000000-0000-4000-a000-300000000000")
 	eventKey := getInput("eventKey", "current")
 	playerID := getInput("eventKey", "00000000-0000-4000-a000-200000000000")

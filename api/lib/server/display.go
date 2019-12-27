@@ -7,9 +7,9 @@ import (
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
-func (server *APIServer) GetSchedule(ctx context.Context,
-	req *pg.GetScheduleRequest) (*pg.GetScheduleReply, error) {
-	tx, eventID, _, err := validateAuthenticatedRequest(server, ctx, &req.EventKey)
+// GetSchedule returns a list of venues and transisiton times for an event.
+func (server *APIServer) GetSchedule(ctx context.Context, req *pg.GetScheduleRequest) (*pg.GetScheduleReply, error) {
+	tx, eventID, _, err := validateAuthenticatedRequest(ctx, server, &req.EventKey)
 	if err != nil {
 		return nil, err
 	}
@@ -24,9 +24,9 @@ func (server *APIServer) GetSchedule(ctx context.Context,
 	return &pg.GetScheduleReply{VenueList: &venueList}, nil
 }
 
-func (server *APIServer) GetScores(ctx context.Context,
-	req *pg.GetScoresRequest) (*pg.GetScoresReply, error) {
-	tx, eventID, _, err := validateAuthenticatedRequest(server, ctx, &req.EventKey)
+// GetScores returns an event's overall leaderboard.
+func (server *APIServer) GetScores(ctx context.Context, req *pg.GetScoresRequest) (*pg.GetScoresReply, error) {
+	tx, eventID, _, err := validateAuthenticatedRequest(ctx, server, &req.EventKey)
 	if err != nil {
 		return nil, err
 	}
@@ -65,19 +65,19 @@ func (server *APIServer) GetScores(ctx context.Context,
 	}, nil
 }
 
-func (server *APIServer) GetScoresForPlayer(ctx context.Context,
-	req *pg.GetScoresForPlayerRequest) (*pg.GetScoresForPlayerReply, error) {
+// GetScoresForPlayer all scores for the requested player.
+func (server *APIServer) GetScoresForPlayer(ctx context.Context, req *pg.GetScoresForPlayerRequest) (
+	*pg.GetScoresForPlayerReply, error) {
 	if invalidIDFormat(&req.PlayerID) {
 		return nil, invalidArgumentError()
 	}
 
-	tx, eventID, _, err := validateAuthenticatedRequest(server, ctx,
-		&req.EventKey)
+	tx, eventID, _, err := validateAuthenticatedRequest(ctx, server, &req.EventKey)
 	if err != nil {
 		return nil, err
 	}
 
-	playerName, err := db.GetPlayerName(tx, &eventID, &req.PlayerID)
+	playerName, err := db.GetPlayerName(tx, &req.PlayerID)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)

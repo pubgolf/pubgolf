@@ -6,6 +6,7 @@ import (
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
+// GetEventID accepts an `eventKey` and returns a corresponding event ID to bypass joins in later queries.
 func GetEventID(tx *sql.Tx, eventKey *string) (string, error) {
 	eventIDRow := tx.QueryRow(`
 		SELECT id
@@ -22,6 +23,7 @@ func GetEventID(tx *sql.Tx, eventKey *string) (string, error) {
 	return eventID, err
 }
 
+// GetScheduleForEvent returns the venue list for an event.
 func GetScheduleForEvent(tx *sql.Tx, eventID *string) (pg.VenueList, error) {
 	venueList := pg.VenueList{}
 	rows, err := tx.Query(`

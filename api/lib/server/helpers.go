@@ -18,8 +18,10 @@ var uuidFormat *regexp.Regexp = regexp.MustCompile(
 var phoneNumberFormat *regexp.Regexp = regexp.MustCompile(
 	"^\\+[1-9]\\d{1,14}$")
 
-func validateAuthenticatedRequest(server *APIServer, ctx context.Context,
-	eventKey *string) (*sql.Tx, string, string, error) {
+// validateAuthenticatedRequest extracts an auth token from the request header and ensures that it's valid for the
+// given `eventKey`, returning the associated player ID and event ID.
+func validateAuthenticatedRequest(ctx context.Context, server *APIServer, eventKey *string) (*sql.Tx, string, string,
+	error) {
 	if isEmpty(eventKey) {
 		return nil, "", "", invalidArgumentError()
 	}
@@ -62,8 +64,8 @@ func validateAuthenticatedRequest(server *APIServer, ctx context.Context,
 	return tx, eventID, playerID, nil
 }
 
-func validateUnauthenticatedRequest(server *APIServer, eventKey *string) (
-	*sql.Tx, string, error) {
+// validateUnauthenticatedRequest ensures that the given `eventKey` is valid.
+func validateUnauthenticatedRequest(server *APIServer, eventKey *string) (*sql.Tx, string, error) {
 	if isEmpty(eventKey) {
 		return nil, "", invalidArgumentError()
 	}
@@ -89,8 +91,7 @@ func validateUnauthenticatedRequest(server *APIServer, eventKey *string) (
 func getAuthTokenFromHeader(ctx context.Context) (string, error) {
 	metadata, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Errorf(codes.DataLoss,
-			"Error reading 'authorization' header.")
+		return "", status.Errorf(codes.DataLoss, "Error reading 'authorization' header.")
 	}
 
 	authHeader, ok := metadata["authorization"]

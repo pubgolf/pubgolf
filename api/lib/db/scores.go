@@ -7,8 +7,8 @@ import (
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
-func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) (
-	[]*pg.Score, error) {
+// GetPlayerScores returns all scores for a given player and event.
+func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score, error) {
 	scores := make([]*pg.Score, 0)
 	rows, err := tx.Query(`
 		WITH event_timeslots AS (
@@ -109,6 +109,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) (
 	return scores, nil
 }
 
+// GetScoreboardBestOf9 returns scores for all players that are eligible for the "Best of 9" category.
 func GetScoreboardBestOf9(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	return getScoreboard(tx, eventID, `
 		SELECT
@@ -129,6 +130,8 @@ func GetScoreboardBestOf9(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	`)
 }
 
+// GetScoreboardBestOf5 returns scores for all players that are eligible for the "Best of 5" category (but not eligible
+// for "Best of 9").
 func GetScoreboardBestOf5(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	return getScoreboard(tx, eventID, `
 		SELECT
@@ -149,6 +152,8 @@ func GetScoreboardBestOf5(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	`)
 }
 
+// GetScoreboardIncomplete returns scores for all players that aren't eligible for either the "Best of 9" or "Best of 5"
+// categories.
 func GetScoreboardIncomplete(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	return getScoreboard(tx, eventID, `
 		SELECT
@@ -168,6 +173,7 @@ func GetScoreboardIncomplete(tx *sql.Tx, eventID *string) ([]*pg.Score, error) {
 	`)
 }
 
+// getScoreboard is a helper function to wrap common logic for all of the scoreboard fetchers.
 func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	[]*pg.Score, error) {
 	scores := make([]*pg.Score, 0)

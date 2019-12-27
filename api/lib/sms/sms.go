@@ -10,21 +10,22 @@ import (
 	"strings"
 )
 
+// SendAuthCodeSms handles populating the auth message template with the provided `authCode` and sends it to
+// `phoneNumber` via SMS. The `phoneNumber` argument is expected to be in valid E.164 format:
+// https://www.twilio.com/docs/glossary/what-e164
 func SendAuthCodeSms(phoneNumber *string, authCode uint32) error {
 	smsContent := fmt.Sprintf("Your pubgolf.co auth code is: %d", authCode)
 	logAction := "Logging"
 	var err error = nil
 
-	if os.Getenv("TWILIO_FROM_NUM") != "" && os.Getenv("TWILIO_ACCOUNT_SID") !=
-		"" && os.Getenv("TWILIO_AUTH_TOKEN") != "" {
+	if os.Getenv("TWILIO_FROM_NUM") != "" && os.Getenv("TWILIO_ACCOUNT_SID") != "" && os.Getenv("TWILIO_AUTH_TOKEN") !=
+		"" {
 		logAction = "Sending"
 		msgReader := formatMessage(phoneNumber, smsContent)
-		err = sendRequest(os.Getenv("TWILIO_ACCOUNT_SID"),
-			os.Getenv("TWILIO_AUTH_TOKEN"), msgReader)
+		err = sendRequest(os.Getenv("TWILIO_ACCOUNT_SID"), os.Getenv("TWILIO_AUTH_TOKEN"), msgReader)
 	}
 
-	log.Printf("%s text message to %s:\n==========\n%s\n==========",
-		logAction, *phoneNumber, smsContent)
+	log.Printf("%s text message to %s:\n==========\n%s\n==========", logAction, *phoneNumber, smsContent)
 
 	return err
 }
@@ -41,8 +42,7 @@ func formatMessage(phoneNumber *string, smsContent string) strings.Reader {
 func sendRequest(accountSid string, authToken string,
 	msgDataReader strings.Reader) error {
 	client := &http.Client{}
-	urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid +
-		"/Messages.json"
+	urlStr := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", accountSid)
 	req, err := http.NewRequest("POST", urlStr, &msgDataReader)
 	if err != nil {
 		return err

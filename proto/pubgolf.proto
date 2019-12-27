@@ -12,16 +12,14 @@ service API {
 
   // Player accounts are per-event.
   rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerReply) {}
-  rpc RequestPlayerLogin (RequestPlayerLoginRequest)
-    returns (RequestPlayerLoginReply) {}
+  rpc RequestPlayerLogin (RequestPlayerLoginRequest) returns (RequestPlayerLoginReply) {}
   rpc PlayerLogin (PlayerLoginRequest) returns (PlayerLoginReply) {}
 
   // Display endpoints - secured via auth token
 
   rpc GetSchedule (GetScheduleRequest) returns (GetScheduleReply) {}
   rpc GetScores (GetScoresRequest) returns (GetScoresReply) {}
-  rpc GetScoresForPlayer (GetScoresForPlayerRequest)
-    returns (GetScoresForPlayerReply) {}
+  rpc GetScoresForPlayer (GetScoresForPlayerRequest) returns (GetScoresForPlayerReply) {}
 
   // User action endpoints - secured via auth token
 
@@ -99,9 +97,8 @@ message CreateOrUpdateScoreRequest {
   string playerID = 2;
   int32 strokes = 3;
 
-  // TODO: Figure out how to handle bonus and penalty. I think we can probably
-  // include this field in the proto, share it across the player server and the
-  // admin server and just ignore it in the player-facing endpoints.
+  // TODO: Figure out how to handle bonus and penalty. I think we can probably include this field in the proto, share it
+  // across the player server and the admin server and just ignore it in the player-facing endpoints.
   // sint32 adjustments = 4;
 
   // TODO: Comments?
