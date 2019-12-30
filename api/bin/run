@@ -3,4 +3,3 @@
 bin/clean-protos
 bin/compile-protos
 go run .
-bin/clean-protos
