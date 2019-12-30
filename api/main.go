@@ -73,9 +73,9 @@ func initDb(logCtx *log.Entry, connStr string) *sql.DB {
 	return db
 }
 
-func initServer(db *sql.DB) *grpc.Server {
+func initServer(logCtx *log.Entry, db *sql.DB) *grpc.Server {
 	grpcServer := grpc.NewServer()
-	pg.RegisterAPIServer(grpcServer, &server.APIServer{DB: db})
+	pg.RegisterAPIServer(grpcServer, &server.APIServer{LogCtx: logCtx, DB: db})
 	return grpcServer
 }
 
@@ -108,18 +108,18 @@ func main() {
 			PrettyPrint: false,
 		})
 	}
-	startupLogContext := log.WithField("server_info", log.Fields{
+	serverLogCtx := log.WithField("server_info", log.Fields{
 		"port": port,
 		"env":  env,
 	})
 
-	db := initDb(startupLogContext, getDbConnectionString())
+	db := initDb(serverLogCtx, getDbConnectionString())
 	defer db.Close()
 
-	server := initServer(db)
-	go bindServer(startupLogContext, server, port)
+	server := initServer(serverLogCtx, db)
+	go bindServer(serverLogCtx, server, port)
 
 	<-shutdownChan
 	server.GracefulStop()
-	startupLogContext.Info("Server Stop")
+	serverLogCtx.Info("Server Stop")
 }
