@@ -7,7 +7,7 @@ import (
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
-// CreatePlayer inserts a new player into the databse in an unconfirmed state.
+// CreatePlayer inserts a new player into the database in an unconfirmed state.
 func CreatePlayer(tx *sql.Tx, eventID *string, name *string, league pg.League, phoneNumber *string,
 	randCode uint32) error {
 	_, err := tx.Exec(`
