@@ -2,6 +2,7 @@
   import { stores } from '@sapper/app';
   import { onMount } from 'svelte';
 
+  import { getAPI } from 'src/api';
   import {
     api,
     event,
@@ -35,6 +36,7 @@
     const { params } = $page;
 
     $event = params.event;
+    $api = getAPI($event, $session.config.API_HOST_EXTERNAL);
 
     if (isDev($session.config.PUBGOLF_ENV)) {
       window.$api = $api;
