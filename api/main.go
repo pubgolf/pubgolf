@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	DEFAULT_PORT = "50051"
+	defaultPort = "50051"
 )
 
 func loadEnv() {
@@ -28,9 +28,8 @@ func loadEnv() {
 
 	log.Printf("Running as PUBGOLF_ENV of %s", env)
 
-	// In dev, we assume we're running in the monorepo, in which case the .env is
-	// at the repo root. Otherwise, we're probably in the docker environment and
-	// can access values as real env vars.
+	// In dev, we assume we're running in the monorepo, in which case the .env is at the repo root. Otherwise, we're
+	// probably in the docker environment and can access values as real env vars.
 	if strings.ToLower(env) == "dev" {
 		if err := godotenv.Load("../.env"); err != nil {
 			log.Fatal("Error loading .env file")
@@ -104,7 +103,7 @@ func main() {
 	server := initServer(db)
 	port := os.Getenv("API_PORT")
 	if port == "" {
-		port = DEFAULT_PORT
+		port = defaultPort
 	}
 	bindServer(server, port)
 }

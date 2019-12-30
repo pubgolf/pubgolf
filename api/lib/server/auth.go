@@ -10,8 +10,10 @@ import (
 	"github.com/escavelo/pubgolf/api/lib/sms"
 )
 
-func (server *APIServer) RegisterPlayer(ctx context.Context,
-	req *pg.RegisterPlayerRequest) (*pg.RegisterPlayerReply, error) {
+// RegisterPlayer adds a new player to an event in an unconfirmed state and sends an auth code SMS to the provided
+// phone number.
+func (server *APIServer) RegisterPlayer(ctx context.Context, req *pg.RegisterPlayerRequest) (*pg.RegisterPlayerReply,
+	error) {
 	if isEmpty(&req.Name) || invalidPhoneNumberFormat(&req.PhoneNumber) {
 		return nil, invalidArgumentError()
 	}
@@ -21,8 +23,7 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 		return nil, err
 	}
 
-	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID,
-		&req.PhoneNumber)
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)
@@ -38,8 +39,7 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 		return nil, temporaryServerError(err)
 	}
 
-	err = db.CreatePlayer(tx, &eventID, &req.Name, req.League, &req.PhoneNumber,
-		authCode)
+	err = db.CreatePlayer(tx, &eventID, &req.Name, req.League, &req.PhoneNumber, authCode)
 	if err != nil {
 		log.Printf("%s - %s", eventID, req)
 		tx.Rollback()
@@ -56,8 +56,10 @@ func (server *APIServer) RegisterPlayer(ctx context.Context,
 	return &pg.RegisterPlayerReply{}, nil
 }
 
-func (server *APIServer) RequestPlayerLogin(ctx context.Context,
-	req *pg.RequestPlayerLoginRequest) (*pg.RequestPlayerLoginReply, error) {
+// RequestPlayerLogin sends an auth code via SMS to the user matching the provided event key and phone number, if one
+// exists. A non-existent player will not trigger an error response, in order to prevent mining of user phone numbers.
+func (server *APIServer) RequestPlayerLogin(ctx context.Context, req *pg.RequestPlayerLoginRequest) (
+	*pg.RequestPlayerLoginReply, error) {
 	if invalidPhoneNumberFormat(&req.PhoneNumber) {
 		return nil, invalidArgumentError()
 	}
@@ -67,8 +69,7 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 		return nil, err
 	}
 
-	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID,
-		&req.PhoneNumber)
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)
@@ -102,8 +103,8 @@ func (server *APIServer) RequestPlayerLogin(ctx context.Context,
 	return &pg.RequestPlayerLoginReply{}, nil
 }
 
-func (server *APIServer) PlayerLogin(ctx context.Context,
-	req *pg.PlayerLoginRequest) (*pg.PlayerLoginReply, error) {
+// PlayerLogin accepts and validates an auth code, returning an auth token for use in authenticated API calls.
+func (server *APIServer) PlayerLogin(ctx context.Context, req *pg.PlayerLoginRequest) (*pg.PlayerLoginReply, error) {
 	if invalidPhoneNumberFormat(&req.PhoneNumber) ||
 		invalidAuthCodeFormat(req.AuthCode) {
 		return nil, invalidArgumentError()
@@ -114,8 +115,7 @@ func (server *APIServer) PlayerLogin(ctx context.Context,
 		return nil, err
 	}
 
-	authCodeValid, err := db.ValidateAuthCode(tx, &eventID, &req.PhoneNumber,
-		req.AuthCode)
+	authCodeValid, err := db.ValidateAuthCode(tx, &eventID, &req.PhoneNumber, req.AuthCode)
 	if err != nil {
 		tx.Rollback()
 		return nil, temporaryServerError(err)
