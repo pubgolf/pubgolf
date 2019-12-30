@@ -3,13 +3,15 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
 	"github.com/escavelo/pubgolf/api/lib/server"
@@ -20,21 +22,21 @@ const (
 	defaultPort = "50051"
 )
 
-func loadEnv() {
+func loadEnv() string {
 	env := os.Getenv("PUBGOLF_ENV")
 	if "" == env {
 		env = "dev"
 	}
 
-	log.Printf("Running as PUBGOLF_ENV of %s", env)
-
 	// In dev, we assume we're running in the monorepo, in which case the .env is at the repo root. Otherwise, we're
 	// probably in the docker environment and can access values as real env vars.
 	if strings.ToLower(env) == "dev" {
 		if err := godotenv.Load("../.env"); err != nil {
-			log.Fatal("Error loading .env file")
+			log.Fatal("error loading .env file")
 		}
 	}
+
+	return env
 }
 
 func getDbConnectionString() string {
@@ -63,11 +65,10 @@ func getDbConnectionString() string {
 		host, port, database, sslmode)
 }
 
-func initDb(connStr string) *sql.DB {
-	log.Printf("Connecting to DB: %s", connStr)
+func initDb(logCtx *log.Entry, connStr string) *sql.DB {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		logCtx.Fatalf("unable to connect to DB: %s", err)
 	}
 	return db
 }
@@ -78,32 +79,47 @@ func initServer(db *sql.DB) *grpc.Server {
 	return grpcServer
 }
 
-func bindServer(server *grpc.Server, port string) {
-	log.Printf("Listening on port %s", port)
+func bindServer(logCtx *log.Entry, server *grpc.Server, port string) {
 	portListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logCtx.Fatalf("failed to listen: %v", err)
 	}
 
-	log.Printf("Serving on port %s", port)
+	logCtx.Info("Server Start")
+
 	if err := server.Serve(portListener); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logCtx.Fatalf("failed to serve: %v", err)
 	}
 }
 
 func main() {
-	log.SetPrefix("[API Server] ")
-	log.Println("Starting API server...")
+	shutdownChan := make(chan os.Signal, 1)
+	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	loadEnv()
-
-	db := initDb(getDbConnectionString())
-	defer db.Close()
-
-	server := initServer(db)
+	env := loadEnv()
 	port := os.Getenv("API_PORT")
 	if port == "" {
 		port = defaultPort
 	}
-	bindServer(server, port)
+
+	if env != "dev" {
+		log.SetFormatter(&log.JSONFormatter{
+			DataKey:     "data",
+			PrettyPrint: false,
+		})
+	}
+	startupLogContext := log.WithField("server_info", log.Fields{
+		"port": port,
+		"env":  env,
+	})
+
+	db := initDb(startupLogContext, getDbConnectionString())
+	defer db.Close()
+
+	server := initServer(db)
+	go bindServer(startupLogContext, server, port)
+
+	<-shutdownChan
+	server.GracefulStop()
+	startupLogContext.Info("Server Stop")
 }
