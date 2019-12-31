@@ -2,7 +2,7 @@
   import Icon from 'src/assets/images/social-beer--green.png';
 
   // TODO: transition between pages
-  export let segment;
+  // export let segment;
 </script>
 
 <style>

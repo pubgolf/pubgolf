@@ -1,19 +1,12 @@
 <script>
-  import { stores } from '@sapper/app';
-  import { onMount } from 'svelte';
-
-  import { getAPI } from 'src/api';
   import {
-    api,
     event,
   } from 'src/stores';
-  import { isDev } from 'src/utils';
   import Nav from 'src/components/Nav.svelte';
 
 
   export let segment;
 
-  const { page, session } = stores();
   const links = [
     {
       segment: 'home',
@@ -31,17 +24,6 @@
     //   icon: require('./_icons/clipboard.svg'),
     // },
   ];
-
-  onMount(() => {
-    const { params } = $page;
-
-    $event = params.event;
-    $api = getAPI($event, $session.config.API_HOST_EXTERNAL);
-
-    if (isDev($session.config.PUBGOLF_ENV)) {
-      window.$api = $api;
-    }
-  });
 </script>
 
 <style>
