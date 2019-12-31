@@ -1,7 +1,6 @@
 package sms
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -55,13 +54,10 @@ func sendRequest(accountSid string, authToken string,
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		var data map[string]interface{}
-		decoder := json.NewDecoder(resp.Body)
-		err := decoder.Decode(&data)
-		return err
-	} else {
-		return fmt.Errorf("twilio server responded with status %d", resp.StatusCode)
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("twilio server responded with status %d and body %s", resp.StatusCode, resp.Body)
 	}
+
 	return nil
 }

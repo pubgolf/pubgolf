@@ -54,7 +54,7 @@ func GetPlayerName(tx *sql.Tx, playerID *string) (string, error) {
 	nameRow := tx.QueryRow(`
 		SELECT name
 		FROM players
-		WHERE id = $2
+		WHERE id = $1
 		`, playerID)
 	var name string
 	err := nameRow.Scan(&name)

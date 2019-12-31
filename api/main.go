@@ -75,7 +75,7 @@ func initDb(logCtx *log.Entry, connStr string) *sql.DB {
 
 func initServer(logCtx *log.Entry, db *sql.DB) *grpc.Server {
 	grpcServer := grpc.NewServer()
-	pg.RegisterAPIServer(grpcServer, &server.APIServer{LogCtx: logCtx, DB: db})
+	pg.RegisterAPIServer(grpcServer, &server.APIServer{Log: logCtx, DB: db})
 	return grpcServer
 }
 
@@ -104,11 +104,12 @@ func main() {
 
 	if env != "dev" {
 		log.SetFormatter(&log.JSONFormatter{
-			DataKey:     "data",
+			DataKey:     "event_context",
 			PrettyPrint: false,
 		})
 	}
-	serverLogCtx := log.WithField("server_info", log.Fields{
+
+	serverLogCtx := log.WithField("server", log.Fields{
 		"port": port,
 		"env":  env,
 	})
