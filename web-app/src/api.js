@@ -1,5 +1,6 @@
 import { StatusCode } from 'grpc-web';
 
+
 const Cookies = require('js-cookie');
 
 const {
@@ -66,16 +67,9 @@ function _unWrap (promise) {
 
 
 class API {
-  constructor (eventKey, host, metadata = {}) {
-    this._cookieJar = getCookieJar();
-    this.eventKey = eventKey;
+  constructor (host, metadata = {}) {
     this.client = new APIPromiseClient(host);
     this.metadata = metadata;
-
-    if (!metadata.authorization) {
-      // TODO: this'll get wonky if you switch events
-      this._logIn(this._cookieJar.get(TOKEN_COOKIE));
-    }
   }
 
   isLoggedIn () {
@@ -102,13 +96,17 @@ class API {
    *
    * @returns {Promise<RegisterPlayerReply>}
    */
-  registerPlayer (playerInfo) {
-    this._logOut();
+  registerPlayer ({
+    eventKey,
+    name,
+    phoneNumber,
+    league,
+  }) {
     const request = new RegisterPlayerRequest();
-    request.setEventkey(this.eventKey);
-    request.setName(playerInfo.name);
-    request.setPhonenumber(`+1${playerInfo.phone}`);
-    request.setLeague(playerInfo.league);
+    request.setEventkey(eventKey);
+    request.setName(name);
+    request.setPhonenumber(`+1${phoneNumber}`);
+    request.setLeague(league);
 
     return _unWrap(this.client.registerPlayer(request, this.metadata));
   }
@@ -118,11 +116,10 @@ class API {
    *
    * @returns {Promise<RequestPlayerLoginReply>}
    */
-  requestPlayerLogin (phone) {
-    this._logOut();
+  requestPlayerLogin ({ eventKey, phoneNumber }) {
     const request = new RequestPlayerLoginRequest();
-    request.setEventkey(this.eventKey);
-    request.setPhonenumber(`+1${phone}`);
+    request.setEventkey(eventKey);
+    request.setPhonenumber(`+1${phoneNumber}`);
 
     return _unWrap(this.client.requestPlayerLogin(
       request,
@@ -136,19 +133,18 @@ class API {
    *
    * @returns {Promise<PlayerLoginReply>}
    */
-  playerLogin (phone, code) {
-    this._logOut();
+  playerLogin ({ eventKey, phoneNumber, authCode }) {
     const request = new PlayerLoginRequest();
-    request.setEventkey(this.eventKey);
-    request.setPhonenumber(`+1${phone}`);
-    request.setAuthcode(code);
+    request.setEventkey(eventKey);
+    request.setPhonenumber(`+1${phoneNumber}`);
+    request.setAuthcode(authCode);
 
     return _unWrap(this.client.playerLogin(
       request,
       this.metadata,
-    )).then(({ authtoken }) => {
-      this._logIn(authtoken);
-    });
+    )).then(({ authtoken }) => ({
+      token: authtoken,
+    }));
   }
 
   /**
@@ -200,11 +196,19 @@ class API {
   }
 }
 
-let SHARED_CLIENT;
+const CACHE = new Map();
 
-export function getAPI (eventKey, ...args) {
-  if (!SHARED_CLIENT || SHARED_CLIENT.eventKey !== eventKey) {
-    SHARED_CLIENT = new API(eventKey, ...args);
+export function getAPI (session) {
+  const {
+    config: { API_HOST_EXTERNAL: host },
+    user: { token },
+  } = session;
+  const cacheKey = `${host} ${token}`;
+
+  if (CACHE.has(cacheKey)) {
+    return CACHE.get(cacheKey);
   }
-  return SHARED_CLIENT;
+  CACHE.set(cacheKey, new API(host, { authorization: token }));
+
+  return CACHE.get(cacheKey);
 }
