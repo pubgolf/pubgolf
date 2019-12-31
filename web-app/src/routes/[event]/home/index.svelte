@@ -1,5 +1,8 @@
 <script>
-  import { goto } from '@sapper/app';
+  import {
+    goto,
+    stores,
+  } from '@sapper/app';
 
   import Countdown from 'src/components/Countdown';
   import {
@@ -12,6 +15,7 @@
 
 
   let fetching = true;
+  const { page, session } = stores();
 
   $: if ($event) {
     // If not authenticated, this page isn't accessible
@@ -30,7 +34,7 @@
         );
         fetching = false;
       }, () => {
-        if (!$api.isLoggedIn()) {
+        if (!api.isLoggedIn()) {
           goto(`${$event}/auth`);
         }
       });
@@ -69,12 +73,12 @@
           {$nextStop.address}
         </a>
       </p>
-      <!--<a
-        href="{$event}/home/add-score"
-        class="block btn btn-primary w-2/3 my-16 mx-auto"
+      <a
+              href="{$page.path}/scores"
+              class="block btn btn-primary w-2/3 my-16 mx-auto"
       >
-        Add your Score
-      </a>-->
+        See scores
+      </a>
     {:else if $stops.length}
       <p class="text-6xl">
         Thanks for Playing!

@@ -20,6 +20,8 @@ polka()
           PUBGOLF_ENV: process.env.PUBGOLF_ENV,
           API_HOST_EXTERNAL: process.env.API_HOST_EXTERNAL,
         },
+        user: {
+        },
       }),
     }),
   ).listen(process.env.PORT, (err) => {

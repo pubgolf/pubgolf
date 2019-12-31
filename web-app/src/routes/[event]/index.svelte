@@ -1,8 +1,9 @@
 <script context="module">
-  export function preload (page) {
-    this.redirect(302, `${page.params.event}/auth`);
+  export function preload (page, session) {
+    if (session.user.token) {
+      this.redirect(302, `${page.params.event}/home`);
+    } else {
+      this.redirect(302, `${page.params.event}/auth`);
+    }
   }
-
-  // Looking for where the API gets initialized?
-  // Go to web-app/src/routes/[event]/_layout
 </script>

@@ -3,11 +3,12 @@
 
 
   export async function preload (page) {
-    if (!page.query.phone) {
+    if (!/\d{10}/.test(page.query.phone)) {
       this.redirect(302, `${page.params.event}/auth`);
     }
 
     return {
+      eventKey: page.params.event,
       phone: onlyDigits(page.query.phone),
     };
   }
@@ -15,17 +16,21 @@
 
 
 <script>
-  import { goto } from '@sapper/app';
-
   import {
-    api,
-    event,
-  } from 'src/stores';
+    goto,
+    stores,
+  } from '@sapper/app';
+
+  import { getAPI } from 'src/api';
   import FormError from './_FormError';
 
 
   // props
+  export let eventKey;
   export let phone;
+
+  const { session } = stores();
+  const api = getAPI($session);
 
   // Local state
   let code = '';
@@ -37,9 +42,14 @@
     // console.log('Verifying', code);
 
     error = null;
-    $api.playerLogin(phone, Number(code))
-      .then(() => {
-        goto(`${$event}/home`);
+
+    api.playerLogin({
+      eventKey,
+      phoneNumber: phone,
+      authCode: Number(code),
+    }).then((user) => {
+        $session.user = user;
+        goto(`${eventKey}/home`);
       }, (apiError) => {
         error = apiError;
       });
