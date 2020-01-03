@@ -2,6 +2,7 @@ package sms
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -56,7 +57,13 @@ func sendRequest(accountSid string, authToken string,
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("twilio server responded with status %d and body %s", resp.StatusCode, resp.Body)
+		defer resp.Body.Close()
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("twilio server responded with status %d, could not read body: %s", resp.StatusCode, err)
+		}
+
+		return fmt.Errorf("twilio server responded with status %d and body %s", resp.StatusCode, string(bodyBytes))
 	}
 
 	return nil
