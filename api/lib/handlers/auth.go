@@ -41,7 +41,7 @@ func RegisterPlayer(rd *RequestData, req *pg.RegisterPlayerRequest) (*pg.Registe
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	err = sms.SendAuthCodeSms(&req.PhoneNumber, authCode)
+	err = sms.SendAuthCodeSms(rd.Log, &req.PhoneNumber, authCode)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -85,7 +85,7 @@ func RequestPlayerLogin(rd *RequestData, req *pg.RequestPlayerLoginRequest) (
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	err = sms.SendAuthCodeSms(&req.PhoneNumber, authCode)
+	err = sms.SendAuthCodeSms(rd.Log, &req.PhoneNumber, authCode)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
