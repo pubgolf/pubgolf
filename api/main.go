@@ -102,7 +102,9 @@ func main() {
 		port = defaultPort
 	}
 
-	if env != "dev" {
+	if strings.HasSuffix(env, "dev") {
+		log.SetLevel(log.DebugLevel)
+	} else {
 		log.SetFormatter(&log.JSONFormatter{
 			DataKey:     "event_context",
 			PrettyPrint: false,
