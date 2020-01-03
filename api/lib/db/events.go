@@ -2,11 +2,13 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
 )
 
-// GetEventID accepts an `eventKey` and returns a corresponding event ID to bypass joins in later queries.
+// GetEventID accepts an `eventKey` and returns a corresponding event ID to bypass joins in later queries. An empty
+// string is returned if the event key does not exist.
 func GetEventID(tx *sql.Tx, eventKey *string) (string, error) {
 	eventIDRow := tx.QueryRow(`
 		SELECT id
@@ -18,6 +20,10 @@ func GetEventID(tx *sql.Tx, eventKey *string) (string, error) {
 
 	if err == sql.ErrNoRows {
 		err = nil
+	}
+
+	if err != nil {
+		err = fmt.Errorf("could not get event ID: %v", err)
 	}
 
 	return eventID, err
@@ -81,8 +87,9 @@ func GetScheduleForEvent(tx *sql.Tx, eventID *string) (pg.VenueList, error) {
 	    JOIN (SELECT * FROM venue_start_times) VS
 	      ON V.id = VS.venue_id
 	  ORDER BY V.order_num
-	  `, eventID)
+		`, eventID)
 	if err != nil {
+		err = fmt.Errorf("could not fetch event schedule: %v", err)
 		return venueList, err
 	}
 
@@ -92,6 +99,7 @@ func GetScheduleForEvent(tx *sql.Tx, eventID *string) (pg.VenueList, error) {
 
 		if err := rows.Scan(&venueStop.StopID, &venue.StartTime, &venue.VenueID,
 			&venue.Name, &venue.Address, &venue.Image); err != nil {
+			err = fmt.Errorf("could not fetch event schedule: %v", err)
 			return venueList, err
 		}
 

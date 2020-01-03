@@ -15,7 +15,15 @@ func RegisterPlayer(rd *RequestData, req *pg.RegisterPlayerRequest) (*pg.Registe
 		return nil, utils.InvalidArgumentError()
 	}
 
-	playerExists, err := db.CheckPlayerExistsByPhoneNumber(rd.Tx, &rd.EventID, &req.PhoneNumber)
+	eventID, err := db.GetEventID(rd.Tx, &req.EventKey)
+	if err != nil {
+		return nil, utils.TemporaryServerError(err)
+	}
+	if eventID == "" {
+		return nil, utils.EventNotFoundError(&req.EventKey)
+	}
+
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(rd.Tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -28,7 +36,7 @@ func RegisterPlayer(rd *RequestData, req *pg.RegisterPlayerRequest) (*pg.Registe
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	err = db.CreatePlayer(rd.Tx, &rd.EventID, &req.Name, req.League, &req.PhoneNumber, authCode)
+	err = db.CreatePlayer(rd.Tx, &eventID, &req.Name, req.League, &req.PhoneNumber, authCode)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -49,7 +57,15 @@ func RequestPlayerLogin(rd *RequestData, req *pg.RequestPlayerLoginRequest) (
 		return nil, utils.InvalidArgumentError()
 	}
 
-	playerExists, err := db.CheckPlayerExistsByPhoneNumber(rd.Tx, &rd.EventID, &req.PhoneNumber)
+	eventID, err := db.GetEventID(rd.Tx, &req.EventKey)
+	if err != nil {
+		return nil, utils.TemporaryServerError(err)
+	}
+	if eventID == "" {
+		return nil, utils.EventNotFoundError(&req.EventKey)
+	}
+
+	playerExists, err := db.CheckPlayerExistsByPhoneNumber(rd.Tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -64,7 +80,7 @@ func RequestPlayerLogin(rd *RequestData, req *pg.RequestPlayerLoginRequest) (
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	err = db.SetAuthCode(rd.Tx, &rd.EventID, &req.PhoneNumber, authCode)
+	err = db.SetAuthCode(rd.Tx, &eventID, &req.PhoneNumber, authCode)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -83,7 +99,15 @@ func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginRe
 		return nil, utils.InvalidArgumentError()
 	}
 
-	authCodeValid, err := db.ValidateAuthCode(rd.Tx, &rd.EventID, &req.PhoneNumber, req.AuthCode)
+	eventID, err := db.GetEventID(rd.Tx, &req.EventKey)
+	if err != nil {
+		return nil, utils.TemporaryServerError(err)
+	}
+	if eventID == "" {
+		return nil, utils.EventNotFoundError(&req.EventKey)
+	}
+
+	authCodeValid, err := db.ValidateAuthCode(rd.Tx, &eventID, &req.PhoneNumber, req.AuthCode)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
@@ -91,7 +115,7 @@ func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginRe
 		return nil, utils.InvalidAuthError()
 	}
 
-	err = db.GenerateAuthToken(rd.Tx, &rd.EventID, &req.PhoneNumber)
+	err = db.GenerateAuthToken(rd.Tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}

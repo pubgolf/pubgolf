@@ -54,7 +54,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score
 	    ORDER BY SUM(V2.duration_minutes)
 	  )
 
-	  , best_of_9_active_and_visted_venues AS (
+	  , best_of_9_active_and_visited_venues AS (
 	    SELECT
 	      V.id
 	      , V.order_num
@@ -69,7 +69,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score
 	  	, S.adjustments
 	  	, S.strokes + S.adjustments AS total
 	  	, V.id
-	  FROM best_of_9_active_and_visted_venues AV
+	  FROM best_of_9_active_and_visited_venues AV
 	  LEFT JOIN venues V
 	    ON AV.id = V.id
 	  LEFT JOIN (
@@ -79,6 +79,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score
   	  ORDER BY V.order_num
 	  `, eventID, playerID)
 	if err != nil {
+		err = fmt.Errorf("could not fetch scores for player: %v", err)
 		return scores, err
 	}
 
@@ -89,6 +90,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score
 
 		if err := rows.Scan(&score.Label, &points, &adjustments,
 			&total, &score.EntityID); err != nil {
+			err = fmt.Errorf("could not fetch scores for player: %v", err)
 			return scores, err
 		}
 
@@ -221,7 +223,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	    ORDER BY SUM(V2.duration_minutes)
 	  )
 
-	  , best_of_9_active_and_visted_venues AS (
+	  , best_of_9_active_and_visited_venues AS (
 	    SELECT
 	      V.id
 	      , V.order_num
@@ -236,11 +238,11 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	    FROM
 	      Scores S
 	    WHERE
-	      S.venue_id IN (SELECT id FROM best_of_9_active_and_visted_venues)
+	      S.venue_id IN (SELECT id FROM best_of_9_active_and_visited_venues)
 	    GROUP BY
 	      S.player_id
 	    HAVING
-	      COUNT(*) = (SELECT COUNT(*) FROM best_of_9_active_and_visted_venues)
+	      COUNT(*) = (SELECT COUNT(*) FROM best_of_9_active_and_visited_venues)
 	  )
 
 	  , scores_for_best_of_9_players AS (
@@ -250,7 +252,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	      Scores
 	    WHERE
 	      player_id IN (SELECT * FROM best_of_9_player_ids)
-	      AND venue_id IN (SELECT id FROM best_of_9_active_and_visted_venues)
+	      AND venue_id IN (SELECT id FROM best_of_9_active_and_visited_venues)
 	  )
 
 	  , score_ids_with_ranking_for_best_of_9_players AS (
@@ -265,14 +267,14 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	    GROUP BY S1.id
 	  )
 
-	  , best_of_5_active_and_visted_venues AS (
+	  , best_of_5_active_and_visited_venues AS (
 	    SELECT
 	        V2.*
 	      FROM (
 	        SELECT
 	          V1.id
 	          , ROW_NUMBER() OVER (ORDER BY V1.order_num) AS order_num_num
-	        FROM (SELECT * FROM best_of_9_active_and_visted_venues) V1
+	        FROM (SELECT * FROM best_of_9_active_and_visited_venues) V1
 	      ) V2
 	      WHERE
 	        MOD(V2.order_num_num, 2) = 1
@@ -284,12 +286,12 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	    FROM
 	      Scores S
 	    WHERE
-	      S.venue_id IN (SELECT id FROM best_of_5_active_and_visted_venues)
+	      S.venue_id IN (SELECT id FROM best_of_5_active_and_visited_venues)
 	      AND S.player_id NOT IN (SELECT * FROM best_of_9_player_ids)
 	    GROUP BY
 	      S.player_id
 	    HAVING
-	      COUNT(*) = (SELECT COUNT(*) FROM best_of_5_active_and_visted_venues)
+	      COUNT(*) = (SELECT COUNT(*) FROM best_of_5_active_and_visited_venues)
 	  )
 
 	  , scores_for_best_of_5_players AS (
@@ -299,7 +301,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	      Scores
 	    WHERE
 	      player_id IN (SELECT * FROM best_of_5_player_ids)
-	      AND venue_id IN (SELECT id FROM best_of_5_active_and_visted_venues)
+	      AND venue_id IN (SELECT id FROM best_of_5_active_and_visited_venues)
 	  )
 
 	  , score_ids_with_ranking_for_best_of_5_players AS (
@@ -317,6 +319,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 	  %s
 	  `, scoreboardQuery), eventID)
 	if err != nil {
+		err = fmt.Errorf("could not fetch scores: %v", err)
 		return scores, err
 	}
 
@@ -325,6 +328,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 
 		if err := rows.Scan(&score.Label, &score.Points, &score.Adjustments,
 			&score.Total, &score.EntityID); err != nil {
+			err = fmt.Errorf("could not fetch scores: %v", err)
 			return scores, err
 		}
 
