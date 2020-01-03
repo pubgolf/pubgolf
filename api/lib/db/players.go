@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
@@ -27,6 +28,11 @@ func CreatePlayer(tx *sql.Tx, eventID *string, name *string, league pg.League, p
 			$1, $2, $3, $4, $5, NOW(), NOW(), NOW(), FALSE
 		)
 	`, eventID, name, league.String(), phoneNumber, randCode)
+
+	if err != nil {
+		err = fmt.Errorf("could not create player: %v", err)
+	}
+
 	return err
 }
 
@@ -46,6 +52,10 @@ func CheckPlayerExistsByPhoneNumber(tx *sql.Tx, eventID *string, phoneNumber *st
 		err = nil
 	}
 
+	if err != nil {
+		err = fmt.Errorf("could not lookup player by phone number: %v", err)
+	}
+
 	return playerCount == 1, err
 }
 
@@ -63,6 +73,10 @@ func GetPlayerName(tx *sql.Tx, playerID *string) (string, error) {
 		err = nil
 	}
 
+	if err != nil {
+		err = fmt.Errorf("could not get player name: %v", err)
+	}
+
 	return name, err
 }
 
@@ -77,6 +91,11 @@ func SetAuthCode(tx *sql.Tx, eventID *string, phoneNumber *string, authCode uint
 		WHERE event_id = $1
 			AND phone_number = $2
 		`, eventID, phoneNumber, authCode)
+
+	if err != nil {
+		err = fmt.Errorf("could not set auth code: %v", err)
+	}
+
 	return err
 }
 
@@ -97,14 +116,16 @@ func ValidateAuthCode(tx *sql.Tx, eventID *string, phoneNumber *string, authCode
 	}
 
 	if err != nil {
+		err = fmt.Errorf("could not validate auth code: %v", err)
 		return false, err
 	}
+
 	codeExpiration, err := time.ParseDuration("10m")
 	isValid := authCodeCreatedAt != time.Time{} && time.Now().Sub(authCodeCreatedAt) < codeExpiration
 	return isValid, err
 }
 
-// GenerateAuthToken unsets a user's auth code and generates a fresh auth token.
+// GenerateAuthToken un-sets a user's auth code and generates a fresh auth token.
 func GenerateAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) error {
 	_, err := tx.Exec(`
 		UPDATE players
@@ -116,6 +137,11 @@ func GenerateAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) error {
 			updated_at = NOW()
 		WHERE event_id = $1 AND phone_number = $2
 	`, eventID, phoneNumber)
+
+	if err != nil {
+		err = fmt.Errorf("could not generate auth token: %v", err)
+	}
+
 	return err
 }
 
@@ -129,6 +155,11 @@ func GetAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) (string, err
 		`, eventID, phoneNumber)
 	var authToken string
 	err := authTokenRow.Scan(&authToken)
+
+	if err != nil {
+		err = fmt.Errorf("could not get player info: %v", err)
+	}
+
 	return authToken, err
 }
 
@@ -142,8 +173,14 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (string, string, error) {
 		WHERE auth_token = $1
 		`, authToken)
 	err := row.Scan(&eventID, &playerID)
+
 	if err == sql.ErrNoRows {
 		err = nil
 	}
+
+	if err != nil {
+		err = fmt.Errorf("could not validate auth token: %v", err)
+	}
+
 	return eventID, playerID, err
 }
