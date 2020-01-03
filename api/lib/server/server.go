@@ -47,7 +47,7 @@ func validateAuthHeader(rd *handlers.RequestData) error {
 		return err
 	}
 
-	eventID, playerID, err := db.ValidateAuthToken(rd.Tx, &authHeader)
+	eventID, playerID, role, err := db.ValidateAuthToken(rd.Tx, &authHeader)
 	if err != nil {
 		return utils.TemporaryServerError(err)
 	}
@@ -57,6 +57,7 @@ func validateAuthHeader(rd *handlers.RequestData) error {
 
 	rd.EventID = eventID
 	rd.PlayerID = playerID
+	rd.PlayerRole = role
 
 	rd.Log = rd.Log.WithField("auth_token", log.Fields{
 		"event_id":  eventID,
