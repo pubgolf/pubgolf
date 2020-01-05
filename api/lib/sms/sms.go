@@ -35,8 +35,8 @@ func SendAuthCodeSms(logCtx *log.Entry, phoneNumber *string, authCode uint32) (e
 	smsContent := fmt.Sprintf("Your pubgolf.co auth code is: %d", authCode)
 	responseInfo := twilioResponse{}
 
-	if os.Getenv("TWILIO_FROM_NUM") != "" && os.Getenv("TWILIO_ACCOUNT_SID") != "" && os.Getenv("TWILIO_AUTH_TOKEN") !=
-		"" {
+	if os.Getenv("PUBGOLF_ENV") != "test" && os.Getenv("TWILIO_FROM_NUM") != "" &&
+		os.Getenv("TWILIO_ACCOUNT_SID") != "" && os.Getenv("TWILIO_AUTH_TOKEN") != "" {
 		// API keys are present, so make live calls.
 		msgReader := formatMessage(phoneNumber, smsContent)
 		responseInfo, err = sendRequest(os.Getenv("TWILIO_ACCOUNT_SID"), os.Getenv("TWILIO_AUTH_TOKEN"), msgReader)

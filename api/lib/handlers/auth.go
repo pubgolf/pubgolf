@@ -11,7 +11,7 @@ import (
 // phone number.
 func RegisterPlayer(rd *RequestData, req *pg.RegisterPlayerRequest) (*pg.RegisterPlayerReply,
 	error) {
-	if utils.IsEmpty(&req.Name) || utils.InvalidPhoneNumberFormat(&req.PhoneNumber) {
+	if utils.IsEmpty(&req.EventKey) || utils.IsEmpty(&req.Name) || utils.InvalidPhoneNumberFormat(&req.PhoneNumber) {
 		return nil, utils.InvalidArgumentError()
 	}
 
@@ -53,7 +53,7 @@ func RegisterPlayer(rd *RequestData, req *pg.RegisterPlayerRequest) (*pg.Registe
 // exists. A non-existent player will not trigger an error response, in order to prevent mining of user phone numbers.
 func RequestPlayerLogin(rd *RequestData, req *pg.RequestPlayerLoginRequest) (
 	*pg.RequestPlayerLoginReply, error) {
-	if utils.InvalidPhoneNumberFormat(&req.PhoneNumber) {
+	if utils.IsEmpty(&req.EventKey) || utils.InvalidPhoneNumberFormat(&req.PhoneNumber) {
 		return nil, utils.InvalidArgumentError()
 	}
 
@@ -95,7 +95,7 @@ func RequestPlayerLogin(rd *RequestData, req *pg.RequestPlayerLoginRequest) (
 
 // PlayerLogin accepts and validates an auth code, returning an auth token for use in authenticated API calls.
 func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginReply, error) {
-	if utils.InvalidPhoneNumberFormat(&req.PhoneNumber) || utils.InvalidAuthCodeFormat(req.AuthCode) {
+	if utils.IsEmpty(&req.EventKey) || utils.InvalidPhoneNumberFormat(&req.PhoneNumber) || utils.InvalidAuthCodeFormat(req.AuthCode) {
 		return nil, utils.InvalidArgumentError()
 	}
 
@@ -120,7 +120,7 @@ func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginRe
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	authToken, playerID, role, err := db.GetPlayerAuthInfo(rd.Tx, &rd.EventID, &req.PhoneNumber)
+	authToken, playerID, role, err := db.GetPlayerAuthInfo(rd.Tx, &eventID, &req.PhoneNumber)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
