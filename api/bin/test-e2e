@@ -6,4 +6,3 @@ go run main.go &
 go run e2e/*.go
 
 kill "$(lsof -ti :50051)"
-bin/clean-protos
