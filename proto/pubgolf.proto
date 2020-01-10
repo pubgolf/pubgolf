@@ -61,6 +61,8 @@ message PlayerLoginRequest {
 
 message PlayerLoginReply {
   string authToken = 1;
+  string playerID = 2;
+  PlayerRole playerRole = 3;
 }
 
 // Display endpoints - secured via auth token

@@ -22,10 +22,11 @@ func CreatePlayer(tx *sql.Tx, eventID *string, name *string, league pg.League, p
 			auth_code_created_at,
 			created_at,
 			updated_at,
-			phone_number_confirmed
+			phone_number_confirmed,
+			role
 		)
 		VALUES (
-			$1, $2, $3, $4, $5, NOW(), NOW(), NOW(), FALSE
+			$1, $2, $3, $4, $5, NOW(), NOW(), NOW(), FALSE, DEFAULT
 		)
 	`, eventID, name, league.String(), phoneNumber, randCode)
 
@@ -145,34 +146,36 @@ func GenerateAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) error {
 	return err
 }
 
-// GetAuthToken returns a user's auth token.
-func GetAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) (string, error) {
+// GetPlayerAuthInfo returns a user's auth token, ID and role.
+func GetPlayerAuthInfo(tx *sql.Tx, eventID *string, phoneNumber *string) (authToken string, playerID string,
+	role pg.PlayerRole, err error) {
 	authTokenRow := tx.QueryRow(`
 		SELECT auth_token
 		FROM players
 		WHERE event_id = $1
 			AND phone_number = $2
 		`, eventID, phoneNumber)
-	var authToken string
-	err := authTokenRow.Scan(&authToken)
+	err = authTokenRow.Scan(&authToken, &playerID, &role)
 
 	if err != nil {
 		err = fmt.Errorf("could not get player info: %v", err)
 	}
 
-	return authToken, err
+	return authToken, playerID, role, err
 }
 
 // ValidateAuthToken returns the corresponding event ID and player ID for a valid `authToken`. In the event of an
 // invalid `authToken`, an empty string will be returned as both IDs.
-func ValidateAuthToken(tx *sql.Tx, authToken *string) (string, string, error) {
-	var eventID, playerID string
+func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID string, role pg.PlayerRole, err error) {
 	row := tx.QueryRow(`
-		SELECT event_id, id
+		SELECT 
+			event_id, 
+			id, 
+			role
 		FROM players
 		WHERE auth_token = $1
 		`, authToken)
-	err := row.Scan(&eventID, &playerID)
+	err = row.Scan(&eventID, &playerID, &role)
 
 	if err == sql.ErrNoRows {
 		err = nil
@@ -182,5 +185,5 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (string, string, error) {
 		err = fmt.Errorf("could not validate auth token: %v", err)
 	}
 
-	return eventID, playerID, err
+	return eventID, playerID, role, err
 }

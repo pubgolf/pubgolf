@@ -120,10 +120,14 @@ func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginRe
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	authToken, err := db.GetAuthToken(rd.Tx, &eventID, &req.PhoneNumber)
+	authToken, playerID, role, err := db.GetPlayerAuthInfo(rd.Tx, &rd.EventID, &req.PhoneNumber)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
 
-	return &pg.PlayerLoginReply{AuthToken: authToken}, nil
+	return &pg.PlayerLoginReply{
+		AuthToken:  authToken,
+		PlayerID:   playerID,
+		PlayerRole: role,
+	}, nil
 }
