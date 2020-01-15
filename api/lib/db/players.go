@@ -88,7 +88,8 @@ func SetAuthCode(tx *sql.Tx, eventID *string, phoneNumber *string, authCode uint
 		SET
 			auth_code = $3,
 			auth_code_created_at = NOW(),
-			auth_token = NULL
+			auth_token = NULL,
+			updated_at = NOW()
 		WHERE event_id = $1
 			AND phone_number = $2
 		`, eventID, phoneNumber, authCode)
@@ -149,17 +150,23 @@ func GenerateAuthToken(tx *sql.Tx, eventID *string, phoneNumber *string) error {
 // GetPlayerAuthInfo returns a user's auth token, ID and role.
 func GetPlayerAuthInfo(tx *sql.Tx, eventID *string, phoneNumber *string) (authToken string, playerID string,
 	role pg.PlayerRole, err error) {
+	var roleRaw []uint8
 	authTokenRow := tx.QueryRow(`
-		SELECT auth_token
+		SELECT 
+			auth_token,
+			id,
+			role
 		FROM players
 		WHERE event_id = $1
 			AND phone_number = $2
 		`, eventID, phoneNumber)
-	err = authTokenRow.Scan(&authToken, &playerID, &role)
+	err = authTokenRow.Scan(&authToken, &playerID, &roleRaw)
 
 	if err != nil {
 		err = fmt.Errorf("could not get player info: %v", err)
 	}
+
+	role = pg.PlayerRole(pg.PlayerRole_value[string(roleRaw)])
 
 	return authToken, playerID, role, err
 }
