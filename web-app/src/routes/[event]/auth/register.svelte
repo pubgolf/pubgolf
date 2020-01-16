@@ -47,18 +47,17 @@
   }
 
   function submit () {
-    const player = {
-      name,
-      phoneNumber: onlyDigits(phone),
-      league,
-      eventKey,
-    };
-
     // console.log('Registering', player);
+    const unformattedPhone = onlyDigits(phone);
 
     error = null;
-    api.registerPlayer(player).then(() => {
-      goto(`${eventKey}/auth/confirm?phone=${player.phoneNumber}`);
+    api.registerPlayer({
+      name,
+      phoneNumber: `+1${unformattedPhone}`,
+      league,
+      eventKey,
+    }).then(() => {
+      goto(`${eventKey}/auth/confirm?phone=${unformattedPhone}`);
     }, (apiError) => {
       error = apiError;
     });
