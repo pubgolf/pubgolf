@@ -22,6 +22,7 @@
   } from '@sapper/app';
 
   import { getAPI } from 'src/api';
+  import { authHelper } from 'src/auth-helper';
   import FormError from './_FormError';
 
 
@@ -45,14 +46,15 @@
 
     api.playerLogin({
       eventKey,
-      phoneNumber: phone,
+      phoneNumber: `+1${phone}`,
       authCode: Number(code),
-    }).then((user) => {
-        $session.user = user;
-        goto(`${eventKey}/home`);
-      }, (apiError) => {
-        error = apiError;
-      });
+    }).then(async (user) => {
+      $session.user = user;
+      await authHelper.preserveSession({ eventKey, user });
+      goto(`${eventKey}/home`);
+    }, (apiError) => {
+      error = apiError;
+    });
   }
 </script>
 

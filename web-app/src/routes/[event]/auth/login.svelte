@@ -51,7 +51,7 @@
     error = null;
     api.requestPlayerLogin({
       eventKey,
-      phoneNumber: unformattedPhone,
+      phoneNumber: `+1${unformattedPhone}`,
     }).then(() => {
       goto(`${eventKey}/auth/confirm?phone=${unformattedPhone}`);
     }, (apiError) => {
