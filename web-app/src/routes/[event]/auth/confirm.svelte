@@ -44,13 +44,12 @@
 
     error = null;
 
-    api.playerLogin({
+    authHelper.logIn({
       eventKey,
       phoneNumber: `+1${phone}`,
       authCode: Number(code),
     }).then(async (user) => {
       $session.user = user;
-      await authHelper.preserveSession({ eventKey, user });
       goto(`${eventKey}/home`);
     }, (apiError) => {
       error = apiError;

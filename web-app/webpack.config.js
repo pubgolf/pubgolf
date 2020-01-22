@@ -144,9 +144,20 @@ module.exports = {
             'css-loader',
           ],
         },
+        {
+          // FIXME: This doesn't work to make XMLHttpRequest available in grpc-web
+          test: require.resolve(`${__dirname}/node_modules/grpc-web/index.js`),
+          use: 'imports-loader?XMLHttpRequest=xhr2',
+        },
       ],
     },
     mode,
+    plugins: [
+      // FIXME: This doesn't work to make XMLHttpRequest available in grpc-web
+      new webpack.ProvidePlugin({
+        XMLHttpRequest: 'xhr2',
+      }),
+    ],
     performance: {
       hints: false, // it doesn't matter if server.js is large
     },
