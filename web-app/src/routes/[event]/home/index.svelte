@@ -1,45 +1,72 @@
+<script context="module">
+  import { authHelper } from 'src/auth-helper';
+
+  export async function preload (page, session) {
+    if (!authHelper.isAuthorized(session)) {
+      try {
+        session.user = await authHelper.restoreSession(this.fetch);
+      } catch (e) {
+        console.debug(e);
+        // If not authenticated, this page isn't accessible
+        this.redirect(302, `${page.params.event}/auth`);
+      }
+    }
+
+    return {
+      eventKey: page.params.event,
+    };
+  }
+</script>
+
 <script>
+  import { onMount } from 'svelte';
   import {
     goto,
     stores,
   } from '@sapper/app';
 
+  import { getAPI } from 'src/api';
   import Countdown from 'src/components/Countdown';
   import {
-    api,
-    event,
     stops,
     nextStop,
     pastStops,
   } from 'src/stores';
 
 
+  // props
+  export let eventKey;
+
   let fetching = true;
   const { page, session } = stores();
 
-  $: if ($event) {
-    // If not authenticated, this page isn't accessible
-    if (!$api.isLoggedIn()) {
-      goto(`${$event}/auth`);
-    } else {
-      $api.getSchedule().then((schedule) => {
-        $stops = schedule.venuelist.venuesList.map(
-          ({ stopid, venue: { starttime, ...venue } }, index) => ({
-            stopid,
-            ...venue,
-            start: new Date(starttime),
-            index,
-          }
-          ),
-        );
-        fetching = false;
-      }, () => {
-        if (!api.isLoggedIn()) {
-          goto(`${$event}/auth`);
-        }
-      });
+  /**
+   * Flatten stop and venue into a single object.
+   * @param stopid
+   * @param venue
+   * @param index
+   * @returns {{start: Date, stopid: *, index: *}}
+   */
+  const flattenStop = ({ stopid, venue }, index) => ({
+    stopid,
+    ...venue,
+    start: new Date(venue.starttime),
+    index,
+  });
+
+  onMount(async () => {
+    try {
+      const api = getAPI($session);
+      const schedule = await api.getSchedule({ eventKey });
+
+      $stops = schedule.venuelist.venuesList.map(flattenStop);
+      fetching = false;
+    } catch (e) {
+      if (!authHelper.isAuthorized($session)) {
+        return goto(`${eventKey}/auth`);
+      }
     }
-  }
+  })
 
   // $: console.log($nextStop);
 </script>

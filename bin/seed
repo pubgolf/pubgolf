@@ -9,6 +9,7 @@ else
 fi
 
 for FILE in "${RELATIVE_PATH_PREFIX}${DB_SEEDS_PATH}"/*.sql; do
+  echo -e "\x1B[32mInserting ${FILE}\x1B[0m"
   psql "postgres://${DB_USER}:${DB_PASSWORD}@localhost:\
 ${HOST_DB_PORT:-5432}/${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" -a -f "$FILE"
 done

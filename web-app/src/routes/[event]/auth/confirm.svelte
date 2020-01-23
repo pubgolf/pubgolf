@@ -46,11 +46,12 @@
 
     api.playerLogin({
       eventKey,
+      // TODO: this phone number normalization should be centralized
       phoneNumber: `+1${phone}`,
       authCode: Number(code),
     }).then(async (user) => {
-      $session.user = user;
-      await authHelper.preserveSession({ eventKey, user });
+      // $session.user = user;
+      await authHelper.preserveSession(user);
       goto(`${eventKey}/home`);
     }, (apiError) => {
       error = apiError;
@@ -60,6 +61,10 @@
 
 <style>
 </style>
+
+<svelte:head>
+  <title>Confirm your Phone Number | Pub Golf</title>
+</svelte:head>
 
 <FormError {error}/>
 
