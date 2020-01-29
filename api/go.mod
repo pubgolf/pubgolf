@@ -9,5 +9,5 @@ require (
 	github.com/lib/pq v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.2.2
-	google.golang.org/grpc v1.25.1
+	google.golang.org/grpc v1.27.0
 )
