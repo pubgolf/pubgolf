@@ -166,7 +166,7 @@ func GetPlayerAuthInfo(tx *sql.Tx, eventID *string, phoneNumber *string) (authTo
 		err = fmt.Errorf("could not get player info: %v", err)
 	}
 
-	role = pg.PlayerRole(pg.PlayerRole_value[string(roleRaw)])
+	role = PlayerRoleFromDBFormat(roleRaw)
 
 	return authToken, playerID, role, err
 }
@@ -174,6 +174,7 @@ func GetPlayerAuthInfo(tx *sql.Tx, eventID *string, phoneNumber *string) (authTo
 // ValidateAuthToken returns the corresponding event ID and player ID for a valid `authToken`. In the event of an
 // invalid `authToken`, an empty string will be returned as both IDs.
 func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID string, role pg.PlayerRole, err error) {
+	var roleRaw []uint8
 	row := tx.QueryRow(`
 		SELECT 
 			event_id, 
@@ -182,7 +183,7 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID 
 		FROM players
 		WHERE auth_token = $1
 		`, authToken)
-	err = row.Scan(&eventID, &playerID, &role)
+	err = row.Scan(&eventID, &playerID, &roleRaw)
 
 	if err == sql.ErrNoRows {
 		err = nil
@@ -192,5 +193,11 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID 
 		err = fmt.Errorf("could not validate auth token: %v", err)
 	}
 
+	role = PlayerRoleFromDBFormat(roleRaw)
+
 	return eventID, playerID, role, err
+}
+
+func PlayerRoleFromDBFormat(roleRaw []uint8) pg.PlayerRole {
+	return pg.PlayerRole(pg.PlayerRole_value[string(roleRaw)])
 }
