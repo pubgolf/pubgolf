@@ -20,9 +20,11 @@
     goto,
     stores,
   } from '@sapper/app';
+  import { onMount } from 'svelte';
 
   import { getAPI } from 'src/api';
   import { authHelper } from 'src/auth-helper';
+  import { isDev } from 'src/utils';
   import FormError from './_FormError';
 
 
@@ -39,6 +41,17 @@
   // reset error to null if the form changes
   $: error = Boolean(code) && null;
 
+  async function resendCode () {
+    return await api.requestPlayerLogin({
+      eventKey,
+      phoneNumber: `+1${phone}`,
+    });
+  }
+
+  if (isDev($session)) {
+    onMount(resendCode);
+  }
+
   function submit () {
     // console.log('Verifying', code);
 
@@ -50,8 +63,10 @@
       phoneNumber: `+1${phone}`,
       authCode: Number(code),
     }).then(async (user) => {
-      // $session.user = user;
-      await authHelper.preserveSession(user);
+      await authHelper.preserveSession({
+        ...user,
+        eventKey,
+      });
       goto(`${eventKey}/home`);
     }, (apiError) => {
       error = apiError;

@@ -6,7 +6,7 @@
   export let error;
 
   const { session } = stores();
-  const showErrors = isDev($session.config.PUBGOLF_ENV);
+  const showErrors = isDev($session);
 </script>
 
 <style>

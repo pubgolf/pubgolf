@@ -5,9 +5,9 @@
   const events = [
     { key: 'nyc-2019', text: 'NYC 2019' },
   ];
-  
+
   const { session } = stores();
-  if (isDev($session.config.PUBGOLF_ENV)) {
+  if (isDev($session)) {
     events.push(
       { key: 'sf-2019', text: 'SF 2019' },
       { key: 'current', text: 'Current' },

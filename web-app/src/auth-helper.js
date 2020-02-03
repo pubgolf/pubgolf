@@ -1,6 +1,6 @@
 export const authHelper = {
-  isAuthorized (session) {
-    return Boolean(session.user && session.user.authtoken);
+  isAuthorized ({ user }, eventKey) {
+    return Boolean(user && user.authtoken && eventKey === user.eventKey);
   },
 
   async preserveSession (user, _fetch = fetch) {

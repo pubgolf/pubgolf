@@ -1,5 +1,9 @@
 import { StatusCode } from 'grpc-web';
 
+import {
+  capitalize,
+  mapEntries,
+} from './utils';
 
 const {
   CreateOrUpdateScoreRequest,
@@ -46,40 +50,100 @@ function _unWrap (promise) {
   );
 }
 
-function rpcMethod (methodName, RequestClass) {
-  return function (params) {
+/**
+ * Generate a wrapper for a given gRPC method
+ * @param {APIPromiseClient} client - The gRPC client that will be used to
+ *                                    make the requests
+ * @param {Object} metadata - Metadata to add to each request
+ * @param {string} methodName - The name of the method to call on `client`
+ * @param {Class} RequestClass - The class of request that that method uses
+ *
+ * @returns {function(Object): Object}
+ *           - A function that takes in a plain object of the method's request
+ *             type and returns a plain object of the methods return type
+ */
+function rpcMethod (client, metadata, methodName, RequestClass) {
+  return (params) => {
     const request = new RequestClass();
+    // Populate the request instance from the given params
     Object.entries(params).forEach(([key, value]) => {
-      const setMethodName = `set${key[0].toUpperCase()}${key.slice(1).toLowerCase()}`;
-      request[setMethodName](value);
+      request[`set${capitalize(key)}`](value);
     });
 
-    return _unWrap(this.client[methodName](request, this.metadata));
+    // Make the request then turn the response into a plain object
+    return _unWrap(client[methodName](request, metadata));
   };
 }
 
-function buildMethods (methods) {
-  return Object.entries(methods).reduce((acc, [methodName, RequestClass]) => {
-    acc[methodName] = rpcMethod(methodName, RequestClass);
-    return acc;
-  }, {});
+/**
+ * Build an object of a bunch of gRPC methods
+ * @param {APIPromiseClient} client - The gRPC client that will be used to
+ *                                    make the requests
+ * @param {Object} metadata - Metadata to add to each request
+ * @param {Object.<string,Class>} methods - a map of method names to classes
+ *         TODO: This was the simplest I could get the config part...
+ *
+ * @returns {Object.<string, function(Object): Object>}
+ */
+function buildMethods (client, metadata, methods) {
+  return mapEntries(methods, ([methodName, RequestClass]) => (
+    [methodName, rpcMethod(client, metadata, methodName, RequestClass)]
+  ));
 }
 
+/**
+ * @typedef {Object} APIWrapper - Expected inputs and outputs for each api method
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   name: string,
+ *   phoneNumber: string,
+ *   league: string,
+ * }): Promise<void>} registerPlayer - Create a player with the given data
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   phoneNumber: string,
+ * }): Promise<void>} requestPlayerLogin - Start authenticating as given player
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   phoneNumber: string,
+ *   authCode: string,
+ * }): Promise<PlayerLoginReply.AsObject>} playerLogin - Log in as the given player
+ *
+ * @property {function({
+ *   eventKey: string,
+ * }): Promise<GetScheduleReply.AsObject>} getSchedule - Get the schedule of stops for an event
+ *
+ * @property {function({
+ *   eventKey: string,
+ * }): Promise<GetScoresReply.AsObject>} getScores - Get groups of current scores for the event
+ *
+ * @property {function({
+ *   venueid: string,
+ *   playerid: string,
+ *   strokes: number,
+ * }): Promise<void>} createOrUpdateScore - Submit a score for approval
+ */
 
-class API {
-  constructor (host, metadata = {}) {
-    this.client = new APIPromiseClient(host);
-    this.metadata = metadata;
-
-    Object.assign(this, buildMethods({
-      registerPlayer: RegisterPlayerRequest,
-      requestPlayerLogin: RequestPlayerLoginRequest,
-      playerLogin: PlayerLoginRequest,
-      getSchedule: GetScheduleRequest,
-      getScores: GetScoresRequest,
-      createOrUpdateScore: CreateOrUpdateScoreRequest,
-    }));
-  }
+/**
+ * Build the API wrapper
+ * @param {string} host - The hostname of the gRPC server
+ * @param {Object} metadata - gRPC metadata
+ *
+ * @returns {APIWrapper}
+ */
+function buildAPIWrapper (host, metadata = {}) {
+  const client = new APIPromiseClient(host);
+  return buildMethods(client, metadata, {
+    registerPlayer: RegisterPlayerRequest,
+    requestPlayerLogin: RequestPlayerLoginRequest,
+    playerLogin: PlayerLoginRequest,
+    getSchedule: GetScheduleRequest,
+    getScores: GetScoresRequest,
+    createOrUpdateScore: CreateOrUpdateScoreRequest,
+  });
 }
 
 const CACHE = new Map();
@@ -88,7 +152,7 @@ const CACHE = new Map();
  *
  * @param {Object} session
  *
- * @returns {API}
+ * @returns {APIWrapper}
  */
 export function getAPI (session) {
   const {
@@ -100,7 +164,7 @@ export function getAPI (session) {
   if (CACHE.has(cacheKey)) {
     return CACHE.get(cacheKey);
   }
-  CACHE.set(cacheKey, new API(host, { authorization: authtoken }));
+  CACHE.set(cacheKey, buildAPIWrapper(host, { authorization: authtoken }));
 
   return CACHE.get(cacheKey);
 }

@@ -2,28 +2,29 @@
   import { authHelper } from 'src/auth-helper';
 
   export async function preload (page, session) {
-    if (!authHelper.isAuthorized(session)) {
+    const eventKey = page.params.event;
+    if (!authHelper.isAuthorized(session, eventKey)) {
       try {
         session.user = await authHelper.restoreSession(this.fetch);
       } catch (e) {
         console.debug(e);
         // If not authenticated, this page isn't accessible
-        this.redirect(302, `${page.params.event}/auth`);
+        this.redirect(302, `${eventKey}/auth`);
       }
     }
 
     return {
-      eventKey: page.params.event,
+      eventKey,
     };
   }
 </script>
 
 <script>
-  import { onMount } from 'svelte';
   import {
     goto,
     stores,
   } from '@sapper/app';
+  import { onMount } from 'svelte';
 
   import { getAPI } from 'src/api';
   import Countdown from 'src/components/Countdown';
@@ -62,7 +63,7 @@
       $stops = schedule.venuelist.venuesList.map(flattenStop);
       fetching = false;
     } catch (e) {
-      if (!authHelper.isAuthorized($session)) {
+      if (!authHelper.isAuthorized($session, eventKey)) {
         return goto(`${eventKey}/auth`);
       }
     }
