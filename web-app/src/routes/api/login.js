@@ -1,5 +1,5 @@
 const COOKIE_NAME = 'user';
-const COOKIE_AGE = 3600 * 24 * 3; // 3 days in seconds
+const COOKIE_AGE = 1000 * 60 * 60 * 24 * 3; // 3 days in milliseconds
 
 export async function post (req, res) {
   // Parse the request body
