@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM golang:1.14.0
 
 RUN apt-get update && apt-get -y install unzip && apt-get clean
 
