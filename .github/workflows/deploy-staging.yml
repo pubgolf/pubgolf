@@ -12,6 +12,8 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout Code
+      uses: actions/checkout@master
     - name: Build Docker Images and Update Docker Compose
       run: |
         curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
