@@ -5,8 +5,6 @@ on:
     branches:
       - develop
       - '**--stage'
-  schedule:
-    - cron: '0 2 * * 0' # Weekly on Sundays at 02:00
 
 jobs:
   deploy-staging:
@@ -23,6 +21,16 @@ jobs:
         curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
         chmod +x ~/docker-compose
         sudo mv ~/docker-compose /usr/local/bin/docker-compose
-        docker-compose build web-app
+        mkdir -p $DOCKER_CERT_PATH
+        echo "${{ secrets.STAGING_DOCKER_HOST_IP }} staging.pubgolf.co" >> /etc/hosts
+        echo "${{ secrets.STAGING_DOCKER_CA }}" > $DOCKER_CERT_PATH/ca.pem
+        echo "${{ secrets.STAGING_DOCKER_CLIENT_CERT }}" > $DOCKER_CERT_PATH/cert.pem
+        echo "${{ secrets.STAGING_DOCKER_CLIENT_KEY }}" > $DOCKER_CERT_PATH/key.pem
+        docker-compose build
         docker-compose down
         docker-compose up -d --force-recreate
+        rm -rf $DOCKER_CERT_PATH
+      env:
+        DOCKER_TLS_VERIFY: "1"
+        DOCKER_HOST: "tcp://staging.pubgolf.co:2376"
+        DOCKER_CERT_PATH: "certs"
