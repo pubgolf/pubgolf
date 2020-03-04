@@ -2,7 +2,7 @@
 
 export $(egrep -v '^#' '.env' | xargs)
 
-for FILE in "${DB_SEEDS_PATH}"/*.sql; do
-  psql "postgres://${DB_USER}:${DB_PASSWORD}@localhost:\
-${HOST_DB_PORT:-5432}/${DB_NAME}?sslmode=${DB_SSL_MODE:-disable}" -a -f "$FILE"
+for FILE in "${RELATIVE_PATH_PREFIX}${DB_SEEDS_PATH}"/*.sql; do
+  docker container exec -e "PGPASSWORD=${DB_PASSWORD}" -i "$(docker-compose ps -q db)" psql \
+    -U "${DB_USER}" -d "${DB_NAME}" < "$FILE"
 done
