@@ -5,9 +5,17 @@
 
 # Required for env var support in the Nginx config file.
 envsubst ''\
-"\$API_HOST_EXTERNAL,"\
-"\$GRPC_WEB_PORT,"\
+"\$ROOT_DOMAIN"\
+"\$WWW_SUBDOMAIN"\
+"\$WEB_APP_SUBDOMAIN"\
 "\$WEB_APP_PORT"\
+"\$API_SUBDOMAIN"\
+"\$GRPC_WEB_PORT,"\
 < /etc/nginx/conf.d/proxy.conf.tmpl > /etc/nginx/conf.d/proxy.conf
+
+while :; do
+  sleep 6h & wait ${!};
+  nginx -s reload;
+done &
 
 nginx -g "daemon off;"
