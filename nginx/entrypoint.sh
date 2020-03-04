@@ -11,6 +11,7 @@ envsubst ''\
 "\$WEB_APP_PORT"\
 "\$API_SUBDOMAIN"\
 "\$GRPC_WEB_PORT,"\
+"\$EVENT_KEY_REDIRECT,"\
 < /etc/nginx/conf.d/proxy.conf.tmpl > /etc/nginx/conf.d/proxy.conf
 
 while :; do

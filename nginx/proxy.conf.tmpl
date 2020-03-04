@@ -1,4 +1,4 @@
-# Redirect http://domain to https://${WEB_APP_SUBDOMAIN}domain
+# Redirect http://*.domain to https://www.domain
 server {
   listen 80;
   listen [::]:80;
@@ -13,7 +13,7 @@ server {
   }
 }
 
-# Redirect https://domain to https://${WEB_APP_SUBDOMAIN}domain
+# Redirect https://domain to https://www.domain
 server {
   server_name ${ROOT_DOMAIN};
   listen 443 ssl http2;
@@ -27,6 +27,7 @@ server {
   return 301 https://${WWW_SUBDOMAIN}${ROOT_DOMAIN}$request_uri;
 }
 
+# Serve https://www.domain
 server {
   server_name ${WWW_SUBDOMAIN}${ROOT_DOMAIN};
   listen 443 ssl http2;
@@ -37,13 +38,10 @@ server {
   include /etc/letsencrypt/options-ssl-nginx.conf;
   ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-  location / {
-    return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/nyc-2019$request_uri;
-  }
-
-  return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}$request_uri;
+  return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/${EVENT_KEY_REDIRECT}/home;
 }
 
+# Serve https://api.domain
 server {
   server_name ${API_SUBDOMAIN}${ROOT_DOMAIN};
   listen 443 ssl http2;
@@ -60,6 +58,7 @@ server {
   }
 }
 
+# Serve https://app.domain
 server {
   server_name ${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN};
   listen 443 ssl http2;
@@ -71,7 +70,7 @@ server {
   ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
   location = / {  
-    return 301 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/nyc-2019;
+    return 301 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/${EVENT_KEY_REDIRECT};
   }
 
   location / {

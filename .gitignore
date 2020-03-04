@@ -1,4 +1,5 @@
-.env
+.env*
+!.env*.gpg
 
 # User-specific stuff
 .idea/
