@@ -1,0 +1,76 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./api/Dockerfile
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - proxy_pass
+      - data_access
+    env_file:
+      - .env
+  web-app:
+    build:
+      context: ./
+      dockerfile: ./web-app/Dockerfile
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${WEB_APP_PORT}:${WEB_APP_PORT}"
+    networks:
+      - proxy_pass
+    environment:
+      PORT: "${WEB_APP_PORT}"
+    env_file:
+      - .env
+  envoy:
+    build:
+      context: ./
+      dockerfile: ./envoy/Dockerfile
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${ENVOY_ADMIN_PORT}:${ENVOY_ADMIN_PORT}"
+      - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
+    networks:
+      - proxy_pass
+    env_file:
+      - .env
+  nginx:
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - proxy_pass
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    env_file:
+      - .env
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  db:
+    image: postgres
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${HOST_DB_PORT}:5432"
+    networks:
+      - data_access
+    volumes:
+      - "${HOST_DB_DATA_PATH}:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_NAME: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+networks:
+  proxy_pass:
+  data_access:
