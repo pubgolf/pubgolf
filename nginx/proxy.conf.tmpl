@@ -37,7 +37,11 @@ server {
   include /etc/letsencrypt/options-ssl-nginx.conf;
   ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-  return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/nyc-2019$request_uri;
+  location / {
+    return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}/nyc-2019$request_uri;
+  }
+
+  return 302 https://${WEB_APP_SUBDOMAIN}${ROOT_DOMAIN}$request_uri;
 }
 
 server {
