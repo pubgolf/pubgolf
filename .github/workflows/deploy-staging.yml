@@ -44,6 +44,7 @@ jobs:
     - name: Build Docker Images and Update Docker Compose
       run: |
         ./bin/migrate
+        ./bin/seed
         docker-compose -f docker-compose.deploy.yml build
         docker-compose -f docker-compose.deploy.yml down
         docker-compose -f docker-compose.deploy.yml up -d --force-recreate
