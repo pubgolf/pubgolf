@@ -2,11 +2,11 @@
 
 export $(egrep -v '^#' '.env' | xargs) 
 
-if [ -z ${PWD+x} ]; then
-  RELATIVE_PATH_PREFIX=""
-else
-  RELATIVE_PATH_PREFIX="${PWD}/"
-fi
+# if [ -z ${PWD+x} ]; then
+#   RELATIVE_PATH_PREFIX=""
+# else
+#   RELATIVE_PATH_PREFIX="${PWD}/"
+# fi
 
 docker run -v "${RELATIVE_PATH_PREFIX}${DB_MIGRATIONS_PATH}:/migrations" \
 --network host \
