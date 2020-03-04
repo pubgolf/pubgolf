@@ -33,11 +33,11 @@ jobs:
       uses: alinz/ssh-scp-action@master
       with:
         key: ${{ secrets.STAGING_SSH_KEY }}
-        host: ${{ secrets.STAGING_DOCKER_HOST_IP }}
+        host: staging.pubgolf.co
         user: deployer
         scp: |
-          api/db/migrations/* deployer@pubgolf.co:~/data/migrations/
-          api/db/seeds/prod-* deployer@pubgolf.co:~/data/seeds/
+          api/db/migrations/* deployer@staging.pubgolf.co:~/data/migrations/
+          api/db/seeds/prod-* deployer@staging.pubgolf.co:~/data/seeds/
     - name: Build Docker Images and Update Docker Compose
       run: |
         ./bin/migrate
