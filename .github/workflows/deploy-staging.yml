@@ -63,6 +63,10 @@ jobs:
             -i "$(docker ps -f name=db -q)" psql \
             -U "${DB_USER}" -d "${DB_NAME}" < "$FILE"
         done
+      env:
+        DOCKER_TLS_VERIFY: "1"
+        DOCKER_HOST: "tcp://staging.pubgolf.co:2376"
+        DOCKER_CERT_PATH: "certs"
     - name: Cleanup
       run: |
         rm -rf $DOCKER_CERT_PATH
