@@ -11,25 +11,41 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@master
-    - name: Decrypt .env File
-      run: |
-        gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.DOT_ENV_GPG_KEY }}" \
-        --output .env .env.staging.gpg
-    - name: Build Docker Images and Update Docker Compose
+    - name: Install Docker Compose
       run: |
         curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
         chmod +x ~/docker-compose
         sudo mv ~/docker-compose /usr/local/bin/docker-compose
+    - name: Decrypt .env File
+      run: |
+        gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.DOT_ENV_GPG_KEY }}" \
+        --output .env .env.staging.gpg
+    - name: Configure Keys
+      run: |
         mkdir -p $DOCKER_CERT_PATH
         sudo echo "${{ secrets.STAGING_DOCKER_HOST_IP }} staging.pubgolf.co" | sudo tee -a /etc/hosts
         echo "${{ secrets.STAGING_DOCKER_CA }}" > $DOCKER_CERT_PATH/ca.pem
         echo "${{ secrets.STAGING_DOCKER_CLIENT_CERT }}" > $DOCKER_CERT_PATH/cert.pem
         echo "${{ secrets.STAGING_DOCKER_CLIENT_KEY }}" > $DOCKER_CERT_PATH/key.pem
+    - name: Copy Seeds and Migrations via SCP
+      uses: alinz/ssh-scp-action@master
+      with:
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        host: staging.pubgolf.co
+        user: deployer
+        scp: |
+          api/db/migrations/* deployer@pubgolf.co:~/data/migrations/
+          api/db/seeds/prod-* deployer@pubgolf.co:~/data/seeds/
+    - name: Build Docker Images and Update Docker Compose
+      run: |
         ./bin/migrate
         docker-compose -f docker-compose.deploy.yml build
         docker-compose -f docker-compose.deploy.yml down
         docker-compose -f docker-compose.deploy.yml up -d --force-recreate
+    - name: Cleanup
+      run: |
         rm -rf $DOCKER_CERT_PATH
+        rm .env
       env:
         DOCKER_TLS_VERIFY: "1"
         DOCKER_HOST: "tcp://staging.pubgolf.co:2376"
