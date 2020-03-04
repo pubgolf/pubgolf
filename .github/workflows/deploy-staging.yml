@@ -33,7 +33,7 @@ jobs:
       uses: alinz/ssh-scp-action@master
       with:
         key: ${{ secrets.STAGING_SSH_KEY }}
-        host: staging.pubgolf.co
+        host: ${{ secrets.STAGING_DOCKER_HOST_IP }}
         user: deployer
         scp: |
           api/db/migrations/* deployer@pubgolf.co:~/data/migrations/
