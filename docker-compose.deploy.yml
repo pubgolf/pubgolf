@@ -48,15 +48,15 @@ services:
     networks:
       - proxy_pass
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - /home/deployer/data/certbot/conf:/etc/letsencrypt
+      - /home/deployer/data/certbot/www:/var/www/certbot
     env_file:
       - .env
   certbot:
     image: certbot/certbot
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - /home/deployer/data/certbot/conf:/etc/letsencrypt
+      - /home/deployer/data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
   db:
     image: postgres
