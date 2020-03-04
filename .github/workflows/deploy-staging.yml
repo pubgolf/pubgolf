@@ -35,6 +35,9 @@ jobs:
         key: ${{ secrets.STAGING_SSH_KEY }}
         host: ${{ secrets.STAGING_DOCKER_HOST_IP }}
         user: deployer
+        ssh_before: |
+          rm -rf ~/data/migrations/
+          rm -rf ~/data/seeds/
         scp: |
           api/db/migrations/* deployer@${{ secrets.STAGING_DOCKER_HOST_IP }}:~/data/migrations/
           api/db/seeds/prod-* deployer@${{ secrets.STAGING_DOCKER_HOST_IP }}:~/data/seeds/
