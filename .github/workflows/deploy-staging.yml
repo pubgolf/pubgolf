@@ -22,7 +22,7 @@ jobs:
         chmod +x ~/docker-compose
         sudo mv ~/docker-compose /usr/local/bin/docker-compose
         mkdir -p $DOCKER_CERT_PATH
-        echo "${{ secrets.STAGING_DOCKER_HOST_IP }} staging.pubgolf.co" >> /etc/hosts
+        sudo echo "${{ secrets.STAGING_DOCKER_HOST_IP }} staging.pubgolf.co" >> /etc/hosts
         echo "${{ secrets.STAGING_DOCKER_CA }}" > $DOCKER_CERT_PATH/ca.pem
         echo "${{ secrets.STAGING_DOCKER_CLIENT_CERT }}" > $DOCKER_CERT_PATH/cert.pem
         echo "${{ secrets.STAGING_DOCKER_CLIENT_KEY }}" > $DOCKER_CERT_PATH/key.pem
