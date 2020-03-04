@@ -2,7 +2,7 @@
   import Icon from 'src/assets/images/social-beer--green.png';
 
   // TODO: transition between pages
-  export let segment;
+  // export let segment;
 </script>
 
 <style>
@@ -38,7 +38,7 @@
 <main class="MAIN">
   <img class="IMAGE" alt="Cheers" src="{Icon}">
 
-  <h1 class="HEADING">Pub Golf NYC 2k19</h1>
+  <h1 class="HEADING">Pub Golf TODO EVENT NAME</h1>
 
   <div class="flex flex-col w-full text-xl mt-8 mx-auto">
     <slot></slot>

@@ -1,17 +1,24 @@
-<script>
-  import { goto } from '@sapper/app';
+<script context="module">
+  export const preload = (page) => ({ eventKey: page.params.event });
+</script>
 
-  // import { LEAGUE } from 'src/api';
+<script>
+  import {
+    goto,
+    stores,
+  } from '@sapper/app';
+
+  import { getAPI } from 'src/api';
   import {
     applyInsertions,
     onlyDigits,
   } from 'src/phone-handler';
-  import {
-    api,
-    event,
-  } from 'src/stores';
   import FormError from './_FormError';
 
+  export let eventKey;
+
+  const { session } = stores();
+  const api = getAPI($session);
 
   // Local state
   let name = '';
@@ -40,13 +47,17 @@
   }
 
   function submit () {
-    const player = { name, phone: onlyDigits(phone), league };
-
     // console.log('Registering', player);
+    const unformattedPhone = onlyDigits(phone);
 
     error = null;
-    $api.registerPlayer(player).then(() => {
-      goto(`${$event}/auth/confirm?phone=${player.phone}`);
+    api.registerPlayer({
+      name,
+      phoneNumber: `+1${unformattedPhone}`,
+      league,
+      eventKey,
+    }).then(() => {
+      goto(`${eventKey}/auth/confirm?phone=${unformattedPhone}`);
     }, (apiError) => {
       error = apiError;
     });

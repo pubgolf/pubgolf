@@ -42,6 +42,35 @@ export function zeroPad (num, minLength = 2) {
   return `${num}`.padStart(minLength, '0');
 }
 
-export function isDev(env = '') {
+/**
+ * Determine from the session whether the server is in dev mode
+ * @param {string} env
+ *
+ * @returns {boolean}
+ */
+export function isDev ({ config: { PUBGOLF_ENV: env = '' } }) {
   return env.endsWith('dev');
+}
+
+/**
+ * Naively capitalize a string
+ * @param {string} str - Any old string
+ *
+ * @returns {string}
+ */
+export function capitalize (str) {
+  return `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
+}
+
+/**
+ * Transform an object by applying a given function to each entry
+ *
+ * @template OriginalValueType, FinalValueType
+ * @param {Object.<PropertyKey, OriginalValueType>} obj
+ * @param {function([PropertyKey, OriginalValueType]): [PropertyKey, FinalValueType]} mapFn
+ *
+ * @returns {Object.<PropertyKey, FinalValueType>}
+ */
+export function mapEntries (obj, mapFn) {
+  return Object.fromEntries(Object.entries(obj).map(mapFn));
 }

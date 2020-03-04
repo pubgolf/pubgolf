@@ -1,7 +1,9 @@
 import { StatusCode } from 'grpc-web';
 
-const Cookies = require('js-cookie');
-
+import {
+  capitalize,
+  mapEntries,
+} from './utils';
 
 const {
   CreateOrUpdateScoreRequest,
@@ -26,23 +28,6 @@ const MESSAGES = {
   [StatusCode.INVALID_ARGUMENT]: 'Invalid input',
 };
 
-// Wrapper for handling cookies so it's abstracted from the rest of the application
-export const getCookieJar = () => { // eslint-disable-line arrow-body-style
-  return {
-    get (name) {
-      return Cookies.get(name);
-    },
-    set (name, value, attributes) {
-      Cookies.set(name, value, attributes);
-    },
-    remove (name, attributes) {
-      Cookies.remove(name, attributes);
-    },
-  };
-};
-
-const TOKEN_COOKIE = 'pg-token';
-
 
 /**
  * @param promise
@@ -53,9 +38,7 @@ function _unWrap (promise) {
   return promise.then(
     instance => instance.toObject(),
     (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error(error);
-      }
+      console.error(error);
 
       // Replace the top-level message with something user-presentable.
       // The original message is still preserved in error.metadata
@@ -67,147 +50,121 @@ function _unWrap (promise) {
   );
 }
 
-
-class API {
-  constructor (eventKey, host, metadata = {}) {
-    this._cookieJar = getCookieJar();
-    this.eventKey = eventKey;
-    this.client = new APIPromiseClient('https://api.pubgolf.co');
-    this.metadata = metadata;
-
-    if (!metadata.authorization) {
-      // TODO: this'll get wonky if you switch events
-      this._logIn(this._cookieJar.get(TOKEN_COOKIE));
-    }
-  }
-
-  isLoggedIn () {
-    return Boolean(this.metadata && this.metadata.authorization);
-  }
-
-  _logIn (token) {
-    if (!token) return;
-
-    this.metadata = {
-      ...this.metadata,
-      authorization: token,
-    };
-    this._cookieJar.set(TOKEN_COOKIE, token);
-  }
-
-  _logOut () {
-    delete this.metadata.authorization;
-    this._cookieJar.remove(TOKEN_COOKIE);
-  }
-
-  /**
-   * @param {Object} playerInfo
-   *
-   * @returns {Promise<RegisterPlayerReply>}
-   */
-  registerPlayer (playerInfo) {
-    this._logOut();
-    const request = new RegisterPlayerRequest();
-    request.setEventkey(this.eventKey);
-    request.setName(playerInfo.name);
-    request.setPhonenumber(`+1${playerInfo.phone}`);
-    request.setLeague(playerInfo.league);
-
-    return _unWrap(this.client.registerPlayer(request, this.metadata));
-  }
-
-  /**
-   * @param {string} phone
-   *
-   * @returns {Promise<RequestPlayerLoginReply>}
-   */
-  requestPlayerLogin (phone) {
-    this._logOut();
-    const request = new RequestPlayerLoginRequest();
-    request.setEventkey(this.eventKey);
-    request.setPhonenumber(`+1${phone}`);
-
-    return _unWrap(this.client.requestPlayerLogin(
-      request,
-      this.metadata,
-    ));
-  }
-
-  /**
-   * @param {string} phone
-   * @param {number} code
-   *
-   * @returns {Promise<PlayerLoginReply>}
-   */
-  playerLogin (phone, code) {
-    this._logOut();
-    const request = new PlayerLoginRequest();
-    request.setEventkey(this.eventKey);
-    request.setPhonenumber(`+1${phone}`);
-    request.setAuthcode(code);
-
-    return _unWrap(this.client.playerLogin(
-      request,
-      this.metadata,
-    )).then(({ authtoken }) => {
-      this._logIn(authtoken);
+/**
+ * Generate a wrapper for a given gRPC method
+ * @param {APIPromiseClient} client - The gRPC client that will be used to
+ *                                    make the requests
+ * @param {Object} metadata - Metadata to add to each request
+ * @param {string} methodName - The name of the method to call on `client`
+ * @param {Class} RequestClass - The class of request that that method uses
+ *
+ * @returns {function(Object): Object}
+ *           - A function that takes in a plain object of the method's request
+ *             type and returns a plain object of the methods return type
+ */
+function rpcMethod (client, metadata, methodName, RequestClass) {
+  return (params) => {
+    const request = new RequestClass();
+    // Populate the request instance from the given params
+    Object.entries(params).forEach(([key, value]) => {
+      request[`set${capitalize(key)}`](value);
     });
-  }
 
-  /**
-   * @returns {Promise<GetScheduleReply>}
-   */
-  getSchedule () {
-    const request = new GetScheduleRequest();
-    request.setEventkey(this.eventKey);
-
-    return _unWrap(this.client.getSchedule(
-      request,
-      this.metadata,
-    )).then(response => response, (error) => {
-      if (error.code === StatusCode.PERMISSION_DENIED) {
-        this._logOut();
-      }
-      throw error;
-    });
-  }
-
-  /**
-   * @returns {Promise<GetScoresReply>}
-   */
-  getScores () {
-    const request = new GetScoresRequest();
-    request.setEventkey(this.eventKey);
-
-    return _unWrap(this.client.getScores(request, this.metadata));
-  }
-
-  /**
-   * @param {string} playerId
-   * @param {number} venueId
-   * @param {number} strokes
-   *
-   * @returns {Promise<CreateOrUpdateScoreReply>}
-   */
-  createOrUpdateScore ({ playerId, venueId, strokes }) {
-    const request = new CreateOrUpdateScoreRequest();
-    request.setEventkey(this.eventKey);
-    request.setPlayerid(playerId);
-    request.setVenueid(venueId);
-    request.setStrokes(strokes);
-
-    return _unWrap(this.client.createOrUpdateScore(
-      request,
-      this.metadata,
-    ));
-  }
+    // Make the request then turn the response into a plain object
+    return _unWrap(client[methodName](request, metadata));
+  };
 }
 
-let SHARED_CLIENT;
+/**
+ * Build an object of a bunch of gRPC methods
+ * @param {APIPromiseClient} client - The gRPC client that will be used to
+ *                                    make the requests
+ * @param {Object} metadata - Metadata to add to each request
+ * @param {Object.<string,Class>} methods - a map of method names to classes
+ *         TODO: This was the simplest I could get the config part...
+ *
+ * @returns {Object.<string, function(Object): Object>}
+ */
+function buildMethods (client, metadata, methods) {
+  return mapEntries(methods, ([methodName, RequestClass]) => (
+    [methodName, rpcMethod(client, metadata, methodName, RequestClass)]
+  ));
+}
 
-export function getAPI (eventKey, ...args) {
-  if (!SHARED_CLIENT || SHARED_CLIENT.eventKey !== eventKey) {
-    SHARED_CLIENT = new API(eventKey, ...args);
+/**
+ * @typedef {Object} APIWrapper - Expected inputs and outputs for each api method
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   name: string,
+ *   phoneNumber: string,
+ *   league: string,
+ * }): Promise<void>} registerPlayer - Create a player with the given data
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   phoneNumber: string,
+ * }): Promise<void>} requestPlayerLogin - Start authenticating as given player
+ *
+ * @property {function({
+ *   eventKey: string,
+ *   phoneNumber: string,
+ *   authCode: string,
+ * }): Promise<PlayerLoginReply.AsObject>} playerLogin - Log in as the given player
+ *
+ * @property {function({
+ *   eventKey: string,
+ * }): Promise<GetScheduleReply.AsObject>} getSchedule - Get the schedule of stops for an event
+ *
+ * @property {function({
+ *   eventKey: string,
+ * }): Promise<GetScoresReply.AsObject>} getScores - Get groups of current scores for the event
+ *
+ * @property {function({
+ *   venueid: string,
+ *   playerid: string,
+ *   strokes: number,
+ * }): Promise<void>} createOrUpdateScore - Submit a score for approval
+ */
+
+/**
+ * Build the API wrapper
+ * @param {string} host - The hostname of the gRPC server
+ * @param {Object} metadata - gRPC metadata
+ *
+ * @returns {APIWrapper}
+ */
+function buildAPIWrapper (host, metadata = {}) {
+  const client = new APIPromiseClient(host);
+  return buildMethods(client, metadata, {
+    registerPlayer: RegisterPlayerRequest,
+    requestPlayerLogin: RequestPlayerLoginRequest,
+    playerLogin: PlayerLoginRequest,
+    getSchedule: GetScheduleRequest,
+    getScores: GetScoresRequest,
+    createOrUpdateScore: CreateOrUpdateScoreRequest,
+  });
+}
+
+const CACHE = new Map();
+
+/**
+ *
+ * @param {Object} session
+ *
+ * @returns {APIWrapper}
+ */
+export function getAPI (session) {
+  const {
+    config: { API_HOST_EXTERNAL: host },
+    user: { authtoken },
+  } = session;
+  const cacheKey = `${host} ${authtoken}`;
+
+  if (CACHE.has(cacheKey)) {
+    return CACHE.get(cacheKey);
   }
-  return SHARED_CLIENT;
+  CACHE.set(cacheKey, buildAPIWrapper(host, { authorization: authtoken }));
+
+  return CACHE.get(cacheKey);
 }

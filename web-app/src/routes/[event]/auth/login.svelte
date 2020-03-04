@@ -1,18 +1,24 @@
-<script>
-  import { goto } from '@sapper/app';
+<script context="module">
+  export const preload = (page) => ({ eventKey: page.params.event });
+</script>
 
+<script>
+  import {
+    goto,
+    stores,
+  } from '@sapper/app';
+
+  import { getAPI } from 'src/api';
   import {
     applyInsertions,
     onlyDigits,
   } from 'src/phone-handler';
-  import {
-    api,
-    event,
-  } from 'src/stores';
   import FormError from './_FormError';
 
-  // TODO: format phone as they type
-  // TODO: validation
+  export let eventKey;
+
+  const { session } = stores();
+  const api = getAPI($session);
 
   // Local state
   let phone = '';
@@ -43,9 +49,11 @@
     const unformattedPhone = onlyDigits(phone);
 
     error = null;
-    $api.requestPlayerLogin(unformattedPhone).then(() => {
-      // TODO: figure out how to get relative urls
-      goto(`${$event}/auth/confirm?phone=${unformattedPhone}`);
+    api.requestPlayerLogin({
+      eventKey,
+      phoneNumber: `+1${unformattedPhone}`,
+    }).then(() => {
+      goto(`${eventKey}/auth/confirm?phone=${unformattedPhone}`);
     }, (apiError) => {
       error = apiError;
     });

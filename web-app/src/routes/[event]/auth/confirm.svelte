@@ -3,11 +3,12 @@
 
 
   export async function preload (page) {
-    if (!page.query.phone) {
+    if (!/\d{10}/.test(page.query.phone)) {
       this.redirect(302, `${page.params.event}/auth`);
     }
 
     return {
+      eventKey: page.params.event,
       phone: onlyDigits(page.query.phone),
     };
   }
@@ -15,17 +16,24 @@
 
 
 <script>
-  import { goto } from '@sapper/app';
-
   import {
-    api,
-    event,
-  } from 'src/stores';
+    goto,
+    stores,
+  } from '@sapper/app';
+  import { onMount } from 'svelte';
+
+  import { getAPI } from 'src/api';
+  import { authHelper } from 'src/auth-helper';
+  import { isDev } from 'src/utils';
   import FormError from './_FormError';
 
 
   // props
+  export let eventKey;
   export let phone;
+
+  const { session } = stores();
+  const api = getAPI($session);
 
   // Local state
   let code = '';
@@ -33,21 +41,45 @@
   // reset error to null if the form changes
   $: error = Boolean(code) && null;
 
+  async function resendCode () {
+    return await api.requestPlayerLogin({
+      eventKey,
+      phoneNumber: `+1${phone}`,
+    });
+  }
+
+  if (isDev($session)) {
+    onMount(resendCode);
+  }
+
   function submit () {
     // console.log('Verifying', code);
 
     error = null;
-    $api.playerLogin(phone, Number(code))
-      .then(() => {
-        goto(`${$event}/home`);
-      }, (apiError) => {
-        error = apiError;
+
+    api.playerLogin({
+      eventKey,
+      // TODO: this phone number normalization should be centralized
+      phoneNumber: `+1${phone}`,
+      authCode: Number(code),
+    }).then(async (user) => {
+      await authHelper.preserveSession({
+        ...user,
+        eventKey,
       });
+      goto(`${eventKey}/home`);
+    }, (apiError) => {
+      error = apiError;
+    });
   }
 </script>
 
 <style>
 </style>
+
+<svelte:head>
+  <title>Confirm your Phone Number | Pub Golf</title>
+</svelte:head>
 
 <FormError {error}/>
 

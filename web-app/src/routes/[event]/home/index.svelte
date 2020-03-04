@@ -1,41 +1,73 @@
-<script>
-  import { goto } from '@sapper/app';
+<script context="module">
+  import { authHelper } from 'src/auth-helper';
 
+  export async function preload (page, session) {
+    const eventKey = page.params.event;
+    if (!authHelper.isAuthorized(session, eventKey)) {
+      try {
+        session.user = await authHelper.restoreSession(this.fetch);
+      } catch (e) {
+        console.debug(e);
+        // If not authenticated, this page isn't accessible
+        this.redirect(302, `${eventKey}/auth`);
+      }
+    }
+
+    return {
+      eventKey,
+    };
+  }
+</script>
+
+<script>
+  import {
+    goto,
+    stores,
+  } from '@sapper/app';
+  import { onMount } from 'svelte';
+
+  import { getAPI } from 'src/api';
   import Countdown from 'src/components/Countdown';
   import {
-    api,
-    event,
     stops,
     nextStop,
     pastStops,
   } from 'src/stores';
 
 
-  let fetching = true;
+  // props
+  export let eventKey;
 
-  $: if ($event) {
-    // If not authenticated, this page isn't accessible
-    if (!$api.isLoggedIn()) {
-      goto(`${$event}/auth`);
-    } else {
-      $api.getSchedule().then((schedule) => {
-        $stops = schedule.venuelist.venuesList.map(
-          ({ stopid, venue: { starttime, ...venue } }, index) => ({
-            stopid,
-            ...venue,
-            start: new Date(starttime),
-            index,
-          }
-          ),
-        );
-        fetching = false;
-      }, () => {
-        if (!$api.isLoggedIn()) {
-          goto(`${$event}/auth`);
-        }
-      });
+  let fetching = true;
+  const { page, session } = stores();
+
+  /**
+   * Flatten stop and venue into a single object.
+   * @param stopid
+   * @param venue
+   * @param index
+   * @returns {{start: Date, stopid: *, index: *}}
+   */
+  const flattenStop = ({ stopid, venue }, index) => ({
+    stopid,
+    ...venue,
+    start: new Date(venue.starttime),
+    index,
+  });
+
+  onMount(async () => {
+    try {
+      const api = getAPI($session);
+      const schedule = await api.getSchedule({ eventKey });
+
+      $stops = schedule.venuelist.venuesList.map(flattenStop);
+      fetching = false;
+    } catch (e) {
+      if (!authHelper.isAuthorized($session, eventKey)) {
+        return goto(`${eventKey}/auth`);
+      }
     }
-  }
+  })
 
   // $: console.log($nextStop);
 </script>
@@ -69,12 +101,12 @@
           {$nextStop.address}
         </a>
       </p>
-      <!--<a
-        href="{$event}/home/add-score"
-        class="block btn btn-primary w-2/3 my-16 mx-auto"
+      <a
+              href="{$page.path}/scores"
+              class="block btn btn-primary w-2/3 my-16 mx-auto"
       >
-        Add your Score
-      </a>-->
+        See scores
+      </a>
     {:else if $stops.length}
       <p class="text-6xl">
         Thanks for Playing!
