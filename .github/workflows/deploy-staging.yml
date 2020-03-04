@@ -60,7 +60,7 @@ jobs:
         export $(egrep -v '^#' '.env' | xargs)
         for FILE in api/db/seeds/prod-*.sql; do
           docker container exec -e "PGPASSWORD=${DB_PASSWORD}" \
-            -i "$(docker-compose -f docker-compose.deploy.yml ps -q db)" psql \
+            -i "$(docker ps -f name=db -q)" psql \
             -U "${DB_USER}" -d "${DB_NAME}" < "$FILE"
         done
     - name: Cleanup
