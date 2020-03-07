@@ -1,5 +1,8 @@
+# Secrets
 .env*
 !.env*.gpg
+keys/
+!keys/README.md
 
 # User-specific stuff
 .idea/
