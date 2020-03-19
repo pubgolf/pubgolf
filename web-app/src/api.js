@@ -1,7 +1,7 @@
 import { StatusCode } from 'grpc-web';
 
 import {
-  capitalize,
+  capFirst,
   mapEntries,
 } from './utils';
 
@@ -67,7 +67,7 @@ function rpcMethod (client, metadata, methodName, RequestClass) {
     const request = new RequestClass();
     // Populate the request instance from the given params
     Object.entries(params).forEach(([key, value]) => {
-      request[`set${capitalize(key)}`](value);
+      request[`set${capFirst(key)}`](value);
     });
 
     // Make the request then turn the response into a plain object
@@ -121,8 +121,8 @@ function buildMethods (client, metadata, methods) {
  * }): Promise<GetScoresReply.AsObject>} getScores - Get groups of current scores for the event
  *
  * @property {function({
- *   venueid: string,
- *   playerid: string,
+ *   venueId: string,
+ *   playerId: string,
  *   strokes: number,
  * }): Promise<void>} createOrUpdateScore - Submit a score for approval
  */
@@ -157,14 +157,14 @@ const CACHE = new Map();
 export function getAPI (session) {
   const {
     config: { API_HOST_EXTERNAL: host },
-    user: { authtoken },
+    user: { authToken },
   } = session;
-  const cacheKey = `${host} ${authtoken}`;
+  const cacheKey = `${host} ${authToken}`;
 
   if (CACHE.has(cacheKey)) {
     return CACHE.get(cacheKey);
   }
-  CACHE.set(cacheKey, buildAPIWrapper(host, { authorization: authtoken }));
+  CACHE.set(cacheKey, buildAPIWrapper(host, { authorization: authToken }));
 
   return CACHE.get(cacheKey);
 }

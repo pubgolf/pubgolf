@@ -42,15 +42,15 @@
 
   /**
    * Flatten stop and venue into a single object.
-   * @param stopid
+   * @param stopId
    * @param venue
    * @param index
-   * @returns {{start: Date, stopid: *, index: *}}
+   * @returns {{start: Date, stopId: *, index: *}}
    */
-  const flattenStop = ({ stopid, venue }, index) => ({
-    stopid,
+  const flattenStop = ({ stopId, venue }, index) => ({
+    stopId,
     ...venue,
-    start: new Date(venue.starttime),
+    start: new Date(venue.startTime),
     index,
   });
 
@@ -59,7 +59,7 @@
       const api = getAPI($session);
       const schedule = await api.getSchedule({ eventKey });
 
-      $stops = schedule.venuelist.venuesList.map(flattenStop);
+      $stops = schedule.venueList.venuesList.map(flattenStop);
       fetching = false;
     } catch (e) {
       if (!authHelper.isAuthorized($session, eventKey)) {
@@ -115,7 +115,7 @@
 
   {#if $pastStops.length}
     <ol class="border-t-4 border-gray-500 px-2">
-      {#each $pastStops as stop, i (stop.stopid)}
+      {#each $pastStops as stop, i (stop.stopId)}
         <li class="{ i ? 'border-t-2 ' : ''}border-gray-500 px-1">
           {#if i === 0 && $nextStop !== null}
             <span class="text-extrabold uppercase">Current:</span>

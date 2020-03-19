@@ -53,13 +53,27 @@ export function isDev ({ config: { PUBGOLF_ENV: env = '' } }) {
 }
 
 /**
+ * Capitalize the first character and optionally lowercase the rest
+ * @param {string} str
+ * @param {boolean} [lowerRest]
+ *
+ * @returns {string}
+ */
+export function capFirst (str, lowerRest = false) {
+  const rest = lowerRest
+    ? str.slice(1).toLowerCase()
+    : str.slice(1);
+  return `${str[0].toUpperCase()}${rest}`;
+}
+
+/**
  * Naively capitalize a string
  * @param {string} str - Any old string
  *
  * @returns {string}
  */
 export function capitalize (str) {
-  return `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
+  return capFirst(str, true);
 }
 
 /**
