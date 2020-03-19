@@ -10,6 +10,8 @@ export async function post (req, res) {
   req.on('end', async () => {
     res.cookies.set(COOKIE_NAME, rawBody, {
       maxAge: COOKIE_AGE,
+      sameSite: 'strict',
+      // secure: true,
       httpOnly: true, // Protect the cookie from javascript access
     });
     res.end('OK');

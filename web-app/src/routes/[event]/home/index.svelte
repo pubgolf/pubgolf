@@ -7,7 +7,6 @@
       try {
         session.user = await authHelper.restoreSession(this.fetch);
       } catch (e) {
-        console.debug(e);
         // If not authenticated, this page isn't accessible
         this.redirect(302, `${eventKey}/auth`);
       }
