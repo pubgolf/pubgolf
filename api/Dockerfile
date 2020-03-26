@@ -36,6 +36,8 @@ RUN mkdir -p /tmp/protobuf && \
 
 ADD ./api /go/src/github.com/pubgolf/pubgolf/api
 ADD ./proto /go/src/github.com/pubgolf/pubgolf/proto
+ADD ./go.mod /go/src/github.com/pubgolf/pubgolf/go.mod
+ADD ./go.sum /go/src/github.com/pubgolf/pubgolf/go.sum
 WORKDIR /go/src/github.com/pubgolf/pubgolf/api
 RUN bin/compile-protos
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/app github.com/pubgolf/pubgolf/api
