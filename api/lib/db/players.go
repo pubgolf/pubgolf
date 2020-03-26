@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // CreatePlayer inserts a new player into the database in an unconfirmed state.

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // GetEventID accepts an `eventKey` and returns a corresponding event ID to bypass joins in later queries. An empty
@@ -97,7 +97,7 @@ func GetScheduleForEvent(tx *sql.Tx, eventID *string) (pg.VenueList, error) {
 		venue := pg.Venue{}
 		venueStop := pg.VenueStop{Venue: &venue}
 
-		if err := rows.Scan(&venueStop.StopID, &venue.StartTime, &venue.VenueID,
+		if err := rows.Scan(&venueStop.StopId, &venue.StartTime, &venue.VenueId,
 			&venue.Name, &venue.Address, &venue.Image); err != nil {
 			err = fmt.Errorf("could not fetch event schedule: %v", err)
 			return venueList, err

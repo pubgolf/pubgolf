@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 
-	"github.com/escavelo/pubgolf/api/lib/handlers"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/handlers"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // ----------------------------------------------

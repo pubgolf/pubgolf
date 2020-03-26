@@ -14,8 +14,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
-	"github.com/escavelo/pubgolf/api/lib/server"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/server"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 const (

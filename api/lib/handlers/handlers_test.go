@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 
-	. "github.com/escavelo/pubgolf/api/lib/handlers"
+	. "github.com/pubgolf/pubgolf/api/lib/handlers"
 )
 
 var testDB *sql.DB

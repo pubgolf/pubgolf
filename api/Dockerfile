@@ -34,11 +34,11 @@ RUN mkdir -p /tmp/protobuf && \
     cp -r /tmp/protobuf/protobuf-${GOPB_VER}/* /go/src/github.com/golang/protobuf/ && \
     go install github.com/golang/protobuf/protoc-gen-go
 
-ADD ./api /go/src/github.com/escavelo/pubgolf/api
-ADD ./proto /go/src/github.com/escavelo/pubgolf/proto
-WORKDIR /go/src/github.com/escavelo/pubgolf/api
+ADD ./api /go/src/github.com/pubgolf/pubgolf/api
+ADD ./proto /go/src/github.com/pubgolf/pubgolf/proto
+WORKDIR /go/src/github.com/pubgolf/pubgolf/api
 RUN bin/compile-protos
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/app github.com/escavelo/pubgolf/api
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/app github.com/pubgolf/pubgolf/api
 
 FROM alpine:latest
 COPY --from=0 /go/bin/app .

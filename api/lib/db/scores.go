@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // GetPlayerScores returns all scores for a given player and event.
@@ -89,7 +89,7 @@ func GetPlayerScores(tx *sql.Tx, eventID *string, playerID *string) ([]*pg.Score
 		score := pg.Score{}
 
 		if err := rows.Scan(&score.Label, &points, &adjustments,
-			&total, &score.EntityID); err != nil {
+			&total, &score.EntityId); err != nil {
 			err = fmt.Errorf("could not fetch scores for player: %v", err)
 			return scores, err
 		}
@@ -327,7 +327,7 @@ func getScoreboard(tx *sql.Tx, eventID *string, scoreboardQuery string) (
 		score := pg.Score{}
 
 		if err := rows.Scan(&score.Label, &score.Points, &score.Adjustments,
-			&score.Total, &score.EntityID); err != nil {
+			&score.Total, &score.EntityId); err != nil {
 			err = fmt.Errorf("could not fetch scores: %v", err)
 			return scores, err
 		}

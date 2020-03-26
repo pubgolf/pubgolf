@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	. "github.com/escavelo/pubgolf/api/lib/handlers"
-	"github.com/escavelo/pubgolf/api/lib/utils"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	. "github.com/pubgolf/pubgolf/api/lib/handlers"
+	"github.com/pubgolf/pubgolf/api/lib/utils"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 const (
@@ -659,7 +659,7 @@ func TestPlayerLoginReturnsUserData(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.NotEmpty(t, rep.AuthToken)
-	assert.NotEmpty(t, rep.PlayerID)
+	assert.NotEmpty(t, rep.PlayerId)
 	assert.Equal(t, pg.PlayerRole_DEFAULT, rep.GetPlayerRole())
 }
 

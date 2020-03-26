@@ -10,10 +10,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/escavelo/pubgolf/api/lib/db"
-	"github.com/escavelo/pubgolf/api/lib/handlers"
-	"github.com/escavelo/pubgolf/api/lib/utils"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/db"
+	"github.com/pubgolf/pubgolf/api/lib/handlers"
+	"github.com/pubgolf/pubgolf/api/lib/utils"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // APIServer is a struct for passing global context, such as the database handle.

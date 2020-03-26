@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/escavelo/pubgolf/api/lib/db"
-	"github.com/escavelo/pubgolf/api/lib/sms"
-	"github.com/escavelo/pubgolf/api/lib/utils"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/db"
+	"github.com/pubgolf/pubgolf/api/lib/sms"
+	"github.com/pubgolf/pubgolf/api/lib/utils"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // RegisterPlayer adds a new player to an event in an unconfirmed state and sends an auth code SMS to the provided
@@ -127,7 +127,7 @@ func PlayerLogin(rd *RequestData, req *pg.PlayerLoginRequest) (*pg.PlayerLoginRe
 
 	return &pg.PlayerLoginReply{
 		AuthToken:  authToken,
-		PlayerID:   playerID,
+		PlayerId:   playerID,
 		PlayerRole: role,
 	}, nil
 }
