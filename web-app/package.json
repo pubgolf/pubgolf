@@ -2,6 +2,12 @@
   "name": "pubgolf-web",
   "description": "Pub Golf Web App",
   "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pubgolf/pubgolf.git",
+    "directory": "web-app"
+  },
   "scripts": {
     "cy:run": "cypress run",
     "cy:open": "cypress open",
