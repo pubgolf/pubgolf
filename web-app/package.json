@@ -2,6 +2,12 @@
   "name": "pubgolf-web",
   "description": "Pub Golf Web App",
   "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pubgolf/pubgolf.git",
+    "directory": "web-app"
+  },
   "scripts": {
     "cy:run": "cypress run",
     "cy:open": "cypress open",
@@ -36,20 +42,20 @@
     "eslint-import-resolver-custom-alias": "^1.2.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-svelte3": "^2.7.3",
-    "file-loader": "^5.0.2",
+    "file-loader": "^6.0.0",
     "glob-all": "^3.1.0",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^4.0.1",
     "mini-css-extract-plugin": "^0.9.0",
     "npm-run-all": "^4.1.5",
     "purgecss": "^1.4.2",
     "purgecss-webpack-plugin": "^1.6.0",
-    "sapper": "^0.27.0",
+    "sapper": "^0.27.11",
     "style-loader": "^1.1.2",
-    "svelte": "^3.16.7",
+    "svelte": "^3.20.1",
     "svelte-loader": "^2.9.0",
     "svg-inline-loader": "^0.8.0",
     "tailwindcss": "^1.1.4",
-    "webpack": "^4.41.5",
+    "webpack": "^4.42.1",
     "webpack-pwa-manifest": "^4.1.1"
   }
 }
