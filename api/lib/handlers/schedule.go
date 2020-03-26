@@ -6,7 +6,7 @@ import (
 	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
-// GetSchedule returns a list of venues and transisiton times for an event.
+// GetSchedule returns a list of venues and transition times for an event.
 func GetSchedule(rd *RequestData, req *pg.GetScheduleRequest) (*pg.GetScheduleReply, error) {
 	eventKey := req.GetEventKey()
 

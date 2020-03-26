@@ -198,6 +198,7 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID 
 	return eventID, playerID, role, err
 }
 
+// PlayerRoleFromDBFormat converts a DB enum into a protobuf enum.
 func PlayerRoleFromDBFormat(roleRaw []uint8) pg.PlayerRole {
 	return pg.PlayerRole(pg.PlayerRole_value[string(roleRaw)])
 }
