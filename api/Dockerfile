@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM golang:1.14.1
 
 RUN apt-get update && apt-get -y install unzip && apt-get clean
 
@@ -25,7 +25,7 @@ RUN mkdir -p /tmp/grpc-go && \
     cp -r /tmp/grpc-go/grpc-go-${GRPC_VER}/* /go/src/google.golang.org/grpc/
 
 # Install protoc-gen-go
-ENV GOPB_VER 1.3.2
+ENV GOPB_VER 1.3.5
 RUN mkdir -p /tmp/protobuf && \
     curl -L https://github.com/golang/protobuf/archive/v${GOPB_VER}.zip > /tmp/protobuf/protobuf.zip && \
     cd /tmp/protobuf && \
