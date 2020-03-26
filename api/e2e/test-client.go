@@ -13,7 +13,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 const (

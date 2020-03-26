@@ -3,7 +3,7 @@
 
 
   export async function preload (page) {
-    if (!/\d{10}/.test(page.query.phone)) {
+    if (!/^\d{10}$/.test(page.query.phone)) {
       this.redirect(302, `${page.params.event}/auth`);
     }
 

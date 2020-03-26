@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"github.com/escavelo/pubgolf/api/lib/db"
-	"github.com/escavelo/pubgolf/api/lib/utils"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/db"
+	"github.com/pubgolf/pubgolf/api/lib/utils"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
-// GetSchedule returns a list of venues and transisiton times for an event.
+// GetSchedule returns a list of venues and transition times for an event.
 func GetSchedule(rd *RequestData, req *pg.GetScheduleRequest) (*pg.GetScheduleReply, error) {
 	eventKey := req.GetEventKey()
 

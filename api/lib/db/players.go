@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // CreatePlayer inserts a new player into the database in an unconfirmed state.
@@ -198,6 +198,7 @@ func ValidateAuthToken(tx *sql.Tx, authToken *string) (eventID string, playerID 
 	return eventID, playerID, role, err
 }
 
+// PlayerRoleFromDBFormat converts a DB enum into a protobuf enum.
 func PlayerRoleFromDBFormat(roleRaw []uint8) pg.PlayerRole {
 	return pg.PlayerRole(pg.PlayerRole_value[string(roleRaw)])
 }

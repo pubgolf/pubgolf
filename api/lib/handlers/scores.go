@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/escavelo/pubgolf/api/lib/db"
-	"github.com/escavelo/pubgolf/api/lib/utils"
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	"github.com/pubgolf/pubgolf/api/lib/db"
+	"github.com/pubgolf/pubgolf/api/lib/utils"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 )
 
 // GetScores returns an event's overall leaderboard.
@@ -44,20 +44,20 @@ func GetScores(rd *RequestData, req *pg.GetScoresRequest) (*pg.GetScoresReply, e
 // GetScoresForPlayer all scores for the requested player.
 func GetScoresForPlayer(rd *RequestData, req *pg.GetScoresForPlayerRequest) (
 	*pg.GetScoresForPlayerReply, error) {
-	if utils.InvalidIDFormat(&req.PlayerID) {
+	if utils.InvalidIDFormat(&req.PlayerId) {
 		return nil, utils.InvalidArgumentError()
 	}
 
-	playerName, err := db.GetPlayerName(rd.Tx, &req.PlayerID)
+	playerName, err := db.GetPlayerName(rd.Tx, &req.PlayerId)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}
 	if playerName == "" {
 		// Player doesn't exist.
-		return nil, utils.PlayerNotFoundError(&req.PlayerID)
+		return nil, utils.PlayerNotFoundError(&req.PlayerId)
 	}
 
-	playerScores, err := db.GetPlayerScores(rd.Tx, &rd.EventID, &req.PlayerID)
+	playerScores, err := db.GetPlayerScores(rd.Tx, &rd.EventID, &req.PlayerId)
 	if err != nil {
 		return nil, utils.TemporaryServerError(err)
 	}

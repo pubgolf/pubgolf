@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	pg "github.com/escavelo/pubgolf/api/proto/pubgolf"
+	pg "github.com/pubgolf/pubgolf/api/proto/pubgolf"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -112,7 +112,7 @@ func getScoresForPlayer(client pg.APIClient) {
 	ctx := metadata.NewOutgoingContext(context.Background(), header)
 	r, err := client.GetScoresForPlayer(ctx, &pg.GetScoresForPlayerRequest{
 		EventKey: eventKey,
-		PlayerID: playerID,
+		PlayerId: playerID,
 	})
 	logResponse(r, err)
 }

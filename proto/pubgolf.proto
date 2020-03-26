@@ -30,10 +30,10 @@ service API {
 // Auth endpoints - accessible without auth token
 
 message RegisterPlayerRequest {
-  string eventKey = 1;
+  string event_key = 1;
 
   // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
-  string phoneNumber = 2;
+  string phone_number = 2;
 
   string name = 3;
   League league = 4;
@@ -42,61 +42,61 @@ message RegisterPlayerRequest {
 message RegisterPlayerReply {}
 
 message RequestPlayerLoginRequest {
-  string eventKey = 1;
+  string event_key = 1;
 
   // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
-  string phoneNumber = 2;
+  string phone_number = 2;
 }
 
 message RequestPlayerLoginReply {}
 
 message PlayerLoginRequest {
-  string eventKey = 1;
+  string event_key = 1;
 
   // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
-  string phoneNumber = 2;
+  string phone_number = 2;
 
-  uint32 authCode = 3;
+  uint32 auth_code = 3;
 }
 
 message PlayerLoginReply {
-  string authToken = 1;
-  string playerID = 2;
-  PlayerRole playerRole = 3;
+  string auth_token = 1;
+  string player_id = 2;
+  PlayerRole player_role = 3;
 }
 
 // Display endpoints - secured via auth token
 
 message GetScheduleRequest {
-  string eventKey = 1;
+  string event_key = 1;
 }
 
 message GetScheduleReply {
-  VenueList venueList = 1;
+  VenueList venue_list = 1;
 }
 
 message GetScoresRequest {
-  string eventKey = 1;
+  string event_key = 1;
 }
 
 message GetScoresReply {
-  repeated ScoreList scoreLists = 1;
+  repeated ScoreList score_lists = 1;
 }
 
 message GetScoresForPlayerRequest {
-  string eventKey = 1;
-  string playerID = 2;
+  string event_key = 1;
+  string player_id = 2;
 }
 
 message GetScoresForPlayerReply {
-  repeated ScoreList scoreLists = 1;
+  repeated ScoreList score_lists = 1;
 }
 
 // User action endpoints - secured via auth token
 
 message CreateOrUpdateScoreRequest {
-  string venueID = 1;
-  string playerID = 2;
+  string venue_id = 1;
+  string player_id = 2;
   int32 strokes = 3;
 
   // TODO: Figure out how to handle bonus and penalty. I think we can probably include this field in the proto, share it
