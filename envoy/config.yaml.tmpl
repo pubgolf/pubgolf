@@ -1,7 +1,7 @@
 admin:
   access_log_path: /tmp/admin_access.log
   address:
-    socket_address: { address: 0.0.0.0, port_value: ${ADMIN_PORT} }
+    socket_address: { address: 0.0.0.0, port_value: ${ENVOY_ADMIN_PORT} }
 
 static_resources:
   listeners:
@@ -45,4 +45,4 @@ static_resources:
     type: logical_dns
     http2_protocol_options: {}
     lb_policy: round_robin
-    hosts: [{ socket_address: { address: ${API_UPSTREAM_HOST} , port_value: ${API_UPSTREAM_PORT} }}]
+    hosts: [{ socket_address: { address: ${API_HOST} , port_value: ${API_PORT} }}]

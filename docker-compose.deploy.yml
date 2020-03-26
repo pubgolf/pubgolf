@@ -35,11 +35,8 @@ services:
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
     networks:
       - proxy_pass
-    environment:
-      ADMIN_PORT: "${ENVOY_ADMIN_PORT}"
-      GRPC_WEB_PORT: "${GRPC_WEB_PORT}"
-      API_UPSTREAM_HOST: "${API_HOST}"
-      API_UPSTREAM_PORT: "${API_PORT}"
+    env_file:
+      - .env
   nginx:
     build:
       context: ./
@@ -51,10 +48,16 @@ services:
     networks:
       - proxy_pass
     volumes:
-      - ./certs:/etc/cloudflare/certs
-      - ./data/certbot/conf:/etc/letsencrypt
+      - /home/deployer/data/certbot/conf:/etc/letsencrypt
+      - /home/deployer/data/certbot/www:/var/www/certbot
     env_file:
       - .env
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /home/deployer/data/certbot/conf:/etc/letsencrypt
+      - /home/deployer/data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
   db:
     image: postgres
     restart: "${RESTART_POLICY:-unless-stopped}"
@@ -68,16 +71,6 @@ services:
       POSTGRES_NAME: "${DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
-  testdb:
-    image: postgres
-    ports:
-      - "${HOST_TEST_DB_PORT}:5432"
-    networks:
-      - data_access
-    environment:
-      POSTGRES_NAME: "${TEST_DB_NAME}"
-      POSTGRES_USER: "${TEST_DB_USER}"
-      POSTGRES_PASSWORD: "${TEST_DB_PASSWORD}"
 networks:
   proxy_pass:
   data_access:

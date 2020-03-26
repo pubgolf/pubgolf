@@ -5,10 +5,10 @@
 
 # Required for env var support in the Envoy config file.
 envsubst ''\
-"\$ADMIN_PORT,"\
+"\$ENVOY_ADMIN_PORT,"\
 "\$GRPC_WEB_PORT,"\
-"\$API_UPSTREAM_HOST,"\
-"\$API_UPSTREAM_PORT" \
+"\$API_HOST,"\
+"\$API_PORT" \
 < /etc/envoy/config.yaml.tmpl > /etc/envoy/config.yaml
 
 /usr/local/bin/envoy -c /etc/envoy/config.yaml
