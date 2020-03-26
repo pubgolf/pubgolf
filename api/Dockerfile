@@ -15,16 +15,7 @@ RUN mkdir -p /tmp/protoc && \
     cd /tmp && \
     rm -r /tmp/protoc
 
-# Get the source from GitHub
-ENV GRPC_VER 1.25.1
-RUN mkdir -p /tmp/grpc-go && \
-    curl -L https://github.com/grpc/grpc-go/archive/v${GRPC_VER}.zip > /tmp/grpc-go/grpc-go.zip && \
-    cd /tmp/grpc-go && \
-    unzip grpc-go.zip && \
-    mkdir -p /go/src/google.golang.org/grpc/ && \
-    cp -r /tmp/grpc-go/grpc-go-${GRPC_VER}/* /go/src/google.golang.org/grpc/
-
-# Install protoc-gen-go
+# protoc-gen-go
 ENV GOPB_VER 1.3.5
 RUN mkdir -p /tmp/protobuf && \
     curl -L https://github.com/golang/protobuf/archive/v${GOPB_VER}.zip > /tmp/protobuf/protobuf.zip && \
