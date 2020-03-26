@@ -35,11 +35,8 @@ services:
       - "${GRPC_WEB_PORT}:${GRPC_WEB_PORT}"
     networks:
       - proxy_pass
-    environment:
-      ADMIN_PORT: "${ENVOY_ADMIN_PORT}"
-      GRPC_WEB_PORT: "${GRPC_WEB_PORT}"
-      API_UPSTREAM_HOST: "${API_HOST}"
-      API_UPSTREAM_PORT: "${API_PORT}"
+    env_file:
+      - .env
   nginx:
     build:
       context: ./
