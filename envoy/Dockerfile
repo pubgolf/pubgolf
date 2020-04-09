@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy:v1.12.2
+FROM envoyproxy/envoy:v1.14.1
 
 # Ensure that the `envsubst` command is installed.
 RUN \
