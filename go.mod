@@ -17,5 +17,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.5.1
-	google.golang.org/grpc v1.28.0
+	google.golang.org/grpc v1.29.1
 )
