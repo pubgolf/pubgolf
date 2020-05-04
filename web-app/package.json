@@ -54,7 +54,7 @@
     "svelte": "^3.20.1",
     "svelte-loader": "^2.9.0",
     "svg-inline-loader": "^0.8.0",
-    "tailwindcss": "^1.2.0",
+    "tailwindcss": "^1.4.4",
     "webpack": "^4.42.1",
     "webpack-pwa-manifest": "^4.1.1"
   }
