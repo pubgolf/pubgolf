@@ -10,12 +10,11 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/protobuf v1.3.5
-	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.3.0
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.5.1
-	google.golang.org/grpc v1.28.0
+	google.golang.org/grpc v1.30.0
 )
