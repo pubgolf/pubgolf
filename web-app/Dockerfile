@@ -1,4 +1,4 @@
-FROM node:12.13.0
+FROM node:14.10.1
 
 RUN apt-get -qq update && apt-get -qq install -y \
   unzip
