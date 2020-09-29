@@ -15,7 +15,7 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.5.0
+	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.5.1
 	google.golang.org/grpc v1.28.0
 )
