@@ -1,4 +1,4 @@
-FROM node:12.13.0
+FROM node:16.3.0
 
 RUN apt-get -qq update && apt-get -qq install -y \
   unzip
