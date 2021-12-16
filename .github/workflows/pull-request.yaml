@@ -30,6 +30,8 @@ jobs:
       - name: Check all generated code is vendored for latest proto spec
         run: |
           buf generate
+          # Call diff to force the mtime changes to be resolved, otherwise diff-index will give us a false positive.
+          git diff > /dev/null
           git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
       - name: Check client versions are updated if there are proto changes
         run: |
