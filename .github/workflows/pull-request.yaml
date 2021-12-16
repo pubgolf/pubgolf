@@ -24,6 +24,6 @@ jobs:
           git diff > /dev/null
           git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
       - name: Check client versions are updated if there are proto changes
-        run: proto/bin/check-current-version-edited
+        run: proto/bin/check-current-version-edited "$GITHUB_BASE_REF"
       - name: Check server version is updated if there are breaking proto changes
-        run: proto/bin/check-min-version-edited
+        run: proto/bin/check-min-version-edited "$GITHUB_BASE_REF"
