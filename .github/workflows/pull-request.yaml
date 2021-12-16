@@ -18,15 +18,13 @@ jobs:
           go install github.com/golang/protobuf/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           npm install -g ts-proto
-      - name: Debug
-        run: |
-          which protoc-gen-go
-          which protoc-gen-go-grpc
-          which protoc-gen-ts_proto
       - name: Check all generated code is vendored for latest proto spec
         run: |
           buf generate
-          git diff-index --quiet HEAD
+          if [[ ! git diff-index --quiet HEAD ]]; then
+            git status
+            exit 1
+          fi
       - name: Check client versions are updated if there are proto changes
         run: |
           if [[ bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/api/.*' ]]; then 
