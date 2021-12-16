@@ -23,7 +23,7 @@ jobs:
           npm install -g ts-proto@$TS_PROTO_VERSION
         env:
           GO_VERSION: 'v1.26.0'
-          GO_GRPC_VERSION: 'v1.26.0'
+          GO_GRPC_VERSION: 'v1.1'
           TS_PROTO_VERSION: '^1.95.0'
       - name: Check all generated code is vendored for latest proto spec
         run: |
