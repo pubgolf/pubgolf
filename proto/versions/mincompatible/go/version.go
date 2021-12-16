@@ -1,4 +1,4 @@
 package mincompatible
 
 // APISpecVersion indicates the latest breaking change to the API spec.
-const APISpecVersion = 0
+const APISpecVersion = 1
