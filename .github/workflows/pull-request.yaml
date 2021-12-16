@@ -30,14 +30,10 @@ jobs:
       - name: Check all generated code is vendored for latest proto spec
         run: |
           buf generate
-          if ! git diff-index --quiet HEAD ; then
-            git status -vv && exit 1
-          else
-            exit 0
-          fi
+          git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
       - name: Check client versions are updated if there are proto changes
         run: |
-          if [[ bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/api/.*' ]]; then 
+          if bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/api/.*' ; then 
             bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/versions/current/go/version.go' &&
             bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/versions/current/ts/version.ts' &&
             bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/versions/current/objc/version.h';
