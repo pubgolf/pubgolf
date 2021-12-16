@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package api;
+package api.v1;
 
 // PubGolfService is the API server which handles all scorekeeping, scheduling and account management for pub golf.
 service PubGolfService {
@@ -13,9 +13,9 @@ message ClientVersionRequest {
 }
 message ClientVersionResponse {
   enum VersionStatus {
-    VERSION_OK = 0;
-    VERSION_OUTDATED = 1;
-    VERSION_INCOMPATIBLE = 2;
+    VERSION_STATUS_OK = 0;
+    VERSION_STATUS_OUTDATED = 1;
+    VERSION_STATUS_INCOMPATIBLE = 2;
   }
   VersionStatus version_status = 1;
 }
