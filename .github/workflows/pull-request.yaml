@@ -21,7 +21,7 @@ jobs:
       - name: Check all generated code is vendored for latest proto spec
         run: |
           buf generate
-          if [[ ! git diff-index --quiet HEAD ]]; then
+          if ! git diff-index --quiet HEAD ; then
             git status
             exit 1
           fi
