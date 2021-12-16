@@ -15,9 +15,10 @@ export interface ClientVersionResponse {
 }
 
 export enum ClientVersionResponse_VersionStatus {
-  VERSION_STATUS_OK = 0,
-  VERSION_STATUS_OUTDATED = 1,
-  VERSION_STATUS_INCOMPATIBLE = 2,
+  VERSION_STATUS_UNSPECIFIED = 0,
+  VERSION_STATUS_OK = 1,
+  VERSION_STATUS_OUTDATED = 2,
+  VERSION_STATUS_INCOMPATIBLE = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -26,12 +27,15 @@ export function clientVersionResponse_VersionStatusFromJSON(
 ): ClientVersionResponse_VersionStatus {
   switch (object) {
     case 0:
+    case "VERSION_STATUS_UNSPECIFIED":
+      return ClientVersionResponse_VersionStatus.VERSION_STATUS_UNSPECIFIED;
+    case 1:
     case "VERSION_STATUS_OK":
       return ClientVersionResponse_VersionStatus.VERSION_STATUS_OK;
-    case 1:
+    case 2:
     case "VERSION_STATUS_OUTDATED":
       return ClientVersionResponse_VersionStatus.VERSION_STATUS_OUTDATED;
-    case 2:
+    case 3:
     case "VERSION_STATUS_INCOMPATIBLE":
       return ClientVersionResponse_VersionStatus.VERSION_STATUS_INCOMPATIBLE;
     case -1:
@@ -45,6 +49,8 @@ export function clientVersionResponse_VersionStatusToJSON(
   object: ClientVersionResponse_VersionStatus
 ): string {
   switch (object) {
+    case ClientVersionResponse_VersionStatus.VERSION_STATUS_UNSPECIFIED:
+      return "VERSION_STATUS_UNSPECIFIED";
     case ClientVersionResponse_VersionStatus.VERSION_STATUS_OK:
       return "VERSION_STATUS_OK";
     case ClientVersionResponse_VersionStatus.VERSION_STATUS_OUTDATED:
