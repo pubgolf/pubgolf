@@ -37,13 +37,13 @@ jobs:
           git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
       - name: Check client versions are updated if there are proto changes
         run: |
-          if bin/check-file-edited "origin/$GITHUB_BASE_REF" $GITHUB_HEAD_REF 'proto/api/.*' ; then 
-            bin/check-file-edited "origin/$GITHUB_BASE_REF" $GITHUB_HEAD_REF 'proto/versions/current/go/version.go'
-            bin/check-file-edited "origin/$GITHUB_BASE_REF" $GITHUB_HEAD_REF 'proto/versions/current/ts/version.ts'
-            bin/check-file-edited "origin/$GITHUB_BASE_REF" $GITHUB_HEAD_REF 'proto/versions/current/objc/version.h'
+          if bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" "refs/heads/${GITHUB_HEAD_REF}" 'proto/api/.*' ; then 
+            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" "refs/heads/${GITHUB_HEAD_REF}" 'proto/versions/current/go/version.go'
+            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" "refs/heads/${GITHUB_HEAD_REF}" 'proto/versions/current/ts/version.ts'
+            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" "refs/heads/${GITHUB_HEAD_REF}" 'proto/versions/current/objc/version.h'
           fi
       - name: Check server version is updated if there are breaking proto changes
         run: |
           if ! buf breaking --against 'https://github.com/pubgolf/pubgolf.git#branch=develop' ; then 
-            bin/check-file-edited "origin/$GITHUB_BASE_REF" $GITHUB_HEAD_REF 'proto/versions/mincompatible/go/version.go';
+            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" "refs/heads/${GITHUB_HEAD_REF}" 'proto/versions/mincompatible/go/version.go';
           fi
