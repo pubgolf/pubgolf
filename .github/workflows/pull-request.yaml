@@ -34,6 +34,6 @@ jobs:
           fi
       - name: Check server version is updated if there are breaking proto changes
         run: |
-          if [[ ! buf breaking --against '.git#branch=develop' ]]; then 
+          if ! buf breaking --against '.git#branch=develop' ; then 
             bin/check-file-edited $GITHUB_BASE_REF $GITHUB_HEAD_REF 'proto/versions/mincompatible/go/version.go';
           fi
