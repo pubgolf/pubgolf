@@ -13,11 +13,18 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: '3.19.1'
       - name: Install protoc plugins
+        with:
+          GO_VERSION: v1.26.0
+          GO_GRPC_VERSION: v1.26.0
+          TS_PROTO_VERSION: v1.26.0
         run: |
-          go install github.com/golang/protobuf/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-          npm install -g ts-proto
+          go install github.com/golang/protobuf/protoc-gen-go@$GO_VERSION
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$GO_GRPC_VERSION
+          npm install -g ts-proto@$TS_PROTO_VERSION
       - name: Check all generated code is vendored for latest proto spec
         run: |
           buf generate
