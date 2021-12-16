@@ -26,4 +26,4 @@ jobs:
       - name: Check client versions are updated if there are proto changes
         run: proto/bin/check-current-version-edited
       - name: Check server version is updated if there are breaking proto changes
-        run: proto/bin/check-min -version-edited
+        run: proto/bin/check-min-version-edited
