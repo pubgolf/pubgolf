@@ -15,7 +15,7 @@ echo 'Checking Go gRPC plugin version...'
 GO_GRPC_PLUGIN_NAME='protoc-gen-go-grpc'
 if [ "$($GO_GRPC_PLUGIN_NAME --version)" != "$GO_GRPC_PLUGIN_NAME $GO_GRPC_PLUGIN_VERSION" ]; then
   echo 'Installing Go gRPC plugin...'
-  go install "google.golang.org/grpc/cmd/protoc-gen-go-grpc@$GO_GRPC_PLUGIN_VERSION"
+  go install "google.golang.org/grpc/cmd/protoc-gen-go-grpc@v$GO_GRPC_PLUGIN_VERSION"
 fi
 
 echo 'Checking TypeScript plugin version...'
