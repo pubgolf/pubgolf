@@ -1,1 +1,1 @@
-export const API_SPEC_VERSION = 0;
+export const API_SPEC_VERSION = 1;

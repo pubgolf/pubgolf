@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+if proto/bin/check-file-edited "refs/remotes/origin/${1}" HEAD 'proto/api/.*' ; then 
+  echo 'Found edits in proto directory. Checking version constants...'
+  proto/bin/check-file-edited "refs/remotes/origin/${1}" HEAD 'proto/versions/current/go/version.go' ||
+  proto/bin/check-file-edited "refs/remotes/origin/${1}" HEAD 'proto/versions/current/ts/version.ts' ||
+  proto/bin/check-file-edited "refs/remotes/origin/${1}" HEAD 'proto/versions/current/objc/version.h'
+  echo 'All version constants have been updated.'
+fi

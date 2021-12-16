@@ -13,9 +13,10 @@ message ClientVersionRequest {
 }
 message ClientVersionResponse {
   enum VersionStatus {
-    VERSION_STATUS_OK = 0;
-    VERSION_STATUS_OUTDATED = 1;
-    VERSION_STATUS_INCOMPATIBLE = 2;
+    VERSION_STATUS_UNSPECIFIED = 0;
+    VERSION_STATUS_OK = 1;
+    VERSION_STATUS_OUTDATED = 2;
+    VERSION_STATUS_INCOMPATIBLE = 3;
   }
   VersionStatus version_status = 1;
 }

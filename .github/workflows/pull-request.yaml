@@ -1,0 +1,29 @@
+name: "Build And Check Protobufs"
+on: pull_request
+jobs:
+  build_and_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: bufbuild/buf-setup-action@v0.6.0
+        with:
+          version: '1.0.0-rc8'
+      - uses: bufbuild/buf-lint-action@v1
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Check all generated code is vendored for latest proto spec
+        run: |
+          proto/bin/clean-and-generate-protos
+          # Call diff to force the mtime changes to be resolved, otherwise diff-index will give us a false positive.
+          git diff > /dev/null
+          git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
+      - name: Check client versions are updated if there are proto changes
+        run: proto/bin/check-current-version-edited "$GITHUB_BASE_REF"
+      - name: Check server version is updated if there are breaking proto changes
+        run: proto/bin/check-min-version-edited "$GITHUB_BASE_REF"
