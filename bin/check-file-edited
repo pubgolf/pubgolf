@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-git diff --name-only "$1" "$2" | grep -q "$3" || (
+git diff --name-only "origin/$1" "$2" | grep -q "$3" || (
   echo "$3 was not edited"
   exit 1
 )
