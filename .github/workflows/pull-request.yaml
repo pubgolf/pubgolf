@@ -29,7 +29,7 @@ jobs:
         run: |
           buf generate
           if ! git diff-index --quiet HEAD ; then
-            git status
+            git status -vv
             exit 1
           fi
       - name: Check client versions are updated if there are proto changes
