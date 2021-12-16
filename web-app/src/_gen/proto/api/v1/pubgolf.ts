@@ -4,7 +4,7 @@ import * as Long from "long";
 import { grpc } from "@improbable-eng/grpc-web";
 import { BrowserHeaders } from "browser-headers";
 
-export const protobufPackage = "api";
+export const protobufPackage = "api.v1";
 
 export interface ClientVersionRequest {
   clientVersion: number;
@@ -15,9 +15,9 @@ export interface ClientVersionResponse {
 }
 
 export enum ClientVersionResponse_VersionStatus {
-  VERSION_OK = 0,
-  VERSION_OUTDATED = 1,
-  VERSION_INCOMPATIBLE = 2,
+  VERSION_STATUS_OK = 0,
+  VERSION_STATUS_OUTDATED = 1,
+  VERSION_STATUS_INCOMPATIBLE = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -26,14 +26,14 @@ export function clientVersionResponse_VersionStatusFromJSON(
 ): ClientVersionResponse_VersionStatus {
   switch (object) {
     case 0:
-    case "VERSION_OK":
-      return ClientVersionResponse_VersionStatus.VERSION_OK;
+    case "VERSION_STATUS_OK":
+      return ClientVersionResponse_VersionStatus.VERSION_STATUS_OK;
     case 1:
-    case "VERSION_OUTDATED":
-      return ClientVersionResponse_VersionStatus.VERSION_OUTDATED;
+    case "VERSION_STATUS_OUTDATED":
+      return ClientVersionResponse_VersionStatus.VERSION_STATUS_OUTDATED;
     case 2:
-    case "VERSION_INCOMPATIBLE":
-      return ClientVersionResponse_VersionStatus.VERSION_INCOMPATIBLE;
+    case "VERSION_STATUS_INCOMPATIBLE":
+      return ClientVersionResponse_VersionStatus.VERSION_STATUS_INCOMPATIBLE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -45,12 +45,12 @@ export function clientVersionResponse_VersionStatusToJSON(
   object: ClientVersionResponse_VersionStatus
 ): string {
   switch (object) {
-    case ClientVersionResponse_VersionStatus.VERSION_OK:
-      return "VERSION_OK";
-    case ClientVersionResponse_VersionStatus.VERSION_OUTDATED:
-      return "VERSION_OUTDATED";
-    case ClientVersionResponse_VersionStatus.VERSION_INCOMPATIBLE:
-      return "VERSION_INCOMPATIBLE";
+    case ClientVersionResponse_VersionStatus.VERSION_STATUS_OK:
+      return "VERSION_STATUS_OK";
+    case ClientVersionResponse_VersionStatus.VERSION_STATUS_OUTDATED:
+      return "VERSION_STATUS_OUTDATED";
+    case ClientVersionResponse_VersionStatus.VERSION_STATUS_INCOMPATIBLE:
+      return "VERSION_STATUS_INCOMPATIBLE";
     default:
       return "UNKNOWN";
   }
@@ -200,7 +200,7 @@ export class PubGolfServiceClientImpl implements PubGolfService {
 }
 
 export const PubGolfServiceDesc = {
-  serviceName: "api.PubGolfService",
+  serviceName: "api.v1.PubGolfService",
 };
 
 export const PubGolfServiceClientVersionDesc: UnaryMethodDefinitionish = {

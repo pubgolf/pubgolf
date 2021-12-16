@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package api.v1;
+
+// PubGolfService is the API server which handles all scorekeeping, scheduling and account management for pub golf.
+service PubGolfService {
+  // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
+  rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}
+}
+
+message ClientVersionRequest {
+  uint32 client_version = 1;
+}
+message ClientVersionResponse {
+  enum VersionStatus {
+    VERSION_STATUS_OK = 0;
+    VERSION_STATUS_OUTDATED = 1;
+    VERSION_STATUS_INCOMPATIBLE = 2;
+  }
+  VersionStatus version_status = 1;
+}
