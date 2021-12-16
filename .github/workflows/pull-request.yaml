@@ -12,8 +12,8 @@ jobs:
           node-version: '16'
       - name: Install protoc plugins
         run: |
-          go get github.com/golang/protobuf/protoc-gen-go &&
-          go get google.golang.org/grpc/cmd/protoc-gen-go-grpc &&
+          go get -u github.com/golang/protobuf/protoc-gen-go &&
+          go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc &&
           npm install -g ts-proto
       - name: Check all generated code is vendored for latest proto spec
         run: |
