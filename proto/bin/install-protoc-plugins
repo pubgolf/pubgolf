@@ -1,0 +1,26 @@
+#!/bin/bash -e
+
+GO_PLUGIN_VERSION='v1.26.0'
+GO_GRPC_PLUGIN_VERSION='1.1.0'
+TS_PROTO_PLUGIN_VERSION='1.95.0'
+
+echo 'Checking Go plugin version...'
+GO_PLUGIN_NAME='protoc-gen-go'
+if [ "$($GO_PLUGIN_NAME --version)" != "$GO_PLUGIN_NAME $GO_PLUGIN_VERSION" ]; then
+  echo 'Installing Go plugin...'
+  go install "google.golang.org/protobuf/cmd/protoc-gen-go@$GO_PLUGIN_VERSION"
+fi
+
+echo 'Checking Go gRPC plugin version...'
+GO_GRPC_PLUGIN_NAME='protoc-gen-go-grpc'
+if [ "$($GO_GRPC_PLUGIN_NAME --version)" != "$GO_GRPC_PLUGIN_NAME $GO_GRPC_PLUGIN_VERSION" ]; then
+  echo 'Installing Go gRPC plugin...'
+  go install "google.golang.org/grpc/cmd/protoc-gen-go-grpc@$GO_GRPC_PLUGIN_VERSION"
+fi
+
+echo 'Checking TypeScript plugin version...'
+TS_PROTO_PACKAGE_NAME='ts-proto'
+if [ "$(npm list --depth 0 --json -g $TS_PROTO_PACKAGE_NAME | jq -r ".dependencies.\"$TS_PROTO_PACKAGE_NAME\".version")" != "$TS_PROTO_PLUGIN_VERSION" ]; then
+  echo 'Installing TypeScript plugin...'
+  npm install -g "ts-proto@$TS_PROTO_PLUGIN_VERSION"
+fi

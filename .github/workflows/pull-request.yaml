@@ -17,33 +17,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: '3.19.1'
-      - name: Install protoc plugins
-        run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@$GO_VERSION
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$GO_GRPC_VERSION
-          npm install -g ts-proto@$TS_PROTO_VERSION
-        env:
-          GO_VERSION: 'v1.26.0'
-          GO_GRPC_VERSION: 'v1.1'
-          TS_PROTO_VERSION: '^1.95.0'
       - name: Check all generated code is vendored for latest proto spec
         run: |
-          buf generate
+          proto/bin/clean-and-generate-protos
           # Call diff to force the mtime changes to be resolved, otherwise diff-index will give us a false positive.
           git diff > /dev/null
           git diff-index --quiet HEAD -- || ( git status -vv && exit 1 )
       - name: Check client versions are updated if there are proto changes
-        run: |
-          if bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" HEAD 'proto/api/.*' ; then 
-            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" HEAD 'proto/versions/current/go/version.go'
-            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" HEAD 'proto/versions/current/ts/version.ts'
-            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" HEAD 'proto/versions/current/objc/version.h'
-          fi
+        run: proto/bin/check-current-version-edited
       - name: Check server version is updated if there are breaking proto changes
-        run: |
-          if ! buf breaking --against 'https://github.com/pubgolf/pubgolf.git#branch=develop' ; then 
-            bin/check-file-edited "refs/remotes/origin/${GITHUB_BASE_REF}" HEAD 'proto/versions/mincompatible/go/version.go';
-          fi
+        run: proto/bin/check-min -version-edited
