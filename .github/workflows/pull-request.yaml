@@ -1,7 +1,7 @@
-name: proto
+name: "Build And Check Protobufs"
 on: pull_request
 jobs:
-  "Build and Check Protobufs":
+  build_and_check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
