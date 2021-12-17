@@ -1,0 +1,12 @@
+# Contents of .gitignore
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+
+# Checked in files we still want to ignore
+src/_gen/*
