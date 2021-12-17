@@ -1,5 +1,6 @@
 FROM golang:1.17.5
 
+ADD ./proto/versions /go/src/github.com/pubgolf/pubgolf/proto/versions
 ADD ./api /go/src/github.com/pubgolf/pubgolf/api
 ADD ./go.mod /go/src/github.com/pubgolf/pubgolf/go.mod
 ADD ./go.sum /go/src/github.com/pubgolf/pubgolf/go.sum
