@@ -33,6 +33,6 @@
 	"dependencies": {
 		"@improbable-eng/grpc-web": "^0.15.0",
 		"browser-headers": "^0.4.1",
-		"protobufjs": "^6.11.2"
+		"protobufjs": "^6.11.3"
 	}
 }
