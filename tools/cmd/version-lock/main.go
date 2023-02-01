@@ -3,7 +3,7 @@ package main
 
 import (
 	// Version locks.
-	// _ "github.com/deepmap/oapi-codegen/cmd/oapi-codegen"
+	_ "github.com/bufbuild/buf/cmd/buf"
 	_ "github.com/golang-migrate/migrate/v4/cmd/migrate"
 	_ "github.com/kyleconroy/sqlc/cmd/sqlc"
 	_ "github.com/vburenin/ifacemaker"

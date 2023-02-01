@@ -12,10 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"google.golang.org/grpc"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 
-	pubg "github.com/pubgolf/pubgolf/api/gen/proto/api/v1"
+	"github.com/pubgolf/pubgolf/api/gen/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/lib/config"
 	"github.com/pubgolf/pubgolf/api/lib/honeycomb"
 	"github.com/pubgolf/pubgolf/api/lib/rpc"
@@ -50,27 +50,16 @@ func guard(err error, msg string) {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, serverImpl pubg.PubGolfServiceServer) *http.Server {
+func makeServer(cfg *config.App, serverImpl apiv1connect.PubGolfServiceClient) *http.Server {
 	// Construct gRPC server.
-	grpcServer := grpc.NewServer()
-	pubg.RegisterPubGolfServiceServer(grpcServer, serverImpl)
 
-	// Configure gRPC-web wrapper.
-	var options []grpcweb.Option
-	if cfg.EnvName != config.DeployEnvProd {
-		options = []grpcweb.Option{
-			// Allow FE dev server to hit the API directly (not via reverse proxy) to allow client-only dev workflows to target staging or preview environments.
-			grpcweb.WithOriginFunc(func(origin string) bool {
-				return origin == "http://localhost:3000"
-			}),
-		}
-	}
-	wrappedGRPCServer := grpcweb.WrapServer(grpcServer, options...)
+	rpcMux := http.NewServeMux()
+	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(serverImpl))
 
 	// Mount routes.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health-check", healthCheck(cfg))
-	mux.Handle("/rpc/", http.StripPrefix("/rpc", webGRPC(wrappedGRPCServer)))
+	mux.Handle("/rpc/", http.StripPrefix("/rpc", rpcMux))
 
 	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
 	if cfg.EnvName == config.DeployEnvDev {
@@ -84,19 +73,12 @@ func makeServer(cfg *config.App, serverImpl pubg.PubGolfServiceServer) *http.Ser
 	// Configure HTTP server.
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: honeycomb.WrapMux(mux),
+		Handler: h2c.NewHandler(honeycomb.WrapMux(mux), &http2.Server{}),
 
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
-}
-
-// webGRPC passes the request through the gRPC-web proxy, which converts it into a standard gRPC request for the handler.
-func webGRPC(wrappedGRPCServer *grpcweb.WrappedGrpcServer) http.HandlerFunc {
-	return honeycomb.WrapHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		wrappedGRPCServer.ServeHTTP(w, r)
-	})
 }
 
 // healthCheck returns a 200 if the app is online and able to process requests.

@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package api.v1;
 
-// PubGolfService is the API server which handles all scorekeeping, scheduling and account management for pub golf.
+option go_package = "github.com/pubgolf/pubgolf/api/gen/proto/api/v1;apiv1";
+
+// PubGolfService is the API server which handles all score keeping, scheduling and account management for pub golf.
 service PubGolfService {
   // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
   rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}

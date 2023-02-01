@@ -1,18 +1,17 @@
 version: v1
-managed:
-  enabled: true
-  go_package_prefix:
-    default: github.com/pubgolf/pubgolf/gen/proto/go
 plugins:
-  - name: go
+  - plugin: buf.build/protocolbuffers/go
     out: api/gen/proto
     opt: paths=source_relative
-  - name: go-grpc
+  - plugin: buf.build/bufbuild/connect-go
     out: api/gen/proto
-    opt:
-      - paths=source_relative
-      - require_unimplemented_servers=false
-  - name: ts_proto
-    out: web-app/src/_gen/proto
-    opt:
-        - outputClientImpl=grpc-web
+    opt: paths=source_relative
+  # - plugin: buf.build/bufbuild/connect-swift
+  #   opt: >
+  #     GenerateAsyncMethods=true,
+  #     GenerateCallbackMethods=true,
+  #     Visibility=Public
+  #   out: gen/proto/swift
+  # - plugin: buf.build/apple/swift
+  #   opt: Visibility=Public
+  #   out: gen/proto/swift
