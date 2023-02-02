@@ -27,48 +27,19 @@ var (
 	// installedToolsHash holds the hash of the source code for the currently installed version of the binary.
 	installedToolsHash string
 	// config holds the provided configuration options.
-	config DevCtrlConfig
+	config CLIConfig
 )
 
 func init() {
 	signal.Notify(beginShutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 }
 
-// DBDriver is an enum specifying which database driver to use for migrations and DAO codegen.
-type DBDriver int
-
-// DBDriver values.
-const (
-	None DBDriver = iota
-	PostgreSQL
-	SQLite3
-)
-
-// DevCtrlConfig sets naming and capabilities for the generated CLI tool.
-type DevCtrlConfig struct {
-	ProjectName    string
-	CLIName        string
-	ServerBinName  string
-	DopplerEnvName string
-	DBDriver       DBDriver
-}
-
 // Execute is the entrypoint for calling the CLI.
-func Execute(toolsDirHash string, c DevCtrlConfig) {
+func Execute(toolsDirHash string, c CLIConfig) {
 	installedToolsHash = toolsDirHash
+
+	c.setDefaults()
 	config = c
-
-	if config.CLIName == "" {
-		config.CLIName = config.ProjectName + "-devctrl"
-	}
-
-	if config.ServerBinName == "" {
-		config.ServerBinName = config.ProjectName + "-api-server"
-	}
-
-	if config.DopplerEnvName == "" {
-		config.DopplerEnvName = "dev"
-	}
 
 	log.SetPrefix(fmt.Sprintf("[%s] ", config.CLIName))
 	if err := rootCmd.Execute(); err != nil {
@@ -79,7 +50,7 @@ func Execute(toolsDirHash string, c DevCtrlConfig) {
 
 var rootCmd = &cobra.Command{
 	Use:   config.CLIName,
-	Short: "DevCtl is a task runner for local dev",
+	Short: "DevCtrl is a task runner for local dev",
 	Long:  `An opinionated task runner for personal use by @thedeerchild`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Skip the update warning for the update command itself

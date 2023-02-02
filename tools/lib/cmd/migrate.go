@@ -16,6 +16,7 @@ import (
 
 	// Postgres and file drivers for the migration lib.
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
@@ -114,8 +115,8 @@ var migrateFixCmd = &cobra.Command{
 	Short: "Reset the migration state of a DB to a known valid migration version, assuming all migrations were transacted",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dbURL := getPostgresURL(config.ServerBinName, config.DopplerEnvName, "PUBGOLF_")
-		db, err := sql.Open("postgres", dbURL)
+		dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix)
+		db, err := sql.Open(config.DBDriver.driverString(), dbURL)
 		guard(err, "open DB connection")
 
 		version, err := strconv.ParseInt(args[0], 10, 32)
@@ -133,7 +134,7 @@ var migrateFixCmd = &cobra.Command{
 }
 
 func getMigrator() *migrate.Migrate {
-	dbURL := getPostgresURL(config.ProjectName, config.DopplerEnvName, "PUBGOLF_")
+	dbURL := getDatabaseURL(config.DBDriver, config.ProjectName, config.DopplerEnvName, config.EnvVarPrefix)
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 	return m

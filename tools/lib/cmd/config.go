@@ -3,29 +3,88 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 )
 
-// getPostgresURL queries Doppler for DB connection details.
-func getPostgresURL(project, env, prefix string) string {
+// DBDriver is an enum specifying which database driver to use for migrations and DAO codegen.
+type DBDriver int
+
+// DBDriver values.
+const (
+	None DBDriver = iota
+	PostgreSQL
+	SQLite3
+)
+
+// driverString returns the database/sql driver ID for the given database type.
+func (d DBDriver) driverString() string {
+	switch d {
+	case PostgreSQL:
+		return "postgres"
+	case SQLite3:
+		return "sqlite3"
+	}
+
+	return ""
+}
+
+// CLIConfig sets naming and capabilities for the generated CLI tool.
+type CLIConfig struct {
+	ProjectName    string
+	CLIName        string
+	ServerBinName  string
+	DopplerEnvName string
+	EnvVarPrefix   string
+	DBDriver       DBDriver
+}
+
+func (c *CLIConfig) setDefaults() {
+	if c.CLIName == "" {
+		c.CLIName = c.ProjectName + "-devctrl"
+	}
+
+	if c.ServerBinName == "" {
+		c.ServerBinName = c.ProjectName + "-api-server"
+	}
+
+	if c.DopplerEnvName == "" {
+		c.DopplerEnvName = "dev"
+	}
+}
+
+// getDatabaseURL queries Doppler for DB connection details.
+func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
 	vars := readDopplerVars(project, env, prefix, []string{
 		"DB_USER",
 		"DB_PASSWORD",
 		"DB_HOST",
 		"DB_PORT",
 		"DB_NAME",
+		"DB_SSL_MODE",
 	})
 
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		getStr(vars, "DB_USER", ""),
-		getStr(vars, "DB_PASSWORD", ""),
-		getStr(vars, "DB_HOST", "localhost"),
-		getStr(vars, "DB_PORT", "5432"),
-		getStr(vars, "DB_NAME", ""),
-		getStr(vars, "DB_SSL_MODE", "disable"),
-	)
+	u := url.URL{
+		User: url.UserPassword(
+			getStr(vars, "DB_USER", ""),
+			getStr(vars, "DB_PASSWORD", ""),
+		),
+		Host: getStr(vars, "DB_HOST", "localhost") + ":" + getStr(vars, "DB_PORT", "5432"),
+		Path: getStr(vars, "DB_NAME", ""),
+	}
+
+	u.Scheme = driver.driverString()
+
+	if driver == SQLite3 {
+		u.Query().Set("x-no-tx-wrap", "true")
+	}
+
+	if driver == PostgreSQL {
+		u.Query().Set("sslmoode", getStr(vars, "DB_SSL_MODE", "disable"))
+	}
+
+	return u.String()
 }
 
 // readDopplerVars queries the Doppler CLI for a requested set of computed env vars.
