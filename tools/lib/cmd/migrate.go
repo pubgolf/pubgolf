@@ -114,7 +114,7 @@ var migrateFixCmd = &cobra.Command{
 	Short: "Reset the migration state of a DB to a known valid migration version, assuming all migrations were transacted",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dbURL := getPostgresURL(serverBinName, dopplerEnvName, "PUBGOLF_")
+		dbURL := getPostgresURL(config.ServerBinName, config.DopplerEnvName, "PUBGOLF_")
 		db, err := sql.Open("postgres", dbURL)
 		guard(err, "open DB connection")
 
@@ -133,7 +133,7 @@ var migrateFixCmd = &cobra.Command{
 }
 
 func getMigrator() *migrate.Migrate {
-	dbURL := getPostgresURL(projectName, dopplerEnvName, "PUBGOLF_")
+	dbURL := getPostgresURL(config.ProjectName, config.DopplerEnvName, "PUBGOLF_")
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 	return m

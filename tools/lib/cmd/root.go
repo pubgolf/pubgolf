@@ -26,26 +26,59 @@ var (
 var (
 	// installedToolsHash holds the hash of the source code for the currently installed version of the binary.
 	installedToolsHash string
-	// projectName is used to infer the name the CLI binary as well as other components, such as the API server and Doppler project.
-	projectName string
-)
-
-// Package-level inferred names.
-var (
-	commandName   string
-	serverBinName string
-)
-
-const (
-	dopplerEnvName = "dev"
+	// config holds the provided configuration options.
+	config DevCtrlConfig
 )
 
 func init() {
 	signal.Notify(beginShutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 }
 
+// DBDriver is an enum specifying which database driver to use for migrations and DAO codegen.
+type DBDriver int
+
+// DBDriver values.
+const (
+	None DBDriver = iota
+	PostgreSQL
+	SQLite3
+)
+
+// DevCtrlConfig sets naming and capabilities for the generated CLI tool.
+type DevCtrlConfig struct {
+	ProjectName    string
+	CLIName        string
+	ServerBinName  string
+	DopplerEnvName string
+	DBDriver       DBDriver
+}
+
+// Execute is the entrypoint for calling the CLI.
+func Execute(toolsDirHash string, c DevCtrlConfig) {
+	installedToolsHash = toolsDirHash
+	config = c
+
+	if config.CLIName == "" {
+		config.CLIName = config.ProjectName + "-devctrl"
+	}
+
+	if config.ServerBinName == "" {
+		config.ServerBinName = config.ProjectName + "-api-server"
+	}
+
+	if config.DopplerEnvName == "" {
+		config.DopplerEnvName = "dev"
+	}
+
+	log.SetPrefix(fmt.Sprintf("[%s] ", config.CLIName))
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
 var rootCmd = &cobra.Command{
-	Use:   commandName,
+	Use:   config.CLIName,
 	Short: "DevCtl is a task runner for local dev",
 	Long:  `An opinionated task runner for personal use by @thedeerchild`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -70,23 +103,7 @@ func checkVersion() {
 
 %[1]s update
 
-`, projectName, curToolsHash, installedToolsHash)
-	}
-}
-
-// Execute is the entrypoint for calling the CLI.
-func Execute(providedProjectName, providedToolsHash string) {
-	installedToolsHash = providedToolsHash
-	projectName = providedProjectName
-
-	commandName = projectName + "-devctrl"
-	serverBinName = projectName + "-api-server"
-
-	log.SetPrefix(fmt.Sprintf("[%s] ", commandName))
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+`, config.ProjectName, curToolsHash, installedToolsHash)
 	}
 }
 

@@ -24,7 +24,7 @@ var updateCmd = &cobra.Command{
 		compiler := exec.Command("go",
 			"install",
 			"-ldflags", fmt.Sprintf("-X main.toolsHash=%s", curToolsHash),
-			filepath.FromSlash("./tools/cmd/"+commandName),
+			filepath.FromSlash("./tools/cmd/"+config.CLIName),
 		)
 		compiler.Stderr = os.Stderr
 		compiler.Stdout = os.Stdout

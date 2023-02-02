@@ -14,9 +14,9 @@ func init() {
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: fmt.Sprintf("Stop all background processes started with `%s run ...`", commandName),
+	Short: fmt.Sprintf("Stop all background processes started with `%s run ...`", config.CLIName),
 	Run: func(cmd *cobra.Command, args []string) {
-		dopplerDockerStop(serverBinName, "dev")
+		dopplerDockerStop(config.ServerBinName, config.DopplerEnvName)
 	},
 }
 
