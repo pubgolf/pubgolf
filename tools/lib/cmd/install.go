@@ -12,7 +12,6 @@ func init() {
 	installCmd.AddCommand(installDopplerCmd)
 	installCmd.AddCommand(installMigrateCmd)
 	installCmd.AddCommand(installSQLcCmd)
-	// installCmd.AddCommand(installOAPICodegenCmd)
 	installCmd.AddCommand(installMockeryCmd)
 	installCmd.AddCommand(installIfacemakerCmd)
 	rootCmd.AddCommand(installCmd)
@@ -26,7 +25,6 @@ var installCmd = &cobra.Command{
 			installDopplerCmd,
 			installMigrateCmd,
 			installSQLcCmd,
-			// installOAPICodegenCmd,
 			installMockeryCmd,
 			installIfacemakerCmd,
 		}
@@ -62,14 +60,6 @@ var installSQLcCmd = &cobra.Command{
 		installWithGolang("github.com/kyleconroy/sqlc/cmd/sqlc")
 	},
 }
-
-// var installOAPICodegenCmd = &cobra.Command{
-// 	Use:   "oapi-codegen",
-// 	Short: "Install the `oapi-codegen` CLI tool",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		installWithGolang("github.com/deepmap/oapi-codegen/cmd/oapi-codegen")
-// 	},
-// }
 
 var installMockeryCmd = &cobra.Command{
 	Use:   "mockery",
