@@ -25,7 +25,7 @@ var testCmd = &cobra.Command{
 		guard(err, "check '--coverage' flag")
 
 		testArgs := []string{
-			"test", filepath.FromSlash("./api/lib/..."), filepath.FromSlash("./api/cmd/..."),
+			"test", filepath.FromSlash("./api/internal/lib/..."), filepath.FromSlash("./api/cmd/..."),
 		}
 
 		if coverageFlag {

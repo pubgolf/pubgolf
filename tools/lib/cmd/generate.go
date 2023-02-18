@@ -42,7 +42,7 @@ var generateSQLcCmd = &cobra.Command{
 			return
 		}
 
-		go watch(filepath.FromSlash("api/db/"), "SQLc codegen", func(ev watcher.Event) {
+		go watch(filepath.FromSlash("api/internal/db/"), "SQLc codegen", func(ev watcher.Event) {
 			if err := generateSQLc(); err != nil {
 				log.Printf("Encountered error while running 'SQLc codegen' task. Waiting to re-run...")
 			}
@@ -53,7 +53,7 @@ var generateSQLcCmd = &cobra.Command{
 }
 
 func generateSQLc() error {
-	sqlc := exec.Command("sqlc", "generate", "--file", filepath.FromSlash("api/db/sqlc.yaml"))
+	sqlc := exec.Command("sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml"))
 	sqlc.Stdout = os.Stdout
 	sqlc.Stderr = os.Stderr
 	return sqlc.Run()
@@ -71,7 +71,7 @@ var generateMockDAOCmd = &cobra.Command{
 			return
 		}
 
-		go watch(filepath.FromSlash("api/lib/dao/"), "DAO mock codegen", func(ev watcher.Event) {
+		go watch(filepath.FromSlash("api/internal/lib/dao/"), "DAO mock codegen", func(ev watcher.Event) {
 			if err := generateMockDAO(); err != nil {
 				log.Printf("Encountered error while running 'DAO mock codegen' task. Waiting to re-run...")
 			}
@@ -82,7 +82,7 @@ var generateMockDAOCmd = &cobra.Command{
 }
 
 func generateMockDAO() error {
-	var genDir = filepath.FromSlash("api/lib/dao/")
+	var genDir = filepath.FromSlash("api/internal/lib/dao/")
 	args := []string{
 		"--struct", "Queries",
 		"--iface", "QueryProvider",

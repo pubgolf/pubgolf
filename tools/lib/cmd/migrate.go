@@ -30,7 +30,7 @@ func init() {
 }
 
 var (
-	migrationDirectory = filepath.FromSlash("api/db/migrations")
+	migrationDirectory = filepath.FromSlash("api/internal/db/migrations")
 	migrationSource    = fmt.Sprintf("file://%s", migrationDirectory)
 )
 
@@ -86,7 +86,7 @@ var migrateCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// Creating migration files isn't supported via the programmatic API, so create using the following shell command: `migrate create -seq -ext 'sql' -dir "api/db/migrations" "$1"`
+		// Creating migration files isn't supported via the programmatic API, so create using the following shell command: `migrate create -seq -ext 'sql' -dir "api/internal/db/migrations" "$1"`
 		migrator := exec.Command("migrate",
 			"create",
 			"-seq",
@@ -134,7 +134,7 @@ var migrateFixCmd = &cobra.Command{
 }
 
 func getMigrator() *migrate.Migrate {
-	dbURL := getDatabaseURL(config.DBDriver, config.ProjectName, config.DopplerEnvName, config.EnvVarPrefix)
+	dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix)
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 	return m
