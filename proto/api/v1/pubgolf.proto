@@ -1,3 +1,5 @@
+// PubGolf defines the app-facing API service for the in-game apps.
+
 syntax = "proto3";
 
 package api.v1;
