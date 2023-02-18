@@ -15,7 +15,7 @@ import (
 	"github.com/honeycombio/beeline-go/wrappers/hnynethttp"
 	"github.com/honeycombio/libhoney-go"
 
-	"github.com/pubgolf/pubgolf/api/lib/config"
+	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 )
 
 const (

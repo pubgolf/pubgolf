@@ -2,7 +2,8 @@ version: 1
 packages:
   - path: "../gen/dbc"
     name: "dbc"
-    engine: "postgresql"
+    # engine: "postgresql"
+    engine: "sqlite"
     schema: "./migrations"
     queries: "./queries"
     emit_prepared_queries: true

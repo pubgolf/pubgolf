@@ -15,10 +15,10 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/pubgolf/pubgolf/api/gen/proto/api/v1/apiv1connect"
-	"github.com/pubgolf/pubgolf/api/lib/config"
-	"github.com/pubgolf/pubgolf/api/lib/honeycomb"
-	"github.com/pubgolf/pubgolf/api/lib/rpc"
+	"github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1/apiv1connect"
+	"github.com/pubgolf/pubgolf/api/internal/lib/config"
+	"github.com/pubgolf/pubgolf/api/internal/lib/honeycomb"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"github.com/pubgolf/pubgolf/api/gen/proto/api/v1/apiv1connect"
+	"github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1/apiv1connect"
 )
 
 // PubGolfServiceServer implements the gRPC handlers for the PubGolf API.

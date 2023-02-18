@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	apiv1 "github.com/pubgolf/pubgolf/api/gen/proto/api/v1"
+	apiv1 "github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1"
 	current "github.com/pubgolf/pubgolf/proto/versions/current/go"
 	mincompatible "github.com/pubgolf/pubgolf/proto/versions/mincompatible/go"
 
