@@ -7,8 +7,9 @@ import (
 var toolsHash string
 
 func main() {
-	cmd.Execute(toolsHash, cmd.DevCtrlConfig{
-		ProjectName: "pubgolf",
-		DBDriver:    cmd.SQLite3,
+	cmd.Execute(toolsHash, cmd.CLIConfig{
+		ProjectName:  "pubgolf",
+		DBDriver:     cmd.SQLite3,
+		EnvVarPrefix: "PUBGOLF_",
 	})
 }
