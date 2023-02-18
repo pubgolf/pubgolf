@@ -13,3 +13,9 @@ After this the `pubgolf-devctrl` binary will be available in your $PATH to run d
 ```sh
 pubgolf-devctrl install
 ```
+
+Some commands may require you to log in to Doppler before running, using the following command. The install command above will have installed the Doppler CLI.
+
+```sh
+doppler login
+```

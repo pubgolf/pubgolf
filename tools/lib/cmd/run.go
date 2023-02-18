@@ -36,7 +36,8 @@ var runAPIServerCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Run API server",
 	Run: func(cmd *cobra.Command, args []string) {
-		watchableDopplerGoRun(cmd, config.ProjectName, config.DopplerEnvName, filepath.Join("api", "cmd", config.ServerBinName))
+		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
+		watchableDopplerGoRun(cmd, config.ServerBinName, config.DopplerEnvName, binPath)
 	},
 }
 
@@ -44,7 +45,7 @@ var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
 	Run: func(cmd *cobra.Command, args []string) {
-		dopplerDockerRun(config.ProjectName, config.DopplerEnvName,
+		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			"api-blob-storage",
 		)
@@ -55,7 +56,7 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, args []string) {
-		dopplerDockerRun(config.ProjectName, config.DopplerEnvName, "api-db")
+		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-db")
 	},
 }
 
@@ -63,7 +64,7 @@ var runAPIMinioCmd = &cobra.Command{
 	Use:   "api-minio",
 	Short: "Run API server's blob storage (Minio) instance",
 	Run: func(cmd *cobra.Command, args []string) {
-		dopplerDockerRun(config.ProjectName, config.DopplerEnvName, "api-blob-storage")
+		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-blob-storage")
 	},
 }
 
@@ -95,7 +96,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	stopFn := dopplerGoRun(config.ProjectName, config.DopplerEnvName, bin)
+	stopFn := dopplerGoRun(config.ServerBinName, config.DopplerEnvName, bin)
 
 	// Launch watcher, if applicable.
 	if watchFlag {
@@ -103,7 +104,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
 			watch("api", "restart API server", func(ev watcher.Event) {
 				// Start the old process and keep track of the new cleanup handler.
 				stopFn()
-				stopFn = dopplerGoRun(config.ProjectName, config.DopplerEnvName, bin)
+				stopFn = dopplerGoRun(config.ServerBinName, config.DopplerEnvName, bin)
 			})
 		}()
 	}

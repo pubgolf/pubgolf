@@ -46,7 +46,7 @@ func (c *CLIConfig) setDefaults() {
 	}
 
 	if c.ServerBinName == "" {
-		c.ServerBinName = c.ProjectName + "-api-server"
+		c.ServerBinName = c.ProjectName + "-app-server"
 	}
 
 	if c.DopplerEnvName == "" {
