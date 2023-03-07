@@ -135,6 +135,5 @@ jobs:
           file: ./api/docker/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache: enabled
           cache-from: type=gha
           cache-to: type=gha,mode=max
