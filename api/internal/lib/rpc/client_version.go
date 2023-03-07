@@ -5,10 +5,13 @@ import (
 	"log"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1"
-	current "github.com/pubgolf/pubgolf/proto/versions/current/go"
-	mincompatible "github.com/pubgolf/pubgolf/proto/versions/mincompatible/go"
 
 	"github.com/bufbuild/connect-go"
+)
+
+const (
+	currentAPIVersion = 1
+	minAPIVersion     = 1
 )
 
 // ClientVersion accepts the API version from the client and returns whether or not it is compatible with the current server version.
@@ -17,11 +20,11 @@ func (s PubGolfServiceServer) ClientVersion(ctx context.Context, req *connect.Re
 
 	status := apiv1.ClientVersionResponse_VERSION_STATUS_OK
 
-	if req.Msg.ClientVersion < current.APISpecVersion {
+	if req.Msg.ClientVersion < currentAPIVersion {
 		status = apiv1.ClientVersionResponse_VERSION_STATUS_OUTDATED
 	}
 
-	if req.Msg.ClientVersion < mincompatible.APISpecVersion {
+	if req.Msg.ClientVersion < minAPIVersion {
 		status = apiv1.ClientVersionResponse_VERSION_STATUS_INCOMPATIBLE
 	}
 

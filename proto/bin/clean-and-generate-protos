@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-proto/bin/install-protoc-plugins
-echo "Cleaning api/gen/*..."
-rm -rf api/gen/
-echo "Cleaning web-app/src/_gen/*..."
-rm -rf web-app/src/_gen/
-echo "Generating proto output..."
-buf generate
