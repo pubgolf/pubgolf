@@ -26,12 +26,13 @@ jobs:
       - name: Generate Protos
         run: |
           buf generate --template buf.gen.ci.yaml
+          zip -r build/proto.zip build/proto/
       - name: Upload Generated Protos as CI Artifact
         uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/develop'
         with:
           name: generated-protos
-          path: build/proto/
+          path: build/proto.zip
 
   publish_gh_release:
     name: Publish Client Deps and Tools
@@ -46,5 +47,5 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{github.workspace}}/**/*
+          files: build/proto.zip
           tag_name: sha-${{ github.sha }}
