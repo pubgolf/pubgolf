@@ -41,5 +41,5 @@ jobs:
       - name: Upload as GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{github.workspace}}/*
+          files: ${{github.workspace}}/**/*
           tag_name: sha-${{ github.sha }}
