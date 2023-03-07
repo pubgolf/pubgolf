@@ -13,6 +13,7 @@ import (
 )
 
 func init() {
+	generateCmd.AddCommand(generateProtoCmd)
 	generateCmd.AddCommand(generateSQLcCmd)
 	generateCmd.AddCommand(generateMockDAOCmd)
 	rootCmd.AddCommand(generateCmd)
@@ -25,9 +26,40 @@ var generateCmd = &cobra.Command{
 	Short: "Run all code generation sub-tasks",
 	Run: func(cmd *cobra.Command, args []string) {
 		runPar(cmd, args,
+			generateProtoCmd,
 			generateSQLcCmd,
 		)
+		generateMockDAOCmd.Run(cmd, args)
 	},
+}
+
+var generateProtoCmd = &cobra.Command{
+	Use:   "proto",
+	Short: "Generate protobuf and gRPC code",
+	Run: func(cmd *cobra.Command, args []string) {
+		watchFlag, err := cmd.Flags().GetBool("watch")
+		guard(err, "check '--watch' flag")
+
+		guard(generateProto(), "execute `buf ...` command")
+		if !watchFlag {
+			return
+		}
+
+		go watch(filepath.FromSlash("proto/"), "Proto codegen", func(ev watcher.Event) {
+			if err := generateProto(); err != nil {
+				log.Printf("Encountered error while running 'Proto codegen' task. Waiting to re-run...")
+			}
+		})
+
+		<-shuttingDown
+	},
+}
+
+func generateProto() error {
+	buf := exec.Command("buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml"))
+	buf.Stdout = os.Stdout
+	buf.Stderr = os.Stderr
+	return buf.Run()
 }
 
 var generateSQLcCmd = &cobra.Command{
