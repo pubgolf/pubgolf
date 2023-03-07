@@ -28,7 +28,8 @@ jobs:
       - name: Generate Protos
         run: |
           buf generate --template buf.gen.ci.yaml
-          zip -r build/proto.zip build/proto/
+          cd build/proto/swift
+          zip -r ${{ github.workspace }}/build/proto.zip ./*
       - name: Upload Generated Protos as CI Artifact
         uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/develop'
