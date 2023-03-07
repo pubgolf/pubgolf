@@ -37,18 +37,48 @@ jobs:
           name: generated-protos
           path: build/proto.zip
 
+  tools_build_and_check:
+    name: Build and Check Tools
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20
+          cache: true
+      - name: Test
+        run: go test -v ./tools/...
+      - name: Build
+        run: GOOS=darwin GOARCH=amd64 go build -v ./tools/cmd/pubgolf-devctrl
+      - name: Upload Built Tools as CI Artifact
+        uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/develop'
+        with:
+          name: pubgolf-devctrl
+          path: pubgolf-devctrl
+
   publish_gh_release:
     name: Publish Client Deps and Tools
-    needs: proto_build_and_check
+    needs:
+      - proto_build_and_check
+      - tools_build_and_check
     runs-on: ubuntu-latest
     steps:
       - name: Download CI Artifact
         uses: actions/download-artifact@v3
         with:
           name: generated-protos
+      - name: Download pubgolf-devctrl Tool
+        uses: actions/download-artifact@v3
+        with:
+          name: pubgolf-devctrl
       - name: Upload as GitHub Release
         if: github.ref == 'refs/heads/develop'
         uses: softprops/action-gh-release@v1
         with:
-          files: proto.zip
+          files: |
+            proto.zip
+            pubgolf-devctrl
           tag_name: sha-${{ github.sha }}
