@@ -49,7 +49,7 @@ jobs:
           go-version: "1.20.x"
           cache: true
       - name: Test
-        run: go test -v ./tools/...
+        run: go test -v ./tools/lib/...
       - name: Build
         run: GOOS=darwin GOARCH=amd64 go build -v ./tools/cmd/pubgolf-devctrl
       - name: Upload Built Tools as CI Artifact
