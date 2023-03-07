@@ -119,15 +119,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v2
-        with:
-          images: ghcr.io/pubgolf/pubgolf
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           file: ./api/docker/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }},sha-${{ github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: sha-${{ github.sha }}
