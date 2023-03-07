@@ -47,5 +47,5 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: softprops/action-gh-release@v1
         with:
-          files: build/proto.zip
+          files: proto.zip
           tag_name: sha-${{ github.sha }}
