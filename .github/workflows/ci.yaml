@@ -103,7 +103,9 @@ jobs:
   api_publish_docker_image:
     name: Publish API Server as Docker Image
     if: github.ref == 'refs/heads/develop'
-    needs: api_build_and_check
+    needs:
+      - proto_build_and_check
+      - api_build_and_check
     runs-on: ubuntu-latest
     permissions:
       contents: read
