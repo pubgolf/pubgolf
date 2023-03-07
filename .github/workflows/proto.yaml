@@ -2,10 +2,10 @@ name: "Build and Release Protobufs"
 on:
   push:
     branches:
-      - main
+      - develop
   pull_request:
     branches:
-      - main
+      - develop
 jobs:
   build_and_check:
     runs-on: ubuntu-latest
