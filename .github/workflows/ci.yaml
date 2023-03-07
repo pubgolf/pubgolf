@@ -59,8 +59,25 @@ jobs:
           name: pubgolf-devctrl
           path: pubgolf-devctrl
 
+  api_build_and_check:
+    name: Build and Check API Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.20.x"
+          cache: true
+      - name: Test
+        run: go test -v ./api/...
+      - name: Build
+        run: go build -v ./api/cmd/pubgolf-app-server
+
   publish_gh_release:
     name: Publish Client Deps and Tools
+    if: github.ref == 'refs/heads/develop'
     needs:
       - proto_build_and_check
       - tools_build_and_check
@@ -82,3 +99,33 @@ jobs:
             proto.zip
             pubgolf-devctrl
           tag_name: sha-${{ github.sha }}
+
+  api_publish_docker_image:
+    name: Publish API Server as Docker Image
+    if: github.ref == 'refs/heads/develop'
+    needs: api_build_and_check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action
+        with:
+          images: ghcr.io/pubgolf/pubgolf
+      - name: Build and push Docker image
+        uses: docker/build-push-action
+        with:
+          context: ./api/docker
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
