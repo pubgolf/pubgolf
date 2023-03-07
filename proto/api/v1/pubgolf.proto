@@ -4,13 +4,23 @@ syntax = "proto3";
 
 package api.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1;apiv1";
 
 // PubGolfService is the API server which handles all score keeping, scheduling and account management for pub golf.
 service PubGolfService {
   // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
   rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}
+
+  // GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
+  
+  // GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
+  rpc GetVenue(GetVenueRequest) returns (GetVenueResponse) {}
 }
+
+// ClientVersion
 
 message ClientVersionRequest {
   uint32 client_version = 1;
@@ -23,4 +33,49 @@ message ClientVersionResponse {
     VERSION_STATUS_INCOMPATIBLE = 3;
   }
   VersionStatus version_status = 1;
+}
+
+// GetSchedule
+
+message GetScheduleRequest {
+  string event_key = 1;
+  optional uint32 cached_data_version = 2;
+}
+message GetScheduleResponse {
+  message Schedule {
+    // List of past venues. Does not include the current venue.
+    repeated uint32 visited_venue_ids = 1;
+    // Optional in the case that the event hasn't started yet.
+    optional uint32 current_venue_id = 2;
+    // Optional in the case that the next venue isn't yet visible to players. This becomes visible X mins before the next venue's start time.
+    optional uint32 next_venue_id = 3;
+    optional google.protobuf.Timestamp next_venue_start = 4;
+  }
+
+  uint32 latest_data_version = 1;
+  optional Schedule schedule = 2;
+}
+
+// GetVenue
+
+message GetVenueRequest {
+  string event_key = 1;
+  repeated uint32 venue_ids = 2;
+}
+message GetVenueResponse {
+  message Venue {
+    string venue_id = 1;
+    string name = 2;
+    // Address string suitable for display or passing in to a maps query.
+    string address = 3;
+    string image_url = 4;
+  }
+
+  // VenueWrapper allows us to return an empty wrapper in the case of an invalid or unauthorized venue ID.
+  message VenueWrapper {
+    optional Venue venue = 1;
+  }
+
+  // Map of requested venue IDs to Venue objects.
+  map<uint32, VenueWrapper> venues = 1;
 }
