@@ -16,12 +16,22 @@ jobs:
       - uses: bufbuild/buf-breaking-action@v1
         with:
           against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=develop"
-      - run: |
+      - name: Generate Protos
+        run: |
           buf generate --template buf.gen.ci.yaml
+      - uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/develop'
+        with:
+          name: generated-protos
+          path: build/proto/
   publish:
+    needs: build_and_check
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: generated-protos
       - name: Release
         uses: fnkr/github-action-ghr@v1
         env:
