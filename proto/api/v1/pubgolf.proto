@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package api.v1;
 
-option go_package = "github.com/pubgolf/pubgolf/api/gen/proto/api/v1;apiv1";
+option go_package = "github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1;apiv1";
 
 // PubGolfService is the API server which handles all score keeping, scheduling and account management for pub golf.
 service PubGolfService {
