@@ -40,11 +40,9 @@ jobs:
           name: generated-protos
       - name: Debug
         run: |
-          ls build/proto
-          ls build/proto/go
-          ls build/proto/swift
+          ls ${{github.workspace}}
       - name: Upload as GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/proto/**/*
+          files: ${{github.workspace}}/build/proto/**/*
           tag_name: sha-${{ github.sha }}
