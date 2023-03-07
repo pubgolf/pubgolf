@@ -17,6 +17,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Download Buf CLI
         uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
       - name: Lint .proto Files
         uses: bufbuild/buf-lint-action@v1
       - name: Check Breaking Changes
@@ -49,3 +51,4 @@ jobs:
         with:
           files: proto.zip
           tag_name: sha-${{ github.sha }}
+          github_token: ${{ github.token }}
