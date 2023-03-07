@@ -41,5 +41,5 @@ jobs:
       - name: Upload as GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/proto/*
+          files: /home/runner/work/pubgolf/pubgolf/build/proto/*
           tag_name: sha-${{ github.sha }}
