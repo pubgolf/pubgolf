@@ -1,0 +1,17 @@
+version: v1
+plugins:
+  - plugin: buf.build/protocolbuffers/go
+    out: build/proto/go
+    opt: paths=source_relative
+  - plugin: buf.build/bufbuild/connect-go
+    out: build/proto/go
+    opt: paths=source_relative
+  - plugin: buf.build/bufbuild/connect-swift
+    opt: >
+      GenerateAsyncMethods=true,
+      GenerateCallbackMethods=true,
+      Visibility=Public
+    out: build/proto/swift
+  - plugin: buf.build/apple/swift
+    opt: Visibility=Public
+    out: build/proto/swift

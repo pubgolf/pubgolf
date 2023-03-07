@@ -1,0 +1,35 @@
+name: "Proto"
+
+jobs:
+  build_and_check:
+    on:
+      push:
+        branches:
+          - main
+      pull_request:
+        branches:
+          - main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bufbuild/buf-setup-action@v1
+      - uses: bufbuild/buf-lint-action@v1
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=develop"
+      - run: |
+          buf generate --template buf.gen.ci.yaml
+
+  publish:
+    on:
+      push:
+        branches:
+          - main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release
+        uses: fnkr/github-action-ghr@v1
+        env:
+          GHR_COMPRESS: xz
+          GHR_PATH: build/proto/
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
