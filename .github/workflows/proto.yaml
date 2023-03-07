@@ -1,14 +1,15 @@
 name: "Proto"
 
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build_and_check:
-    on:
-      push:
-        branches:
-          - main
-      pull_request:
-        branches:
-          - main
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,10 +22,7 @@ jobs:
           buf generate --template buf.gen.ci.yaml
 
   publish:
-    on:
-      push:
-        branches:
-          - main
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
       - name: Release
