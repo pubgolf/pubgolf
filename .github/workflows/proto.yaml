@@ -38,11 +38,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: generated-protos
-      - name: Debug
-        run: |
-          ls ${{github.workspace}}
       - name: Upload as GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{github.workspace}}/build/proto/**/*
+          files: ${{github.workspace}}/*
           tag_name: sha-${{ github.sha }}
