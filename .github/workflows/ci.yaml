@@ -52,4 +52,3 @@ jobs:
         with:
           files: proto.zip
           tag_name: sha-${{ github.sha }}
-          github_token: ${{ github.token }}
