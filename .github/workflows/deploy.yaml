@@ -14,7 +14,7 @@ on:
 
 jobs:
   deploy_app:
-    name: Trigger Fly.io Deployment to `${{ inputs.version }}` Environment
+    name: Trigger Fly.io Deployment to `${{ inputs.env }}` Environment
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,7 +39,7 @@ jobs:
         run: docker pull ghcr.io/pubgolf/pubgolf:${{ inputs.version }}
 
       - name: Deploy Staging
-        if: inputs.environment == 'staging'
+        if: inputs.env == 'staging'
         run: |
           docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf-staging:${{ inputs.version }}
           docker push docker registry.fly.io/pubgolf-staging:${{ inputs.version }}
@@ -47,7 +47,7 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - name: Deploy Production
-        if: inputs.environment == 'production'
+        if: inputs.env == 'production'
         run: |
           docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf:${{ inputs.version }}
           docker push docker registry.fly.io/pubgolf:${{ inputs.version }}
