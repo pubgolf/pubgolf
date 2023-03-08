@@ -91,6 +91,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: pubgolf-devctrl
+      - name: Get short SHA
+        run: echo "SHORT_SHA=$("${{ github.sha }}".SubString(0, 8))" >> $env:GITHUB_ENV
       - name: Upload as GitHub Release
         if: github.ref == 'refs/heads/develop'
         uses: softprops/action-gh-release@v1
@@ -98,7 +100,7 @@ jobs:
           files: |
             proto.zip
             pubgolf-devctrl
-          tag_name: sha-${{ github.sha }}
+          tag_name: sha-${{ env.SHORT_SHA }}
 
   api_publish_docker_image:
     name: Publish API Server
@@ -145,10 +147,12 @@ jobs:
       - api_publish_docker_image
     runs-on: ubuntu-latest
     steps:
+      - name: Get short SHA
+        run: echo "SHORT_SHA=$("${{ github.sha }}".SubString(0, 8))" >> $env:GITHUB_ENV
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: deploy.yaml
           # Disable auto-format to prevent replacing the outer quotes with single quotes
           # prettier-ignore
-          inputs: "{ \"env\": \"staging\", \"version\": \"sha-${GITHUB_SHA::7}\" }"
+          inputs: "{ \"env\": \"staging\", \"version\": \"sha-${{ env.SHORT_SHA }}\" }"
