@@ -42,7 +42,7 @@ jobs:
         if: inputs.env == 'staging'
         run: |
           docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf-staging:${{ inputs.version }}
-          docker push docker registry.fly.io/pubgolf-staging:${{ inputs.version }}
+          docker push registry.fly.io/pubgolf-staging:${{ inputs.version }}
           flyctl deploy --image registry.fly.io/pubgolf-staging:${{ inputs.version }} --config ./infra/fly.staging.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
         if: inputs.env == 'production'
         run: |
           docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf:${{ inputs.version }}
-          docker push docker registry.fly.io/pubgolf:${{ inputs.version }}
+          docker push registry.fly.io/pubgolf:${{ inputs.version }}
           flyctl deploy --image registry.fly.io/pubgolf:${{ inputs.version }} --config ./infra/fly.production.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
