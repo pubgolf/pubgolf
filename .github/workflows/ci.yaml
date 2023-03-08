@@ -151,4 +151,4 @@ jobs:
           workflow: deploy.yaml
           # Disable auto-format to prevent replacing the outer quotes with single quotes
           # prettier-ignore
-          inputs: "{ \"environment\": \"staging\", \"version\": \"sha-${GITHUB_SHA::7}\" }"
+          inputs: "{ \"env\": \"staging\", \"version\": \"sha-${GITHUB_SHA::7}\" }"
