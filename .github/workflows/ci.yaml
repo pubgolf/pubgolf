@@ -72,8 +72,14 @@ jobs:
           cache: true
       - name: Test
         run: go test -v ./api/...
-      - name: Build
-        run: go build -v ./api/cmd/pubgolf-app-server
+      - name: Build API Server Binary
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-app-server
+      - name: Upload API Server Binary as CI Artifact
+        uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/develop'
+        with:
+          name: pubgolf-app-server
+          path: pubgolf-app-server
 
   publish_gh_release:
     name: Publish Protos and Tools
@@ -130,11 +136,15 @@ jobs:
           images: ghcr.io/pubgolf/pubgolf
           tags: |
             type=sha
+      - name: Download API Server Binary as CI Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: pubgolf-app-server
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           push: true
-          file: ./api/docker/Dockerfile
+          file: ./infra/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
