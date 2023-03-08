@@ -149,6 +149,7 @@ jobs:
         with:
           push: true
           file: ./infra/Dockerfile
+          context: ./
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
