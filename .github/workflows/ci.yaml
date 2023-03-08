@@ -1,4 +1,4 @@
-name: "CI/CD Workflow"
+name: "Build and Publish Artifacts"
 
 on:
   push:
@@ -137,3 +137,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  trigger_staging_deploy:
+    name: Trigger Staging Deploy for App
+    if: github.ref == 'refs/heads/develop'
+    needs:
+      - api_publish_docker_image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke workflow with inputs
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: deploy.yaml
+          # Disable auto-format to prevent replacing the outer quotes with single quotes
+          # prettier-ignore
+          inputs: "{ \"env\": \"staging\", \"version\": \"sha-${GITHUB_SHA::7}\" }"

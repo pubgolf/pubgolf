@@ -1,0 +1,56 @@
+# fly.toml file generated for pubgolf-staging on 2023-03-07T21:13:47-05:00
+
+app = "pubgolf-staging"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+  cmd = []
+  entrypoint = []
+  exec = []
+  private_network = true
+
+[[services]]
+  internal_port = 5000
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.http_checks]]
+    grace_period = "5s"
+    interval = "10s"
+    method = "get"
+    path = "/health-check"
+    protocol = "http"
+    restart_limit = 0
+    timeout = "2s"
+    tls_skip_verify = false
+    [services.http_checks.headers]
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls"]
+    port = 443
+    [services.ports.tls_options]
+      alpn = ["h2"]
+      default_self_signed = false
+      versions = []
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"

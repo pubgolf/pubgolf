@@ -1,0 +1,31 @@
+name: "Deploy App"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        type: environment
+        required: true
+      version:
+        description: "Docker image label to deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy_app:
+    name: Trigger Fly.io Deployment to `${{ inputs.version }}` Environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy Staging
+        if: inputs.environment == 'staging'
+        run: flyctl deploy --image registry.fly.io/pubgolf-staging:${{ inputs.version }} --config ./infra/fly.staging.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Deploy Production
+        if: inputs.environment == 'production'
+        run: flyctl deploy --image registry.fly.io/pubgolf-staging:${{ inputs.version }} --config ./infra/fly.production.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
