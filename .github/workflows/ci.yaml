@@ -140,10 +140,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: pubgolf-app-server
-      - name: Debug
-        run: |
-          pwd
-          ls
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
         with:
