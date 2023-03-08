@@ -92,7 +92,7 @@ jobs:
         with:
           name: pubgolf-devctrl
       - name: Get short SHA
-        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $env:GITHUB_ENV
+        run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $env:GITHUB_ENV
       - name: Upload as GitHub Release
         if: github.ref == 'refs/heads/develop'
         uses: softprops/action-gh-release@v1
@@ -148,7 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get short SHA
-        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $env:GITHUB_ENV
+        run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $env:GITHUB_ENV
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
