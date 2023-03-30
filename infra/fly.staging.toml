@@ -1,4 +1,4 @@
-# fly.toml file generated for pubgolf-staging on 2023-03-07T21:13:47-05:00
+# fly.toml file generated for pubgolf-staging on 2023-03-30T19:01:22-04:00
 
 app = "pubgolf-staging"
 kill_signal = "SIGINT"
@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [env]
-  TINI_SUBREAPER=true
+  TINI_SUBREAPER = "t"
 
 [experimental]
   allowed_public_ports = []
