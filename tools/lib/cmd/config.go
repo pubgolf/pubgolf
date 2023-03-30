@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 // DBDriver is an enum specifying which database driver to use for migrations and DAO codegen.
@@ -57,6 +58,7 @@ func (c *CLIConfig) setDefaults() {
 // getDatabaseURL queries Doppler for DB connection details.
 func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
 	vars := readDopplerVars(project, env, prefix, []string{
+		"SQLITE_PATH",
 		"DB_USER",
 		"DB_PASSWORD",
 		"DB_HOST",
@@ -65,22 +67,22 @@ func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
 		"DB_SSL_MODE",
 	})
 
-	u := url.URL{
-		User: url.UserPassword(
-			getStr(vars, "DB_USER", ""),
-			getStr(vars, "DB_PASSWORD", ""),
-		),
-		Host: getStr(vars, "DB_HOST", "localhost") + ":" + getStr(vars, "DB_PORT", "5432"),
-		Path: getStr(vars, "DB_NAME", ""),
+	if driver == SQLite3 {
+		return "sqlite3://" + getStr(vars, "SQLITE_PATH", filepath.FromSlash("./data/db/data.db")) + "?x-no-tx-wrap=true"
 	}
 
-	u.Scheme = driver.driverString()
-
-	if driver == SQLite3 {
-		u.Query().Set("x-no-tx-wrap", "true")
+	u := url.URL{
+		Scheme: driver.driverString(),
 	}
 
 	if driver == PostgreSQL {
+		u.User = url.UserPassword(
+			getStr(vars, "DB_USER", ""),
+			getStr(vars, "DB_PASSWORD", ""),
+		)
+		u.Host = getStr(vars, "DB_HOST", "localhost") + ":" + getStr(vars, "DB_PORT", "5432")
+		u.Path = getStr(vars, "DB_NAME", "")
+
 		u.Query().Set("sslmoode", getStr(vars, "DB_SSL_MODE", "disable"))
 	}
 
