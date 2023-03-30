@@ -70,11 +70,11 @@ func checkVersion() {
 	guard(err, "hash tools dir")
 
 	if installedToolsHash != curToolsHash {
-		log.Printf(`The installed version of %[1]s (%[2]s) is out of date (expected %[3]s). Run the following to update:
+		log.Printf(`The installed version of %[1]s is out of date. Run the following to update:
 
 %[1]s update
 
-`, config.ProjectName, curToolsHash, installedToolsHash)
+`, config.CLIName)
 	}
 }
 
