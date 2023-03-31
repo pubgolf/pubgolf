@@ -9,7 +9,7 @@ require (
 	github.com/honeycombio/beeline-go v1.11.1
 	github.com/honeycombio/libhoney-go v1.18.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/kyleconroy/sqlc v1.17.0
+	github.com/kyleconroy/sqlc v1.17.2
 	github.com/lib/pq v1.10.7
 	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/cobra v1.6.1
@@ -156,6 +156,7 @@ require (
 	github.com/mutecomm/go-sqlcipher/v4 v4.4.2 // indirect
 	github.com/nakagami/firebirdsql v0.9.4 // indirect
 	github.com/neo4j/neo4j-go-driver v1.8.3 // indirect
+	github.com/oklog/ulid/v2 v2.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect

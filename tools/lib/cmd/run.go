@@ -13,8 +13,8 @@ import (
 
 func init() {
 	runCmd.AddCommand(runAPIServerCmd)
-	// runCmd.AddCommand(runAPIBgCmd)
-	// runCmd.AddCommand(runAPIDatabaseCmd)
+	runCmd.AddCommand(runAPIBgCmd)
+	runCmd.AddCommand(runAPIDatabaseCmd)
 	// runCmd.AddCommand(runAPIMinioCmd)
 	rootCmd.AddCommand(runCmd)
 
@@ -25,7 +25,7 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run all server executables",
 	Run: func(cmd *cobra.Command, args []string) {
-		// runAPIBgCmd.Run(cmd, args)
+		runAPIBgCmd.Run(cmd, args)
 		runPar(cmd, args,
 			runAPIServerCmd,
 		)
@@ -41,24 +41,24 @@ var runAPIServerCmd = &cobra.Command{
 	},
 }
 
-// var runAPIBgCmd = &cobra.Command{
-// 	Use:   "bg",
-// 	Short: "Run all supporting services for the API server",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName,
-// 			"api-db",
-// 			"api-blob-storage",
-// 		)
-// 	},
-// }
+var runAPIBgCmd = &cobra.Command{
+	Use:   "bg",
+	Short: "Run all supporting services for the API server",
+	Run: func(cmd *cobra.Command, args []string) {
+		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName,
+			"api-db",
+			// "api-blob-storage",
+		)
+	},
+}
 
-// var runAPIDatabaseCmd = &cobra.Command{
-// 	Use:   "api-db",
-// 	Short: "Run API server's DB instance",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-db")
-// 	},
-// }
+var runAPIDatabaseCmd = &cobra.Command{
+	Use:   "api-db",
+	Short: "Run API server's DB instance",
+	Run: func(cmd *cobra.Command, args []string) {
+		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-db")
+	},
+}
 
 // var runAPIMinioCmd = &cobra.Command{
 // 	Use:   "api-minio",
@@ -68,28 +68,28 @@ var runAPIServerCmd = &cobra.Command{
 // 	},
 // }
 
-// func dopplerDockerRun(project, env string, services ...string) {
-// 	args := []string{
-// 		"run",
-// 		"--project", project,
-// 		"--config", env,
-// 		"--",
-// 		"docker-compose",
-// 		"--file", "docker-compose.dev.yaml",
-// 		"up",
-// 		"--detach",
-// 		"--",
-// 	}
-// 	args = append(args, services...)
+func dopplerDockerRun(project, env string, services ...string) {
+	args := []string{
+		"run",
+		"--project", project,
+		"--config", env,
+		"--",
+		"docker-compose",
+		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
+		"up",
+		"--detach",
+		"--",
+	}
+	args = append(args, services...)
 
-// 	doppler := exec.Command("doppler", args...)
+	doppler := exec.Command("doppler", args...)
 
-// 	doppler.Stdout = os.Stdout
-// 	doppler.Stderr = os.Stderr
-// 	doppler.Stdin = os.Stdin
+	doppler.Stdout = os.Stdout
+	doppler.Stderr = os.Stderr
+	doppler.Stdin = os.Stdin
 
-// 	guard(doppler.Run(), "execute `docker-compose up ...` command")
-// }
+	guard(doppler.Run(), "execute `docker-compose up ...` command")
+}
 
 func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
 	watchFlag, err := cmd.Flags().GetBool("watch")

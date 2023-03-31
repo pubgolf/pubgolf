@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,7 @@ func dopplerDockerStop(project, env string, services ...string) {
 		"--config", env,
 		"--",
 		"docker-compose",
-		"--file", "docker-compose.dev.yaml",
+		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
 		"down")
 
 	doppler.Stdout = os.Stdout

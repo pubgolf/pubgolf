@@ -1,0 +1,24 @@
+version: '3'
+services:
+  api-db:
+    image: postgres:15
+    restart: "${PUBGOLF_DB_RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "${PUBGOLF_DB_PORT:-5432}:5432"
+    volumes:
+      - "${PUBGOLF_DB_HOST_DATA_PATH:-../data/postgres}:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_NAME: "${PUBGOLF_DB_NAME:-pubgolf_dev}"
+      POSTGRES_USER: "${PUBGOLF_DB_USER:-pubgolf_dev}"
+      POSTGRES_PASSWORD: "${PUBGOLF_DB_PASSWORD:-pubgolf_dev}"
+  # api-blob-storage:
+  #   image: minio/minio
+  #   restart: "${PUBGOLF_BLOB_STORE_RESTART_POLICY:-unless-stopped}"
+  #   ports:
+  #     - "${PUBGOLF_BLOB_STORE_PORT:-9000}:9000"
+  #   volumes:
+  #     - "${PUBGOLF_BLOB_STORE_HOST_DATA_PATH:-./data/minio}:/var/lib/minio/data"
+  #   environment:
+  #     MINIO_ROOT_USER: "${PUBGOLF_BLOB_STORE_USER:-pubgolf_dev}"
+  #     MINIO_ROOT_PASSWORD: "${PUBGOLF_BLOB_STORE_PASSWORD:-pubgolf_dev}"
+  #   command: server /var/lib/minio/data

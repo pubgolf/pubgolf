@@ -75,16 +75,16 @@ func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
 		Scheme: driver.driverString(),
 	}
 
-	if driver == PostgreSQL {
-		u.User = url.UserPassword(
-			getStr(vars, "DB_USER", ""),
-			getStr(vars, "DB_PASSWORD", ""),
-		)
-		u.Host = getStr(vars, "DB_HOST", "localhost") + ":" + getStr(vars, "DB_PORT", "5432")
-		u.Path = getStr(vars, "DB_NAME", "")
+	u.User = url.UserPassword(
+		getStr(vars, "DB_USER", config.ProjectName+"_dev"),
+		getStr(vars, "DB_PASSWORD", config.ProjectName+"_dev"),
+	)
+	u.Host = getStr(vars, "DB_HOST", "localhost") + ":" + getStr(vars, "DB_PORT", "5432")
+	u.Path = getStr(vars, "DB_NAME", config.ProjectName+"_dev")
 
-		u.Query().Set("sslmoode", getStr(vars, "DB_SSL_MODE", "disable"))
-	}
+	q := u.Query()
+	q.Add("sslmode", getStr(vars, "DB_SSL_MODE", "disable"))
+	u.RawQuery = q.Encode()
 
 	return u.String()
 }

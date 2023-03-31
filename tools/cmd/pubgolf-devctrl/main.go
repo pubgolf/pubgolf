@@ -9,7 +9,7 @@ var toolsHash string
 func main() {
 	cmd.Execute(toolsHash, cmd.CLIConfig{
 		ProjectName:  "pubgolf",
-		DBDriver:     cmd.SQLite3,
+		DBDriver:     cmd.PostgreSQL,
 		EnvVarPrefix: "PUBGOLF_",
 	})
 }

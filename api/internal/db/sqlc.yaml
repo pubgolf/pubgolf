@@ -1,15 +1,22 @@
-version: 1
-packages:
-  - path: "../gen/dbc"
-    name: "dbc"
-    # engine: "postgresql"
-    engine: "sqlite"
-    schema: "./migrations"
+version: 2
+sql:
+  - schema: "./migrations"
     queries: "./queries"
-    emit_prepared_queries: true
-overrides:
-  - go_type: "github.com/gofrs/uuid.UUID"
-    db_type: "uuid"
-  - go_type: "github.com/gofrs/uuid.UUID"
-    db_type: "uuid"
-    nullable: true
+    engine: "postgresql"
+    gen:
+      go:
+        package: "dbc"
+        out: "../gen/dbc"
+        emit_prepared_queries: true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/oklog/ulid/v2"
+              package: "ulid"
+              type: "ULID"
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              import: "github.com/oklog/ulid/v2"
+              package: "ulid"
+              type: "ULID"
