@@ -44,11 +44,11 @@ message GetScheduleRequest {
 message GetScheduleResponse {
   message Schedule {
     // List of past venues. Does not include the current venue.
-    repeated uint32 visited_venue_ids = 1;
+    repeated uint32 visited_venue_keys = 1;
     // Optional in the case that the event hasn't started yet.
-    optional uint32 current_venue_id = 2;
+    optional uint32 current_venue_key = 2;
     // Optional in the case that the next venue isn't yet visible to players. This becomes visible X mins before the next venue's start time.
-    optional uint32 next_venue_id = 3;
+    optional uint32 next_venue_key = 3;
     optional google.protobuf.Timestamp next_venue_start = 4;
   }
 
@@ -60,11 +60,12 @@ message GetScheduleResponse {
 
 message GetVenueRequest {
   string event_key = 1;
-  repeated uint32 venue_ids = 2;
+  repeated uint32 venue_keys = 2;
 }
 message GetVenueResponse {
   message Venue {
-    string venue_id = 1;
+    // Global ID for the venue, not to be confused with the venue key.
+    string id = 1;
     string name = 2;
     // Address string suitable for display or passing in to a maps query.
     string address = 3;
@@ -76,6 +77,6 @@ message GetVenueResponse {
     optional Venue venue = 1;
   }
 
-  // Map of requested venue IDs to Venue objects.
+  // Map of requested venue keys to Venue objects.
   map<uint32, VenueWrapper> venues = 1;
 }
