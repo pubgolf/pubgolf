@@ -12,6 +12,7 @@ func init() {
 	rootCmd.AddCommand(testCmd)
 
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
+	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output")
 }
 
 var testCmd = &cobra.Command{
@@ -24,8 +25,19 @@ var testCmd = &cobra.Command{
 		coverageFlag, err := cmd.Flags().GetBool("coverage")
 		guard(err, "check '--coverage' flag")
 
+		verboseFlag, err := cmd.Flags().GetBool("verbose")
+		guard(err, "check '--verbose' flag")
+
 		testArgs := []string{
-			"test", filepath.FromSlash("./api/internal/lib/..."), filepath.FromSlash("./api/cmd/..."),
+			"test",
+
+			filepath.FromSlash("./api/internal/lib/..."),
+			filepath.FromSlash("./api/internal/gen/dbc"),
+			filepath.FromSlash("./api/cmd/..."),
+		}
+
+		if verboseFlag {
+			testArgs = append(testArgs, "-v")
 		}
 
 		if coverageFlag {
