@@ -10,7 +10,7 @@ import (
 	context "context"
 	errors "errors"
 	connect_go "github.com/bufbuild/connect-go"
-	v1 "github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1"
+	v1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	http "net/http"
 	strings "strings"
 )
