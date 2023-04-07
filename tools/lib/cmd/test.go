@@ -31,9 +31,7 @@ var testCmd = &cobra.Command{
 		testArgs := []string{
 			"test",
 
-			filepath.FromSlash("./api/internal/lib/..."),
-			filepath.FromSlash("./api/internal/gen/dbc"),
-			filepath.FromSlash("./api/cmd/..."),
+			filepath.FromSlash("./api/..."),
 		}
 
 		if verboseFlag {
