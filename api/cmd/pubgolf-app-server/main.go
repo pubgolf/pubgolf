@@ -15,9 +15,9 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/pubgolf/pubgolf/api/internal/gen/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/honeycomb"
+	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
 )
 
