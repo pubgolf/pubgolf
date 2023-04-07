@@ -5,10 +5,10 @@ sql:
     engine: postgresql
     gen:
       go:
-        package: "dbc"
         package: dbc
         out: ../lib/dao/internal/dbc
         emit_prepared_queries: true
+        emit_interface: true
         overrides:
           - db_type: uuid
             go_type:
