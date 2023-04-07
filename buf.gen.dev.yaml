@@ -1,8 +1,8 @@
 version: v1
 plugins:
   - plugin: buf.build/protocolbuffers/go
-    out: api/internal/gen/proto
+    out: api/internal/lib/proto
     opt: paths=source_relative
   - plugin: buf.build/bufbuild/connect-go
-    out: api/internal/gen/proto
+    out: api/internal/lib/proto
     opt: paths=source_relative
