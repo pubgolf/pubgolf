@@ -47,9 +47,10 @@ message GetScheduleResponse {
     repeated uint32 visited_venue_keys = 1;
     // Optional in the case that the event hasn't started yet.
     optional uint32 current_venue_key = 2;
-    // Optional in the case that the next venue isn't yet visible to players. This becomes visible X mins before the next venue's start time.
+    // Optional in the case that the next venue isn't yet visible to players, or after the second to last venue. The next venue key only becomes visible X mins before the next venue's start time.
     optional uint32 next_venue_key = 3;
     optional google.protobuf.Timestamp next_venue_start = 4;
+    google.protobuf.Timestamp event_end = 5;
   }
 
   uint32 latest_data_version = 1;
@@ -64,10 +65,10 @@ message GetVenueRequest {
 }
 message GetVenueResponse {
   message Venue {
-    // Global ID for the venue, not to be confused with the venue key.
+    // Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
     string id = 1;
     string name = 2;
-    // Address string suitable for display or passing in to a maps query.
+    // Address string suitable for display or using for a mapping query.
     string address = 3;
     string image_url = 4;
   }
