@@ -21,3 +21,19 @@ sql:
               import: github.com/oklog/ulid/v2
               package: ulid
               type: ULID
+          - column: events.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
+          - column: events.current_venue_key
+            go_type: uint32
+          - column: events.current_schedule_cache_version
+            go_type: uint32
+          - column: venues.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
+          - column: event_venues.event_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
+          - column: event_venues.venue_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
+          - column: event_venues.venue_key
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueKey
+          - column: event_venues.duration_minutes
+            go_type: uint32
