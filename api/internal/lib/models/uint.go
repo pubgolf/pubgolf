@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql/driver"
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -12,12 +13,12 @@ type VenueKey struct{ uint32 }
 // Scan parses an int64 into a VenueKey if it is in the valid range for a uint32.
 func (v *VenueKey) Scan(src interface{}) error {
 	if x, ok := src.(int64); ok {
-		if x >= 0 && x <= 4294967295 {
+		if x >= 0 && x <= math.MaxUint32 {
 			*v = VenueKey{uint32(x)}
 			return nil
 		}
 
-		return fmt.Errorf("VenueKey: value out of range [0,4294967295]: %v", src)
+		return fmt.Errorf("VenueKey: value out of range [0,%d]: %v", math.MaxUint32, src)
 	}
 
 	return fmt.Errorf("VenueKey: invalid scanned value: %v of type %v", src, reflect.TypeOf(src))
