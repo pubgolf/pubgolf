@@ -8,6 +8,10 @@ on:
     branches:
       - develop
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   proto_build_and_check:
     name: Build and Check Protos
