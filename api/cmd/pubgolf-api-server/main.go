@@ -89,9 +89,13 @@ func makeDB(cfg *config.App) *sql.DB {
 // makeServer initializes an HTTP server with settings and the router.
 func makeServer(cfg *config.App, db *sql.DB) *http.Server {
 	// Construct gRPC server.
+	server, err := rpc.NewPubGolfServiceServer(context.Background(), db)
+	guard(err, "initialize gRPC server")
+
+	// Bind gRPC server to mux.
 	rpcMux := http.NewServeMux()
 	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(
-		rpc.NewPubGolfServiceServer(db),
+		server,
 		connect.WithInterceptors(
 			otelconnect.NewInterceptor(),
 			middleware.NewLoggingInterceptor(),

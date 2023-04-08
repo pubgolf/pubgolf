@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -17,10 +18,15 @@ type Queries struct {
 }
 
 // New returns a concrete implementation of `QueryProvider`.
-func New(db *sql.DB) *Queries {
-	return &Queries{
-		dbc: dbc.New(db),
+func New(ctx context.Context, db *sql.DB) (*Queries, error) {
+	q, err := dbc.Prepare(ctx, db)
+	if err != nil {
+		return nil, fmt.Errorf("prepare dbc queries: %w", err)
 	}
+
+	return &Queries{
+		dbc: q,
+	}, nil
 }
 
 // daoSpan annotates a DAO method with a span for tracing.
