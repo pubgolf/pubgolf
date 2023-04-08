@@ -16,6 +16,8 @@ type Venue struct {
 
 // VenueByKey returns venue info for the venue key and event id.
 func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error) {
+	defer daoSpan(&ctx)()
+
 	v, err := q.dbc.VenueByKey(ctx, dbc.VenueByKeyParams{
 		EventID:  eventID,
 		VenueKey: venueKey,

@@ -16,6 +16,8 @@ type VenueStop struct {
 
 // EventSchedule returns a slice of venue keys and durations for the given event ID.
 func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error) {
+	defer daoSpan(&ctx)()
+
 	validKeys, err := q.dbc.EventVenueKeysAreValid(ctx, eventID)
 	if err != nil {
 		return nil, fmt.Errorf("check venue keys are valid: %v", err)
