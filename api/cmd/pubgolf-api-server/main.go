@@ -16,8 +16,8 @@ import (
 
 	"github.com/bufbuild/connect-go"
 	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
-	"github.com/lib/pq"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -75,10 +75,10 @@ func guard(err error, msg string) {
 
 // makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
 func makeDB(cfg *config.App) *sql.DB {
-	ctr, err := pq.NewConnector(cfg.AppDatabaseURL)
-	guard(err, "open database connection")
+	conConfig, err := pgx.ParseConfig(cfg.AppDatabaseURL)
+	guard(err, "parse database config")
 
-	db := telemetry.WrapDB(ctr)
+	db := telemetry.WrapDB(stdlib.GetConnector(*conConfig))
 
 	err = db.Ping()
 	guard(err, "ping database")

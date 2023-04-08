@@ -12,7 +12,8 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/phayes/freeport"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
@@ -54,8 +55,9 @@ func setupTestDB() (*sql.DB, func()) {
 	db := epg.NewDatabase(epg.DefaultConfig().Version(epg.V15).Port(uint32(port)))
 	guardSetup(db.Start(), "start test DB")
 
-	conn, err := sql.Open("postgres", dbURL)
-	guardSetup(err, "connect to test DB")
+	cfg, err := pgx.ParseConfig(dbURL)
+	guardSetup(err, "prase test DB config")
+	conn := stdlib.OpenDB(*cfg)
 
 	driver, err := postgres.WithInstance(conn, &postgres.Config{})
 	guardSetup(err, "create DB driver")

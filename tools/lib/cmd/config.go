@@ -23,7 +23,7 @@ const (
 func (d DBDriver) driverString() string {
 	switch d {
 	case PostgreSQL:
-		return "postgres"
+		return "pgx"
 	case SQLite3:
 		return "sqlite3"
 	}

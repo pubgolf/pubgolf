@@ -17,20 +17,25 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 	if x, ok := src.([]byte); ok {
 		parsed, err := uuid.FromString(string(x))
 		if err != nil {
-			return fmt.Errorf("EventID scan: %w", err)
+			return fmt.Errorf("DatabaseULID scan: %w", err)
 		}
 		copy(db.ULID[:], parsed[:])
 		return nil
 	}
 
-	return errors.New("EventID: source value must be a byte slice")
+	if x, ok := src.(string); ok {
+		parsed, err := uuid.FromString(x)
+		if err != nil {
+			return fmt.Errorf("DatabaseULID scan: %w", err)
+		}
+		copy(db.ULID[:], parsed[:])
+		return nil
+	}
+
+	return errors.New("EventID: source value must be a byte slice or string")
 }
 
 // Value serializes a ULID into a UUID-formatted string representing the same underlying byte content.
 func (db DatabaseULID) Value() (driver.Value, error) {
-	u, err := uuid.FromBytes(db.ULID[:])
-	if err != nil {
-		return nil, err
-	}
-	return u.MarshalText()
+	return db.ULID.MarshalBinary()
 }
