@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,13 +13,19 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/bufbuild/connect-go"
+	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
+	"github.com/lib/pq"
+	_ "github.com/lib/pq"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
-	"github.com/pubgolf/pubgolf/api/internal/lib/honeycomb"
+	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
+	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 func main() {
@@ -26,12 +33,14 @@ func main() {
 	cfg, err := config.Init()
 	guard(err, "parse env config")
 
-	// Initialize monitoring.
-	flush := honeycomb.Init(cfg)
-	defer flush()
+	// Initialize telemetry.
+	cleanupTelemetry, err := telemetry.Init(cfg)
+	guard(err, "init otel")
+	defer cleanupTelemetry()
 
 	// Initialize server.
-	server := makeServer(cfg, &rpc.PubGolfServiceServer{})
+	db := makeDB(cfg)
+	server := makeServer(cfg, db)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -49,16 +58,34 @@ func guard(err error, msg string) {
 	}
 }
 
-// makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, serverImpl apiv1connect.PubGolfServiceClient) *http.Server {
-	// Construct gRPC server.
+// makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
+func makeDB(cfg *config.App) *sql.DB {
+	ctr, err := pq.NewConnector(cfg.AppDatabaseURL)
+	guard(err, "open database connection")
 
+	db := telemetry.WrapDB(ctr)
+
+	err = db.Ping()
+	guard(err, "ping database")
+
+	return db
+}
+
+// makeServer initializes an HTTP server with settings and the router.
+func makeServer(cfg *config.App, db *sql.DB) *http.Server {
+	// Construct gRPC server.
 	rpcMux := http.NewServeMux()
-	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(serverImpl))
+	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(
+		rpc.NewPubGolfServiceServer(db),
+		connect.WithInterceptors(
+			otelconnect.NewInterceptor(),
+			middleware.NewLoggingInterceptor(),
+		),
+	))
 
 	// Mount routes.
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health-check", healthCheck(cfg))
+	mux.Handle("/health-check", healthCheck(cfg))
 	mux.Handle("/rpc/", http.StripPrefix("/rpc", rpcMux))
 
 	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
@@ -73,7 +100,7 @@ func makeServer(cfg *config.App, serverImpl apiv1connect.PubGolfServiceClient) *
 	// Configure HTTP server.
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: h2c.NewHandler(honeycomb.WrapMux(mux), &http2.Server{}),
+		Handler: h2c.NewHandler(mux, &http2.Server{}),
 
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -82,10 +109,10 @@ func makeServer(cfg *config.App, serverImpl apiv1connect.PubGolfServiceClient) *
 }
 
 // healthCheck returns a 200 if the app is online and able to process requests.
-func healthCheck(cfg *config.App) http.HandlerFunc {
-	return honeycomb.WrapHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func healthCheck(cfg *config.App) http.Handler {
+	return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Saluton mundo, from `%s`!", cfg.EnvName)
-	})
+	}), "health-check")
 }
 
 // makeShutdownWatcher spawns a child goroutine to gracefully close the server on an OS signal.

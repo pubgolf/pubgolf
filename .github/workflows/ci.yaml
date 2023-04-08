@@ -73,13 +73,13 @@ jobs:
       - name: Test
         run: go test -v ./api/...
       - name: Build API Server Binary
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-app-server
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-api-server
       - name: Upload API Server Binary as CI Artifact
         uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/develop'
         with:
-          name: pubgolf-app-server
-          path: pubgolf-app-server
+          name: pubgolf-api-server
+          path: pubgolf-api-server
 
   publish_gh_release:
     name: Publish Protos and Tools
@@ -139,7 +139,7 @@ jobs:
       - name: Download API Server Binary as CI Artifact
         uses: actions/download-artifact@v3
         with:
-          name: pubgolf-app-server
+          name: pubgolf-api-server
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
         with:
