@@ -10,7 +10,7 @@ import (
 
 const envVarPrefix = "pubgolf"
 
-// Init checks for env vars matchint the `envVarPrefix` and returns a populated config struct.
+// Init checks for env vars matching the `envVarPrefix` and returns a populated config struct.
 func Init() (*App, error) {
 	var c App
 	if err := envconfig.Process(envVarPrefix, &c); err != nil {
@@ -32,6 +32,6 @@ type App struct {
 	EnvName DeployEnv `required:"true" split_words:"true"`
 
 	// Credentials
-	HoneycombWriteKey string `split_words:"true"`
-	AppDatabaseURL    string `required:"true" split_words:"true"`
+	HoneycombKey   string `split_words:"true"`
+	AppDatabaseURL string `required:"true" split_words:"true"`
 }
