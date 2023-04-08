@@ -16,8 +16,11 @@ type DatabaseULID struct{ ulid.ULID }
 func (db *DatabaseULID) Scan(src interface{}) error {
 	if x, ok := src.([]byte); ok {
 		parsed, err := uuid.FromString(string(x))
+		if err != nil {
+			return fmt.Errorf("EventID scan: %w", err)
+		}
 		copy(db.ULID[:], parsed[:])
-		return fmt.Errorf("EventID scan: %w", err)
+		return nil
 	}
 
 	return errors.New("EventID: source value must be a byte slice")
