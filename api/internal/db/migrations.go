@@ -5,6 +5,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -34,6 +35,7 @@ func RunMigrations(db *sql.DB) error {
 	err = m.Up()
 	if err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
+			log.Println("No pending migrations.")
 			return nil
 		}
 		return fmt.Errorf("run migration: %w", err)

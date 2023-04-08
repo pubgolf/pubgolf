@@ -49,9 +49,12 @@ func main() {
 	flag.Parse()
 
 	if *migrationFlag {
+		log.Println("Migrator instance: starting database migrations...")
+
 		err = db.RunMigrations(dbConn)
 		guard(err, "run migrations")
 
+		log.Println("Migrator instance: completed migrations and shutting down...")
 		os.Exit(0)
 	}
 
