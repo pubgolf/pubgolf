@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
+	"github.com/pubgolf/pubgolf/api/internal/db"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
@@ -39,9 +41,19 @@ func main() {
 	defer cleanupTelemetry()
 
 	// Initialize server.
-	db := makeDB(cfg)
-	server := makeServer(cfg, db)
+	dbConn := makeDB(cfg)
+	server := makeServer(cfg, dbConn)
 	makeShutdownWatcher(server)
+
+	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
+	flag.Parse()
+
+	if *migrationFlag {
+		err = db.RunMigrations(dbConn)
+		guard(err, "run migrations")
+
+		os.Exit(0)
+	}
 
 	// Run server.
 	log.Printf("Listening on port %d...", cfg.Port)
