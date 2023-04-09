@@ -16,7 +16,7 @@ func Init(cfg *config.App) (func(), error) {
 		launcher.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
 		launcher.WithServiceName("pubgolf-api-server"),
 		launcher.WithServiceVersion(gitVersion()),
-		launcher.WithMetricsEnabled(true),
+		launcher.WithMetricsEnabled(false),
 		honeycomb.WithMetricsDataset("pubgolf-api-server-metrics"),
 		honeycomb.WithApiKey(cfg.HoneycombKey),
 	)
