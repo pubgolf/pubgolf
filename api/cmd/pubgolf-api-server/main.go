@@ -109,7 +109,7 @@ func makeServer(cfg *config.App, db *sql.DB) *http.Server {
 
 	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
 	if cfg.EnvName == config.DeployEnvDev {
-		upstream, err := url.Parse("http://localhost:3000")
+		upstream, err := url.Parse("http://localhost:5173")
 		guard(err, "parse upstream for web-app reverse proxy")
 		mux.HandleFunc("/", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
 	} else {

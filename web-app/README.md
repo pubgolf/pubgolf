@@ -1,44 +1,38 @@
-# web-app
+# create-svelte
 
-This directory contains the frontend web app for [pubgolf.co](https://pubgolf.co).
+Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 
-## Setup
+## Creating a project
 
-Make sure you have the following installed:
-
-- NVM
-- Doppler
-
-Configure `doppler` in the `web-app` directory to use the `web-app` project and the `dev` environment.
-
-**Note:** The following isn't yet accurate. Adding for future reference.
-
-This will point to the staging API server. If you are running the web app frontend against a local API server (instead of the remote staging environment), configure `doppler` in the `web-app` directory to use the `web-app` project and the `dev_local_api` environment (NOT `dev`).
-
-## Development
-
-Remember to run `nvm use` whenever you navigate into the repo.
-
-### Running
-
-Run locally with hot reloading:
+If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
-doppler run -- npm run dev
+# create a new project in the current directory
+npm create svelte@latest
+
+# create a new project in my-app
+npm create svelte@latest my-app
 ```
 
-### Build
+## Developing
 
-Verify that production builds will be generated correctly:
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-doppler run -- npm run build
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
 ```
 
-### Lint / Test
+## Building
+
+To create a production version of your app:
 
 ```bash
-npm run check
-npm run format
-npm run lint
+npm run build
 ```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

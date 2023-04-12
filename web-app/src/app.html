@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="description" content="" />
-		<link rel="icon" href="/favicon.png" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%svelte.head%
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" href="%sveltekit.assets%/reset.css" />
+        %sveltekit.head%
 	</head>
-	<body>
-		<div id="svelte">%svelte.body%</div>
-	</body>
+    <body data-sveltekit-preload-data="hover">
+        <div style="display: contents" class="h-full overflow-hidden">%sveltekit.body%</div>
+    </body>
 </html>

@@ -3,11 +3,10 @@ module.exports = {
 	parser: '@typescript-eslint/parser',
 	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
 	plugins: ['svelte3', '@typescript-eslint'],
-	ignorePatterns: ['*.cjs', 'src/_gen/**/*'],
+	ignorePatterns: ['*.cjs'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
 	settings: {
-		'svelte3/typescript': () => require('typescript'),
-		'svelte3/ignore-styles': () => true
+		'svelte3/typescript': () => require('typescript')
 	},
 	parserOptions: {
 		sourceType: 'module',

@@ -1,38 +1,48 @@
 {
-	"name": "pubgolf-web-app",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "svelte-kit dev",
-		"build": "svelte-kit build",
-		"check": "svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
-		"format": "prettier --write --plugin-search-dir=. ."
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/adapter-static": "^1.0.0-next.22",
-		"@sveltejs/kit": "next",
-		"@typescript-eslint/eslint-plugin": "^4.31.1",
-		"@typescript-eslint/parser": "^4.31.1",
-		"eslint": "^7.32.0",
-		"eslint-config-prettier": "^8.3.0",
-		"eslint-plugin-svelte3": "^3.2.1",
-		"prettier": "^2.4.1",
-		"prettier-plugin-svelte": "^2.4.0",
-		"sass": "^1.45.0",
-		"svelte": "^3.44.0",
-		"svelte-check": "^2.2.6",
-		"svelte-preprocess": "^4.9.4",
-		"ts-proto": "^1.95.0",
-		"tslib": "^2.3.1",
-		"typescript": "^4.4.3",
-		"vite-tsconfig-paths": "^3.3.17"
-	},
-	"type": "module",
-	"dependencies": {
-		"@improbable-eng/grpc-web": "^0.15.0",
-		"browser-headers": "^0.4.1",
-		"protobufjs": "^6.11.2"
-	}
+    "name": "web-app",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "dev": "vite dev",
+        "build": "npm run prepare && vite build",
+        "preview": "vite preview",
+        "test": "playwright test",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+        "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+        "test:unit": "vitest",
+        "lint": "prettier --plugin-search-dir . --check . && eslint .",
+        "format": "prettier --plugin-search-dir . --write ."
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.28.1",
+        "@skeletonlabs/skeleton": "^1.1.0",
+        "@sveltejs/adapter-auto": "^2.0.0",
+        "@sveltejs/adapter-static": "^2.0.2",
+        "@sveltejs/kit": "^1.5.0",
+        "@typescript-eslint/eslint-plugin": "^5.45.0",
+        "@typescript-eslint/parser": "^5.45.0",
+        "autoprefixer": "^10.4.7",
+        "eslint": "^8.28.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-svelte3": "^4.0.0",
+        "postcss": "^8.4.14",
+        "postcss-load-config": "^4.0.1",
+        "prettier": "^2.8.0",
+        "prettier-plugin-svelte": "^2.8.1",
+        "sass": "^1.62.0",
+        "smui-theme": "^7.0.0-beta.3",
+        "svelte": "^3.54.0",
+        "svelte-check": "^3.0.1",
+        "tailwindcss": "^3.1.5",
+        "tslib": "^2.4.1",
+        "typescript": "^5.0.0",
+        "vite": "^4.2.0",
+        "vitest": "^0.25.3"
+    },
+    "type": "module",
+    "dependencies": {
+        "@bufbuild/connect": "^0.8.6",
+        "@bufbuild/connect-web": "^0.8.6",
+        "lucide-svelte": "^0.140.0"
+    }
 }
