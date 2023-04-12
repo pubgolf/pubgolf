@@ -1,0 +1,11 @@
+html,
+body {
+	@apply h-full overflow-hidden;
+}
+
+.dark .drawer .list-nav a:focus {
+	@apply bg-inherit !important;
+	@apply outline outline-2 outline-offset-[-2px];
+	outline-color: rgba(var(--color-primary-500) / 1);
+	color: rgba(var(--on-surface) / 1) !important;
+}
