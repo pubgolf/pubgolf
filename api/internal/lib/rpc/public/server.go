@@ -1,4 +1,4 @@
-package rpc
+package public
 
 import (
 	"context"
@@ -9,20 +9,20 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 )
 
-// PubGolfServiceServer implements the gRPC handlers for the PubGolf API.
-type PubGolfServiceServer struct {
+// Server implements the gRPC handlers for the PubGolf API.
+type Server struct {
 	apiv1connect.UnimplementedPubGolfServiceHandler
 	dao dao.QueryProvider
 }
 
-// NewPubGolfServiceServer constructs a gRPC server implementation with data access dependencies injected.
-func NewPubGolfServiceServer(ctx context.Context, db *sql.DB) (*PubGolfServiceServer, error) {
+// NewServer constructs a gRPC server implementation with data access dependencies injected.
+func NewServer(ctx context.Context, db *sql.DB) (*Server, error) {
 	q, err := dao.New(ctx, db)
 	if err != nil {
 		return nil, fmt.Errorf("initialize DAO: %w", err)
 	}
 
-	return &PubGolfServiceServer{
+	return &Server{
 		dao: q,
 	}, nil
 }

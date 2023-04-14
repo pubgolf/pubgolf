@@ -1,4 +1,4 @@
-package rpc
+package public
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 // GetVenue returns display information for the provided venue keys.
-func (s *PubGolfServiceServer) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVenueRequest]) (*connect.Response[apiv1.GetVenueResponse], error) {
+func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVenueRequest]) (*connect.Response[apiv1.GetVenueResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
 	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)

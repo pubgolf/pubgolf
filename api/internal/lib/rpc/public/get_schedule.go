@@ -1,4 +1,4 @@
-package rpc
+package public
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 const nextVenueVisibilityDuration = time.Duration(10) * time.Minute
 
 // GetSchedule returns the list of past venues, the current venue, and next venue plus transition time (if currently visible to clients).
-func (s *PubGolfServiceServer) GetSchedule(ctx context.Context, req *connect.Request[apiv1.GetScheduleRequest]) (*connect.Response[apiv1.GetScheduleResponse], error) {
+func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.GetScheduleRequest]) (*connect.Response[apiv1.GetScheduleResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
 	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)

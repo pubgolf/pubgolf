@@ -1,0 +1,56 @@
+// Admin defines the admin API service for the game management UI.
+
+syntax = "proto3";
+
+package api.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
+
+// AdminService allows administering events with enhanced permissions.
+service AdminService {
+  // CreatePlayer creates a new player profile for a given event.
+  rpc CreatePlayer(CreatePlayerRequest) returns (CreatePlayerResponse) {}
+
+  // ListPlayers returns all players for a given event.
+  rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse) {}
+}
+
+// Shared
+
+enum ScoringCategory {
+  UNKNOWN = 0;
+  PUB_GOLF_NINE_HOLE = 1;
+  PUB_GOLF_FIVE_HOLE = 2;
+  PUB_GOLF_CHALLENGES = 3;
+}
+
+// CreatePlayer
+
+message CreatePlayerRequest {
+  message PlayerInfo {
+    string name = 1;
+    optional ScoringCategory scoring_category = 2;
+  }
+
+  string event_key = 1;
+  PlayerInfo player = 2;
+}
+message CreatePlayerResponse {
+  string player_id = 1;
+}
+
+// ListPlayers
+
+message ListPlayersRequest {
+  string event_key = 1;
+}
+message ListPlayersResponse {
+  message PlayerInfo {
+    string id = 1;
+    string name = 2;
+    optional ScoringCategory scoring_category = 3;
+  }
+  repeated PlayerInfo players = 1;
+}

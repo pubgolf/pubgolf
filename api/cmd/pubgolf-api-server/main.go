@@ -26,7 +26,8 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
-	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/admin"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/public"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
@@ -88,14 +89,23 @@ func makeDB(cfg *config.App) *sql.DB {
 
 // makeServer initializes an HTTP server with settings and the router.
 func makeServer(cfg *config.App, db *sql.DB) *http.Server {
-	// Construct gRPC server.
-	server, err := rpc.NewPubGolfServiceServer(context.Background(), db)
-	guard(err, "initialize gRPC server")
+	// Construct gRPC servers.
+	gameServer, err := public.NewServer(context.Background(), db)
+	guard(err, "initialize pubgolf gRPC server")
+	adminServer, err := admin.NewServer(context.Background(), db)
+	guard(err, "initialize admin gRPC server")
 
 	// Bind gRPC server to mux.
 	rpcMux := http.NewServeMux()
 	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(
-		server,
+		gameServer,
+		connect.WithInterceptors(
+			otelconnect.NewInterceptor(),
+			middleware.NewLoggingInterceptor(),
+		),
+	))
+	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(
+		adminServer,
 		connect.WithInterceptors(
 			otelconnect.NewInterceptor(),
 			middleware.NewLoggingInterceptor(),
