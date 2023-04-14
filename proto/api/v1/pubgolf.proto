@@ -15,7 +15,7 @@ service PubGolfService {
 
   // GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
-  
+
   // GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
   rpc GetVenue(GetVenueRequest) returns (GetVenueResponse) {}
 }

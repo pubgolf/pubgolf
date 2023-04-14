@@ -106,33 +106,27 @@ func (q *Queries) EventVenueKeysAreValid(ctx context.Context, eventID models.Eve
 }
 
 const setEventVenueKeys = `-- name: SetEventVenueKeys :exec
-WITH
-  starting_venue_key AS (
-    SELECT
-      current_venue_key
-    FROM
-      events
-    WHERE
-      id = $1
-  ),
-  venue_keys AS (
-    SELECT
-      venue_id,
-      (
-        SELECT
-          current_venue_key
-        FROM
-          starting_venue_key
-      ) + row_number() OVER (
-        ORDER BY
-          venue_id
-      ) AS new_venue_key
+WITH starting_venue_key AS (
+  SELECT
+    current_venue_key
+  FROM
+    events
+  WHERE
+    id = $1
+),
+venue_keys AS (
+  SELECT
+    venue_id,
+(
+      SELECT
+        current_venue_key
+      FROM
+        starting_venue_key) + row_number() OVER (ORDER BY venue_id) AS new_venue_key
     FROM
       event_venues
     WHERE
       event_id = $1
-      AND venue_key IS NULL
-  )
+      AND venue_key IS NULL)
 UPDATE
   event_venues ev
 SET
@@ -151,25 +145,22 @@ func (q *Queries) SetEventVenueKeys(ctx context.Context, eventID models.EventID)
 }
 
 const setNextEventVenueKey = `-- name: SetNextEventVenueKey :exec
-WITH
-  max_venue_key AS (
-    SELECT
-      max(venue_key)
-    FROM
-      event_venues
-    WHERE
-      event_id = $1
-      AND venue_key IS NOT NULL
-  )
+WITH max_venue_key AS (
+  SELECT
+    max(venue_key)
+  FROM
+    event_venues
+  WHERE
+    event_id = $1
+    AND venue_key IS NOT NULL)
 UPDATE
   events
 SET
-  current_venue_key = (
+  current_venue_key =(
     SELECT
       max
     FROM
-      max_venue_key
-  ),
+      max_venue_key),
   updated_at = now()
 WHERE
   id = $1

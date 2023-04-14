@@ -11,3 +11,4 @@ WHERE
   AND ev.venue_key = $2
   AND ev.deleted_at IS NULL
   AND v.deleted_at IS NULL;
+
