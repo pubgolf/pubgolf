@@ -11,6 +11,10 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+type EnumScoringCategory struct {
+	Value string
+}
+
 type Event struct {
 	ID                          models.EventID
 	Key                         string
@@ -28,6 +32,16 @@ type EventVenue struct {
 	VenueKey        models.VenueKey
 	Rank            int32
 	DurationMinutes uint32
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       sql.NullTime
+}
+
+type Player struct {
+	ID              models.PlayerID
+	EventID         models.EventID
+	Name            string
+	ScoringCategory models.NullScoringCategory
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       sql.NullTime
