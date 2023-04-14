@@ -8,10 +8,11 @@ require (
 	github.com/bufbuild/connect-go v1.6.0
 	github.com/bufbuild/connect-opentelemetry-go v0.1.0
 	github.com/bxcodec/faker/v3 v3.8.1
+	github.com/dmarkham/enumer v1.5.8
 	github.com/fergusstrange/embedded-postgres v1.21.0
 	github.com/go-faker/faker/v4 v4.1.0
-	// Needed until v4.15.4 is released to remove pgx/v4 dependency.
-	github.com/golang-migrate/migrate/v4 v4.15.3-0.20230405045701-b94ed1a710af
+	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/golang-migrate/migrate/v4 v4.15.3-0.20230405045701-b94ed1a710af // Needed until v4.15.4 is released to remove pgx/v4 dependency.
 	github.com/honeycombio/honeycomb-opentelemetry-go v0.5.2
 	github.com/honeycombio/otel-launcher-go v1.6.0
 	github.com/jackc/pgx/v5 v5.3.1
@@ -24,7 +25,9 @@ require (
 	github.com/stretchr/testify v1.8.2
 	github.com/vburenin/ifacemaker v1.2.0
 	github.com/vektra/mockery/v2 v2.23.2
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/otel v1.14.0
+	go.opentelemetry.io/otel/trace v1.14.0
 	golang.org/x/mod v0.10.0
 	golang.org/x/net v0.9.0
 	google.golang.org/protobuf v1.30.0
@@ -96,7 +99,6 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gocql/gocql v0.0.0-20210515062232-b7ef815b4556 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/gofrs/uuid/v5 v5.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
@@ -159,6 +161,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
+	github.com/pascaldekloe/name v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pganalyze/pg_query_go/v2 v2.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.8 // indirect
@@ -201,7 +204,6 @@ require (
 	go.mongodb.org/mongo-driver v1.7.5 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/host v0.40.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.40.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.15.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.15.0 // indirect
@@ -216,7 +218,6 @@ require (
 	go.opentelemetry.io/otel/metric v0.37.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.14.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.37.0 // indirect
-	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
