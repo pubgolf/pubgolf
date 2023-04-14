@@ -4,8 +4,6 @@ syntax = "proto3";
 
 package api.v1;
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
 
 // AdminService allows administering events with enhanced permissions.
@@ -20,10 +18,10 @@ service AdminService {
 // Shared
 
 enum ScoringCategory {
-  UNKNOWN = 0;
-  PUB_GOLF_NINE_HOLE = 1;
-  PUB_GOLF_FIVE_HOLE = 2;
-  PUB_GOLF_CHALLENGES = 3;
+  SCORING_CATEGORY_UNSPECIFIED = 0;
+  SCORING_CATEGORY_PUB_GOLF_NINE_HOLE = 1;
+  SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE = 2;
+  SCORING_CATEGORY_PUB_GOLF_CHALLENGES = 3;
 }
 
 // CreatePlayer

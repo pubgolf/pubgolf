@@ -14,7 +14,7 @@ type ScoringCategory int
 
 // ScoringCategory values.
 const (
-	ScoringCategoryUnknown ScoringCategory = iota
+	ScoringCategoryUnspecified ScoringCategory = iota
 	ScoringCategoryPubGolfNineHole
 	ScoringCategoryPubGolfFiveHole
 	ScoringCategoryPubGolfChallenges
@@ -62,7 +62,7 @@ func (nsc NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
 // FromProtoEnum parses an enum from a proto message into an internal representation. If the provided pointer is nil, a NULL-serializable value will be created.
 func (nsc *NullScoringCategory) FromProtoEnum(pe *apiv1.ScoringCategory) error {
 	if pe == nil {
-		*nsc = NullScoringCategory{ScoringCategoryUnknown, false}
+		*nsc = NullScoringCategory{ScoringCategoryUnspecified, false}
 		return nil
 	}
 

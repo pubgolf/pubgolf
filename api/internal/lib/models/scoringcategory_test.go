@@ -34,7 +34,7 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 		},
 		{
 			Description:             "Non-nil pointer gives non-NULL value",
-			Given:                   apiv1.ScoringCategory_PUB_GOLF_NINE_HOLE.Enum(),
+			Given:                   apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE.Enum(),
 			ExpectedScoringCategory: nil,
 			ExpectedValid:           true,
 			ExpectedError:           false,
@@ -87,14 +87,14 @@ func TestNullScoringCategory_ProtoEnum(t *testing.T) {
 	}{
 		{
 			Description:       "NULL (valid = false) value gives nil pointer",
-			Given:             NullScoringCategory{ScoringCategoryUnknown, false},
+			Given:             NullScoringCategory{ScoringCategoryUnspecified, false},
 			ExpectedProtoEnum: nil,
 			ExpectedError:     false,
 		},
 		{
 			Description:       "Non-NULL (valid = true) value gives non-nil pointer",
 			Given:             NullScoringCategory{ScoringCategoryPubGolfFiveHole, true},
-			ExpectedProtoEnum: protoEnumToPointer(apiv1.ScoringCategory_PUB_GOLF_FIVE_HOLE),
+			ExpectedProtoEnum: protoEnumToPointer(apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE),
 			ExpectedError:     false,
 		},
 		{

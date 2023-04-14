@@ -102,7 +102,7 @@ var generateEnumCmd = &cobra.Command{
 }
 
 func generateEnum(typ, pkg string) error {
-	enumer := exec.Command("enumer", "-sql", "-transform", "snake-upper", "-trimprefix", typ, "-type", typ, pkg)
+	enumer := exec.Command("enumer", "-sql", "-transform", "snake-upper", "-type", typ, pkg)
 	enumer.Stdout = os.Stdout
 	enumer.Stderr = os.Stderr
 	return enumer.Run()
