@@ -15,7 +15,8 @@ import (
 func init() {
 	generateCmd.AddCommand(generateProtoCmd)
 	generateCmd.AddCommand(generateSQLcCmd)
-	generateCmd.AddCommand(generateMocksCmd)
+	generateCmd.AddCommand(generateEnumCmd)
+	generateCmd.AddCommand(generateMockCmd)
 	rootCmd.AddCommand(generateCmd)
 
 	generateCmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically re-run the generator.")
@@ -28,8 +29,9 @@ var generateCmd = &cobra.Command{
 		runPar(cmd, args,
 			generateProtoCmd,
 			generateSQLcCmd,
+			generateEnumCmd,
 		)
-		generateMocksCmd.Run(cmd, args)
+		generateMockCmd.Run(cmd, args)
 	},
 }
 
@@ -91,7 +93,22 @@ func generateSQLc() error {
 	return sqlc.Run()
 }
 
-var generateMocksCmd = &cobra.Command{
+var generateEnumCmd = &cobra.Command{
+	Use:   "enum",
+	Short: "Generate enum stringers",
+	Run: func(cmd *cobra.Command, args []string) {
+		guard(generateEnum("ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
+	},
+}
+
+func generateEnum(typ, pkg string) error {
+	enumer := exec.Command("enumer", "-sql", "-transform", "snake-upper", "-trimprefix", typ, "-type", typ, pkg)
+	enumer.Stdout = os.Stdout
+	enumer.Stderr = os.Stderr
+	return enumer.Run()
+}
+
+var generateMockCmd = &cobra.Command{
 	Use:   "mock",
 	Short: "Generate DAO interface and mock",
 	Run: func(cmd *cobra.Command, args []string) {

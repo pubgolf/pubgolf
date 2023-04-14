@@ -19,3 +19,11 @@ type VenueID struct{ DatabaseULID }
 func VenueIDFromULID(u ulid.ULID) VenueID {
 	return VenueID{DatabaseULID: DatabaseULID{ULID: u}}
 }
+
+// PlayerID uniquely identifies a player.
+type PlayerID struct{ DatabaseULID }
+
+// PlayerIDFromULID converts a plain ULID into an PlayerID.
+func PlayerIDFromULID(u ulid.ULID) PlayerID {
+	return PlayerID{DatabaseULID: DatabaseULID{ULID: u}}
+}

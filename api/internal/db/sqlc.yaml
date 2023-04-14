@@ -37,3 +37,9 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueKey
           - column: event_venues.duration_minutes
             go_type: uint32
+          - column: players.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
+          - column: players.event_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
+          - column: players.scoring_category
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.NullScoringCategory
