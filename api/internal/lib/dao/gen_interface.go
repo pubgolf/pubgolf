@@ -13,10 +13,14 @@ import (
 type QueryProvider interface {
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
+	// EventPlayers returns all players registered for a given event, in alphabetical order by name.
+	EventPlayers(ctx context.Context, eventID models.EventID) ([]models.Player, error)
 	// EventSchedule returns a slice of venue keys and durations for the given event ID.
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
+	// UpsertPlayer takes a human readable event key (slug) and returns the event's canonical identifier.
+	UpsertPlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.PlayerID, error)
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
 }
