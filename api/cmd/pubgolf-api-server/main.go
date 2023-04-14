@@ -24,6 +24,7 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/db"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/admin"
@@ -41,14 +42,12 @@ func main() {
 	guard(err, "init otel")
 	defer cleanupTelemetry()
 
-	// Initialize server.
+	// Initialize DB.
 	dbConn := makeDB(cfg)
-	server := makeServer(cfg, dbConn)
-	makeShutdownWatcher(server)
 
+	// Run migrations and exit if migrator instance.
 	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
 	flag.Parse()
-
 	if *migrationFlag {
 		log.Println("Migrator instance: starting database migrations...")
 
@@ -58,6 +57,12 @@ func main() {
 		log.Println("Migrator instance: completed migrations and shutting down...")
 		os.Exit(0)
 	}
+
+	// Initialize server.
+	dao, err := dao.New(context.Background(), dbConn)
+	guard(err, "init DAO")
+	server := makeServer(cfg, dao)
+	makeShutdownWatcher(server)
 
 	// Run server.
 	log.Printf("Listening on port %d...", cfg.Port)
@@ -88,11 +93,11 @@ func makeDB(cfg *config.App) *sql.DB {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, db *sql.DB) *http.Server {
+func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
 	// Construct gRPC servers.
-	gameServer, err := public.NewServer(context.Background(), db)
+	gameServer, err := public.NewServer(context.Background(), dao)
 	guard(err, "initialize pubgolf gRPC server")
-	adminServer, err := admin.NewServer(context.Background(), db)
+	adminServer, err := admin.NewServer(context.Background(), dao)
 	guard(err, "initialize admin gRPC server")
 
 	// Bind gRPC server to mux.
