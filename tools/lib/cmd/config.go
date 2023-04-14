@@ -20,9 +20,13 @@ const (
 )
 
 // driverString returns the database/sql driver ID for the given database type.
-func (d DBDriver) driverString() string {
+func (d DBDriver) driverString(isMigrator bool) string {
 	switch d {
 	case PostgreSQL:
+		// Hack to deal with golang-migrate needing a different driver string for pgx vs pq.
+		if isMigrator {
+			return "pgx5"
+		}
 		return "pgx"
 	case SQLite3:
 		return "sqlite3"
@@ -56,7 +60,7 @@ func (c *CLIConfig) setDefaults() {
 }
 
 // getDatabaseURL queries Doppler for DB connection details.
-func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
+func getDatabaseURL(driver DBDriver, project, env, prefix string, isMigrator bool) string {
 	vars := readDopplerVars(project, env, prefix, []string{
 		"SQLITE_PATH",
 		"DB_USER",
@@ -71,10 +75,12 @@ func getDatabaseURL(driver DBDriver, project, env, prefix string) string {
 		return "sqlite3://" + getStr(vars, "SQLITE_PATH", filepath.FromSlash("./data/db/data.db")) + "?x-no-tx-wrap=true"
 	}
 
-	u := url.URL{
-		Scheme: driver.driverString(),
+	scheme := "postgres"
+	if isMigrator {
+		scheme = "pgx5"
 	}
 
+	u := url.URL{Scheme: scheme}
 	u.User = url.UserPassword(
 		getStr(vars, "DB_USER", config.ProjectName+"_dev"),
 		getStr(vars, "DB_PASSWORD", config.ProjectName+"_dev"),

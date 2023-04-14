@@ -115,8 +115,8 @@ var migrateFixCmd = &cobra.Command{
 	Short: "Reset the migration state of a DB to a known valid migration version, assuming all migrations were transacted",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix)
-		db, err := sql.Open(config.DBDriver.driverString(), dbURL)
+		dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
+		db, err := sql.Open(config.DBDriver.driverString(false), dbURL)
 		guard(err, "open DB connection")
 
 		version, err := strconv.ParseInt(args[0], 10, 32)
@@ -134,7 +134,7 @@ var migrateFixCmd = &cobra.Command{
 }
 
 func getMigrator() *migrate.Migrate {
-	dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix)
+	dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 	return m
