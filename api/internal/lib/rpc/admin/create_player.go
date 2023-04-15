@@ -30,7 +30,7 @@ func (s *Server) CreatePlayer(ctx context.Context, req *connect.Request[apiv1.Cr
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	playerID, err := s.dao.UpsertPlayer(ctx, eventID, player)
+	playerID, err := s.dao.CreatePlayer(ctx, eventID, player)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}

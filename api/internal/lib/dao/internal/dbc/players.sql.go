@@ -11,6 +11,29 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+const createPlayer = `-- name: CreatePlayer :one
+INSERT INTO players(event_id, name, scoring_category)
+  VALUES ($1, $2, $3)
+ON CONFLICT (event_id, name)
+  DO UPDATE SET
+    updated_at = now()
+  RETURNING
+    id
+`
+
+type CreatePlayerParams struct {
+	EventID         models.EventID
+	Name            string
+	ScoringCategory models.NullScoringCategory
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error) {
+	row := q.queryRow(ctx, q.createPlayerStmt, createPlayer, arg.EventID, arg.Name, arg.ScoringCategory)
+	var id models.PlayerID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const eventPlayers = `-- name: EventPlayers :many
 SELECT
   id,
@@ -52,27 +75,4 @@ func (q *Queries) EventPlayers(ctx context.Context, eventID models.EventID) ([]E
 		return nil, err
 	}
 	return items, nil
-}
-
-const upsertPlayer = `-- name: UpsertPlayer :one
-INSERT INTO players(event_id, name, scoring_category)
-  VALUES ($1, $2, $3)
-ON CONFLICT (event_id, name)
-  DO UPDATE SET
-    updated_at = now()
-  RETURNING
-    id
-`
-
-type UpsertPlayerParams struct {
-	EventID         models.EventID
-	Name            string
-	ScoringCategory models.NullScoringCategory
-}
-
-func (q *Queries) UpsertPlayer(ctx context.Context, arg UpsertPlayerParams) (models.PlayerID, error) {
-	row := q.queryRow(ctx, q.upsertPlayerStmt, upsertPlayer, arg.EventID, arg.Name, arg.ScoringCategory)
-	var id models.PlayerID
-	err := row.Scan(&id)
-	return id, err
 }

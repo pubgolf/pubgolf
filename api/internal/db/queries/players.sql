@@ -1,4 +1,4 @@
--- name: UpsertPlayer :one
+-- name: CreatePlayer :one
 INSERT INTO players(event_id, name, scoring_category)
   VALUES ($1, $2, $3)
 ON CONFLICT (event_id, name)

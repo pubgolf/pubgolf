@@ -16,6 +16,27 @@ type MockQueryProvider struct {
 	mock.Mock
 }
 
+// CreatePlayer provides a mock function with given fields: ctx, eventID, player
+func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.PlayerID, error) {
+	ret := _m.Called(ctx, eventID, player)
+
+	var r0 models.PlayerID
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerParams) models.PlayerID); ok {
+		r0 = rf(ctx, eventID, player)
+	} else {
+		r0 = ret.Get(0).(models.PlayerID)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerParams) error); ok {
+		r1 = rf(ctx, eventID, player)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventIDByKey provides a mock function with given fields: ctx, key
 func (_m *MockQueryProvider) EventIDByKey(ctx context.Context, key string) (models.EventID, error) {
 	ret := _m.Called(ctx, key)
@@ -97,27 +118,6 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
 		r1 = rf(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// UpsertPlayer provides a mock function with given fields: ctx, eventID, player
-func (_m *MockQueryProvider) UpsertPlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.PlayerID, error) {
-	ret := _m.Called(ctx, eventID, player)
-
-	var r0 models.PlayerID
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerParams) models.PlayerID); ok {
-		r0 = rf(ctx, eventID, player)
-	} else {
-		r0 = ret.Get(0).(models.PlayerID)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerParams) error); ok {
-		r1 = rf(ctx, eventID, player)
 	} else {
 		r1 = ret.Error(1)
 	}

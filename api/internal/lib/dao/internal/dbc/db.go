@@ -24,6 +24,9 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createPlayerStmt, err = db.PrepareContext(ctx, createPlayer); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePlayer: %w", err)
+	}
 	if q.eventIDByKeyStmt, err = db.PrepareContext(ctx, eventIDByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query EventIDByKey: %w", err)
 	}
@@ -45,9 +48,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.setNextEventVenueKeyStmt, err = db.PrepareContext(ctx, setNextEventVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query SetNextEventVenueKey: %w", err)
 	}
-	if q.upsertPlayerStmt, err = db.PrepareContext(ctx, upsertPlayer); err != nil {
-		return nil, fmt.Errorf("error preparing query UpsertPlayer: %w", err)
-	}
 	if q.venueByKeyStmt, err = db.PrepareContext(ctx, venueByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query VenueByKey: %w", err)
 	}
@@ -56,6 +56,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createPlayerStmt != nil {
+		if cerr := q.createPlayerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPlayerStmt: %w", cerr)
+		}
+	}
 	if q.eventIDByKeyStmt != nil {
 		if cerr := q.eventIDByKeyStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing eventIDByKeyStmt: %w", cerr)
@@ -89,11 +94,6 @@ func (q *Queries) Close() error {
 	if q.setNextEventVenueKeyStmt != nil {
 		if cerr := q.setNextEventVenueKeyStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing setNextEventVenueKeyStmt: %w", cerr)
-		}
-	}
-	if q.upsertPlayerStmt != nil {
-		if cerr := q.upsertPlayerStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing upsertPlayerStmt: %w", cerr)
 		}
 	}
 	if q.venueByKeyStmt != nil {
@@ -140,6 +140,7 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                         DBTX
 	tx                         *sql.Tx
+	createPlayerStmt           *sql.Stmt
 	eventIDByKeyStmt           *sql.Stmt
 	eventPlayersStmt           *sql.Stmt
 	eventScheduleStmt          *sql.Stmt
@@ -147,7 +148,6 @@ type Queries struct {
 	eventVenueKeysAreValidStmt *sql.Stmt
 	setEventVenueKeysStmt      *sql.Stmt
 	setNextEventVenueKeyStmt   *sql.Stmt
-	upsertPlayerStmt           *sql.Stmt
 	venueByKeyStmt             *sql.Stmt
 }
 
@@ -155,6 +155,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                         tx,
 		tx:                         tx,
+		createPlayerStmt:           q.createPlayerStmt,
 		eventIDByKeyStmt:           q.eventIDByKeyStmt,
 		eventPlayersStmt:           q.eventPlayersStmt,
 		eventScheduleStmt:          q.eventScheduleStmt,
@@ -162,7 +163,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventVenueKeysAreValidStmt: q.eventVenueKeysAreValidStmt,
 		setEventVenueKeysStmt:      q.setEventVenueKeysStmt,
 		setNextEventVenueKeyStmt:   q.setNextEventVenueKeyStmt,
-		upsertPlayerStmt:           q.upsertPlayerStmt,
 		venueByKeyStmt:             q.venueByKeyStmt,
 	}
 }
