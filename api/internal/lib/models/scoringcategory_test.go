@@ -1,10 +1,12 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
@@ -15,6 +17,115 @@ func protoEnumToPointer(pe apiv1.ScoringCategory) *apiv1.ScoringCategory {
 
 func enumToPointer(e ScoringCategory) *ScoringCategory {
 	return &e
+}
+
+func TestNullScoringCategory_Scan(t *testing.T) {
+	t.Run("NULL values scan correctly", func(t *testing.T) {
+		ctx, tx, cleanup := initMigratedDB(t)
+		defer cleanup()
+		_, err := tx.ExecContext(ctx, `
+			CREATE TABLE TestNullScoringCategory_Scan(
+				id SERIAL PRIMARY KEY,
+				value TEXT REFERENCES enum_scoring_categories(value)
+			);
+		`)
+		require.NoError(t, err)
+
+		// Insert NULL value.
+		inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Scan(value) VALUES (NULL) RETURNING id")
+		require.NoError(t, inRow.Err())
+		var id int
+		require.NoError(t, inRow.Scan(&id))
+
+		// Retrieve as NullScoringCategory.
+		outRow := tx.QueryRowContext(ctx, "SELECT value FROM TestNullScoringCategory_Scan WHERE id = $1", id)
+		require.NoError(t, outRow.Err())
+		var nsc NullScoringCategory
+
+		// Scans without error and sets `valid = false`.
+		require.NoError(t, outRow.Scan(&nsc))
+		assert.False(t, nsc.Valid)
+	})
+
+	t.Run("All DB enums correctly scan", func(t *testing.T) {
+		ctx, tx, cleanup := initMigratedDB(t)
+		defer cleanup()
+
+		rows, err := tx.QueryContext(ctx, "SELECT value FROM enum_scoring_categories")
+		require.NoError(t, err)
+		defer rows.Close()
+
+		for rows.Next() {
+			var s string
+			require.NoError(t, rows.Scan(&s))
+
+			t.Run(s, func(t *testing.T) {
+				var nsc NullScoringCategory
+				require.NoError(t, rows.Scan(&nsc))
+
+				assert.True(t, nsc.Valid)
+				assert.Equal(t, s, nsc.ScoringCategory.String())
+			})
+		}
+	})
+}
+
+func TestNullScoringCategory_Value(t *testing.T) {
+	t.Run("NULL values save correctly", func(t *testing.T) {
+		ctx, tx, cleanup := initMigratedDB(t)
+		defer cleanup()
+		_, err := tx.ExecContext(ctx, `
+			CREATE TABLE TestNullScoringCategory_Value(
+				id SERIAL PRIMARY KEY,
+				value TEXT REFERENCES enum_scoring_categories(value)
+			);
+		`)
+		require.NoError(t, err)
+
+		// Insert NULL valued NullScoringCategory.
+		nsc := NullScoringCategory{Valid: false}
+		inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Value(value) VALUES ($1) RETURNING id", nsc)
+		require.NoError(t, inRow.Err())
+		var id int
+		require.NoError(t, inRow.Scan(&id))
+
+		// Retrieve as string.
+		outRow := tx.QueryRowContext(ctx, "SELECT value FROM TestNullScoringCategory_Value WHERE id = $1", id)
+		require.NoError(t, outRow.Err())
+
+		// Assert string shows the value was NULL in the database.
+		var s sql.NullString
+		require.NoError(t, outRow.Scan(&s))
+		assert.False(t, s.Valid)
+	})
+
+	t.Run("All enums correctly persist to the DB", func(t *testing.T) {
+		for _, sc := range ScoringCategoryValues() {
+			t.Run(sc.String(), func(t *testing.T) {
+				ctx, tx, cleanup := initMigratedDB(t)
+				defer cleanup()
+				_, err := tx.ExecContext(ctx, `
+					CREATE TABLE TestNullScoringCategory_Value(
+						id SERIAL PRIMARY KEY,
+						value TEXT REFERENCES enum_scoring_categories(value)
+					);
+				`)
+				require.NoError(t, err)
+
+				inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Value(value) VALUES ($1) RETURNING id", NullScoringCategory{sc, true})
+				require.NoError(t, inRow.Err())
+				var id int
+				require.NoError(t, inRow.Scan(&id))
+
+				outRow := tx.QueryRowContext(ctx, "SELECT value FROM TestNullScoringCategory_Value WHERE id = $1", id)
+				require.NoError(t, outRow.Err())
+				var dbEnum string
+				require.NoError(t, outRow.Scan(&dbEnum))
+
+				assert.Equal(t, sc.String(), dbEnum)
+			})
+		}
+	})
 }
 
 func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
