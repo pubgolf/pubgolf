@@ -107,9 +107,9 @@ func nextVenueStart(eventStart time.Time, venueOffset time.Duration, hasNextVenu
 // nextVenue returns the next venue ID if nextVenueStart is non-nil and within `nextVenueVisibilityDuration` of the current time.
 func nextVenue(venues []dao.VenueStop, idx int, nextVenueStart *time.Time) *uint32 {
 	nextVenueExists := nextVenueStart != nil
-	inPreviewPeriod := time.Until(*nextVenueStart) < nextVenueVisibilityDuration
+	inPreviewPeriod := func() bool { return time.Until(*nextVenueStart) < nextVenueVisibilityDuration }
 	eventHasNotStarted := idx == -1
-	if nextVenueExists && (inPreviewPeriod || eventHasNotStarted) {
+	if nextVenueExists && (inPreviewPeriod() || eventHasNotStarted) {
 		return venueKeyAtIndex(venues, idx+1)
 	}
 
