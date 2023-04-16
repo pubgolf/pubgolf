@@ -42,29 +42,35 @@ func main() {
 	guard(err, "init otel")
 	defer cleanupTelemetry()
 
+	ctx, bootSpan := otel.Tracer("").Start(context.Background(), "ServerBoot", trace.WithSpanKind(trace.SpanKindInternal))
+
 	// Initialize DB.
-	dbConn := makeDB(cfg)
+	dbConn := makeDB(ctx, cfg)
 
 	// Run migrations and exit if migrator instance.
 	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
 	flag.Parse()
 	if *migrationFlag {
+		bootSpan.SetAttributes(attribute.String("service.type", "migrator"))
 		log.Println("Migrator instance: starting database migrations...")
 
 		err = db.RunMigrations(dbConn)
 		guard(err, "run migrations")
 
 		log.Println("Migrator instance: completed migrations and shutting down...")
+		bootSpan.End()
 		os.Exit(0)
 	}
+	bootSpan.SetAttributes(attribute.String("service.type", "server"))
 
 	// Initialize server.
-	dao, err := dao.New(context.Background(), dbConn)
+	dao, err := dao.New(ctx, dbConn)
 	guard(err, "init DAO")
-	server := makeServer(cfg, dao)
+	server := makeServer(ctx, cfg, dao)
 	makeShutdownWatcher(server)
 
 	// Run server.
+	bootSpan.End()
 	log.Printf("Listening on port %d...", cfg.Port)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		guard(err, "listen and serve")
@@ -80,24 +86,24 @@ func guard(err error, msg string) {
 }
 
 // makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
-func makeDB(cfg *config.App) *sql.DB {
+func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 	conConfig, err := pgx.ParseConfig(cfg.AppDatabaseURL)
 	guard(err, "parse database config")
 
 	db := telemetry.WrapDB(stdlib.GetConnector(*conConfig))
 
-	err = db.Ping()
+	err = db.PingContext(ctx)
 	guard(err, "ping database")
 
 	return db
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
+func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *http.Server {
 	// Construct gRPC servers.
-	gameServer, err := public.NewServer(context.Background(), dao)
+	gameServer, err := public.NewServer(ctx, dao)
 	guard(err, "initialize pubgolf gRPC server")
-	adminServer, err := admin.NewServer(context.Background(), dao)
+	adminServer, err := admin.NewServer(ctx, dao)
 	guard(err, "initialize admin gRPC server")
 
 	// Bind gRPC server to mux.
