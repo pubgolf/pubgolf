@@ -12,14 +12,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// ServiceName provides the attribute value for "service.name".
+const ServiceName = "pubgolf-api-server"
+
 // Init configures OTel and Honeycomb reporting.
 func Init(cfg *config.App) (func(), error) {
 	return launcher.ConfigureOpenTelemetry(
 		launcher.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
-		launcher.WithServiceName("pubgolf-api-server"),
+		launcher.WithServiceName(ServiceName),
 		launcher.WithServiceVersion(gitVersion()),
-		launcher.WithMetricsEnabled(false),
-		honeycomb.WithMetricsDataset("pubgolf-api-server-metrics"),
 		honeycomb.WithApiKey(cfg.HoneycombKey),
 	)
 }
