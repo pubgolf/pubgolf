@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/XSAM/otelsql"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // spanNameFormatterFn is a helper to convert an anonymous function to an `otelsql.SpanNameFormatter`.
@@ -29,7 +30,16 @@ var parseDBCQueryName spanNameFormatterFn = spanNameFormatterFn(func(ctx context
 	return string(method)
 })
 
+func parseDBCQueryAttributes(ctx context.Context, method otelsql.Method, query string, args []driver.NamedValue) []attribute.KeyValue {
+	return []attribute.KeyValue{
+		attribute.String("sql.method", string(method)),
+	}
+}
+
 // WrapDB returns an OTel-instrumented DB handle.
 func WrapDB(db driver.Connector) *sql.DB {
-	return otelsql.OpenDB(db, otelsql.WithSpanNameFormatter(parseDBCQueryName))
+	return otelsql.OpenDB(db,
+		otelsql.WithSpanNameFormatter(parseDBCQueryName),
+		otelsql.WithAttributesGetter(parseDBCQueryAttributes),
+	)
 }
