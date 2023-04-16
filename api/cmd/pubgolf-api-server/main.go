@@ -15,10 +15,16 @@ import (
 	"time"
 
 	"github.com/bufbuild/connect-go"
-	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
+
+	"github.com/go-chi/chi/v5"
+	chim "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/riandyrn/otelchi"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -108,39 +114,38 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 
 	// Bind gRPC server to mux.
 	rpcMux := http.NewServeMux()
-	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(
-		gameServer,
-		connect.WithInterceptors(
-			otelconnect.NewInterceptor(),
-			middleware.NewLoggingInterceptor(),
-		),
+	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(gameServer,
+		connect.WithInterceptors(middleware.ConnectInterceptors()...),
 	))
-	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(
-		adminServer,
-		connect.WithInterceptors(
-			otelconnect.NewInterceptor(),
-			middleware.NewLoggingInterceptor(),
-		),
+	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(adminServer,
+		connect.WithInterceptors(middleware.ConnectInterceptors()...),
 	))
 
 	// Mount routes.
-	mux := http.NewServeMux()
-	mux.Handle("/health-check", healthCheck(cfg))
-	mux.Handle("/rpc/", http.StripPrefix("/rpc", rpcMux))
+	r := chi.NewRouter()
+	r.Use(otelchi.Middleware(telemetry.ServiceName, otelchi.WithChiRoutes(r)))
+	r.Use(middleware.ChiMiddleware()...)
+
+	r.Route("/rpc/", func(r chi.Router) {
+		r.Use(chim.NoCache)
+		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
+	})
+
+	r.Handle("/health-check", healthCheck(cfg))
 
 	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
 	if cfg.EnvName == config.DeployEnvDev {
 		upstream, err := url.Parse("http://127.0.0.1:5173")
 		guard(err, "parse upstream for web-app reverse proxy")
-		mux.HandleFunc("/", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
+		r.HandleFunc("/", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
 	} else {
-		mux.HandleFunc("/", http.FileServer(http.Dir("./web-app/build")).ServeHTTP)
+		r.HandleFunc("/", http.FileServer(http.Dir("./web-app/build")).ServeHTTP)
 	}
 
 	// Configure HTTP server.
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
+		Handler: h2c.NewHandler(r, &http2.Server{}),
 
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
