@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/bufbuild/connect-go"
-
 	"github.com/go-chi/chi/v5"
 	chim "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
@@ -137,9 +136,9 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 	if cfg.EnvName == config.DeployEnvDev {
 		upstream, err := url.Parse("http://127.0.0.1:5173")
 		guard(err, "parse upstream for web-app reverse proxy")
-		r.HandleFunc("/", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
+		r.HandleFunc("/*", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
 	} else {
-		r.HandleFunc("/", http.FileServer(http.Dir("./web-app/build")).ServeHTTP)
+		r.HandleFunc("/*", http.FileServer(http.Dir("./web-app/build")).ServeHTTP)
 	}
 
 	// Configure HTTP server.
