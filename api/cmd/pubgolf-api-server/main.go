@@ -130,13 +130,13 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
 	})
 
-	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
-	if cfg.EnvName == config.DeployEnvDev {
-		upstream, err := url.Parse("http://127.0.0.1:5173")
+	// Reverse proxy the web-app's static deployment.
+	if cfg.WebAppUpstreamHost != "" {
+		upstream, err := url.Parse(cfg.WebAppUpstreamHost)
 		guard(err, "parse upstream for web-app reverse proxy")
 		r.HandleFunc("/*", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
 	} else {
-		r.HandleFunc("/*", http.FileServer(http.Dir("./web-app/build")).ServeHTTP)
+		r.HandleFunc("/*", http.FileServer(http.Dir("./web-app-content/")).ServeHTTP)
 	}
 
 	// Configure HTTP server.

@@ -28,8 +28,9 @@ func Init() (*App, error) {
 // App defines the env config for the app. The tag directive syntax is defined at https://github.com/kelseyhightower/envconfig.
 type App struct {
 	// Env config
-	Port    int       `default:"5000"`
-	EnvName DeployEnv `required:"true" split_words:"true"`
+	Port               int       `default:"5000"`
+	EnvName            DeployEnv `required:"true" split_words:"true"`
+	WebAppUpstreamHost string    `split_words:"true"`
 
 	// Credentials
 	HoneycombKey   string `split_words:"true"`
