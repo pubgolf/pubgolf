@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	ulid "github.com/oklog/ulid/v2"
 )
 
@@ -26,4 +28,13 @@ type PlayerID struct{ DatabaseULID }
 // PlayerIDFromULID converts a plain ULID into an PlayerID.
 func PlayerIDFromULID(u ulid.ULID) PlayerID {
 	return PlayerID{DatabaseULID: DatabaseULID{ULID: u}}
+}
+
+// PlayerIDFromString converts a string-format ULID into an PlayerID.
+func PlayerIDFromString(s string) (PlayerID, error) {
+	id, err := ulid.Parse(s)
+	if err != nil {
+		return PlayerID{}, fmt.Errorf("parse playerID from string: %w", err)
+	}
+	return PlayerID{DatabaseULID: DatabaseULID{ULID: id}}, nil
 }

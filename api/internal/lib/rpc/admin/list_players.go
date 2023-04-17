@@ -28,17 +28,19 @@ func (s *Server) ListPlayers(ctx context.Context, req *connect.Request[apiv1.Lis
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	players := make([]*apiv1.ListPlayersResponse_PlayerInfo, 0, len(dbPlayers))
+	players := make([]*apiv1.Player, 0, len(dbPlayers))
 	for _, p := range dbPlayers {
 		cat, err := p.ScoringCategory.ProtoEnum()
 		if err != nil {
 			return nil, connect.NewError(connect.CodeUnknown, err)
 		}
 
-		player := apiv1.ListPlayersResponse_PlayerInfo{
-			Id:              p.ID.String(),
-			Name:            p.Name,
-			ScoringCategory: cat,
+		player := apiv1.Player{
+			Id: p.ID.String(),
+			Data: &apiv1.PlayerData{
+				Name:            p.Name,
+				ScoringCategory: cat,
+			},
 		}
 
 		players = append(players, &player)

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"reflect"
@@ -19,6 +18,22 @@ const (
 	ScoringCategoryPubGolfFiveHole
 	ScoringCategoryPubGolfChallenges
 )
+
+// ProtoEnum returns an enum compatible with the generated proto code.
+func (sc ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
+	if val, ok := apiv1.ScoringCategory_value[sc.String()]; ok {
+		return apiv1.ScoringCategory(val), nil
+	}
+
+	return apiv1.ScoringCategory(0), fmt.Errorf("convert NullScoringCategory to protobuf enum: invalid apiv1.ScoringCategory_name: %s", sc.String())
+}
+
+// FromProtoEnum parses an enum from a proto message into an internal representation.
+func (sc *ScoringCategory) FromProtoEnum(pe apiv1.ScoringCategory) error {
+	var err error
+	*sc, err = ScoringCategoryString(pe.String())
+	return err
+}
 
 // NullScoringCategory is a wrapper for ScoringCategory that allows storing it in a nullable DB column.
 type NullScoringCategory struct {
@@ -74,5 +89,3 @@ func (nsc *NullScoringCategory) FromProtoEnum(pe *apiv1.ScoringCategory) error {
 	*nsc = NullScoringCategory{sc, true}
 	return nil
 }
-
-var a sql.NullInt64

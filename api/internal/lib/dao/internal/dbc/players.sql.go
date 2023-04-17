@@ -12,26 +12,32 @@ import (
 )
 
 const createPlayer = `-- name: CreatePlayer :one
-INSERT INTO players(event_id, name, scoring_category)
-  VALUES ($1, $2, $3)
+INSERT INTO players(event_id, name, scoring_category, updated_at)
+  VALUES ($1, $2, $3, now())
 ON CONFLICT (event_id, name)
   DO UPDATE SET
     updated_at = now()
   RETURNING
-    id
+    id, name, scoring_category
 `
 
 type CreatePlayerParams struct {
 	EventID         models.EventID
 	Name            string
-	ScoringCategory models.NullScoringCategory
+	ScoringCategory models.ScoringCategory
 }
 
-func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error) {
+type CreatePlayerRow struct {
+	ID              models.PlayerID
+	Name            string
+	ScoringCategory models.ScoringCategory
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (CreatePlayerRow, error) {
 	row := q.queryRow(ctx, q.createPlayerStmt, createPlayer, arg.EventID, arg.Name, arg.ScoringCategory)
-	var id models.PlayerID
-	err := row.Scan(&id)
-	return id, err
+	var i CreatePlayerRow
+	err := row.Scan(&i.ID, &i.Name, &i.ScoringCategory)
+	return i, err
 }
 
 const eventPlayers = `-- name: EventPlayers :many
@@ -51,7 +57,7 @@ ORDER BY
 type EventPlayersRow struct {
 	ID              models.PlayerID
 	Name            string
-	ScoringCategory models.NullScoringCategory
+	ScoringCategory models.ScoringCategory
 }
 
 func (q *Queries) EventPlayers(ctx context.Context, eventID models.EventID) ([]EventPlayersRow, error) {
@@ -75,4 +81,38 @@ func (q *Queries) EventPlayers(ctx context.Context, eventID models.EventID) ([]E
 		return nil, err
 	}
 	return items, nil
+}
+
+const updatePlayer = `-- name: UpdatePlayer :one
+UPDATE
+  players
+SET
+  name = $2,
+  scoring_category = $3,
+  updated_at = now()
+WHERE
+  id = $1
+RETURNING
+  id,
+  name,
+  scoring_category
+`
+
+type UpdatePlayerParams struct {
+	ID              models.PlayerID
+	Name            string
+	ScoringCategory models.ScoringCategory
+}
+
+type UpdatePlayerRow struct {
+	ID              models.PlayerID
+	Name            string
+	ScoringCategory models.ScoringCategory
+}
+
+func (q *Queries) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) (UpdatePlayerRow, error) {
+	row := q.queryRow(ctx, q.updatePlayerStmt, updatePlayer, arg.ID, arg.Name, arg.ScoringCategory)
+	var i UpdatePlayerRow
+	err := row.Scan(&i.ID, &i.Name, &i.ScoringCategory)
+	return i, err
 }

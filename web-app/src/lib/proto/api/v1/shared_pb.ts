@@ -5,7 +5,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3 } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
  * @generated from enum api.v1.ScoringCategory
@@ -38,4 +39,92 @@ proto3.util.setEnumType(ScoringCategory, "api.v1.ScoringCategory", [
   { no: 2, name: "SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE" },
   { no: 3, name: "SCORING_CATEGORY_PUB_GOLF_CHALLENGES" },
 ]);
+
+/**
+ * @generated from message api.v1.Player
+ */
+export class Player extends Message<Player> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: api.v1.PlayerData data = 2;
+   */
+  data?: PlayerData;
+
+  constructor(data?: PartialMessage<Player>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Player";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "data", kind: "message", T: PlayerData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Player {
+    return new Player().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Player {
+    return new Player().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Player {
+    return new Player().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Player | PlainMessage<Player> | undefined, b: Player | PlainMessage<Player> | undefined): boolean {
+    return proto3.util.equals(Player, a, b);
+  }
+}
+
+/**
+ * PlayerData contains the user-editable fields for a player.
+ *
+ * @generated from message api.v1.PlayerData
+ */
+export class PlayerData extends Message<PlayerData> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: api.v1.ScoringCategory scoring_category = 2;
+   */
+  scoringCategory = ScoringCategory.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<PlayerData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PlayerData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "scoring_category", kind: "enum", T: proto3.getEnumType(ScoringCategory) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PlayerData {
+    return new PlayerData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PlayerData {
+    return new PlayerData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PlayerData {
+    return new PlayerData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PlayerData | PlainMessage<PlayerData> | undefined, b: PlayerData | PlainMessage<PlayerData> | undefined): boolean {
+    return proto3.util.equals(PlayerData, a, b);
+  }
+}
 

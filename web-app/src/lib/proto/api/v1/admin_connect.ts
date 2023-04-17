@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreatePlayerRequest, CreatePlayerResponse, ListPlayersRequest, ListPlayersResponse } from "./admin_pb.js";
+import { CreatePlayerRequest, CreatePlayerResponse, ListPlayersRequest, ListPlayersResponse, UpdatePlayerRequest, UpdatePlayerResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -25,6 +25,17 @@ export const AdminService = {
       name: "CreatePlayer",
       I: CreatePlayerRequest,
       O: CreatePlayerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * UpdatePlayer modifies the player's profile and settings for a given event.
+     *
+     * @generated from rpc api.v1.AdminService.UpdatePlayer
+     */
+    updatePlayer: {
+      name: "UpdatePlayer",
+      I: UpdatePlayerRequest,
+      O: UpdatePlayerResponse,
       kind: MethodKind.Unary,
     },
     /**

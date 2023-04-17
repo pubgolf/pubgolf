@@ -42,4 +42,4 @@ sql:
           - column: players.event_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
           - column: players.scoring_category
-            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.NullScoringCategory
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.ScoringCategory

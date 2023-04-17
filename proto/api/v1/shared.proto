@@ -12,3 +12,14 @@ enum ScoringCategory {
   SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE = 2;
   SCORING_CATEGORY_PUB_GOLF_CHALLENGES = 3;
 }
+
+message Player {
+  string id = 1;
+  PlayerData data = 2;
+}
+
+// PlayerData contains the user-editable fields for a player.
+message PlayerData {
+  string name = 1;
+  ScoringCategory scoring_category = 2;
+}

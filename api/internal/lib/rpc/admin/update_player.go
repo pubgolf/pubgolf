@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/bufbuild/connect-go"
 
@@ -12,11 +13,11 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
-// CreatePlayer registers a player in the given event, returning the created player object. This method is idempotent, so if the player is already registered the request will still succeed.
-func (s *Server) CreatePlayer(ctx context.Context, req *connect.Request[apiv1.CreatePlayerRequest]) (*connect.Response[apiv1.CreatePlayerResponse], error) {
+// UpdatePlayer updates the given player's profile and settings, returning the full player object.
+func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerRequest]) (*connect.Response[apiv1.UpdatePlayerResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	_, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -27,26 +28,32 @@ func (s *Server) CreatePlayer(ctx context.Context, req *connect.Request[apiv1.Cr
 	playerParams := models.PlayerParams{
 		Name: req.Msg.PlayerData.Name,
 	}
+
 	err = playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument Player.ScoringCategory: %w", err))
 	}
 
-	player, err := s.dao.CreatePlayer(ctx, eventID, playerParams)
+	playerID, err := models.PlayerIDFromString(req.Msg.PlayerId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument PlayerID: %w", err))
+	}
+
+	updatedPlayer, err := s.dao.UpdatePlayer(ctx, playerID, playerParams)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	cat, err := player.ScoringCategory.ProtoEnum()
+	cat, err := updatedPlayer.ScoringCategory.ProtoEnum()
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	return connect.NewResponse(&apiv1.CreatePlayerResponse{
+	return connect.NewResponse(&apiv1.UpdatePlayerResponse{
 		Player: &apiv1.Player{
-			Id: player.ID.String(),
+			Id: updatedPlayer.ID.String(),
 			Data: &apiv1.PlayerData{
-				Name:            player.Name,
+				Name:            updatedPlayer.Name,
 				ScoringCategory: cat,
 			},
 		},

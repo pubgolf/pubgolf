@@ -4,11 +4,11 @@ package models
 type Player struct {
 	ID              PlayerID
 	Name            string
-	ScoringCategory NullScoringCategory
+	ScoringCategory ScoringCategory
 }
 
 // PlayerParams contains writable information about a player.
 type PlayerParams struct {
 	Name            string
-	ScoringCategory NullScoringCategory
+	ScoringCategory ScoringCategory
 }

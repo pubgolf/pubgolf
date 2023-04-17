@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.setNextEventVenueKeyStmt, err = db.PrepareContext(ctx, setNextEventVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query SetNextEventVenueKey: %w", err)
 	}
+	if q.updatePlayerStmt, err = db.PrepareContext(ctx, updatePlayer); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePlayer: %w", err)
+	}
 	if q.venueByKeyStmt, err = db.PrepareContext(ctx, venueByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query VenueByKey: %w", err)
 	}
@@ -94,6 +97,11 @@ func (q *Queries) Close() error {
 	if q.setNextEventVenueKeyStmt != nil {
 		if cerr := q.setNextEventVenueKeyStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing setNextEventVenueKeyStmt: %w", cerr)
+		}
+	}
+	if q.updatePlayerStmt != nil {
+		if cerr := q.updatePlayerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePlayerStmt: %w", cerr)
 		}
 	}
 	if q.venueByKeyStmt != nil {
@@ -148,6 +156,7 @@ type Queries struct {
 	eventVenueKeysAreValidStmt *sql.Stmt
 	setEventVenueKeysStmt      *sql.Stmt
 	setNextEventVenueKeyStmt   *sql.Stmt
+	updatePlayerStmt           *sql.Stmt
 	venueByKeyStmt             *sql.Stmt
 }
 
@@ -163,6 +172,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventVenueKeysAreValidStmt: q.eventVenueKeysAreValidStmt,
 		setEventVenueKeysStmt:      q.setEventVenueKeysStmt,
 		setNextEventVenueKeyStmt:   q.setNextEventVenueKeyStmt,
+		updatePlayerStmt:           q.updatePlayerStmt,
 		venueByKeyStmt:             q.venueByKeyStmt,
 	}
 }

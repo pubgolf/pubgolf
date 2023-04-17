@@ -19,6 +19,93 @@ func enumToPointer(e ScoringCategory) *ScoringCategory {
 	return &e
 }
 
+func TestScoringCategory_FromProtoEnum(t *testing.T) {
+	cases := []struct {
+		Description             string
+		Given                   apiv1.ScoringCategory
+		ExpectedScoringCategory *ScoringCategory
+		ExpectedError           bool
+	}{
+		{
+			Description:             "Invalid proto enum returns an error",
+			Given:                   apiv1.ScoringCategory(9999),
+			ExpectedScoringCategory: nil,
+			ExpectedError:           true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Description, func(t *testing.T) {
+			var sc ScoringCategory
+			err := sc.FromProtoEnum(tc.Given)
+
+			if tc.ExpectedScoringCategory != nil {
+				assert.Equal(t, tc.ExpectedScoringCategory, sc)
+			}
+
+			if tc.ExpectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+
+	for n, v := range apiv1.ScoringCategory_value {
+		t.Run(fmt.Sprintf("Valid conversion for proto enum %s", n), func(t *testing.T) {
+			pe := apiv1.ScoringCategory(v)
+
+			var nsc NullScoringCategory
+			err := nsc.FromProtoEnum(&pe)
+
+			assert.Equal(t, pe.String(), nsc.ScoringCategory.String())
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestScoringCategory_ProtoEnum(t *testing.T) {
+	cases := []struct {
+		Description       string
+		Given             ScoringCategory
+		ExpectedProtoEnum *apiv1.ScoringCategory
+		ExpectedError     bool
+	}{
+		{
+			Description:       "Invalid enum value gives error",
+			Given:             ScoringCategory(9999),
+			ExpectedProtoEnum: nil,
+			ExpectedError:     true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.Description, func(t *testing.T) {
+			pe, err := tc.Given.ProtoEnum()
+
+			if tc.ExpectedProtoEnum != nil {
+				assert.Equal(t, *tc.ExpectedProtoEnum, pe)
+			}
+
+			if tc.ExpectedError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+
+	for _, v := range ScoringCategoryValues() {
+		sc := ScoringCategory(v)
+		t.Run(fmt.Sprintf("Valid conversion for enum %s", sc.String()), func(t *testing.T) {
+			pe, err := sc.ProtoEnum()
+
+			assert.Equal(t, sc.String(), pe.String())
+			assert.NoError(t, err)
+		})
+	}
+}
+
 func TestNullScoringCategory_Scan(t *testing.T) {
 	t.Run("NULL values scan correctly", func(t *testing.T) {
 		ctx, tx, cleanup := initMigratedDB(t)

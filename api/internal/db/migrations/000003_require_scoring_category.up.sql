@@ -1,0 +1,17 @@
+BEGIN;
+
+ALTER TABLE players
+  ALTER COLUMN scoring_category SET DEFAULT 'SCORING_CATEGORY_UNSPECIFIED';
+
+UPDATE
+  players
+SET
+  scoring_category = 'SCORING_CATEGORY_UNSPECIFIED'
+WHERE
+  scoring_category IS NULL;
+
+ALTER TABLE players
+  ALTER COLUMN scoring_category SET NOT NULL;
+
+COMMIT;
+

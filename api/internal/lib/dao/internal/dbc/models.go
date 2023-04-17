@@ -41,7 +41,7 @@ type Player struct {
 	ID              models.PlayerID
 	EventID         models.EventID
 	Name            string
-	ScoringCategory models.NullScoringCategory
+	ScoringCategory models.ScoringCategory
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       sql.NullTime
