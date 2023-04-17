@@ -4,6 +4,8 @@ syntax = "proto3";
 
 package api.v1;
 
+import "api/v1/shared.proto";
+
 option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
 
 // AdminService allows administering events with enhanced permissions.
@@ -13,15 +15,6 @@ service AdminService {
 
   // ListPlayers returns all players for a given event.
   rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse) {}
-}
-
-// Shared
-
-enum ScoringCategory {
-  SCORING_CATEGORY_UNSPECIFIED = 0;
-  SCORING_CATEGORY_PUB_GOLF_NINE_HOLE = 1;
-  SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE = 2;
-  SCORING_CATEGORY_PUB_GOLF_CHALLENGES = 3;
 }
 
 // CreatePlayer
