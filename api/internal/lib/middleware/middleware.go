@@ -5,6 +5,9 @@ import (
 	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/riandyrn/otelchi"
+
+	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // ConnectInterceptors returns the standard set of middleware for the gRPC servers.
@@ -17,8 +20,9 @@ func ConnectInterceptors() []connect.Interceptor {
 }
 
 // ChiMiddleware returns the standard set of middleware for the HTTP handlers.
-func ChiMiddleware() chi.Middlewares {
+func ChiMiddleware(r chi.Router) chi.Middlewares {
 	return chi.Middlewares{
+		otelchi.Middleware(telemetry.ServiceName, otelchi.WithChiRoutes(r)),
 		middleware.RealIP,
 		middleware.Logger,
 		Recoverer,

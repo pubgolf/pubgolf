@@ -19,7 +19,6 @@ import (
 	chim "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/riandyrn/otelchi"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -120,17 +119,16 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 		connect.WithInterceptors(middleware.ConnectInterceptors()...),
 	))
 
-	// Mount routes.
+	// Init router and middleware.
 	r := chi.NewRouter()
-	r.Use(otelchi.Middleware(telemetry.ServiceName, otelchi.WithChiRoutes(r)))
-	r.Use(middleware.ChiMiddleware()...)
+	r.Use(middleware.ChiMiddleware(r)...)
 
+	// Mount routes.
+	r.Handle("/health-check", healthCheck(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
 		r.Use(chim.NoCache)
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
 	})
-
-	r.Handle("/health-check", healthCheck(cfg))
 
 	// Fallback to serving the built web-app assets, or the HMR server in the dev environment.
 	if cfg.EnvName == config.DeployEnvDev {
