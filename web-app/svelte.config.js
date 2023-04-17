@@ -15,6 +15,8 @@ const config = {
 			entries: [
 				'/',
 				'/event/nyc-2023',
+                '/about/contact',
+                '/about/privacy',
 				'/admin',
 				'/admin/nyc-2023',
 				'/admin/nyc-2023/alerts',
