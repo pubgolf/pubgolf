@@ -1,0 +1,41 @@
+name: "Deploy App to Production"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Docker image label to deploy"
+        type: string
+        required: true
+
+jobs:
+  deploy_app:
+    name: Trigger Fly.io Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Download Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to the Fly.io Container registry
+        run: flyctl auth docker
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Pull Docker Image
+        run: docker pull ghcr.io/pubgolf/pubgolf:${{ inputs.version }}
+      - name: Deploy to Production
+        run: |
+          docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf:${{ inputs.version }}
+          docker push registry.fly.io/pubgolf:${{ inputs.version }}
+          flyctl deploy --image registry.fly.io/pubgolf:${{ inputs.version }} --config ./infra/fly.production.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

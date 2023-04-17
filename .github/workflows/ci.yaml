@@ -169,7 +169,7 @@ jobs:
       - name: Trigger Deployment Workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: deploy.yaml
+          workflow: deploy-staging.yaml
           # Disable auto-format to prevent replacing the outer quotes with single quotes
           # prettier-ignore
-          inputs: "{ \"env\": \"staging\", \"version\": \"sha-${{ env.SHORT_SHA }}\" }"
+          inputs: "{ \"version\": \"sha-${{ env.SHORT_SHA }}\" }"

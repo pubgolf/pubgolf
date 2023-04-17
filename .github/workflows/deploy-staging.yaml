@@ -1,12 +1,8 @@
-name: "Deploy App"
+name: "Deploy App to Staging"
 
 on:
   workflow_dispatch:
     inputs:
-      env:
-        description: "Environment to deploy to"
-        type: string
-        required: true
       version:
         description: "Docker image label to deploy"
         type: string
@@ -14,7 +10,7 @@ on:
 
 jobs:
   deploy_app:
-    name: Trigger Fly.io Deployment to `${{ inputs.env }}` Environment
+    name: Trigger Fly.io Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,7 +20,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Download Fly.io CLI
         uses: superfly/flyctl-actions/setup-flyctl@master
-
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v2
         with:
@@ -37,20 +32,10 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - name: Pull Docker Image
         run: docker pull ghcr.io/pubgolf/pubgolf:${{ inputs.version }}
-
       - name: Deploy Staging
-        if: inputs.env == 'staging'
         run: |
           docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf-staging:${{ inputs.version }}
           docker push registry.fly.io/pubgolf-staging:${{ inputs.version }}
           flyctl deploy --image registry.fly.io/pubgolf-staging:${{ inputs.version }} --config ./infra/fly.staging.toml
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-      - name: Deploy Production
-        if: inputs.env == 'production'
-        run: |
-          docker tag ghcr.io/pubgolf/pubgolf:${{ inputs.version }} registry.fly.io/pubgolf:${{ inputs.version }}
-          docker push registry.fly.io/pubgolf:${{ inputs.version }}
-          flyctl deploy --image registry.fly.io/pubgolf:${{ inputs.version }} --config ./infra/fly.production.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
