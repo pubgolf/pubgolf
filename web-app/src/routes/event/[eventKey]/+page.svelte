@@ -1,3 +1,9 @@
+<script>
+	import SetTitle from '$lib/components/util/SetTitle.svelte';
+</script>
+
+<SetTitle title="NYC Bottle Open 2023" />
+
 <div class="container mx-auto h-screen p-4 flex flex-col justify-center items-center">
 	<div class="text-center">
 		<h1 class="mb-2">NYC Bottle Open ’23</h1>
@@ -10,9 +16,3 @@
 <footer class="fixed text-center w-full bottom-4">
 	<p>With <span class="bg-primary-500 py-0.5 px-1 rounded">&#60;3</span> from Kaitlyn & Eric</p>
 </footer>
-
-<style lang="postcss">
-	/* .heart {
-		@apply text-primary-500;
-	} */
-</style>
