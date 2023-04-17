@@ -22,7 +22,7 @@
 						<Menu />
 					</button>
 				</svelte:fragment>
-				<span class="text-l">Admin Panel</span>
+				<span class="text-l">About PubGolf</span>
 			</AppBar>
 		</div>
 	</svelte:fragment>
