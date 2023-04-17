@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AppBar, AppShell, drawerStore } from '@skeletonlabs/skeleton';
 	import { Menu } from 'lucide-svelte';
-	import AboutNav from '$lib/components/sidebars/AboutNav.svelte';
+	import AboutNav from '$lib/components/nav/AboutNav.svelte';
 </script>
 
 <AppShell>
