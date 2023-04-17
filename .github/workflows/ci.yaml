@@ -98,6 +98,7 @@ jobs:
         with:
           node-version: 16
           cache: npm
+          cache-dependency-path: web-app/package-lock.json
       - name: NPM Install
         working-directory: ./web-app
         run: npm ci
