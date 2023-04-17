@@ -13,3 +13,25 @@ func healthCheck(cfg *config.App) http.HandlerFunc {
 		fmt.Fprintf(w, "Saluton mundo, from `%s`!", cfg.EnvName)
 	}
 }
+
+var robotsTxtProd = `
+User-agent: *
+Disallow: /admin/
+Disallow: /rpc/
+`[1:]
+
+var robotsTxt = `
+User-agent: *
+Disallow: /
+`[1:]
+
+// robots returns a permissive robots.txt for production and disallows all indexing in other envs.
+func robots(cfg *config.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if cfg.EnvName == config.DeployEnvProd {
+			fmt.Fprint(w, robotsTxtProd)
+			return
+		}
+		fmt.Fprint(w, robotsTxt)
+	}
+}

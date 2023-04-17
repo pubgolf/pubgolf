@@ -124,6 +124,7 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 
 	// Mount routes.
 	r.Get("/health-check", healthCheck(cfg))
+	r.Get("/robots.txt", robots(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
 		r.Use(chim.NoCache)
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
