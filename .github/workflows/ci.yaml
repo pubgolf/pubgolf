@@ -107,13 +107,14 @@ jobs:
         run: npm run build
       - name: Upload Assets to R2
         if: github.ref == 'refs/heads/main'
-        uses: jakejarvis/s3-sync-action@master
+        uses: jakejarvis/s3-sync-action@v0.5.1
         env:
           AWS_S3_ENDPOINT: https://cc720e9866469bbe052e0c3d90b4c016.r2.cloudflarestorage.com
           AWS_S3_BUCKET: pubgolf-web-app-assets
           AWS_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: web-app/build/_app/
+          SOURCE_DIR: web-app/build/_app/immutable/
+          DEST_DIR: _app/immutable/
       - name: Upload Web App Dynamic Files as CI Artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v3
@@ -121,7 +122,7 @@ jobs:
           name: pubgolf-web-app
           path: |
             web-app/build/
-            !web-app/build/_app/
+            !web-app/build/_app/immutable/
 
   publish_gh_release:
     name: Publish Protos and Tools
