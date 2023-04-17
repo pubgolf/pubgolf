@@ -19,7 +19,6 @@ import (
 	chim "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -124,7 +123,7 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 	r.Use(middleware.ChiMiddleware(r)...)
 
 	// Mount routes.
-	r.Handle("/health-check", healthCheck(cfg))
+	r.Get("/health-check", healthCheck(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
 		r.Use(chim.NoCache)
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
@@ -148,13 +147,6 @@ func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *ht
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
-}
-
-// healthCheck returns a 200 if the app is online and able to process requests.
-func healthCheck(cfg *config.App) http.Handler {
-	return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Saluton mundo, from `%s`!", cfg.EnvName)
-	}), "health-check")
 }
 
 // makeShutdownWatcher spawns a child goroutine to gracefully close the server on an OS signal.
