@@ -3,10 +3,10 @@ name: "Build and Publish Artifacts"
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     branches:
-      - develop
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,7 +30,7 @@ jobs:
       - name: Check Breaking Changes
         uses: bufbuild/buf-breaking-action@v1
         with:
-          against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=develop"
+          against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
       - name: Generate Protos
         run: |
           buf generate --template buf.gen.ci.yaml
@@ -38,7 +38,7 @@ jobs:
           zip -r ${{ github.workspace }}/build/proto.zip ./*
       - name: Upload Generated Protos as CI Artifact
         uses: actions/upload-artifact@v3
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/main'
         with:
           name: generated-protos
           path: build/proto.zip
@@ -60,7 +60,7 @@ jobs:
         run: GOOS=darwin GOARCH=amd64 go build -v ./tools/cmd/pubgolf-devctrl
       - name: Upload Built Tools as CI Artifact
         uses: actions/upload-artifact@v3
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/main'
         with:
           name: pubgolf-devctrl
           path: pubgolf-devctrl
@@ -82,14 +82,14 @@ jobs:
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-api-server
       - name: Upload API Server Binary as CI Artifact
         uses: actions/upload-artifact@v3
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/main'
         with:
           name: pubgolf-api-server
           path: pubgolf-api-server
 
   publish_gh_release:
     name: Publish Protos and Tools
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/main'
     needs:
       - proto_build_and_check
       - tools_build_and_check
@@ -106,7 +106,7 @@ jobs:
       - name: Get short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Upload as GitHub Release
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -116,7 +116,7 @@ jobs:
 
   api_publish_docker_image:
     name: Publish API Server
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/main'
     needs:
       - proto_build_and_check
       - api_build_and_check
@@ -159,7 +159,7 @@ jobs:
 
   trigger_staging_deploy:
     name: Trigger Staging Deploy for App
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/main'
     needs:
       - api_publish_docker_image
     runs-on: ubuntu-latest
