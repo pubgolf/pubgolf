@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { drawerStore } from '@skeletonlabs/skeleton';
 </script>
 
 <div class="py-8 px-4">
@@ -7,11 +8,19 @@
 	<nav class="list-nav">
 		<ul>
 			<li>
-				<a href="/about/privacy/" class:bg-primary-500={$page.route.id?.endsWith('privacy')}>
+				<a
+					href="/about/privacy/"
+					class:bg-primary-500={$page.route.id?.endsWith('privacy')}
+					on:click={() => drawerStore.close()}
+				>
 					<span class="badge-icon">🕵️</span>
 					<span class="flex-auto">Privacy Policy</span>
 				</a>
-				<a href="/about/contact/" class:bg-primary-500={$page.route.id?.endsWith('contact')}>
+				<a
+					href="/about/contact/"
+					class:bg-primary-500={$page.route.id?.endsWith('contact')}
+					on:click={() => drawerStore.close()}
+				>
 					<span class="badge-icon">📞</span>
 					<span class="flex-auto">Contact Us</span>
 				</a>
