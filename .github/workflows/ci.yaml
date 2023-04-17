@@ -17,7 +17,7 @@ jobs:
     name: Build and Check Protos
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       - name: Download Buf CLI
         uses: bufbuild/buf-setup-action@v1
@@ -47,7 +47,7 @@ jobs:
     name: Build and Check Tools
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -69,7 +69,7 @@ jobs:
     name: Build and Check API Server
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -86,6 +86,43 @@ jobs:
         with:
           name: pubgolf-api-server
           path: pubgolf-api-server
+
+  web_app_build_and_check:
+    name: Build and Check Web App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+      - name: NPM Install
+        working-directory: ./web-app
+        run: npm ci
+      - name: Build Web App
+        working-directory: ./web-app
+        run: npm run build
+      - name: Upload Assets to R2
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./web-app
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_ENDPOINT: cc720e9866469bbe052e0c3d90b4c016.r2.cloudflarestorage.com
+          AWS_S3_BUCKET: pubgolf-web-app-assets
+          AWS_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: "public"
+      - name: Upload Web App Dynamic Files as CI Artifact
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./web-app
+        uses: actions/upload-artifact@v3
+        with:
+          name: pubgolf-web-app
+          path: |
+            build/
+            !build/_app/
 
   publish_gh_release:
     name: Publish Protos and Tools
@@ -120,6 +157,7 @@ jobs:
     needs:
       - proto_build_and_check
       - api_build_and_check
+      - web_app_build_and_check
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -146,6 +184,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: pubgolf-api-server
+      - name: Download Web App Dynamic Files as CI Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: pubgolf-web-app
+          path: web-app-content
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
         with:
