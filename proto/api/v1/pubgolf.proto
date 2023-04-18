@@ -74,6 +74,8 @@ message GetScheduleResponse {
     optional uint32 next_venue_key = 3;
     optional google.protobuf.Timestamp next_venue_start = 4;
     google.protobuf.Timestamp event_end = 5;
+    // current_venue_description contains rules specific to the current venue, in markdown format.
+    optional string current_venue_description = 6;
   }
 
   uint32 latest_data_version = 1;

@@ -236,6 +236,13 @@ export class GetScheduleResponse_Schedule extends Message<GetScheduleResponse_Sc
    */
   eventEnd?: Timestamp;
 
+  /**
+   * current_venue_description contains rules specific to the current venue, in markdown format.
+   *
+   * @generated from field: optional string current_venue_description = 6;
+   */
+  currentVenueDescription?: string;
+
   constructor(data?: PartialMessage<GetScheduleResponse_Schedule>) {
     super();
     proto3.util.initPartial(data, this);
@@ -249,6 +256,7 @@ export class GetScheduleResponse_Schedule extends Message<GetScheduleResponse_Sc
     { no: 3, name: "next_venue_key", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 4, name: "next_venue_start", kind: "message", T: Timestamp, opt: true },
     { no: 5, name: "event_end", kind: "message", T: Timestamp },
+    { no: 6, name: "current_venue_description", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetScheduleResponse_Schedule {
