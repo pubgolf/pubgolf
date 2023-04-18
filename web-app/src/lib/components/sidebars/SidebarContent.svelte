@@ -1,11 +1,11 @@
 <script>
 	import { drawerStore } from '@skeletonlabs/skeleton';
-	import SideBarNav from '../nav/SideBarNav.svelte';
+	import SidebarNav from '../nav/SidebarNav.svelte';
 	import AboutNav from '../nav/AboutNav.svelte';
 </script>
 
 {#if $drawerStore.id === 'admin-nav'}
-	<SideBarNav
+	<SidebarNav
 		title="Dashboards"
 		items={[
 			{

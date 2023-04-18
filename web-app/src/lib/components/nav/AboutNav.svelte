@@ -1,8 +1,8 @@
 <script lang="ts">
-	import SideBarNav from './SideBarNav.svelte';
+	import SidebarNav from './SidebarNav.svelte';
 </script>
 
-<SideBarNav
+<SidebarNav
 	title="About PubGolf"
 	items={[
 		{
