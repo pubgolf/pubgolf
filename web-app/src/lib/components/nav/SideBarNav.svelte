@@ -18,6 +18,8 @@
 	}
 </script>
 
+<!-- Touch file -->
+
 <div class="py-8 px-4" class:floating-sidebar={floatOnDesktop}>
 	<span class="title h2 ml-4 mb-4">{title}</span>
 	<nav class="list-nav">
