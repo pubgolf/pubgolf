@@ -33,9 +33,8 @@ message CreatePlayerResponse {
 // UpdatePlayer
 
 message UpdatePlayerRequest {
-  string event_key = 1;
-  string player_id = 2;
-  PlayerData player_data = 3;
+  string player_id = 1;
+  PlayerData player_data = 2;
 }
 message UpdatePlayerResponse {
   Player player = 1;

@@ -94,17 +94,12 @@ export class CreatePlayerResponse extends Message<CreatePlayerResponse> {
  */
 export class UpdatePlayerRequest extends Message<UpdatePlayerRequest> {
   /**
-   * @generated from field: string event_key = 1;
-   */
-  eventKey = "";
-
-  /**
-   * @generated from field: string player_id = 2;
+   * @generated from field: string player_id = 1;
    */
   playerId = "";
 
   /**
-   * @generated from field: api.v1.PlayerData player_data = 3;
+   * @generated from field: api.v1.PlayerData player_data = 2;
    */
   playerData?: PlayerData;
 
@@ -116,9 +111,8 @@ export class UpdatePlayerRequest extends Message<UpdatePlayerRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.UpdatePlayerRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "player_data", kind: "message", T: PlayerData },
+    { no: 1, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_data", kind: "message", T: PlayerData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdatePlayerRequest {

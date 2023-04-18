@@ -49,7 +49,6 @@
 
 					if (operation === 'edit') {
 						await AdminClient.updatePlayer({
-							eventKey: $page.params.eventKey,
 							playerId,
 							playerData
 						});

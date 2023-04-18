@@ -2,34 +2,24 @@ package admin
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/bufbuild/connect-go"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // UpdatePlayer updates the given player's profile and settings, returning the full player object.
 func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerRequest]) (*connect.Response[apiv1.UpdatePlayerResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
-
-	_, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
-		}
-		return nil, connect.NewError(connect.CodeUnknown, err)
-	}
+	// TODO: Fetch the event key based on the player ID.
+	// telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
 	playerParams := models.PlayerParams{
 		Name: req.Msg.PlayerData.Name,
 	}
 
-	err = playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory)
+	err := playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument Player.ScoringCategory: %w", err))
 	}
