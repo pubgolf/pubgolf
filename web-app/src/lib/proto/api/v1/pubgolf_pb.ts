@@ -686,14 +686,9 @@ export class GetContentItemRequest extends Message<GetContentItemRequest> {
  */
 export class GetContentItemResponse extends Message<GetContentItemResponse> {
   /**
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
    * content is in markdown format.
    *
-   * @generated from field: string content = 2;
+   * @generated from field: string content = 1;
    */
   content = "";
 
@@ -705,8 +700,7 @@ export class GetContentItemResponse extends Message<GetContentItemResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.GetContentItemResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetContentItemResponse {

@@ -134,9 +134,8 @@ message GetContentItemRequest {
   string id = 1;
 }
 message GetContentItemResponse {
-  string id = 1;
   // content is in markdown format.
-  string content = 2;
+  string content = 1;
 }
 
 message GetPlayerByNameRequest {
