@@ -146,7 +146,7 @@ UPDATE
 SET
   current_schedule_cache_hash = $2,
   current_schedule_cache_version = scv.current_schedule_cache_version + 1,
-  update_at = now()
+  updated_at = now()
 FROM
   starting_cache_version scv
 WHERE
