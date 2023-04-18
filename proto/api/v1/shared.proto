@@ -6,6 +6,13 @@ package api.v1;
 
 option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
 
+message Color {
+  float r = 1;
+  float g = 2;
+  float b = 3;
+  float a = 4;
+}
+
 enum ScoringCategory {
   SCORING_CATEGORY_UNSPECIFIED = 0;
   SCORING_CATEGORY_PUB_GOLF_NINE_HOLE = 1;
@@ -22,4 +29,35 @@ message Player {
 message PlayerData {
   string name = 1;
   ScoringCategory scoring_category = 2;
+}
+
+message ScoreBoard {
+  enum ScoreStatus {
+    SCORE_STATUS_UNSPECIFIED = 0;
+    // SCORE_STATUS_PENDING indicates the player has not yet submitted/finalized their score for this round.
+    SCORE_STATUS_PENDING = 1;
+    // SCORE_STATUS_FINALIZED indicates that a player's score is "locked in" as of a given milestone.
+    SCORE_STATUS_FINALIZED = 2;
+    // SCORE_STATUS_INCOMPLETE indicates that a player's score is in an invalid or non-comparable state (e.g. they have dropped out of the event).
+    SCORE_STATUS_INCOMPLETE = 3;
+  }
+
+  message ScoreBoardEntry {
+    string entity_id = 1;
+    string label = 2;
+
+    int32 score = 3;
+    // display_score_signed indicates that non-zero scores should be displayed with an explicit +/-.
+    bool display_score_signed = 4;
+
+    uint32 rank = 5;
+
+    // icon_key is an SF-Symbol name (e.g. "heart.fill").
+    string icon_key = 6;
+    Color icon_color = 7;
+    ScoreStatus status = 8;
+    optional string status_details = 9;
+  }
+
+  repeated ScoreBoardEntry scores = 1;
 }

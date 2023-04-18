@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, GetScheduleRequest, GetScheduleResponse, GetVenueRequest, GetVenueResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, GetContentItemRequest, GetContentItemResponse, GetPlayerByNameRequest, GetPlayerByNameResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -47,6 +47,72 @@ export const PubGolfService = {
       name: "GetVenue",
       I: GetVenueRequest,
       O: GetVenueResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ListContentItems
+     *
+     * @generated from rpc api.v1.PubGolfService.ListContentItems
+     */
+    listContentItems: {
+      name: "ListContentItems",
+      I: ListContentItemsRequest,
+      O: ListContentItemsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetContentItem
+     *
+     * @generated from rpc api.v1.PubGolfService.GetContentItem
+     */
+    getContentItem: {
+      name: "GetContentItem",
+      I: GetContentItemRequest,
+      O: GetContentItemResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetPlayerByName
+     *
+     * @generated from rpc api.v1.PubGolfService.GetPlayerByName
+     */
+    getPlayerByName: {
+      name: "GetPlayerByName",
+      I: GetPlayerByNameRequest,
+      O: GetPlayerByNameResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetScoresForCategory
+     *
+     * @generated from rpc api.v1.PubGolfService.GetScoresForCategory
+     */
+    getScoresForCategory: {
+      name: "GetScoresForCategory",
+      I: GetScoresForCategoryRequest,
+      O: GetScoresForCategoryResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetScoresForPlayer
+     *
+     * @generated from rpc api.v1.PubGolfService.GetScoresForPlayer
+     */
+    getScoresForPlayer: {
+      name: "GetScoresForPlayer",
+      I: GetScoresForPlayerRequest,
+      O: GetScoresForPlayerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetScoresForVenue
+     *
+     * @generated from rpc api.v1.PubGolfService.GetScoresForVenue
+     */
+    getScoresForVenue: {
+      name: "GetScoresForVenue",
+      I: GetScoresForVenueRequest,
+      O: GetScoresForVenueResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -4,6 +4,7 @@ syntax = "proto3";
 
 package api.v1;
 
+import "api/v1/shared.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
@@ -13,11 +14,33 @@ service PubGolfService {
   // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
   rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}
 
+  // Event
+
   // GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
 
   // GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
   rpc GetVenue(GetVenueRequest) returns (GetVenueResponse) {}
+
+  // ListContentItems
+  rpc ListContentItems(ListContentItemsRequest) returns (ListContentItemsResponse) {}
+
+  // GetContentItem
+  rpc GetContentItem(GetContentItemRequest) returns (GetContentItemResponse) {}
+
+  // Scoreboard
+
+  // GetPlayerByName
+  rpc GetPlayerByName(GetPlayerByNameRequest) returns (GetPlayerByNameResponse) {}
+
+  // GetScoresForCategory
+  rpc GetScoresForCategory(GetScoresForCategoryRequest) returns (GetScoresForCategoryResponse) {}
+
+  // GetScoresForPlayer
+  rpc GetScoresForPlayer(GetScoresForPlayerRequest) returns (GetScoresForPlayerResponse) {}
+
+  // GetScoresForVenue
+  rpc GetScoresForVenue(GetScoresForVenueRequest) returns (GetScoresForVenueResponse) {}
 }
 
 // ClientVersion
@@ -80,4 +103,68 @@ message GetVenueResponse {
 
   // Map of requested venue keys to Venue objects.
   map<uint32, VenueWrapper> venues = 1;
+}
+
+message ListContentItemsRequest {
+  string event_key = 1;
+}
+message ListContentItemsResponse {
+  message ContentItemMetaData {
+    string id = 1;
+    string display_name = 2;
+    // icon_key is an SF-Symbol name (e.g. "heart.fill").
+    string icon_key = 3;
+    Color icon_color = 4;
+  }
+
+  message Section {
+    string display_name = 1;
+    repeated ContentItemMetaData content_sections = 2;
+    // icon_key is an SF-Symbol name (e.g. "heart.fill").
+    string icon_key = 3;
+    Color icon_color = 4;
+  }
+
+  repeated Section sections = 1;
+}
+
+message GetContentItemRequest {
+  string id = 1;
+}
+message GetContentItemResponse {
+  string id = 1;
+  // content is in markdown format.
+  string content = 2;
+}
+
+message GetPlayerByNameRequest {
+  string event_key = 1;
+  string player_name = 2;
+}
+message GetPlayerByNameResponse {
+  Player player = 1;
+}
+
+message GetScoresForCategoryRequest {
+  string event_key = 1;
+  ScoringCategory category = 2;
+}
+message GetScoresForCategoryResponse {
+  ScoreBoard scores = 1;
+}
+
+message GetScoresForPlayerRequest {
+  string event_key = 1;
+  string player_id = 2;
+}
+message GetScoresForPlayerResponse {
+  ScoreBoard scores = 1;
+}
+
+message GetScoresForVenueRequest {
+  string event_key = 1;
+  string venue_id = 2;
+}
+message GetScoresForVenueResponse {
+  ScoreBoard scores = 1;
 }

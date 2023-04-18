@@ -382,6 +382,611 @@ func (x *GetVenueResponse) GetVenues() map[uint32]*GetVenueResponse_VenueWrapper
 	return nil
 }
 
+type ListContentItemsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey string `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+}
+
+func (x *ListContentItemsRequest) Reset() {
+	*x = ListContentItemsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListContentItemsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContentItemsRequest) ProtoMessage() {}
+
+func (x *ListContentItemsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContentItemsRequest.ProtoReflect.Descriptor instead.
+func (*ListContentItemsRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListContentItemsRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+type ListContentItemsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Sections []*ListContentItemsResponse_Section `protobuf:"bytes,1,rep,name=sections,proto3" json:"sections,omitempty"`
+}
+
+func (x *ListContentItemsResponse) Reset() {
+	*x = ListContentItemsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListContentItemsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContentItemsResponse) ProtoMessage() {}
+
+func (x *ListContentItemsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContentItemsResponse.ProtoReflect.Descriptor instead.
+func (*ListContentItemsResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListContentItemsResponse) GetSections() []*ListContentItemsResponse_Section {
+	if x != nil {
+		return x.Sections
+	}
+	return nil
+}
+
+type GetContentItemRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetContentItemRequest) Reset() {
+	*x = GetContentItemRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetContentItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetContentItemRequest) ProtoMessage() {}
+
+func (x *GetContentItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetContentItemRequest.ProtoReflect.Descriptor instead.
+func (*GetContentItemRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetContentItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetContentItemResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// content is in markdown format.
+	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *GetContentItemResponse) Reset() {
+	*x = GetContentItemResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetContentItemResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetContentItemResponse) ProtoMessage() {}
+
+func (x *GetContentItemResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetContentItemResponse.ProtoReflect.Descriptor instead.
+func (*GetContentItemResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetContentItemResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetContentItemResponse) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+type GetPlayerByNameRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey   string `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+	PlayerName string `protobuf:"bytes,2,opt,name=player_name,json=playerName,proto3" json:"player_name,omitempty"`
+}
+
+func (x *GetPlayerByNameRequest) Reset() {
+	*x = GetPlayerByNameRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPlayerByNameRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPlayerByNameRequest) ProtoMessage() {}
+
+func (x *GetPlayerByNameRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPlayerByNameRequest.ProtoReflect.Descriptor instead.
+func (*GetPlayerByNameRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetPlayerByNameRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+func (x *GetPlayerByNameRequest) GetPlayerName() string {
+	if x != nil {
+		return x.PlayerName
+	}
+	return ""
+}
+
+type GetPlayerByNameResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Player *Player `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
+}
+
+func (x *GetPlayerByNameResponse) Reset() {
+	*x = GetPlayerByNameResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPlayerByNameResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPlayerByNameResponse) ProtoMessage() {}
+
+func (x *GetPlayerByNameResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPlayerByNameResponse.ProtoReflect.Descriptor instead.
+func (*GetPlayerByNameResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetPlayerByNameResponse) GetPlayer() *Player {
+	if x != nil {
+		return x.Player
+	}
+	return nil
+}
+
+type GetScoresForCategoryRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey string          `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+	Category ScoringCategory `protobuf:"varint,2,opt,name=category,proto3,enum=api.v1.ScoringCategory" json:"category,omitempty"`
+}
+
+func (x *GetScoresForCategoryRequest) Reset() {
+	*x = GetScoresForCategoryRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForCategoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForCategoryRequest) ProtoMessage() {}
+
+func (x *GetScoresForCategoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForCategoryRequest.ProtoReflect.Descriptor instead.
+func (*GetScoresForCategoryRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetScoresForCategoryRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+func (x *GetScoresForCategoryRequest) GetCategory() ScoringCategory {
+	if x != nil {
+		return x.Category
+	}
+	return ScoringCategory_SCORING_CATEGORY_UNSPECIFIED
+}
+
+type GetScoresForCategoryResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Scores *ScoreBoard `protobuf:"bytes,1,opt,name=scores,proto3" json:"scores,omitempty"`
+}
+
+func (x *GetScoresForCategoryResponse) Reset() {
+	*x = GetScoresForCategoryResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForCategoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForCategoryResponse) ProtoMessage() {}
+
+func (x *GetScoresForCategoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForCategoryResponse.ProtoReflect.Descriptor instead.
+func (*GetScoresForCategoryResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetScoresForCategoryResponse) GetScores() *ScoreBoard {
+	if x != nil {
+		return x.Scores
+	}
+	return nil
+}
+
+type GetScoresForPlayerRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey string `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+	PlayerId string `protobuf:"bytes,2,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+}
+
+func (x *GetScoresForPlayerRequest) Reset() {
+	*x = GetScoresForPlayerRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForPlayerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForPlayerRequest) ProtoMessage() {}
+
+func (x *GetScoresForPlayerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForPlayerRequest.ProtoReflect.Descriptor instead.
+func (*GetScoresForPlayerRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetScoresForPlayerRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+func (x *GetScoresForPlayerRequest) GetPlayerId() string {
+	if x != nil {
+		return x.PlayerId
+	}
+	return ""
+}
+
+type GetScoresForPlayerResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Scores *ScoreBoard `protobuf:"bytes,1,opt,name=scores,proto3" json:"scores,omitempty"`
+}
+
+func (x *GetScoresForPlayerResponse) Reset() {
+	*x = GetScoresForPlayerResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForPlayerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForPlayerResponse) ProtoMessage() {}
+
+func (x *GetScoresForPlayerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForPlayerResponse.ProtoReflect.Descriptor instead.
+func (*GetScoresForPlayerResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetScoresForPlayerResponse) GetScores() *ScoreBoard {
+	if x != nil {
+		return x.Scores
+	}
+	return nil
+}
+
+type GetScoresForVenueRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey string `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+	VenueId  string `protobuf:"bytes,2,opt,name=venue_id,json=venueId,proto3" json:"venue_id,omitempty"`
+}
+
+func (x *GetScoresForVenueRequest) Reset() {
+	*x = GetScoresForVenueRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForVenueRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForVenueRequest) ProtoMessage() {}
+
+func (x *GetScoresForVenueRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForVenueRequest.ProtoReflect.Descriptor instead.
+func (*GetScoresForVenueRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetScoresForVenueRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+func (x *GetScoresForVenueRequest) GetVenueId() string {
+	if x != nil {
+		return x.VenueId
+	}
+	return ""
+}
+
+type GetScoresForVenueResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Scores *ScoreBoard `protobuf:"bytes,1,opt,name=scores,proto3" json:"scores,omitempty"`
+}
+
+func (x *GetScoresForVenueResponse) Reset() {
+	*x = GetScoresForVenueResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetScoresForVenueResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScoresForVenueResponse) ProtoMessage() {}
+
+func (x *GetScoresForVenueResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScoresForVenueResponse.ProtoReflect.Descriptor instead.
+func (*GetScoresForVenueResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetScoresForVenueResponse) GetScores() *ScoreBoard {
+	if x != nil {
+		return x.Scores
+	}
+	return nil
+}
+
 type GetScheduleResponse_Schedule struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -400,7 +1005,7 @@ type GetScheduleResponse_Schedule struct {
 func (x *GetScheduleResponse_Schedule) Reset() {
 	*x = GetScheduleResponse_Schedule{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_pubgolf_proto_msgTypes[6]
+		mi := &file_api_v1_pubgolf_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -413,7 +1018,7 @@ func (x *GetScheduleResponse_Schedule) String() string {
 func (*GetScheduleResponse_Schedule) ProtoMessage() {}
 
 func (x *GetScheduleResponse_Schedule) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_pubgolf_proto_msgTypes[6]
+	mi := &file_api_v1_pubgolf_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -480,7 +1085,7 @@ type GetVenueResponse_Venue struct {
 func (x *GetVenueResponse_Venue) Reset() {
 	*x = GetVenueResponse_Venue{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_pubgolf_proto_msgTypes[7]
+		mi := &file_api_v1_pubgolf_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -493,7 +1098,7 @@ func (x *GetVenueResponse_Venue) String() string {
 func (*GetVenueResponse_Venue) ProtoMessage() {}
 
 func (x *GetVenueResponse_Venue) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_pubgolf_proto_msgTypes[7]
+	mi := &file_api_v1_pubgolf_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -549,7 +1154,7 @@ type GetVenueResponse_VenueWrapper struct {
 func (x *GetVenueResponse_VenueWrapper) Reset() {
 	*x = GetVenueResponse_VenueWrapper{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_pubgolf_proto_msgTypes[8]
+		mi := &file_api_v1_pubgolf_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -562,7 +1167,7 @@ func (x *GetVenueResponse_VenueWrapper) String() string {
 func (*GetVenueResponse_VenueWrapper) ProtoMessage() {}
 
 func (x *GetVenueResponse_VenueWrapper) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_pubgolf_proto_msgTypes[8]
+	mi := &file_api_v1_pubgolf_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -585,14 +1190,158 @@ func (x *GetVenueResponse_VenueWrapper) GetVenue() *GetVenueResponse_Venue {
 	return nil
 }
 
+type ListContentItemsResponse_ContentItemMetaData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	// icon_key is an SF-Symbol name (e.g. "heart.fill").
+	IconKey   string `protobuf:"bytes,3,opt,name=icon_key,json=iconKey,proto3" json:"icon_key,omitempty"`
+	IconColor *Color `protobuf:"bytes,4,opt,name=icon_color,json=iconColor,proto3" json:"icon_color,omitempty"`
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) Reset() {
+	*x = ListContentItemsResponse_ContentItemMetaData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContentItemsResponse_ContentItemMetaData) ProtoMessage() {}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContentItemsResponse_ContentItemMetaData.ProtoReflect.Descriptor instead.
+func (*ListContentItemsResponse_ContentItemMetaData) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{7, 0}
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) GetIconKey() string {
+	if x != nil {
+		return x.IconKey
+	}
+	return ""
+}
+
+func (x *ListContentItemsResponse_ContentItemMetaData) GetIconColor() *Color {
+	if x != nil {
+		return x.IconColor
+	}
+	return nil
+}
+
+type ListContentItemsResponse_Section struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DisplayName     string                                          `protobuf:"bytes,1,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	ContentSections []*ListContentItemsResponse_ContentItemMetaData `protobuf:"bytes,2,rep,name=content_sections,json=contentSections,proto3" json:"content_sections,omitempty"`
+	// icon_key is an SF-Symbol name (e.g. "heart.fill").
+	IconKey   string `protobuf:"bytes,3,opt,name=icon_key,json=iconKey,proto3" json:"icon_key,omitempty"`
+	IconColor *Color `protobuf:"bytes,4,opt,name=icon_color,json=iconColor,proto3" json:"icon_color,omitempty"`
+}
+
+func (x *ListContentItemsResponse_Section) Reset() {
+	*x = ListContentItemsResponse_Section{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_pubgolf_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListContentItemsResponse_Section) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContentItemsResponse_Section) ProtoMessage() {}
+
+func (x *ListContentItemsResponse_Section) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_pubgolf_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContentItemsResponse_Section.ProtoReflect.Descriptor instead.
+func (*ListContentItemsResponse_Section) Descriptor() ([]byte, []int) {
+	return file_api_v1_pubgolf_proto_rawDescGZIP(), []int{7, 1}
+}
+
+func (x *ListContentItemsResponse_Section) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *ListContentItemsResponse_Section) GetContentSections() []*ListContentItemsResponse_ContentItemMetaData {
+	if x != nil {
+		return x.ContentSections
+	}
+	return nil
+}
+
+func (x *ListContentItemsResponse_Section) GetIconKey() string {
+	if x != nil {
+		return x.IconKey
+	}
+	return ""
+}
+
+func (x *ListContentItemsResponse_Section) GetIconColor() *Color {
+	if x != nil {
+		return x.IconColor
+	}
+	return nil
+}
+
 var File_api_v1_pubgolf_proto protoreflect.FileDescriptor
 
 var file_api_v1_pubgolf_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x75, 0x62, 0x67, 0x6f, 0x6c, 0x66,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x1a, 0x1f,
-	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
-	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
-	0x13, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x70,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x1a, 0x13,
+	0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x22, 0x3d, 0x0a, 0x14, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65,
 	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x25, 0x0a, 0x0e,
 	0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01,
@@ -679,27 +1428,141 @@ var file_api_v1_pubgolf_proto_rawDesc = []byte{
 	0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
 	0x31, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
 	0x73, 0x65, 0x2e, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x57, 0x72, 0x61, 0x70, 0x70, 0x65, 0x72, 0x52,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x32, 0xeb, 0x01, 0x0a, 0x0e, 0x50,
-	0x75, 0x62, 0x47, 0x6f, 0x6c, 0x66, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4e, 0x0a,
-	0x0d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c,
-	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73,
-	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x48, 0x0a,
-	0x0b, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1a, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
-	0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x3f, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x56, 0x65,
-	0x6e, 0x75, 0x65, 0x12, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
-	0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x70, 0x75, 0x62, 0x67, 0x6f, 0x6c, 0x66, 0x2f, 0x70,
-	0x75, 0x62, 0x67, 0x6f, 0x6c, 0x66, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72,
-	0x6e, 0x61, 0x6c, 0x2f, 0x6c, 0x69, 0x62, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x61, 0x70,
-	0x69, 0x2f, 0x76, 0x31, 0x3b, 0x61, 0x70, 0x69, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x36, 0x0a, 0x17, 0x4c, 0x69,
+	0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x6b,
+	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x4b,
+	0x65, 0x79, 0x22, 0xcd, 0x03, 0x0a, 0x18, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x44, 0x0a, 0x08, 0x73, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x28, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43,
+	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x2e, 0x53, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x08, 0x73, 0x65, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x91, 0x01, 0x0a, 0x13, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x49, 0x74, 0x65, 0x6d, 0x4d, 0x65, 0x74, 0x61, 0x44, 0x61, 0x74, 0x61, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x21, 0x0a,
+	0x0c, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x4e, 0x61, 0x6d, 0x65,
+	0x12, 0x19, 0x0a, 0x08, 0x69, 0x63, 0x6f, 0x6e, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x69, 0x63, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x12, 0x2c, 0x0a, 0x0a, 0x69,
+	0x63, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x52, 0x09,
+	0x69, 0x63, 0x6f, 0x6e, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x1a, 0xd6, 0x01, 0x0a, 0x07, 0x53, 0x65,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79,
+	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x69, 0x73,
+	0x70, 0x6c, 0x61, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x5f, 0x0a, 0x10, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x5f, 0x73, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x34, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74,
+	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d,
+	0x4d, 0x65, 0x74, 0x61, 0x44, 0x61, 0x74, 0x61, 0x52, 0x0f, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x53, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x69, 0x63, 0x6f,
+	0x6e, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x69, 0x63, 0x6f,
+	0x6e, 0x4b, 0x65, 0x79, 0x12, 0x2c, 0x0a, 0x0a, 0x69, 0x63, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6c,
+	0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x52, 0x09, 0x69, 0x63, 0x6f, 0x6e, 0x43, 0x6f, 0x6c,
+	0x6f, 0x72, 0x22, 0x27, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
+	0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x42, 0x0a, 0x16, 0x47,
+	0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22,
+	0x56, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61,
+	0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72,
+	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x6c, 0x61,
+	0x79, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x41, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x50, 0x6c,
+	0x61, 0x79, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x26, 0x0a, 0x06, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6c, 0x61, 0x79,
+	0x65, 0x72, 0x52, 0x06, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x22, 0x6f, 0x0a, 0x1b, 0x47, 0x65,
+	0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f,
+	0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x33, 0x0a, 0x08, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f,
+	0x72, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x53, 0x63, 0x6f, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72,
+	0x79, 0x52, 0x08, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x22, 0x4a, 0x0a, 0x1c, 0x47,
+	0x65, 0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x43, 0x61, 0x74, 0x65, 0x67,
+	0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x06, 0x73,
+	0x63, 0x6f, 0x72, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x52,
+	0x06, 0x73, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x22, 0x55, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x53, 0x63,
+	0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x6b, 0x65,
+	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x4b, 0x65,
+	0x79, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x49, 0x64, 0x22, 0x48,
+	0x0a, 0x1a, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x50, 0x6c,
+	0x61, 0x79, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x06,
+	0x73, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x42, 0x6f, 0x61, 0x72, 0x64,
+	0x52, 0x06, 0x73, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x22, 0x52, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x53,
+	0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x6b, 0x65,
+	0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x4b, 0x65,
+	0x79, 0x12, 0x19, 0x0a, 0x08, 0x76, 0x65, 0x6e, 0x75, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x6e, 0x75, 0x65, 0x49, 0x64, 0x22, 0x47, 0x0a, 0x19,
+	0x47, 0x65, 0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x56, 0x65, 0x6e, 0x75,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x06, 0x73, 0x63, 0x6f,
+	0x72, 0x65, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x42, 0x6f, 0x61, 0x72, 0x64, 0x52, 0x06, 0x73,
+	0x63, 0x6f, 0x72, 0x65, 0x73, 0x32, 0x8d, 0x06, 0x0a, 0x0e, 0x50, 0x75, 0x62, 0x47, 0x6f, 0x6c,
+	0x66, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4e, 0x0a, 0x0d, 0x43, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1c, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x48, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x53,
+	0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
+	0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x3f, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x12, 0x17,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x65, 0x6e, 0x75, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x57, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x12, 0x1f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65,
+	0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x51, 0x0a, 0x0e,
+	0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x1d,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x54, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61,
+	0x6d, 0x65, 0x12, 0x1e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50,
+	0x6c, 0x61, 0x79, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50,
+	0x6c, 0x61, 0x79, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x63, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f, 0x72,
+	0x65, 0x73, 0x46, 0x6f, 0x72, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x12, 0x23, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73,
+	0x46, 0x6f, 0x72, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x24, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53,
+	0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5d, 0x0a, 0x12, 0x47, 0x65,
+	0x74, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72,
+	0x12, 0x21, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f,
+	0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
+	0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x11, 0x47, 0x65, 0x74,
+	0x53, 0x63, 0x6f, 0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x12, 0x20,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f, 0x72, 0x65,
+	0x73, 0x46, 0x6f, 0x72, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x21, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x63, 0x6f,
+	0x72, 0x65, 0x73, 0x46, 0x6f, 0x72, 0x56, 0x65, 0x6e, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x70, 0x75, 0x62, 0x67, 0x6f, 0x6c, 0x66, 0x2f, 0x70, 0x75, 0x62, 0x67,
+	0x6f, 0x6c, 0x66, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c,
+	0x2f, 0x6c, 0x69, 0x62, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76,
+	0x31, 0x3b, 0x61, 0x70, 0x69, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -715,40 +1578,79 @@ func file_api_v1_pubgolf_proto_rawDescGZIP() []byte {
 }
 
 var file_api_v1_pubgolf_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_v1_pubgolf_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_v1_pubgolf_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_api_v1_pubgolf_proto_goTypes = []interface{}{
-	(ClientVersionResponse_VersionStatus)(0), // 0: api.v1.ClientVersionResponse.VersionStatus
-	(*ClientVersionRequest)(nil),             // 1: api.v1.ClientVersionRequest
-	(*ClientVersionResponse)(nil),            // 2: api.v1.ClientVersionResponse
-	(*GetScheduleRequest)(nil),               // 3: api.v1.GetScheduleRequest
-	(*GetScheduleResponse)(nil),              // 4: api.v1.GetScheduleResponse
-	(*GetVenueRequest)(nil),                  // 5: api.v1.GetVenueRequest
-	(*GetVenueResponse)(nil),                 // 6: api.v1.GetVenueResponse
-	(*GetScheduleResponse_Schedule)(nil),     // 7: api.v1.GetScheduleResponse.Schedule
-	(*GetVenueResponse_Venue)(nil),           // 8: api.v1.GetVenueResponse.Venue
-	(*GetVenueResponse_VenueWrapper)(nil),    // 9: api.v1.GetVenueResponse.VenueWrapper
-	nil,                                      // 10: api.v1.GetVenueResponse.VenuesEntry
-	(*timestamppb.Timestamp)(nil),            // 11: google.protobuf.Timestamp
+	(ClientVersionResponse_VersionStatus)(0),             // 0: api.v1.ClientVersionResponse.VersionStatus
+	(*ClientVersionRequest)(nil),                         // 1: api.v1.ClientVersionRequest
+	(*ClientVersionResponse)(nil),                        // 2: api.v1.ClientVersionResponse
+	(*GetScheduleRequest)(nil),                           // 3: api.v1.GetScheduleRequest
+	(*GetScheduleResponse)(nil),                          // 4: api.v1.GetScheduleResponse
+	(*GetVenueRequest)(nil),                              // 5: api.v1.GetVenueRequest
+	(*GetVenueResponse)(nil),                             // 6: api.v1.GetVenueResponse
+	(*ListContentItemsRequest)(nil),                      // 7: api.v1.ListContentItemsRequest
+	(*ListContentItemsResponse)(nil),                     // 8: api.v1.ListContentItemsResponse
+	(*GetContentItemRequest)(nil),                        // 9: api.v1.GetContentItemRequest
+	(*GetContentItemResponse)(nil),                       // 10: api.v1.GetContentItemResponse
+	(*GetPlayerByNameRequest)(nil),                       // 11: api.v1.GetPlayerByNameRequest
+	(*GetPlayerByNameResponse)(nil),                      // 12: api.v1.GetPlayerByNameResponse
+	(*GetScoresForCategoryRequest)(nil),                  // 13: api.v1.GetScoresForCategoryRequest
+	(*GetScoresForCategoryResponse)(nil),                 // 14: api.v1.GetScoresForCategoryResponse
+	(*GetScoresForPlayerRequest)(nil),                    // 15: api.v1.GetScoresForPlayerRequest
+	(*GetScoresForPlayerResponse)(nil),                   // 16: api.v1.GetScoresForPlayerResponse
+	(*GetScoresForVenueRequest)(nil),                     // 17: api.v1.GetScoresForVenueRequest
+	(*GetScoresForVenueResponse)(nil),                    // 18: api.v1.GetScoresForVenueResponse
+	(*GetScheduleResponse_Schedule)(nil),                 // 19: api.v1.GetScheduleResponse.Schedule
+	(*GetVenueResponse_Venue)(nil),                       // 20: api.v1.GetVenueResponse.Venue
+	(*GetVenueResponse_VenueWrapper)(nil),                // 21: api.v1.GetVenueResponse.VenueWrapper
+	nil,                                                  // 22: api.v1.GetVenueResponse.VenuesEntry
+	(*ListContentItemsResponse_ContentItemMetaData)(nil), // 23: api.v1.ListContentItemsResponse.ContentItemMetaData
+	(*ListContentItemsResponse_Section)(nil),             // 24: api.v1.ListContentItemsResponse.Section
+	(*Player)(nil),                                       // 25: api.v1.Player
+	(ScoringCategory)(0),                                 // 26: api.v1.ScoringCategory
+	(*ScoreBoard)(nil),                                   // 27: api.v1.ScoreBoard
+	(*timestamppb.Timestamp)(nil),                        // 28: google.protobuf.Timestamp
+	(*Color)(nil),                                        // 29: api.v1.Color
 }
 var file_api_v1_pubgolf_proto_depIdxs = []int32{
 	0,  // 0: api.v1.ClientVersionResponse.version_status:type_name -> api.v1.ClientVersionResponse.VersionStatus
-	7,  // 1: api.v1.GetScheduleResponse.schedule:type_name -> api.v1.GetScheduleResponse.Schedule
-	10, // 2: api.v1.GetVenueResponse.venues:type_name -> api.v1.GetVenueResponse.VenuesEntry
-	11, // 3: api.v1.GetScheduleResponse.Schedule.next_venue_start:type_name -> google.protobuf.Timestamp
-	11, // 4: api.v1.GetScheduleResponse.Schedule.event_end:type_name -> google.protobuf.Timestamp
-	8,  // 5: api.v1.GetVenueResponse.VenueWrapper.venue:type_name -> api.v1.GetVenueResponse.Venue
-	9,  // 6: api.v1.GetVenueResponse.VenuesEntry.value:type_name -> api.v1.GetVenueResponse.VenueWrapper
-	1,  // 7: api.v1.PubGolfService.ClientVersion:input_type -> api.v1.ClientVersionRequest
-	3,  // 8: api.v1.PubGolfService.GetSchedule:input_type -> api.v1.GetScheduleRequest
-	5,  // 9: api.v1.PubGolfService.GetVenue:input_type -> api.v1.GetVenueRequest
-	2,  // 10: api.v1.PubGolfService.ClientVersion:output_type -> api.v1.ClientVersionResponse
-	4,  // 11: api.v1.PubGolfService.GetSchedule:output_type -> api.v1.GetScheduleResponse
-	6,  // 12: api.v1.PubGolfService.GetVenue:output_type -> api.v1.GetVenueResponse
-	10, // [10:13] is the sub-list for method output_type
-	7,  // [7:10] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	19, // 1: api.v1.GetScheduleResponse.schedule:type_name -> api.v1.GetScheduleResponse.Schedule
+	22, // 2: api.v1.GetVenueResponse.venues:type_name -> api.v1.GetVenueResponse.VenuesEntry
+	24, // 3: api.v1.ListContentItemsResponse.sections:type_name -> api.v1.ListContentItemsResponse.Section
+	25, // 4: api.v1.GetPlayerByNameResponse.player:type_name -> api.v1.Player
+	26, // 5: api.v1.GetScoresForCategoryRequest.category:type_name -> api.v1.ScoringCategory
+	27, // 6: api.v1.GetScoresForCategoryResponse.scores:type_name -> api.v1.ScoreBoard
+	27, // 7: api.v1.GetScoresForPlayerResponse.scores:type_name -> api.v1.ScoreBoard
+	27, // 8: api.v1.GetScoresForVenueResponse.scores:type_name -> api.v1.ScoreBoard
+	28, // 9: api.v1.GetScheduleResponse.Schedule.next_venue_start:type_name -> google.protobuf.Timestamp
+	28, // 10: api.v1.GetScheduleResponse.Schedule.event_end:type_name -> google.protobuf.Timestamp
+	20, // 11: api.v1.GetVenueResponse.VenueWrapper.venue:type_name -> api.v1.GetVenueResponse.Venue
+	21, // 12: api.v1.GetVenueResponse.VenuesEntry.value:type_name -> api.v1.GetVenueResponse.VenueWrapper
+	29, // 13: api.v1.ListContentItemsResponse.ContentItemMetaData.icon_color:type_name -> api.v1.Color
+	23, // 14: api.v1.ListContentItemsResponse.Section.content_sections:type_name -> api.v1.ListContentItemsResponse.ContentItemMetaData
+	29, // 15: api.v1.ListContentItemsResponse.Section.icon_color:type_name -> api.v1.Color
+	1,  // 16: api.v1.PubGolfService.ClientVersion:input_type -> api.v1.ClientVersionRequest
+	3,  // 17: api.v1.PubGolfService.GetSchedule:input_type -> api.v1.GetScheduleRequest
+	5,  // 18: api.v1.PubGolfService.GetVenue:input_type -> api.v1.GetVenueRequest
+	7,  // 19: api.v1.PubGolfService.ListContentItems:input_type -> api.v1.ListContentItemsRequest
+	9,  // 20: api.v1.PubGolfService.GetContentItem:input_type -> api.v1.GetContentItemRequest
+	11, // 21: api.v1.PubGolfService.GetPlayerByName:input_type -> api.v1.GetPlayerByNameRequest
+	13, // 22: api.v1.PubGolfService.GetScoresForCategory:input_type -> api.v1.GetScoresForCategoryRequest
+	15, // 23: api.v1.PubGolfService.GetScoresForPlayer:input_type -> api.v1.GetScoresForPlayerRequest
+	17, // 24: api.v1.PubGolfService.GetScoresForVenue:input_type -> api.v1.GetScoresForVenueRequest
+	2,  // 25: api.v1.PubGolfService.ClientVersion:output_type -> api.v1.ClientVersionResponse
+	4,  // 26: api.v1.PubGolfService.GetSchedule:output_type -> api.v1.GetScheduleResponse
+	6,  // 27: api.v1.PubGolfService.GetVenue:output_type -> api.v1.GetVenueResponse
+	8,  // 28: api.v1.PubGolfService.ListContentItems:output_type -> api.v1.ListContentItemsResponse
+	10, // 29: api.v1.PubGolfService.GetContentItem:output_type -> api.v1.GetContentItemResponse
+	12, // 30: api.v1.PubGolfService.GetPlayerByName:output_type -> api.v1.GetPlayerByNameResponse
+	14, // 31: api.v1.PubGolfService.GetScoresForCategory:output_type -> api.v1.GetScoresForCategoryResponse
+	16, // 32: api.v1.PubGolfService.GetScoresForPlayer:output_type -> api.v1.GetScoresForPlayerResponse
+	18, // 33: api.v1.PubGolfService.GetScoresForVenue:output_type -> api.v1.GetScoresForVenueResponse
+	25, // [25:34] is the sub-list for method output_type
+	16, // [16:25] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_pubgolf_proto_init() }
@@ -831,7 +1733,7 @@ func file_api_v1_pubgolf_proto_init() {
 			}
 		}
 		file_api_v1_pubgolf_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetScheduleResponse_Schedule); i {
+			switch v := v.(*ListContentItemsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -843,7 +1745,7 @@ func file_api_v1_pubgolf_proto_init() {
 			}
 		}
 		file_api_v1_pubgolf_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetVenueResponse_Venue); i {
+			switch v := v.(*ListContentItemsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -855,7 +1757,175 @@ func file_api_v1_pubgolf_proto_init() {
 			}
 		}
 		file_api_v1_pubgolf_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetContentItemRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetContentItemResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetPlayerByNameRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetPlayerByNameResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForCategoryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForCategoryResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForPlayerRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForPlayerResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForVenueRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScoresForVenueResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetScheduleResponse_Schedule); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetVenueResponse_Venue); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetVenueResponse_VenueWrapper); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListContentItemsResponse_ContentItemMetaData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_pubgolf_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListContentItemsResponse_Section); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -869,15 +1939,15 @@ func file_api_v1_pubgolf_proto_init() {
 	}
 	file_api_v1_pubgolf_proto_msgTypes[2].OneofWrappers = []interface{}{}
 	file_api_v1_pubgolf_proto_msgTypes[3].OneofWrappers = []interface{}{}
-	file_api_v1_pubgolf_proto_msgTypes[6].OneofWrappers = []interface{}{}
-	file_api_v1_pubgolf_proto_msgTypes[8].OneofWrappers = []interface{}{}
+	file_api_v1_pubgolf_proto_msgTypes[18].OneofWrappers = []interface{}{}
+	file_api_v1_pubgolf_proto_msgTypes[20].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_v1_pubgolf_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
