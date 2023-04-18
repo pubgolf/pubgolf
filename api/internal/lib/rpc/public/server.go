@@ -1,8 +1,6 @@
 package public
 
 import (
-	"context"
-
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 )
@@ -14,8 +12,8 @@ type Server struct {
 }
 
 // NewServer constructs a gRPC server implementation with data access dependencies injected.
-func NewServer(ctx context.Context, q dao.QueryProvider) (*Server, error) {
+func NewServer(q dao.QueryProvider) *Server {
 	return &Server{
 		dao: q,
-	}, nil
+	}
 }

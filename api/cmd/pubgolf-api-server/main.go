@@ -69,7 +69,7 @@ func main() {
 	// Initialize server.
 	dao, err := dao.New(ctx, dbConn)
 	guard(err, "init DAO")
-	server := makeServer(ctx, cfg, dao)
+	server := makeServer(cfg, dao)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -102,19 +102,13 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(ctx context.Context, cfg *config.App, dao dao.QueryProvider) *http.Server {
-	// Construct gRPC servers.
-	gameServer, err := public.NewServer(ctx, dao)
-	guard(err, "initialize pubgolf gRPC server")
-	adminServer, err := admin.NewServer(ctx, dao)
-	guard(err, "initialize admin gRPC server")
-
+func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
 	// Bind gRPC server to mux.
 	rpcMux := http.NewServeMux()
-	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(gameServer,
+	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao),
 		connect.WithInterceptors(middleware.ConnectInterceptors()...),
 	))
-	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(adminServer,
+	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
 		connect.WithInterceptors(middleware.ConnectInterceptors()...),
 	))
 
