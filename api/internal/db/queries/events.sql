@@ -29,12 +29,15 @@ WHERE
 -- name: EventSchedule :many
 SELECT
   ev.venue_key,
-  ev.duration_minutes
+  ev.duration_minutes,
+  s.description
 FROM
   event_venues ev
+  LEFT JOIN stages s ON ev.stage_id = s.id
 WHERE
   ev.event_id = $1
   AND ev.deleted_at IS NULL
+  AND s.deleted_at IS NULL
 ORDER BY
   ev.rank ASC;
 

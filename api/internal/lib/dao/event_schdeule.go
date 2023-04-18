@@ -10,8 +10,9 @@ import (
 
 // VenueStop contains a venue lookup key and a duration in minutes spent at the venue.
 type VenueStop struct {
-	VenueKey models.VenueKey
-	Duration time.Duration
+	VenueKey    models.VenueKey
+	Duration    time.Duration
+	Description string
 }
 
 // EventSchedule returns a slice of venue keys and durations for the given event ID.
@@ -40,9 +41,15 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 
 	var venueStops []VenueStop
 	for _, v := range schedule {
+		desc := ""
+		if v.Description.Valid {
+			desc = v.Description.String
+		}
+
 		venueStops = append(venueStops, VenueStop{
-			VenueKey: v.VenueKey,
-			Duration: time.Duration(v.DurationMinutes) * time.Minute,
+			VenueKey:    v.VenueKey,
+			Duration:    time.Duration(v.DurationMinutes) * time.Minute,
+			Description: desc,
 		})
 	}
 

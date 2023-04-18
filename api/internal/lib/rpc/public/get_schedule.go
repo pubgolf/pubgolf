@@ -50,11 +50,12 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 	return connect.NewResponse(&apiv1.GetScheduleResponse{
 		LatestDataVersion: 0,
 		Schedule: &apiv1.GetScheduleResponse_Schedule{
-			VisitedVenueKeys: venueKeysUntilIndex(venues, currentVenueIdx),
-			CurrentVenueKey:  venueKeyAtIndex(venues, currentVenueIdx),
-			NextVenueKey:     nextVenue(venues, currentVenueIdx, nextVenueStart),
-			NextVenueStart:   nextVenueStartPB,
-			EventEnd:         timestamppb.New(startTime.Add(totalDuration(venues))),
+			VisitedVenueKeys:        venueKeysUntilIndex(venues, currentVenueIdx),
+			CurrentVenueKey:         venueKeyAtIndex(venues, currentVenueIdx),
+			NextVenueKey:            nextVenue(venues, currentVenueIdx, nextVenueStart),
+			NextVenueStart:          nextVenueStartPB,
+			EventEnd:                timestamppb.New(startTime.Add(totalDuration(venues))),
+			CurrentVenueDescription: descriptionAtIndex(venues, currentVenueIdx),
 		},
 	}), nil
 }
@@ -75,6 +76,16 @@ func venueKeysUntilIndex(venues []dao.VenueStop, idx int) []uint32 {
 func venueKeyAtIndex(venues []dao.VenueStop, idx int) *uint32 {
 	if idx >= 0 && idx < len(venues) {
 		v := venues[idx].VenueKey.UInt32()
+		return &v
+	}
+
+	return nil
+}
+
+// descriptionAtIndex returns the given venue stop's stage description text, or nil if the index is out of range.
+func descriptionAtIndex(venues []dao.VenueStop, idx int) *string {
+	if idx >= 0 && idx < len(venues) {
+		v := venues[idx].Description
 		return &v
 	}
 

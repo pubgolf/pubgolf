@@ -7,6 +7,7 @@ package dbc
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -32,12 +33,15 @@ func (q *Queries) EventIDByKey(ctx context.Context, key string) (models.EventID,
 const eventSchedule = `-- name: EventSchedule :many
 SELECT
   ev.venue_key,
-  ev.duration_minutes
+  ev.duration_minutes,
+  s.description
 FROM
   event_venues ev
+  LEFT JOIN stages s ON ev.stage_id = s.id
 WHERE
   ev.event_id = $1
   AND ev.deleted_at IS NULL
+  AND s.deleted_at IS NULL
 ORDER BY
   ev.rank ASC
 `
@@ -45,6 +49,7 @@ ORDER BY
 type EventScheduleRow struct {
 	VenueKey        models.VenueKey
 	DurationMinutes uint32
+	Description     sql.NullString
 }
 
 func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]EventScheduleRow, error) {
@@ -56,7 +61,7 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 	var items []EventScheduleRow
 	for rows.Next() {
 		var i EventScheduleRow
-		if err := rows.Scan(&i.VenueKey, &i.DurationMinutes); err != nil {
+		if err := rows.Scan(&i.VenueKey, &i.DurationMinutes, &i.Description); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
