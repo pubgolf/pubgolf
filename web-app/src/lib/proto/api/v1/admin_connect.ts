@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreatePlayerRequest, CreatePlayerResponse, ListPlayersRequest, ListPlayersResponse, UpdatePlayerRequest, UpdatePlayerResponse } from "./admin_pb.js";
+import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, ListPlayersRequest, ListPlayersResponse, UpdatePlayerRequest, UpdatePlayerResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -23,8 +23,8 @@ export const AdminService = {
      */
     createPlayer: {
       name: "CreatePlayer",
-      I: CreatePlayerRequest,
-      O: CreatePlayerResponse,
+      I: AdminServiceCreatePlayerRequest,
+      O: AdminServiceCreatePlayerResponse,
       kind: MethodKind.Unary,
     },
     /**

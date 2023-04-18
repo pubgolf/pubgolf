@@ -11,7 +11,7 @@ option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;ap
 // AdminService allows administering events with enhanced permissions.
 service AdminService {
   // CreatePlayer creates a new player profile for a given event.
-  rpc CreatePlayer(CreatePlayerRequest) returns (CreatePlayerResponse) {}
+  rpc CreatePlayer(AdminServiceCreatePlayerRequest) returns (AdminServiceCreatePlayerResponse) {}
 
   // UpdatePlayer modifies the player's profile and settings for a given event.
   rpc UpdatePlayer(UpdatePlayerRequest) returns (UpdatePlayerResponse) {}
@@ -22,11 +22,11 @@ service AdminService {
 
 // CreatePlayer
 
-message CreatePlayerRequest {
+message AdminServiceCreatePlayerRequest {
   string event_key = 1;
   PlayerData player_data = 2;
 }
-message CreatePlayerResponse {
+message AdminServiceCreatePlayerResponse {
   Player player = 1;
 }
 

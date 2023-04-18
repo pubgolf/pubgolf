@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, GetContentItemRequest, GetContentItemResponse, GetPlayerByNameRequest, GetPlayerByNameResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, GetContentItemRequest, GetContentItemResponse, GetPlayerByNameRequest, GetPlayerByNameResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -25,6 +25,17 @@ export const PubGolfService = {
       name: "ClientVersion",
       I: ClientVersionRequest,
       O: ClientVersionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * CreatePlayer creates a new player profile for a given event.
+     *
+     * @generated from rpc api.v1.PubGolfService.CreatePlayer
+     */
+    createPlayer: {
+      name: "CreatePlayer",
+      I: PubGolfServiceCreatePlayerRequest,
+      O: PubGolfServiceCreatePlayerResponse,
       kind: MethodKind.Unary,
     },
     /**

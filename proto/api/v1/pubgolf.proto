@@ -14,6 +14,9 @@ service PubGolfService {
   // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
   rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}
 
+  // CreatePlayer creates a new player profile for a given event.
+  rpc CreatePlayer(PubGolfServiceCreatePlayerRequest) returns (PubGolfServiceCreatePlayerResponse) {}
+
   // Event
 
   // GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
@@ -56,6 +59,16 @@ message ClientVersionResponse {
     VERSION_STATUS_INCOMPATIBLE = 3;
   }
   VersionStatus version_status = 1;
+}
+
+// CreatePlayer
+
+message PubGolfServiceCreatePlayerRequest {
+  string event_key = 1;
+  PlayerData player_data = 2;
+}
+message PubGolfServiceCreatePlayerResponse {
+  Player player = 1;
 }
 
 // GetSchedule

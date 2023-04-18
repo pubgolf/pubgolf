@@ -10,9 +10,9 @@ import { Message, proto3 } from "@bufbuild/protobuf";
 import { Player, PlayerData } from "./shared_pb.js";
 
 /**
- * @generated from message api.v1.CreatePlayerRequest
+ * @generated from message api.v1.AdminServiceCreatePlayerRequest
  */
-export class CreatePlayerRequest extends Message<CreatePlayerRequest> {
+export class AdminServiceCreatePlayerRequest extends Message<AdminServiceCreatePlayerRequest> {
   /**
    * @generated from field: string event_key = 1;
    */
@@ -23,69 +23,69 @@ export class CreatePlayerRequest extends Message<CreatePlayerRequest> {
    */
   playerData?: PlayerData;
 
-  constructor(data?: PartialMessage<CreatePlayerRequest>) {
+  constructor(data?: PartialMessage<AdminServiceCreatePlayerRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.CreatePlayerRequest";
+  static readonly typeName = "api.v1.AdminServiceCreatePlayerRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "player_data", kind: "message", T: PlayerData },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreatePlayerRequest {
-    return new CreatePlayerRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdminServiceCreatePlayerRequest {
+    return new AdminServiceCreatePlayerRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreatePlayerRequest {
-    return new CreatePlayerRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AdminServiceCreatePlayerRequest {
+    return new AdminServiceCreatePlayerRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreatePlayerRequest {
-    return new CreatePlayerRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AdminServiceCreatePlayerRequest {
+    return new AdminServiceCreatePlayerRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CreatePlayerRequest | PlainMessage<CreatePlayerRequest> | undefined, b: CreatePlayerRequest | PlainMessage<CreatePlayerRequest> | undefined): boolean {
-    return proto3.util.equals(CreatePlayerRequest, a, b);
+  static equals(a: AdminServiceCreatePlayerRequest | PlainMessage<AdminServiceCreatePlayerRequest> | undefined, b: AdminServiceCreatePlayerRequest | PlainMessage<AdminServiceCreatePlayerRequest> | undefined): boolean {
+    return proto3.util.equals(AdminServiceCreatePlayerRequest, a, b);
   }
 }
 
 /**
- * @generated from message api.v1.CreatePlayerResponse
+ * @generated from message api.v1.AdminServiceCreatePlayerResponse
  */
-export class CreatePlayerResponse extends Message<CreatePlayerResponse> {
+export class AdminServiceCreatePlayerResponse extends Message<AdminServiceCreatePlayerResponse> {
   /**
    * @generated from field: api.v1.Player player = 1;
    */
   player?: Player;
 
-  constructor(data?: PartialMessage<CreatePlayerResponse>) {
+  constructor(data?: PartialMessage<AdminServiceCreatePlayerResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.CreatePlayerResponse";
+  static readonly typeName = "api.v1.AdminServiceCreatePlayerResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "player", kind: "message", T: Player },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreatePlayerResponse {
-    return new CreatePlayerResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdminServiceCreatePlayerResponse {
+    return new AdminServiceCreatePlayerResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreatePlayerResponse {
-    return new CreatePlayerResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AdminServiceCreatePlayerResponse {
+    return new AdminServiceCreatePlayerResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreatePlayerResponse {
-    return new CreatePlayerResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AdminServiceCreatePlayerResponse {
+    return new AdminServiceCreatePlayerResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CreatePlayerResponse | PlainMessage<CreatePlayerResponse> | undefined, b: CreatePlayerResponse | PlainMessage<CreatePlayerResponse> | undefined): boolean {
-    return proto3.util.equals(CreatePlayerResponse, a, b);
+  static equals(a: AdminServiceCreatePlayerResponse | PlainMessage<AdminServiceCreatePlayerResponse> | undefined, b: AdminServiceCreatePlayerResponse | PlainMessage<AdminServiceCreatePlayerResponse> | undefined): boolean {
+    return proto3.util.equals(AdminServiceCreatePlayerResponse, a, b);
   }
 }
 

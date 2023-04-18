@@ -38,6 +38,9 @@ const (
 	// PubGolfServiceClientVersionProcedure is the fully-qualified name of the PubGolfService's
 	// ClientVersion RPC.
 	PubGolfServiceClientVersionProcedure = "/api.v1.PubGolfService/ClientVersion"
+	// PubGolfServiceCreatePlayerProcedure is the fully-qualified name of the PubGolfService's
+	// CreatePlayer RPC.
+	PubGolfServiceCreatePlayerProcedure = "/api.v1.PubGolfService/CreatePlayer"
 	// PubGolfServiceGetScheduleProcedure is the fully-qualified name of the PubGolfService's
 	// GetSchedule RPC.
 	PubGolfServiceGetScheduleProcedure = "/api.v1.PubGolfService/GetSchedule"
@@ -67,6 +70,8 @@ const (
 type PubGolfServiceClient interface {
 	// ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
 	ClientVersion(context.Context, *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error)
+	// CreatePlayer creates a new player profile for a given event.
+	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
 	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
@@ -98,6 +103,11 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 		clientVersion: connect_go.NewClient[v1.ClientVersionRequest, v1.ClientVersionResponse](
 			httpClient,
 			baseURL+PubGolfServiceClientVersionProcedure,
+			opts...,
+		),
+		createPlayer: connect_go.NewClient[v1.PubGolfServiceCreatePlayerRequest, v1.PubGolfServiceCreatePlayerResponse](
+			httpClient,
+			baseURL+PubGolfServiceCreatePlayerProcedure,
 			opts...,
 		),
 		getSchedule: connect_go.NewClient[v1.GetScheduleRequest, v1.GetScheduleResponse](
@@ -146,6 +156,7 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 // pubGolfServiceClient implements PubGolfServiceClient.
 type pubGolfServiceClient struct {
 	clientVersion        *connect_go.Client[v1.ClientVersionRequest, v1.ClientVersionResponse]
+	createPlayer         *connect_go.Client[v1.PubGolfServiceCreatePlayerRequest, v1.PubGolfServiceCreatePlayerResponse]
 	getSchedule          *connect_go.Client[v1.GetScheduleRequest, v1.GetScheduleResponse]
 	getVenue             *connect_go.Client[v1.GetVenueRequest, v1.GetVenueResponse]
 	listContentItems     *connect_go.Client[v1.ListContentItemsRequest, v1.ListContentItemsResponse]
@@ -159,6 +170,11 @@ type pubGolfServiceClient struct {
 // ClientVersion calls api.v1.PubGolfService.ClientVersion.
 func (c *pubGolfServiceClient) ClientVersion(ctx context.Context, req *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error) {
 	return c.clientVersion.CallUnary(ctx, req)
+}
+
+// CreatePlayer calls api.v1.PubGolfService.CreatePlayer.
+func (c *pubGolfServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error) {
+	return c.createPlayer.CallUnary(ctx, req)
 }
 
 // GetSchedule calls api.v1.PubGolfService.GetSchedule.
@@ -205,6 +221,8 @@ func (c *pubGolfServiceClient) GetScoresForVenue(ctx context.Context, req *conne
 type PubGolfServiceHandler interface {
 	// ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
 	ClientVersion(context.Context, *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error)
+	// CreatePlayer creates a new player profile for a given event.
+	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
 	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
@@ -233,6 +251,11 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect_go.Hand
 	mux.Handle(PubGolfServiceClientVersionProcedure, connect_go.NewUnaryHandler(
 		PubGolfServiceClientVersionProcedure,
 		svc.ClientVersion,
+		opts...,
+	))
+	mux.Handle(PubGolfServiceCreatePlayerProcedure, connect_go.NewUnaryHandler(
+		PubGolfServiceCreatePlayerProcedure,
+		svc.CreatePlayer,
 		opts...,
 	))
 	mux.Handle(PubGolfServiceGetScheduleProcedure, connect_go.NewUnaryHandler(
@@ -283,6 +306,10 @@ type UnimplementedPubGolfServiceHandler struct{}
 
 func (UnimplementedPubGolfServiceHandler) ClientVersion(context.Context, *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.ClientVersion is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.CreatePlayer is not implemented"))
 }
 
 func (UnimplementedPubGolfServiceHandler) GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error) {

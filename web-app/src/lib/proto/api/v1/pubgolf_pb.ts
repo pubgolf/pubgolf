@@ -7,7 +7,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Color, Player, ScoreBoard, ScoringCategory } from "./shared_pb.js";
+import { Color, Player, PlayerData, ScoreBoard, ScoringCategory } from "./shared_pb.js";
 
 /**
  * @generated from message api.v1.ClientVersionRequest
@@ -114,6 +114,86 @@ proto3.util.setEnumType(ClientVersionResponse_VersionStatus, "api.v1.ClientVersi
   { no: 2, name: "VERSION_STATUS_OUTDATED" },
   { no: 3, name: "VERSION_STATUS_INCOMPATIBLE" },
 ]);
+
+/**
+ * @generated from message api.v1.PubGolfServiceCreatePlayerRequest
+ */
+export class PubGolfServiceCreatePlayerRequest extends Message<PubGolfServiceCreatePlayerRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  /**
+   * @generated from field: api.v1.PlayerData player_data = 2;
+   */
+  playerData?: PlayerData;
+
+  constructor(data?: PartialMessage<PubGolfServiceCreatePlayerRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PubGolfServiceCreatePlayerRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_data", kind: "message", T: PlayerData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PubGolfServiceCreatePlayerRequest {
+    return new PubGolfServiceCreatePlayerRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PubGolfServiceCreatePlayerRequest {
+    return new PubGolfServiceCreatePlayerRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PubGolfServiceCreatePlayerRequest {
+    return new PubGolfServiceCreatePlayerRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PubGolfServiceCreatePlayerRequest | PlainMessage<PubGolfServiceCreatePlayerRequest> | undefined, b: PubGolfServiceCreatePlayerRequest | PlainMessage<PubGolfServiceCreatePlayerRequest> | undefined): boolean {
+    return proto3.util.equals(PubGolfServiceCreatePlayerRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.PubGolfServiceCreatePlayerResponse
+ */
+export class PubGolfServiceCreatePlayerResponse extends Message<PubGolfServiceCreatePlayerResponse> {
+  /**
+   * @generated from field: api.v1.Player player = 1;
+   */
+  player?: Player;
+
+  constructor(data?: PartialMessage<PubGolfServiceCreatePlayerResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PubGolfServiceCreatePlayerResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "player", kind: "message", T: Player },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PubGolfServiceCreatePlayerResponse {
+    return new PubGolfServiceCreatePlayerResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PubGolfServiceCreatePlayerResponse {
+    return new PubGolfServiceCreatePlayerResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PubGolfServiceCreatePlayerResponse {
+    return new PubGolfServiceCreatePlayerResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PubGolfServiceCreatePlayerResponse | PlainMessage<PubGolfServiceCreatePlayerResponse> | undefined, b: PubGolfServiceCreatePlayerResponse | PlainMessage<PubGolfServiceCreatePlayerResponse> | undefined): boolean {
+    return proto3.util.equals(PubGolfServiceCreatePlayerResponse, a, b);
+  }
+}
 
 /**
  * @generated from message api.v1.GetScheduleRequest

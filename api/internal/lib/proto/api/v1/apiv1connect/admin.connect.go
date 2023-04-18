@@ -49,7 +49,7 @@ const (
 // AdminServiceClient is a client for the api.v1.AdminService service.
 type AdminServiceClient interface {
 	// CreatePlayer creates a new player profile for a given event.
-	CreatePlayer(context.Context, *connect_go.Request[v1.CreatePlayerRequest]) (*connect_go.Response[v1.CreatePlayerResponse], error)
+	CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
 	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
@@ -66,7 +66,7 @@ type AdminServiceClient interface {
 func NewAdminServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) AdminServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &adminServiceClient{
-		createPlayer: connect_go.NewClient[v1.CreatePlayerRequest, v1.CreatePlayerResponse](
+		createPlayer: connect_go.NewClient[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse](
 			httpClient,
 			baseURL+AdminServiceCreatePlayerProcedure,
 			opts...,
@@ -86,13 +86,13 @@ func NewAdminServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 
 // adminServiceClient implements AdminServiceClient.
 type adminServiceClient struct {
-	createPlayer *connect_go.Client[v1.CreatePlayerRequest, v1.CreatePlayerResponse]
+	createPlayer *connect_go.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
 	updatePlayer *connect_go.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
 	listPlayers  *connect_go.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
 }
 
 // CreatePlayer calls api.v1.AdminService.CreatePlayer.
-func (c *adminServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.CreatePlayerRequest]) (*connect_go.Response[v1.CreatePlayerResponse], error) {
+func (c *adminServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error) {
 	return c.createPlayer.CallUnary(ctx, req)
 }
 
@@ -109,7 +109,7 @@ func (c *adminServiceClient) ListPlayers(ctx context.Context, req *connect_go.Re
 // AdminServiceHandler is an implementation of the api.v1.AdminService service.
 type AdminServiceHandler interface {
 	// CreatePlayer creates a new player profile for a given event.
-	CreatePlayer(context.Context, *connect_go.Request[v1.CreatePlayerRequest]) (*connect_go.Response[v1.CreatePlayerResponse], error)
+	CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
 	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
@@ -144,7 +144,7 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerO
 // UnimplementedAdminServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAdminServiceHandler struct{}
 
-func (UnimplementedAdminServiceHandler) CreatePlayer(context.Context, *connect_go.Request[v1.CreatePlayerRequest]) (*connect_go.Response[v1.CreatePlayerResponse], error) {
+func (UnimplementedAdminServiceHandler) CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.CreatePlayer is not implemented"))
 }
 
