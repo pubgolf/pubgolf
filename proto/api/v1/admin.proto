@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package api.v1;
 
-import "proto/api/v1/shared.proto";
+import "api/v1/shared.proto";
 
 option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;apiv1";
 
