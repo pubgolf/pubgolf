@@ -42,7 +42,7 @@ func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVen
 				Id:       v.ID.String(),
 				Name:     v.Name,
 				Address:  v.Address,
-				ImageUrl: "",
+				ImageUrl: v.ImageURL,
 			},
 		}
 	}

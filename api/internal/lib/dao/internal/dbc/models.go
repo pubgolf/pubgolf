@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"time"
 
+	ulid "github.com/oklog/ulid/v2"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
@@ -24,6 +25,7 @@ type Event struct {
 	CreatedAt                   time.Time
 	UpdatedAt                   time.Time
 	DeletedAt                   sql.NullTime
+	CurrentScheduleCacheHash    []byte
 }
 
 type EventVenue struct {
@@ -35,6 +37,7 @@ type EventVenue struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       sql.NullTime
+	StageID         ulid.ULID
 }
 
 type Player struct {
@@ -47,6 +50,14 @@ type Player struct {
 	DeletedAt       sql.NullTime
 }
 
+type Stage struct {
+	ID          ulid.ULID
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   sql.NullTime
+}
+
 type Venue struct {
 	ID        models.VenueID
 	Name      string
@@ -54,4 +65,5 @@ type Venue struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime
+	ImageUrl  sql.NullString
 }

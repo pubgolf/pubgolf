@@ -2,7 +2,8 @@
 SELECT
   v.id,
   v.name,
-  v.address
+  v.address,
+  v.image_url
 FROM
   event_venues ev
   JOIN venues v ON ev.venue_id = v.id

@@ -7,6 +7,7 @@ package dbc
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -15,7 +16,8 @@ const venueByKey = `-- name: VenueByKey :one
 SELECT
   v.id,
   v.name,
-  v.address
+  v.address,
+  v.image_url
 FROM
   event_venues ev
   JOIN venues v ON ev.venue_id = v.id
@@ -32,14 +34,20 @@ type VenueByKeyParams struct {
 }
 
 type VenueByKeyRow struct {
-	ID      models.VenueID
-	Name    string
-	Address string
+	ID       models.VenueID
+	Name     string
+	Address  string
+	ImageUrl sql.NullString
 }
 
 func (q *Queries) VenueByKey(ctx context.Context, arg VenueByKeyParams) (VenueByKeyRow, error) {
 	row := q.queryRow(ctx, q.venueByKeyStmt, venueByKey, arg.EventID, arg.VenueKey)
 	var i VenueByKeyRow
-	err := row.Scan(&i.ID, &i.Name, &i.Address)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Address,
+		&i.ImageUrl,
+	)
 	return i, err
 }
