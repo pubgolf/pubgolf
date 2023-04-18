@@ -27,7 +27,7 @@ CREATE TABLE stages(
 );
 
 ALTER TABLE event_venues
-  ADD COLUMN stage_id uuid REFERENCES stages(id);
+  ADD COLUMN stage_id uuid UNIQUE REFERENCES stages(id);
 
 COMMIT;
 
