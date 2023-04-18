@@ -19,6 +19,8 @@ type QueryProvider interface {
 	EventPlayers(ctx context.Context, eventID models.EventID) ([]models.Player, error)
 	// EventSchedule returns a slice of venue keys and durations for the given event ID.
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error)
+	// EventScheduleCacheVersion returns the integer version number of the latest schedule version, as well as whether or not the provided hash triggered a cache break.
+	EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// UpdatePlayer creates a new player and adds them to the given event.

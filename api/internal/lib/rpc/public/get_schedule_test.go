@@ -57,6 +57,22 @@ func mockEventSchedule(m *dao.MockQueryProvider, eventID models.EventID, schedul
 	}.Bind(m, "EventSchedule")
 }
 
+func mockEventScheduleCacheVersion(m *dao.MockQueryProvider, eventID models.EventID, version uint32, matched bool) {
+	dao.MockDAOCall{
+		ShouldCall: true,
+		Args: []interface{}{
+			mock.Anything,
+			eventID,
+			mock.Anything,
+		},
+		Return: []interface{}{
+			version,
+			matched,
+			nil,
+		},
+	}.Bind(m, "EventScheduleCacheVersion")
+}
+
 var _testSchedule = []dao.VenueStop{
 	{VenueKey: models.VenueKeyFromUInt32(1), Duration: 30 * time.Minute},
 	{VenueKey: models.VenueKeyFromUInt32(2), Duration: 30 * time.Minute},
@@ -72,6 +88,10 @@ var _testSchedule = []dao.VenueStop{
 func _venueKeyAtIndex(schedule []dao.VenueStop, index int) *uint32 {
 	i := schedule[index].VenueKey.UInt32()
 	return &i
+}
+
+func pointerFromUInt32(u uint32) *uint32 {
+	return &u
 }
 
 func assertVenueKeysMatch(t *testing.T, expected *uint32, actual *uint32) {
@@ -103,6 +123,7 @@ func TestGetSchedule(t *testing.T) {
 		mockEventIDByKey(mockDAO, eventKey, eventID)
 		mockEventStartTime(mockDAO, eventID, time.Now().Add(time.Minute*5))
 		mockEventSchedule(mockDAO, eventID, []dao.VenueStop{})
+		mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
 		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
 			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
@@ -111,197 +132,402 @@ func TestGetSchedule(t *testing.T) {
 		assert.NotNil(t, resp.Msg.Schedule.NextVenueStart)
 	})
 
-	t.Run("Handles pre-event state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+	t.Run("Calculating event schedule", func(t *testing.T) {
+		t.Run("Handles pre-event state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * 5)
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * 5)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime, resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
 		})
-		assert.NoError(t, err)
 
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime, resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		t.Run("Handles first venue, pre-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * -15)
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles first venue, post-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * -25)
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 1), resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles fifth venue, pre-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * (-1*(30*4) - 15))
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 4)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 4), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(5*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles fifth venue, post-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * (-1*(30*4) - 25))
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 4)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 4), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 5), resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(5*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles last venue, pre-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * (-1*(30*8) - 15))
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 8)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 8), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(9*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles last venue, post-visibility state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * (-1*(30*8) - 25))
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 8)
+			assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 8), resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
+			assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
+
+		t.Run("Handles post-event state", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
+
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * (-1 * (30 * 10)))
+
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
+
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 9)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.CurrentVenueKey)
+			assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
+			assert.Nil(t, resp.Msg.Schedule.NextVenueStart)
+
+			assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+			assertTimestampsMatch(t, time.Now().Add(-30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
+		})
 	})
 
-	t.Run("Handles first venue, pre-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+	t.Run("Calculating data cache", func(t *testing.T) {
+		t.Run("Returns data version from EventScheduleCacheVersion call", func(t *testing.T) {
+			mockDAO := new(dao.MockQueryProvider)
+			s := NewServer(mockDAO)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * -15)
+			eventKey := "my-testing-key"
+			eventID := models.EventIDFromULID(ulid.Make())
+			startTime := time.Now().Add(time.Minute * 5)
+			cacheVersion := uint32(999)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockEventStartTime(mockDAO, eventID, startTime)
+			mockEventSchedule(mockDAO, eventID, _testSchedule)
+			mockEventScheduleCacheVersion(mockDAO, eventID, cacheVersion, true)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+			})
+			assert.NoError(t, err)
+
+			assert.Equal(t, cacheVersion, resp.Msg.LatestDataVersion)
 		})
-		assert.NoError(t, err)
+		t.Run("When request is missing CachedDataVersion", func(t *testing.T) {
+			t.Run("Returns schedule when hash matches", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
 
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
 
-	t.Run("Handles first venue, post-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 1, true)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * -25)
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				})
+				assert.NoError(t, err)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
+			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
+
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 1, false)
+
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				})
+				assert.NoError(t, err)
+
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
 		})
-		assert.NoError(t, err)
 
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 0)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 0), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 1), resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
+		t.Run("When request has lower cache data version", func(t *testing.T) {
+			t.Run("Returns schedule when hash matches", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
 
-	t.Run("Handles fifth venue, pre-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * (-1*(30*4) - 15))
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(1)},
+				})
+				assert.NoError(t, err)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
+			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
+
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
+
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
+
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(1)},
+				})
+				assert.NoError(t, err)
+
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
 		})
-		assert.NoError(t, err)
 
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 4)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 4), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(5*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
+		t.Run("When request has matching cache data version", func(t *testing.T) {
+			t.Run("Does not return schedule when hash matches", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
 
-	t.Run("Handles fifth venue, post-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * (-1*(30*4) - 25))
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(2)},
+				})
+				assert.NoError(t, err)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				assert.Nil(t, resp.Msg.Schedule)
+			})
+			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
+
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
+
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
+
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(2)},
+				})
+				assert.NoError(t, err)
+
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
 		})
-		assert.NoError(t, err)
 
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 4)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 4), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 5), resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(5*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
+		t.Run("When request has greater cache data version", func(t *testing.T) {
+			t.Run("Returns schedule when hash matches", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
 
-	t.Run("Handles last venue, pre-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
 
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * (-1*(30*8) - 15))
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(3)},
+				})
+				assert.NoError(t, err)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
+			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
+				mockDAO := new(dao.MockQueryProvider)
+				s := NewServer(mockDAO)
+
+				eventKey := "my-testing-key"
+				eventID := models.EventIDFromULID(ulid.Make())
+				startTime := time.Now().Add(time.Minute * 5)
+
+				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockEventStartTime(mockDAO, eventID, startTime)
+				mockEventSchedule(mockDAO, eventID, _testSchedule)
+				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
+
+				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(3)},
+				})
+				assert.NoError(t, err)
+
+				assert.NotNil(t, resp.Msg.Schedule)
+			})
 		})
-		assert.NoError(t, err)
-
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 8)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 8), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(9*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
-
-	t.Run("Handles last venue, post-visibility state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
-
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * (-1*(30*8) - 25))
-
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
-
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
-		})
-		assert.NoError(t, err)
-
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 8)
-		assertVenueKeysMatch(t, _venueKeyAtIndex(_testSchedule, 8), resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.NextVenueStart.AsTime())
-		assertTimestampsMatch(t, startTime.Add(time.Duration(len(_testSchedule))*30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-	})
-
-	t.Run("Handles post-event state", func(t *testing.T) {
-		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
-
-		eventKey := "my-testing-key"
-		eventID := models.EventIDFromULID(ulid.Make())
-		startTime := time.Now().Add(time.Minute * (-1 * (30 * 10)))
-
-		mockEventIDByKey(mockDAO, eventKey, eventID)
-		mockEventStartTime(mockDAO, eventID, startTime)
-		mockEventSchedule(mockDAO, eventID, _testSchedule)
-
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
-			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
-		})
-		assert.NoError(t, err)
-
-		assert.Len(t, resp.Msg.Schedule.VisitedVenueKeys, 9)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.CurrentVenueKey)
-		assertVenueKeysMatch(t, nil, resp.Msg.Schedule.NextVenueKey)
-		assert.Nil(t, resp.Msg.Schedule.NextVenueStart)
-
-		assertTimestampsMatch(t, startTime.Add(30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
-		assertTimestampsMatch(t, time.Now().Add(-30*time.Minute), resp.Msg.Schedule.EventEnd.AsTime())
 	})
 }

@@ -104,6 +104,34 @@ func (_m *MockQueryProvider) EventSchedule(ctx context.Context, eventID models.E
 	return r0, r1
 }
 
+// EventScheduleCacheVersion provides a mock function with given fields: ctx, eventID, hash
+func (_m *MockQueryProvider) EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (uint32, bool, error) {
+	ret := _m.Called(ctx, eventID, hash)
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, []byte) uint32); ok {
+		r0 = rf(ctx, eventID, hash)
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, []byte) bool); ok {
+		r1 = rf(ctx, eventID, hash)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, models.EventID, []byte) error); ok {
+		r2 = rf(ctx, eventID, hash)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // EventStartTime provides a mock function with given fields: ctx, id
 func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {
 	ret := _m.Called(ctx, id)

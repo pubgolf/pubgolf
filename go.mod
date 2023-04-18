@@ -18,6 +18,7 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kyleconroy/sqlc v1.17.2
+	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/radovskyb/watcher v1.0.7

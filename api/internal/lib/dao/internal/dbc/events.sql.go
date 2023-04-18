@@ -13,6 +13,29 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+const eventCacheVersionByHash = `-- name: EventCacheVersionByHash :one
+SELECT
+  current_schedule_cache_version
+FROM
+  events
+WHERE
+  id = $1
+  AND current_schedule_cache_hash = $2
+  AND deleted_at IS NULL
+`
+
+type EventCacheVersionByHashParams struct {
+	ID                       models.EventID
+	CurrentScheduleCacheHash []byte
+}
+
+func (q *Queries) EventCacheVersionByHash(ctx context.Context, arg EventCacheVersionByHashParams) (uint32, error) {
+	row := q.queryRow(ctx, q.eventCacheVersionByHashStmt, eventCacheVersionByHash, arg.ID, arg.CurrentScheduleCacheHash)
+	var current_schedule_cache_version uint32
+	err := row.Scan(&current_schedule_cache_version)
+	return current_schedule_cache_version, err
+}
+
 const eventIDByKey = `-- name: EventIDByKey :one
 SELECT
   id
@@ -108,6 +131,40 @@ func (q *Queries) EventVenueKeysAreValid(ctx context.Context, eventID models.Eve
 	var column_1 bool
 	err := row.Scan(&column_1)
 	return column_1, err
+}
+
+const setEventCacheKeys = `-- name: SetEventCacheKeys :one
+WITH starting_cache_version AS (
+  SELECT
+    current_schedule_cache_version
+  FROM
+    events
+  WHERE
+    id = $1)
+UPDATE
+  events e
+SET
+  current_schedule_cache_hash = $2,
+  current_schedule_cache_version = scv.current_schedule_cache_version + 1,
+  update_at = now()
+FROM
+  starting_cache_version scv
+WHERE
+  e.id = $1
+RETURNING
+  e.current_schedule_cache_version
+`
+
+type SetEventCacheKeysParams struct {
+	ID                       models.EventID
+	CurrentScheduleCacheHash []byte
+}
+
+func (q *Queries) SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error) {
+	row := q.queryRow(ctx, q.setEventCacheKeysStmt, setEventCacheKeys, arg.ID, arg.CurrentScheduleCacheHash)
+	var current_schedule_cache_version uint32
+	err := row.Scan(&current_schedule_cache_version)
+	return current_schedule_cache_version, err
 }
 
 const setEventVenueKeys = `-- name: SetEventVenueKeys :exec

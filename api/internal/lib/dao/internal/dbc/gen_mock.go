@@ -37,6 +37,27 @@ func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams)
 	return r0, r1
 }
 
+// EventCacheVersionByHash provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) EventCacheVersionByHash(ctx context.Context, arg EventCacheVersionByHashParams) (uint32, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func(context.Context, EventCacheVersionByHashParams) uint32); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, EventCacheVersionByHashParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventIDByKey provides a mock function with given fields: ctx, key
 func (_m *MockQuerier) EventIDByKey(ctx context.Context, key string) (models.EventID, error) {
 	ret := _m.Called(ctx, key)
@@ -139,6 +160,27 @@ func (_m *MockQuerier) EventVenueKeysAreValid(ctx context.Context, eventID model
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
 		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SetEventCacheKeys provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func(context.Context, SetEventCacheKeysParams) uint32); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, SetEventCacheKeysParams) error); ok {
+		r1 = rf(ctx, arg)
 	} else {
 		r1 = ret.Error(1)
 	}

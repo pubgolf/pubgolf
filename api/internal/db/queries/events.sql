@@ -95,3 +95,34 @@ SET
 WHERE
   id = $1;
 
+-- name: EventCacheVersionByHash :one
+SELECT
+  current_schedule_cache_version
+FROM
+  events
+WHERE
+  id = $1
+  AND current_schedule_cache_hash = $2
+  AND deleted_at IS NULL;
+
+-- name: SetEventCacheKeys :one
+WITH starting_cache_version AS (
+  SELECT
+    current_schedule_cache_version
+  FROM
+    events
+  WHERE
+    id = $1)
+UPDATE
+  events e
+SET
+  current_schedule_cache_hash = $2,
+  current_schedule_cache_version = scv.current_schedule_cache_version + 1,
+  update_at = now()
+FROM
+  starting_cache_version scv
+WHERE
+  e.id = $1
+RETURNING
+  e.current_schedule_cache_version;
+

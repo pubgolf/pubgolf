@@ -3,10 +3,12 @@ package public
 import (
 	"context"
 	"database/sql"
+	"encoding/binary"
 	"errors"
 	"time"
 
 	"github.com/bufbuild/connect-go"
+	"github.com/mitchellh/hashstructure/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
@@ -47,17 +49,34 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 		nextVenueStartPB = timestamppb.New(*nextVenueStart)
 	}
 
-	return connect.NewResponse(&apiv1.GetScheduleResponse{
-		LatestDataVersion: 0,
-		Schedule: &apiv1.GetScheduleResponse_Schedule{
-			VisitedVenueKeys:        venueKeysUntilIndex(venues, currentVenueIdx),
-			CurrentVenueKey:         venueKeyAtIndex(venues, currentVenueIdx),
-			NextVenueKey:            nextVenue(venues, currentVenueIdx, nextVenueStart),
-			NextVenueStart:          nextVenueStartPB,
-			EventEnd:                timestamppb.New(startTime.Add(totalDuration(venues))),
-			CurrentVenueDescription: descriptionAtIndex(venues, currentVenueIdx),
-		},
-	}), nil
+	schedule := apiv1.GetScheduleResponse_Schedule{
+		VisitedVenueKeys:        venueKeysUntilIndex(venues, currentVenueIdx),
+		CurrentVenueKey:         venueKeyAtIndex(venues, currentVenueIdx),
+		NextVenueKey:            nextVenue(venues, currentVenueIdx, nextVenueStart),
+		NextVenueStart:          nextVenueStartPB,
+		EventEnd:                timestamppb.New(startTime.Add(totalDuration(venues))),
+		CurrentVenueDescription: descriptionAtIndex(venues, currentVenueIdx),
+	}
+
+	hashCode, err := hashstructure.Hash(&schedule, hashstructure.FormatV2, nil)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeUnknown, err)
+	}
+
+	hash := make([]byte, 8)
+	binary.LittleEndian.PutUint64(hash, hashCode)
+
+	version, hashMatched, err := s.dao.EventScheduleCacheVersion(ctx, eventID, hash)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeUnknown, err)
+	}
+
+	resp := apiv1.GetScheduleResponse{LatestDataVersion: version}
+	if !hashMatched || version != req.Msg.GetCachedDataVersion() {
+		resp.Schedule = &schedule
+	}
+
+	return connect.NewResponse(&resp), nil
 }
 
 // venueKeysUntilIndex returns the venue keys in the range `[0, idx)`.
