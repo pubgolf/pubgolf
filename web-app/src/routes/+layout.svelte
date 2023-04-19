@@ -3,7 +3,7 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.postcss';
 
-	import { Drawer, Modal } from '@skeletonlabs/skeleton';
+	import { Drawer, Modal, Toast } from '@skeletonlabs/skeleton';
 	import SidebarContent from '$lib/components/sidebars/SidebarContent.svelte';
 </script>
 
@@ -12,6 +12,8 @@
 </Drawer>
 
 <Modal position="items-start pt-24" />
+
+<Toast />
 
 <div class="h-screen overflow-y-auto">
 	<slot />
