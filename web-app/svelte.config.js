@@ -36,7 +36,8 @@ const config = {
 				'/admin/nyc-2023/event-info',
 				'/admin/nyc-2023/players',
 				'/admin/nyc-2023/schedule',
-				'/admin/nyc-2023/scores'
+				'/admin/nyc-2023/scores',
+				'/auth/login'
 			]
 		}
 	}
