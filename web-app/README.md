@@ -1,38 +1,37 @@
-# create-svelte
+# web-app
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This directory contains the source code for the PubGolf promotional website, as well as the web-based admin UI.
 
-## Creating a project
+Unlike the other sub-projects, commands in this README should be run within the `web-app/` subdirectory.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Development
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+First, ensure the app server is running, (use `pubgolf-devctrl run api` in the repo root). Then, in another terminal in the `web-app/` subdirectory, run:
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+You can then access the app on [http://127.0.0.1:5000](http://127.0.0.1:5000) (note not `localhost:5000`). To change the port, update the dev configuration in Doppler.
 
-To create a production version of your app:
+## Lint/Check
 
-```bash
-npm run build
+```sh
+npm run lint
+npm run format
+npm run check
 ```
 
-You can preview the production build with `npm run preview`.
+## Test
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+```sh
+npm run test:unit
+npm run test:e2e
+```
+
+## Build
+The following produces a production build and serves it on port `:4173`. Note that you will need to override `PUBGOLF_WEB_APP_UPSTREAM_HOST` when running the API to proxy this, as the normal `npm run dev` command exposes the web app on port `:5173`.
+
+```sh
+npm run build && npm run preview
+```

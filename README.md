@@ -19,3 +19,11 @@ Some commands may require you to log in to Doppler before running, using the fol
 ```sh
 doppler login
 ```
+
+## Development
+
+Get a list of supported development tasks using:
+
+```sh
+pubgolf-devctrl help
+```

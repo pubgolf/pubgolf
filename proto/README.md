@@ -4,10 +4,11 @@ This directory contains the proto definitions for the API server, as well as too
 
 All commands in this README should be run from the **repo root**, NOT the `proto/` subdirectory.
 
-### Lint/Test
+## Lint/Test
 
 ```bash
 buf lint
+buf format -w
 buf breaking --against "https://github.com/pubgolf/pubgolf.git#branch=develop"
 ```
 
