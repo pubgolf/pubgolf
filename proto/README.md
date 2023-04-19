@@ -6,7 +6,7 @@ All commands in this README should be run from the **repo root**, NOT the `proto
 
 ## Lint/Test
 
-```bash
+```sh
 buf lint
 buf format -w
 buf breaking --against "https://github.com/pubgolf/pubgolf.git#branch=develop"
@@ -16,7 +16,7 @@ buf breaking --against "https://github.com/pubgolf/pubgolf.git#branch=develop"
 
 Run the following to generate code based on the latest proto definition:
 
-```bash
+```sh
 pubgolf-devctrl generate proto
 ```
 
