@@ -11,7 +11,7 @@
 	<SidebarContent />
 </Drawer>
 
-<Modal />
+<Modal position="items-start pt-24" />
 
 <div class="h-screen overflow-y-auto">
 	<slot />
