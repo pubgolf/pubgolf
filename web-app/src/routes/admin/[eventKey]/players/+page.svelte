@@ -9,7 +9,7 @@
 		type FormError,
 		type FormOperation
 	} from '$lib/components/modals/PlayerForm.svelte';
-	import { PlayerData, type Player, ScoringCategory } from '$lib/proto/api/v1/shared_pb';
+	import { PlayerData, type Player } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
 
 	let players: Promise<Player[]> = fetchPlayers();

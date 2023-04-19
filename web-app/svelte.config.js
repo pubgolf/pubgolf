@@ -14,7 +14,7 @@ const config = {
 				css: {
 					postcss: join(__dirname, 'postcss.config.cjs')
 				}
-			},
+			}
 		})
 	],
 	kit: {
@@ -33,7 +33,7 @@ const config = {
 				'/admin',
 				'/admin/nyc-2023',
 				'/admin/nyc-2023/alerts',
-                '/admin/nyc-2023/event-info',
+				'/admin/nyc-2023/event-info',
 				'/admin/nyc-2023/players',
 				'/admin/nyc-2023/schedule',
 				'/admin/nyc-2023/scores'

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 </script>
 
