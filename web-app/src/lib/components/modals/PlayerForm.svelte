@@ -1,21 +1,26 @@
 <script lang="ts" context="module">
 	export type FormOperation = 'create' | 'edit';
-	export type FormError = { type: string; message: string } | null;
 </script>
 
 <script lang="ts">
-	import { modalStore } from '@skeletonlabs/skeleton';
-	import { AlertTriangleIcon, XIcon } from 'lucide-svelte';
+	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { PlayerData } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
+	import type { DisplayError } from '../ErrorBanner.svelte';
+	import ErrorBanner from '../ErrorBanner.svelte';
+	import type { ComponentProps } from 'svelte';
 
-	export let parent: any;
+	export let parent: ComponentProps<Modal>;
 	export let playerData: PlayerData;
 	export let operation: FormOperation;
-	export let onSubmit: (op: FormOperation, playerData: PlayerData) => Promise<FormError>;
+	export let onSubmit: (op: FormOperation, playerData: PlayerData) => Promise<DisplayError>;
 
-	let error: FormError = null;
 	let ctaText = operation === 'create' ? 'Register Player' : 'Update Player';
+
+	let error: DisplayError = null;
+	function clearError() {
+		error = null;
+	}
 
 	async function onFormSubmit() {
 		if (playerData.name === '') {
@@ -34,35 +39,18 @@
 	}
 </script>
 
-<div class="modal-example-form card p-4 w-modal shadow-xl space-y-4 relative">
+<div class="card p-4 w-modal shadow-xl space-y-4 relative">
 	{#if $modalStore[0]?.title}
-		<header class="text-2xl font-bold">{$modalStore[0]?.title}</header>
+		<header class="card-header">
+			<span class="text-2xl font-bold">{$modalStore[0]?.title}</span>
+		</header>
 	{/if}
 
-	{#if error}
-		<aside class="alert variant-filled-error flex-row items-center">
-			<AlertTriangleIcon class="hidden sm:block mr-4" />
-			<div class="alert-message">
-				<h3>{error.type}</h3>
-				<p>{error.message}</p>
-			</div>
-			<div class="alert-actions">
-				<button
-					type="button"
-					class="btn-icon variant-filled"
-					on:click={() => {
-						error = null;
-					}}><XIcon /></button
-				>
-			</div>
-		</aside>
-	{/if}
+	<div class="px-4">
+		<ErrorBanner {error} on:dismiss={clearError} />
+	</div>
 
-	{#if $modalStore[0]?.body}
-		<article>{$modalStore[0]?.body}</article>
-	{/if}
-
-	<form class="modal-form space-y-4 mb-8">
+	<form class="space-y-4 p-4 pt-0">
 		<label class="label">
 			<span>Name</span>
 			<input
@@ -83,17 +71,10 @@
 		</label>
 	</form>
 
-	<footer class="modal-footer {parent.regionFooter}">
+	<footer class="card-footer {parent.regionFooter}">
 		<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}
 			>{parent.buttonTextCancel}</button
 		>
 		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>{ctaText}</button>
 	</footer>
 </div>
-
-<style lang="postcss">
-	.alert .alert-message,
-	.alert .alert-actions {
-		@apply mt-0;
-	}
-</style>
