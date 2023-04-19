@@ -2,21 +2,21 @@
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCcwIcon, UserPlusIcon } from 'lucide-svelte';
 	import type { ComponentProps } from 'svelte';
-	import { AdminClient } from '$lib/rpc/client';
+	import { getAdminServiceClient } from '$lib/rpc/client';
 	import { page } from '$app/stores';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
-	import PlayerForm, {
-		type FormError,
-		type FormOperation
-	} from '$lib/components/modals/PlayerForm.svelte';
+	import PlayerForm, { type FormOperation } from '$lib/components/modals/PlayerForm.svelte';
 	import { PlayerData, type Player } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
+	import type { DisplayError } from '$lib/components/ErrorBanner.svelte';
 
+	let adminClient = getAdminServiceClient();
 	let players: Promise<Player[]> = fetchPlayers();
 	let dataUpdatedAt: Date = new Date();
 
 	async function fetchPlayers() {
-		const resp = await AdminClient.listPlayers({
+		const rpc = await adminClient;
+		const resp = await rpc.listPlayers({
 			eventKey: $page.params.eventKey
 		});
 
@@ -38,17 +38,18 @@
 		const props: Omit<ComponentProps<PlayerForm>, 'parent'> = {
 			operation,
 			playerData,
-			onSubmit: async (op: FormOperation, playerData: PlayerData): Promise<FormError> => {
+			onSubmit: async (op: FormOperation, playerData: PlayerData): Promise<DisplayError> => {
+				const rpc = await adminClient;
 				try {
 					if (operation === 'create') {
-						await AdminClient.createPlayer({
+						await rpc.createPlayer({
 							eventKey: $page.params.eventKey,
 							playerData
 						});
 					}
 
 					if (operation === 'edit') {
-						await AdminClient.updatePlayer({
+						await rpc.updatePlayer({
 							playerId,
 							playerData
 						});
