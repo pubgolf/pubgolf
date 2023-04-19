@@ -33,6 +33,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/admin"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/public"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
+	"github.com/pubgolf/pubgolf/api/internal/lib/webapi"
 )
 
 func main() {
@@ -103,24 +104,23 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 
 // makeServer initializes an HTTP server with settings and the router.
 func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
-	// Bind gRPC server to mux.
-	rpcMux := http.NewServeMux()
-	rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao),
-		connect.WithInterceptors(middleware.ConnectInterceptors()...),
-	))
-	rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
-		connect.WithInterceptors(middleware.ConnectInterceptors()...),
-	))
-
-	// Init router and middleware.
 	r := chi.NewRouter()
 	r.Use(middleware.ChiMiddleware(r)...)
 
 	// Mount routes.
 	r.Get("/health-check", healthCheck(cfg))
 	r.Get("/robots.txt", robots(cfg))
+	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
 		r.Use(chim.NoCache)
+
+		rpcMux := http.NewServeMux()
+		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao),
+			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+		))
+		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
+			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+		))
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
 	})
 

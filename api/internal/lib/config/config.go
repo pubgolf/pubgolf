@@ -31,8 +31,19 @@ type App struct {
 	Port               int       `default:"5000"`
 	EnvName            DeployEnv `required:"true" split_words:"true"`
 	WebAppUpstreamHost string    `split_words:"true"`
+	HostOrigin         string    `required:"true" split_words:"true"`
 
 	// Credentials
 	HoneycombKey   string `split_words:"true"`
 	AppDatabaseURL string `required:"true" split_words:"true"`
+
+	// Web App Auth
+	AdminAuth WebAppAuth `required:"true" split_words:"true"`
+}
+
+// WebAppAuth contains auth params for the admin user.
+type WebAppAuth struct {
+	Password          string `required:"true" split_words:"true"`
+	CookieToken       string `required:"true" split_words:"true"`
+	AdminServiceToken string `required:"true" split_words:"true"`
 }
