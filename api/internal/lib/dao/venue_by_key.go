@@ -7,7 +7,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-const fallbackImage = "https://satyr.dev/300?text=Fallback%20Image"
+const fallbackImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
 
 // Venue contains metadata about a venue location.
 type Venue struct {
