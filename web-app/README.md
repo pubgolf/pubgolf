@@ -30,6 +30,7 @@ npm run test:e2e
 ```
 
 ## Build
+
 The following produces a production build and serves it on port `:4173`. Note that you will need to override `PUBGOLF_WEB_APP_UPSTREAM_HOST` when running the API to proxy this, as the normal `npm run dev` command exposes the web app on port `:5173`.
 
 ```sh
