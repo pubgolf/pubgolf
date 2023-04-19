@@ -102,6 +102,11 @@ jobs:
       - name: NPM Install
         working-directory: ./web-app
         run: npm ci
+      - name: Run Web App Checks
+        working-directory: ./web-app
+        run: |
+          npm run ci:lint
+          npm run ci:check
       - name: Build Web App
         working-directory: ./web-app
         run: npm run build

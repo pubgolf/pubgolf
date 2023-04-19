@@ -6,6 +6,8 @@
         "dev": "vite dev",
         "build": "vite build",
         "preview": "vite preview",
+        "ci:lint": "prettier --plugin-search-dir . --check . && eslint . --quiet",
+        "ci:check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --diagnostic-sources js,svelte",
         "lint": "prettier --plugin-search-dir . --check . && eslint .",
         "format": "prettier --plugin-search-dir . --write .",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
