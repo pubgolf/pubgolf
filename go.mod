@@ -10,6 +10,8 @@ require (
 	github.com/bxcodec/faker/v3 v3.8.1
 	github.com/dmarkham/enumer v1.5.8
 	github.com/fergusstrange/embedded-postgres v1.21.0
+	github.com/go-chi/cors v1.2.1
+	github.com/go-chi/render v1.0.2
 	github.com/go-faker/faker/v4 v4.1.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.3-0.20230405045701-b94ed1a710af // Needed until v4.15.4 is released to remove pgx/v4 dependency.
@@ -52,6 +54,7 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211013220434-5962184e7a30 // indirect
 	github.com/aws/aws-sdk-go v1.34.0 // indirect
