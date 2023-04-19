@@ -3,7 +3,7 @@
 	import { AppShell, AppBar, drawerStore } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { USER_NOT_AUTHORIZED_ERROR, getAPIToken } from '$lib/auth/client';
+	import { USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
 	import { page } from '$app/stores';
 	import type { DisplayError } from '$lib/components/ErrorBanner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';

@@ -9,7 +9,7 @@
 	const dispatch = createEventDispatcher();
 
 	export let error: DisplayError;
-	export let dismissLabel: string = '';
+	export let dismissLabel = '';
 </script>
 
 {#if error}
