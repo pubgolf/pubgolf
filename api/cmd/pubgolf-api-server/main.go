@@ -120,6 +120,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
 		))
 		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
 			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+			connect.WithInterceptors(middleware.NewAdminAuthInterceptor(cfg)),
 		))
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
 	})
