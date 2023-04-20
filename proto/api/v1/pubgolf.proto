@@ -102,15 +102,6 @@ message GetVenueRequest {
   repeated uint32 venue_keys = 2;
 }
 message GetVenueResponse {
-  message Venue {
-    // Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
-    string id = 1;
-    string name = 2;
-    // Address string suitable for display or using for a mapping query.
-    string address = 3;
-    string image_url = 4;
-  }
-
   // VenueWrapper allows us to return an empty wrapper in the case of an invalid or unauthorized venue ID.
   message VenueWrapper {
     optional Venue venue = 1;

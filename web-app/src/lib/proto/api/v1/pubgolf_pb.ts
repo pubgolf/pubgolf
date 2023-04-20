@@ -7,7 +7,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Color, Player, PlayerData, ScoreBoard, ScoringCategory } from "./shared_pb.js";
+import { Color, Player, PlayerData, ScoreBoard, ScoringCategory, Venue } from "./shared_pb.js";
 
 /**
  * @generated from message api.v1.ClientVersionRequest
@@ -439,74 +439,15 @@ export class GetVenueResponse extends Message<GetVenueResponse> {
 }
 
 /**
- * @generated from message api.v1.GetVenueResponse.Venue
- */
-export class GetVenueResponse_Venue extends Message<GetVenueResponse_Venue> {
-  /**
-   * Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
-   *
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
-   * @generated from field: string name = 2;
-   */
-  name = "";
-
-  /**
-   * Address string suitable for display or using for a mapping query.
-   *
-   * @generated from field: string address = 3;
-   */
-  address = "";
-
-  /**
-   * @generated from field: string image_url = 4;
-   */
-  imageUrl = "";
-
-  constructor(data?: PartialMessage<GetVenueResponse_Venue>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.GetVenueResponse.Venue";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "image_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetVenueResponse_Venue {
-    return new GetVenueResponse_Venue().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetVenueResponse_Venue {
-    return new GetVenueResponse_Venue().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetVenueResponse_Venue {
-    return new GetVenueResponse_Venue().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetVenueResponse_Venue | PlainMessage<GetVenueResponse_Venue> | undefined, b: GetVenueResponse_Venue | PlainMessage<GetVenueResponse_Venue> | undefined): boolean {
-    return proto3.util.equals(GetVenueResponse_Venue, a, b);
-  }
-}
-
-/**
  * VenueWrapper allows us to return an empty wrapper in the case of an invalid or unauthorized venue ID.
  *
  * @generated from message api.v1.GetVenueResponse.VenueWrapper
  */
 export class GetVenueResponse_VenueWrapper extends Message<GetVenueResponse_VenueWrapper> {
   /**
-   * @generated from field: optional api.v1.GetVenueResponse.Venue venue = 1;
+   * @generated from field: optional api.v1.Venue venue = 1;
    */
-  venue?: GetVenueResponse_Venue;
+  venue?: Venue;
 
   constructor(data?: PartialMessage<GetVenueResponse_VenueWrapper>) {
     super();
@@ -516,7 +457,7 @@ export class GetVenueResponse_VenueWrapper extends Message<GetVenueResponse_Venu
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.GetVenueResponse.VenueWrapper";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "venue", kind: "message", T: GetVenueResponse_Venue, opt: true },
+    { no: 1, name: "venue", kind: "message", T: Venue, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetVenueResponse_VenueWrapper {

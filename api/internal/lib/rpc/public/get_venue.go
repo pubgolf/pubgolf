@@ -38,7 +38,7 @@ func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVen
 		}
 
 		venues[vk] = &apiv1.GetVenueResponse_VenueWrapper{
-			Venue: &apiv1.GetVenueResponse_Venue{
+			Venue: &apiv1.Venue{
 				Id:       v.ID.String(),
 				Name:     v.Name,
 				Address:  v.Address,

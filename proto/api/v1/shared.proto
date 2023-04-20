@@ -20,6 +20,15 @@ enum ScoringCategory {
   SCORING_CATEGORY_PUB_GOLF_CHALLENGES = 3;
 }
 
+message Venue {
+  // Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
+  string id = 1;
+  string name = 2;
+  // Address string suitable for display or using for a mapping query.
+  string address = 3;
+  string image_url = 4;
+}
+
 message Player {
   string id = 1;
   PlayerData data = 2;

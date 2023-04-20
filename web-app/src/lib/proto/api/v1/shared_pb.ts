@@ -96,6 +96,65 @@ export class Color extends Message<Color> {
 }
 
 /**
+ * @generated from message api.v1.Venue
+ */
+export class Venue extends Message<Venue> {
+  /**
+   * Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
+   *
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
+  /**
+   * Address string suitable for display or using for a mapping query.
+   *
+   * @generated from field: string address = 3;
+   */
+  address = "";
+
+  /**
+   * @generated from field: string image_url = 4;
+   */
+  imageUrl = "";
+
+  constructor(data?: PartialMessage<Venue>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Venue";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "image_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Venue {
+    return new Venue().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Venue {
+    return new Venue().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Venue {
+    return new Venue().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Venue | PlainMessage<Venue> | undefined, b: Venue | PlainMessage<Venue> | undefined): boolean {
+    return proto3.util.equals(Venue, a, b);
+  }
+}
+
+/**
  * @generated from message api.v1.Player
  */
 export class Player extends Message<Player> {
