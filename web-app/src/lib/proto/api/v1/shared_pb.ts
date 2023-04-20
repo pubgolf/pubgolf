@@ -285,9 +285,11 @@ export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEnt
   displayScoreSigned = false;
 
   /**
-   * @generated from field: uint32 rank = 5;
+   * rank is a display value indicating the ranking of the score. May be omitted in the case of ties, so ordering should be done based on the index of the `ScoreBoardEntry` in the repated field `Scoreboard.scores`.
+   *
+   * @generated from field: optional uint32 rank = 5;
    */
-  rank = 0;
+  rank?: number;
 
   /**
    * icon_key is an SF-Symbol name (e.g. "heart.fill").
@@ -323,7 +325,7 @@ export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEnt
     { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "display_score_signed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "rank", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "rank", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
     { no: 6, name: "icon_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "icon_color", kind: "message", T: Color },
     { no: 8, name: "status", kind: "enum", T: proto3.getEnumType(ScoreBoard_ScoreStatus) },

@@ -50,7 +50,8 @@ message ScoreBoard {
     // display_score_signed indicates that non-zero scores should be displayed with an explicit +/-.
     bool display_score_signed = 4;
 
-    uint32 rank = 5;
+    // rank is a display value indicating the ranking of the score. May be omitted in the case of ties, so ordering should be done based on the index of the `ScoreBoardEntry` in the repated field `Scoreboard.scores`.
+    optional uint32 rank = 5;
 
     // icon_key is an SF-Symbol name (e.g. "heart.fill").
     string icon_key = 6;
