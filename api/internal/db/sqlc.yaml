@@ -29,13 +29,17 @@ sql:
             go_type: uint32
           - column: venues.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
-          - column: event_venues.event_id
+          - column: stages.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
+          - column: stages.event_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
-          - column: event_venues.venue_id
+          - column: stages.venue_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
-          - column: event_venues.venue_key
+          - column: stages.rules_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.RuleID
+          - column: stages.venue_key
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueKey
-          - column: event_venues.duration_minutes
+          - column: stages.duration_minutes
             go_type: uint32
           - column: players.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID

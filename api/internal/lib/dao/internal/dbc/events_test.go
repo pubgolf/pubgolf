@@ -126,7 +126,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 
 			for i, vID := range venueIDs {
 				_, err := tx.ExecContext(ctx, `
-				INSERT INTO event_venues 
+				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
@@ -156,7 +156,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			for i, vID := range venueIDs {
 				if i == 0 {
 					_, err := tx.ExecContext(ctx, `
-					INSERT INTO event_venues 
+					INSERT INTO stages 
 						(event_id, venue_id, duration_minutes, rank, venue_key) 
 					VALUES 
 						($1, $2, 30, $3, NULL);
@@ -166,7 +166,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 				}
 
 				_, err := tx.ExecContext(ctx, `
-				INSERT INTO event_venues 
+				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
@@ -195,7 +195,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			for i, vID := range venueIDs {
 				if i == len(venueIDs)-1 {
 					_, err := tx.ExecContext(ctx, `
-					INSERT INTO event_venues 
+					INSERT INTO stages 
 						(event_id, venue_id, duration_minutes, rank, venue_key) 
 					VALUES 
 						($1, $2, 30, $3, NULL);
@@ -205,7 +205,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 				}
 
 				_, err := tx.ExecContext(ctx, `
-				INSERT INTO event_venues 
+				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
@@ -234,7 +234,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 
 			for i, vID := range venueIDs {
 				_, err := tx.ExecContext(ctx, `
-				INSERT INTO event_venues 
+				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, NULL);

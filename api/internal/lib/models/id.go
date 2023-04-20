@@ -22,6 +22,22 @@ func VenueIDFromULID(u ulid.ULID) VenueID {
 	return VenueID{DatabaseULID: DatabaseULID{ULID: u}}
 }
 
+// StageID uniquely identifies an event.
+type StageID struct{ DatabaseULID }
+
+// StageIDFromULID converts a plain ULID into an StageID.
+func StageIDFromULID(u ulid.ULID) StageID {
+	return StageID{DatabaseULID: DatabaseULID{ULID: u}}
+}
+
+// RuleID uniquely identifies an event.
+type RuleID struct{ DatabaseULID }
+
+// RuleIDFromULID converts a plain ULID into an RuleID.
+func RuleIDFromULID(u ulid.ULID) RuleID {
+	return RuleID{DatabaseULID: DatabaseULID{ULID: u}}
+}
+
 // PlayerID uniquely identifies a player.
 type PlayerID struct{ DatabaseULID }
 

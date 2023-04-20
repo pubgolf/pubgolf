@@ -55,18 +55,18 @@ func (q *Queries) EventIDByKey(ctx context.Context, key string) (models.EventID,
 
 const eventSchedule = `-- name: EventSchedule :many
 SELECT
-  ev.venue_key,
-  ev.duration_minutes,
-  s.description
+  s.venue_key,
+  s.duration_minutes,
+  r.description
 FROM
-  event_venues ev
-  LEFT JOIN stages s ON ev.stage_id = s.id
+  stages s
+  LEFT JOIN rules r ON s.rule_id = r.id
 WHERE
-  ev.event_id = $1
-  AND ev.deleted_at IS NULL
+  s.event_id = $1
+  AND s.deleted_at IS NULL
   AND s.deleted_at IS NULL
 ORDER BY
-  ev.rank ASC
+  s.rank ASC
 `
 
 type EventScheduleRow struct {
@@ -119,11 +119,11 @@ const eventVenueKeysAreValid = `-- name: EventVenueKeysAreValid :one
 SELECT
   COUNT(*) < 1
 FROM
-  event_venues ev
+  stages s
 WHERE
-  ev.event_id = $1
-  AND ev.deleted_at IS NULL
-  AND ev.venue_key IS NULL
+  s.event_id = $1
+  AND s.deleted_at IS NULL
+  AND s.venue_key IS NULL
 `
 
 func (q *Queries) EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error) {
@@ -185,20 +185,20 @@ venue_keys AS (
       FROM
         starting_venue_key) + row_number() OVER (ORDER BY venue_id) AS new_venue_key
     FROM
-      event_venues
+      stages
     WHERE
       event_id = $1
       AND venue_key IS NULL)
 UPDATE
-  event_venues ev
+  stages s
 SET
   venue_key = vk.new_venue_key,
   updated_at = now()
 FROM
   venue_keys vk
 WHERE
-  ev.event_id = $1
-  AND vk.venue_id = ev.venue_id
+  s.event_id = $1
+  AND vk.venue_id = s.venue_id
 `
 
 func (q *Queries) SetEventVenueKeys(ctx context.Context, eventID models.EventID) error {
@@ -211,12 +211,12 @@ WITH max_venue_key AS (
   SELECT
     max(venue_key)
   FROM
-    event_venues
+    stages
   WHERE
     event_id = $1
     AND venue_key IS NOT NULL)
 UPDATE
-  events
+  events e
 SET
   current_venue_key =(
     SELECT
@@ -225,7 +225,7 @@ SET
       max_venue_key),
   updated_at = now()
 WHERE
-  id = $1
+  e.id = $1
 `
 
 func (q *Queries) SetNextEventVenueKey(ctx context.Context, id models.EventID) error {

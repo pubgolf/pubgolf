@@ -28,18 +28,6 @@ type Event struct {
 	CurrentScheduleCacheHash    []byte
 }
 
-type EventVenue struct {
-	EventID         models.EventID
-	VenueID         models.VenueID
-	VenueKey        models.VenueKey
-	Rank            int32
-	DurationMinutes uint32
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	DeletedAt       sql.NullTime
-	StageID         ulid.ULID
-}
-
 type Player struct {
 	ID              models.PlayerID
 	EventID         models.EventID
@@ -50,12 +38,25 @@ type Player struct {
 	DeletedAt       sql.NullTime
 }
 
-type Stage struct {
+type Rule struct {
 	ID          ulid.ULID
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   sql.NullTime
+}
+
+type Stage struct {
+	EventID         models.EventID
+	VenueID         models.VenueID
+	VenueKey        models.VenueKey
+	Rank            int32
+	DurationMinutes uint32
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       sql.NullTime
+	RuleID          ulid.ULID
+	ID              models.StageID
 }
 
 type Venue struct {

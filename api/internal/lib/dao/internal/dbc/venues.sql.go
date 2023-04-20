@@ -19,12 +19,12 @@ SELECT
   v.address,
   v.image_url
 FROM
-  event_venues ev
-  JOIN venues v ON ev.venue_id = v.id
+  stages s
+  JOIN venues v ON s.venue_id = v.id
 WHERE
-  ev.event_id = $1
-  AND ev.venue_key = $2
-  AND ev.deleted_at IS NULL
+  s.event_id = $1
+  AND s.venue_key = $2
+  AND s.deleted_at IS NULL
   AND v.deleted_at IS NULL
 `
 
