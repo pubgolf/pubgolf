@@ -34,10 +34,51 @@ func New(ctx context.Context, db *sql.DB) (*Queries, error) {
 	}
 
 	return &Queries{
+		db:  db,
 		dbc: q,
 	}, nil
 }
 
+func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
+	defer telemetry.FnSpan(&ctx)()
+
+	if q.tx != nil {
+		return query(ctx, q)
+	}
+
+	tx, err := q.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("start transaction: %w", err)
+	}
+
+	tDBC, err := q.txQuerier(tx)
+	if err != nil {
+		return fmt.Errorf("acquire transacted DAO: %w", err)
+	}
+
+	err = query(ctx, &Queries{tx: tx, dbc: tDBC})
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
+	if q.tx != nil {
+		return q.dbc, nil
+	}
+
+	var tDBC dbc.Querier
+	switch dbc := q.dbc.(type) {
+	case *dbc.Queries:
+		tDBC = dbc.WithTx(tx)
+		return tDBC, nil
+	case *dbc.MockQuerier:
+		return tDBC, fmt.Errorf("dbc.MockQuerier does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", ErrTransactedQuerier)
+	default:
+		return tDBC, fmt.Errorf("Type %T does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", dbc, ErrTransactedQuerier)
 	}
 }
 
