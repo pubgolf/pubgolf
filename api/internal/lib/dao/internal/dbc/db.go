@@ -24,8 +24,17 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.adjustmentsByPlayerStageStmt, err = db.PrepareContext(ctx, adjustmentsByPlayerStage); err != nil {
+		return nil, fmt.Errorf("error preparing query AdjustmentsByPlayerStage: %w", err)
+	}
+	if q.createAdjustmentStmt, err = db.PrepareContext(ctx, createAdjustment); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateAdjustment: %w", err)
+	}
 	if q.createPlayerStmt, err = db.PrepareContext(ctx, createPlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreatePlayer: %w", err)
+	}
+	if q.createScoreStmt, err = db.PrepareContext(ctx, createScore); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateScore: %w", err)
 	}
 	if q.eventCacheVersionByHashStmt, err = db.PrepareContext(ctx, eventCacheVersionByHash); err != nil {
 		return nil, fmt.Errorf("error preparing query EventCacheVersionByHash: %w", err)
@@ -39,11 +48,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.eventScheduleStmt, err = db.PrepareContext(ctx, eventSchedule); err != nil {
 		return nil, fmt.Errorf("error preparing query EventSchedule: %w", err)
 	}
+	if q.eventScheduleWithDetailsStmt, err = db.PrepareContext(ctx, eventScheduleWithDetails); err != nil {
+		return nil, fmt.Errorf("error preparing query EventScheduleWithDetails: %w", err)
+	}
 	if q.eventStartTimeStmt, err = db.PrepareContext(ctx, eventStartTime); err != nil {
 		return nil, fmt.Errorf("error preparing query EventStartTime: %w", err)
 	}
 	if q.eventVenueKeysAreValidStmt, err = db.PrepareContext(ctx, eventVenueKeysAreValid); err != nil {
 		return nil, fmt.Errorf("error preparing query EventVenueKeysAreValid: %w", err)
+	}
+	if q.scoreByPlayerStageStmt, err = db.PrepareContext(ctx, scoreByPlayerStage); err != nil {
+		return nil, fmt.Errorf("error preparing query ScoreByPlayerStage: %w", err)
 	}
 	if q.setEventCacheKeysStmt, err = db.PrepareContext(ctx, setEventCacheKeys); err != nil {
 		return nil, fmt.Errorf("error preparing query SetEventCacheKeys: %w", err)
@@ -65,9 +80,24 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.adjustmentsByPlayerStageStmt != nil {
+		if cerr := q.adjustmentsByPlayerStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing adjustmentsByPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.createAdjustmentStmt != nil {
+		if cerr := q.createAdjustmentStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createAdjustmentStmt: %w", cerr)
+		}
+	}
 	if q.createPlayerStmt != nil {
 		if cerr := q.createPlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createPlayerStmt: %w", cerr)
+		}
+	}
+	if q.createScoreStmt != nil {
+		if cerr := q.createScoreStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createScoreStmt: %w", cerr)
 		}
 	}
 	if q.eventCacheVersionByHashStmt != nil {
@@ -90,6 +120,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing eventScheduleStmt: %w", cerr)
 		}
 	}
+	if q.eventScheduleWithDetailsStmt != nil {
+		if cerr := q.eventScheduleWithDetailsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing eventScheduleWithDetailsStmt: %w", cerr)
+		}
+	}
 	if q.eventStartTimeStmt != nil {
 		if cerr := q.eventStartTimeStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing eventStartTimeStmt: %w", cerr)
@@ -98,6 +133,11 @@ func (q *Queries) Close() error {
 	if q.eventVenueKeysAreValidStmt != nil {
 		if cerr := q.eventVenueKeysAreValidStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing eventVenueKeysAreValidStmt: %w", cerr)
+		}
+	}
+	if q.scoreByPlayerStageStmt != nil {
+		if cerr := q.scoreByPlayerStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing scoreByPlayerStageStmt: %w", cerr)
 		}
 	}
 	if q.setEventCacheKeysStmt != nil {
@@ -162,37 +202,47 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                          DBTX
-	tx                          *sql.Tx
-	createPlayerStmt            *sql.Stmt
-	eventCacheVersionByHashStmt *sql.Stmt
-	eventIDByKeyStmt            *sql.Stmt
-	eventPlayersStmt            *sql.Stmt
-	eventScheduleStmt           *sql.Stmt
-	eventStartTimeStmt          *sql.Stmt
-	eventVenueKeysAreValidStmt  *sql.Stmt
-	setEventCacheKeysStmt       *sql.Stmt
-	setEventVenueKeysStmt       *sql.Stmt
-	setNextEventVenueKeyStmt    *sql.Stmt
-	updatePlayerStmt            *sql.Stmt
-	venueByKeyStmt              *sql.Stmt
+	db                           DBTX
+	tx                           *sql.Tx
+	adjustmentsByPlayerStageStmt *sql.Stmt
+	createAdjustmentStmt         *sql.Stmt
+	createPlayerStmt             *sql.Stmt
+	createScoreStmt              *sql.Stmt
+	eventCacheVersionByHashStmt  *sql.Stmt
+	eventIDByKeyStmt             *sql.Stmt
+	eventPlayersStmt             *sql.Stmt
+	eventScheduleStmt            *sql.Stmt
+	eventScheduleWithDetailsStmt *sql.Stmt
+	eventStartTimeStmt           *sql.Stmt
+	eventVenueKeysAreValidStmt   *sql.Stmt
+	scoreByPlayerStageStmt       *sql.Stmt
+	setEventCacheKeysStmt        *sql.Stmt
+	setEventVenueKeysStmt        *sql.Stmt
+	setNextEventVenueKeyStmt     *sql.Stmt
+	updatePlayerStmt             *sql.Stmt
+	venueByKeyStmt               *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                          tx,
-		tx:                          tx,
-		createPlayerStmt:            q.createPlayerStmt,
-		eventCacheVersionByHashStmt: q.eventCacheVersionByHashStmt,
-		eventIDByKeyStmt:            q.eventIDByKeyStmt,
-		eventPlayersStmt:            q.eventPlayersStmt,
-		eventScheduleStmt:           q.eventScheduleStmt,
-		eventStartTimeStmt:          q.eventStartTimeStmt,
-		eventVenueKeysAreValidStmt:  q.eventVenueKeysAreValidStmt,
-		setEventCacheKeysStmt:       q.setEventCacheKeysStmt,
-		setEventVenueKeysStmt:       q.setEventVenueKeysStmt,
-		setNextEventVenueKeyStmt:    q.setNextEventVenueKeyStmt,
-		updatePlayerStmt:            q.updatePlayerStmt,
-		venueByKeyStmt:              q.venueByKeyStmt,
+		db:                           tx,
+		tx:                           tx,
+		adjustmentsByPlayerStageStmt: q.adjustmentsByPlayerStageStmt,
+		createAdjustmentStmt:         q.createAdjustmentStmt,
+		createPlayerStmt:             q.createPlayerStmt,
+		createScoreStmt:              q.createScoreStmt,
+		eventCacheVersionByHashStmt:  q.eventCacheVersionByHashStmt,
+		eventIDByKeyStmt:             q.eventIDByKeyStmt,
+		eventPlayersStmt:             q.eventPlayersStmt,
+		eventScheduleStmt:            q.eventScheduleStmt,
+		eventScheduleWithDetailsStmt: q.eventScheduleWithDetailsStmt,
+		eventStartTimeStmt:           q.eventStartTimeStmt,
+		eventVenueKeysAreValidStmt:   q.eventVenueKeysAreValidStmt,
+		scoreByPlayerStageStmt:       q.scoreByPlayerStageStmt,
+		setEventCacheKeysStmt:        q.setEventCacheKeysStmt,
+		setEventVenueKeysStmt:        q.setEventVenueKeysStmt,
+		setNextEventVenueKeyStmt:     q.setNextEventVenueKeyStmt,
+		updatePlayerStmt:             q.updatePlayerStmt,
+		venueByKeyStmt:               q.venueByKeyStmt,
 	}
 }

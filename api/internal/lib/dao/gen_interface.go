@@ -11,8 +11,12 @@ import (
 
 // QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.
 type QueryProvider interface {
+	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
+	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
 	// CreatePlayer creates a new player and adds them to the given event.
 	CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.Player, error)
+	// CreateScoreForStage creates score and adjustment records for a given stage.
+	CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
 	// EventPlayers returns all players registered for a given event, in alphabetical order by name.
@@ -21,8 +25,12 @@ type QueryProvider interface {
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error)
 	// EventScheduleCacheVersion returns the integer version number of the latest schedule version, as well as whether or not the provided hash triggered a cache break.
 	EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error)
+	// EventScheduleWithDetails returns the event schedule with venue and rule details included.
+	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]models.Stage, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
+	// ScoreByPlayerStage returns the base score for a given player/stage combination.
+	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
 	// VenueByKey returns venue info for the venue key and event id.

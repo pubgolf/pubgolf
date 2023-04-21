@@ -16,6 +16,43 @@ type MockQuerier struct {
 	mock.Mock
 }
 
+// AdjustmentsByPlayerStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 []AdjustmentsByPlayerStageRow
+	if rf, ok := ret.Get(0).(func(context.Context, AdjustmentsByPlayerStageParams) []AdjustmentsByPlayerStageRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]AdjustmentsByPlayerStageRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, AdjustmentsByPlayerStageParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CreateAdjustment provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, CreateAdjustmentParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreatePlayer provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (CreatePlayerRow, error) {
 	ret := _m.Called(ctx, arg)
@@ -35,6 +72,20 @@ func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams)
 	}
 
 	return r0, r1
+}
+
+// CreateScore provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateScore(ctx context.Context, arg CreateScoreParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, CreateScoreParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // EventCacheVersionByHash provides a mock function with given fields: ctx, arg
@@ -125,6 +176,29 @@ func (_m *MockQuerier) EventSchedule(ctx context.Context, eventID models.EventID
 	return r0, r1
 }
 
+// EventScheduleWithDetails provides a mock function with given fields: ctx, eventID
+func (_m *MockQuerier) EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]EventScheduleWithDetailsRow, error) {
+	ret := _m.Called(ctx, eventID)
+
+	var r0 []EventScheduleWithDetailsRow
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []EventScheduleWithDetailsRow); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]EventScheduleWithDetailsRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventStartTime provides a mock function with given fields: ctx, id
 func (_m *MockQuerier) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {
 	ret := _m.Called(ctx, id)
@@ -160,6 +234,27 @@ func (_m *MockQuerier) EventVenueKeysAreValid(ctx context.Context, eventID model
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
 		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ScoreByPlayerStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 ScoreByPlayerStageRow
+	if rf, ok := ret.Get(0).(func(context.Context, ScoreByPlayerStageParams) ScoreByPlayerStageRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(ScoreByPlayerStageRow)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, ScoreByPlayerStageParams) error); ok {
+		r1 = rf(ctx, arg)
 	} else {
 		r1 = ret.Error(1)
 	}

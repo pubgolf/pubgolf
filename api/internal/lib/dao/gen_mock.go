@@ -16,6 +16,29 @@ type MockQueryProvider struct {
 	mock.Mock
 }
 
+// AdjustmentsByPlayerStage provides a mock function with given fields: ctx, playerID, stageID
+func (_m *MockQueryProvider) AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error) {
+	ret := _m.Called(ctx, playerID, stageID)
+
+	var r0 []models.Adjustment
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID) []models.Adjustment); ok {
+		r0 = rf(ctx, playerID, stageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Adjustment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID, models.StageID) error); ok {
+		r1 = rf(ctx, playerID, stageID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreatePlayer provides a mock function with given fields: ctx, eventID, player
 func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.Player, error) {
 	ret := _m.Called(ctx, eventID, player)
@@ -35,6 +58,20 @@ func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, eventID models.Ev
 	}
 
 	return r0, r1
+}
+
+// CreateScoreForStage provides a mock function with given fields: ctx, playerID, stageID, score, adjustments
+func (_m *MockQueryProvider) CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error {
+	ret := _m.Called(ctx, playerID, stageID, score, adjustments)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []models.AdjustmentParams) error); ok {
+		r0 = rf(ctx, playerID, stageID, score, adjustments)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // EventIDByKey provides a mock function with given fields: ctx, key
@@ -132,6 +169,29 @@ func (_m *MockQueryProvider) EventScheduleCacheVersion(ctx context.Context, even
 	return r0, r1, r2
 }
 
+// EventScheduleWithDetails provides a mock function with given fields: ctx, eventID
+func (_m *MockQueryProvider) EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]models.Stage, error) {
+	ret := _m.Called(ctx, eventID)
+
+	var r0 []models.Stage
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.Stage); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Stage)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventStartTime provides a mock function with given fields: ctx, id
 func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {
 	ret := _m.Called(ctx, id)
@@ -146,6 +206,27 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
 		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ScoreByPlayerStage provides a mock function with given fields: ctx, playerID, stageID
+func (_m *MockQueryProvider) ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error) {
+	ret := _m.Called(ctx, playerID, stageID)
+
+	var r0 models.Score
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID) models.Score); ok {
+		r0 = rf(ctx, playerID, stageID)
+	} else {
+		r0 = ret.Get(0).(models.Score)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID, models.StageID) error); ok {
+		r1 = rf(ctx, playerID, stageID)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -64,7 +64,7 @@ FROM
 WHERE
   s.event_id = $1
   AND s.deleted_at IS NULL
-  AND s.deleted_at IS NULL
+  AND r.deleted_at IS NULL
 ORDER BY
   s.rank ASC
 `
@@ -85,6 +85,69 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 	for rows.Next() {
 		var i EventScheduleRow
 		if err := rows.Scan(&i.VenueKey, &i.DurationMinutes, &i.Description); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const eventScheduleWithDetails = `-- name: EventScheduleWithDetails :many
+SELECT
+  s.id,
+  r.id AS rule_id,
+  r.description,
+  v.id AS venue_id,
+  v.name,
+  v.address,
+  v.image_url
+FROM
+  stages s
+  LEFT JOIN rules r ON s.rule_id = r.id
+  LEFT JOIN venues v ON s.venue_id = v.id
+WHERE
+  s.event_id = $1
+  AND s.deleted_at IS NULL
+  AND r.deleted_at IS NULL
+  AND v.deleted_at IS NULL
+ORDER BY
+  s.rank ASC
+`
+
+type EventScheduleWithDetailsRow struct {
+	ID          models.StageID
+	RuleID      models.DatabaseULID
+	Description sql.NullString
+	VenueID     models.DatabaseULID
+	Name        sql.NullString
+	Address     sql.NullString
+	ImageUrl    sql.NullString
+}
+
+func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]EventScheduleWithDetailsRow, error) {
+	rows, err := q.query(ctx, q.eventScheduleWithDetailsStmt, eventScheduleWithDetails, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []EventScheduleWithDetailsRow
+	for rows.Next() {
+		var i EventScheduleWithDetailsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.RuleID,
+			&i.Description,
+			&i.VenueID,
+			&i.Name,
+			&i.Address,
+			&i.ImageUrl,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
