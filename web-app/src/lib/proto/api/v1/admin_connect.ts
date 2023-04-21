@@ -5,11 +5,13 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, ListPlayersRequest, ListPlayersResponse, UpdatePlayerRequest, UpdatePlayerResponse } from "./admin_pb.js";
+import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateStageScoreRequest, CreateStageScoreResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
  * AdminService allows administering events with enhanced permissions.
+ *
+ * Players
  *
  * @generated from service api.v1.AdminService
  */
@@ -47,6 +49,50 @@ export const AdminService = {
       name: "ListPlayers",
       I: ListPlayersRequest,
       O: ListPlayersResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ListEventStages returns a full schedule for an event.
+     *
+     * @generated from rpc api.v1.AdminService.ListEventStages
+     */
+    listEventStages: {
+      name: "ListEventStages",
+      I: ListEventStagesRequest,
+      O: ListEventStagesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
+     *
+     * @generated from rpc api.v1.AdminService.CreateStageScore
+     */
+    createStageScore: {
+      name: "CreateStageScore",
+      I: CreateStageScoreRequest,
+      O: CreateStageScoreResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
+     *
+     * @generated from rpc api.v1.AdminService.UpdateStageScore
+     */
+    updateStageScore: {
+      name: "UpdateStageScore",
+      I: UpdateStageScoreRequest,
+      O: UpdateStageScoreResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time. 
+     *
+     * @generated from rpc api.v1.AdminService.ListStageScores
+     */
+    listStageScores: {
+      name: "ListStageScores",
+      I: ListStageScoresRequest,
+      O: ListStageScoresResponse,
       kind: MethodKind.Unary,
     },
   }

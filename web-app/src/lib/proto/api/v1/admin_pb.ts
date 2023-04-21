@@ -7,7 +7,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { Player, PlayerData } from "./shared_pb.js";
+import { Player, PlayerData, Venue } from "./shared_pb.js";
 
 /**
  * @generated from message api.v1.AdminServiceCreatePlayerRequest
@@ -240,6 +240,682 @@ export class ListPlayersResponse extends Message<ListPlayersResponse> {
 
   static equals(a: ListPlayersResponse | PlainMessage<ListPlayersResponse> | undefined, b: ListPlayersResponse | PlainMessage<ListPlayersResponse> | undefined): boolean {
     return proto3.util.equals(ListPlayersResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.Rule
+ */
+export class Rule extends Message<Rule> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string venue_description = 2;
+   */
+  venueDescription = "";
+
+  constructor(data?: PartialMessage<Rule>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Rule";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "venue_description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Rule {
+    return new Rule().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Rule {
+    return new Rule().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Rule {
+    return new Rule().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Rule | PlainMessage<Rule> | undefined, b: Rule | PlainMessage<Rule> | undefined): boolean {
+    return proto3.util.equals(Rule, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.Stage
+ */
+export class Stage extends Message<Stage> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: api.v1.Venue venue = 2;
+   */
+  venue?: Venue;
+
+  /**
+   * @generated from field: api.v1.Rule rule = 3;
+   */
+  rule?: Rule;
+
+  constructor(data?: PartialMessage<Stage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Stage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "venue", kind: "message", T: Venue },
+    { no: 3, name: "rule", kind: "message", T: Rule },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage {
+    return new Stage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Stage {
+    return new Stage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Stage {
+    return new Stage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Stage | PlainMessage<Stage> | undefined, b: Stage | PlainMessage<Stage> | undefined): boolean {
+    return proto3.util.equals(Stage, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListEventStagesRequest
+ */
+export class ListEventStagesRequest extends Message<ListEventStagesRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  constructor(data?: PartialMessage<ListEventStagesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListEventStagesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListEventStagesRequest {
+    return new ListEventStagesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListEventStagesRequest {
+    return new ListEventStagesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListEventStagesRequest {
+    return new ListEventStagesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListEventStagesRequest | PlainMessage<ListEventStagesRequest> | undefined, b: ListEventStagesRequest | PlainMessage<ListEventStagesRequest> | undefined): boolean {
+    return proto3.util.equals(ListEventStagesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListEventStagesResponse
+ */
+export class ListEventStagesResponse extends Message<ListEventStagesResponse> {
+  /**
+   * @generated from field: repeated api.v1.Stage stages = 1;
+   */
+  stages: Stage[] = [];
+
+  constructor(data?: PartialMessage<ListEventStagesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListEventStagesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stages", kind: "message", T: Stage, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListEventStagesResponse {
+    return new ListEventStagesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListEventStagesResponse {
+    return new ListEventStagesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListEventStagesResponse {
+    return new ListEventStagesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListEventStagesResponse | PlainMessage<ListEventStagesResponse> | undefined, b: ListEventStagesResponse | PlainMessage<ListEventStagesResponse> | undefined): boolean {
+    return proto3.util.equals(ListEventStagesResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.Score
+ */
+export class Score extends Message<Score> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: api.v1.ScoreData data = 2;
+   */
+  data?: ScoreData;
+
+  constructor(data?: PartialMessage<Score>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Score";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "data", kind: "message", T: ScoreData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Score {
+    return new Score().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Score {
+    return new Score().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Score {
+    return new Score().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Score | PlainMessage<Score> | undefined, b: Score | PlainMessage<Score> | undefined): boolean {
+    return proto3.util.equals(Score, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ScoreData
+ */
+export class ScoreData extends Message<ScoreData> {
+  /**
+   * @generated from field: uint32 value = 1;
+   */
+  value = 0;
+
+  constructor(data?: PartialMessage<ScoreData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ScoreData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ScoreData {
+    return new ScoreData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ScoreData {
+    return new ScoreData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ScoreData {
+    return new ScoreData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ScoreData | PlainMessage<ScoreData> | undefined, b: ScoreData | PlainMessage<ScoreData> | undefined): boolean {
+    return proto3.util.equals(ScoreData, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.Adjustment
+ */
+export class Adjustment extends Message<Adjustment> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: api.v1.AdjustmentData data = 2;
+   */
+  data?: AdjustmentData;
+
+  constructor(data?: PartialMessage<Adjustment>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Adjustment";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "data", kind: "message", T: AdjustmentData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Adjustment {
+    return new Adjustment().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Adjustment {
+    return new Adjustment().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Adjustment {
+    return new Adjustment().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Adjustment | PlainMessage<Adjustment> | undefined, b: Adjustment | PlainMessage<Adjustment> | undefined): boolean {
+    return proto3.util.equals(Adjustment, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.AdjustmentData
+ */
+export class AdjustmentData extends Message<AdjustmentData> {
+  /**
+   * @generated from field: int32 value = 1;
+   */
+  value = 0;
+
+  /**
+   * @generated from field: string label = 2;
+   */
+  label = "";
+
+  constructor(data?: PartialMessage<AdjustmentData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.AdjustmentData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdjustmentData {
+    return new AdjustmentData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AdjustmentData {
+    return new AdjustmentData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AdjustmentData {
+    return new AdjustmentData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AdjustmentData | PlainMessage<AdjustmentData> | undefined, b: AdjustmentData | PlainMessage<AdjustmentData> | undefined): boolean {
+    return proto3.util.equals(AdjustmentData, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.StageScore
+ */
+export class StageScore extends Message<StageScore> {
+  /**
+   * @generated from field: string stage_id = 1;
+   */
+  stageId = "";
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = "";
+
+  /**
+   * @generated from field: api.v1.Score score = 3;
+   */
+  score?: Score;
+
+  /**
+   * @generated from field: repeated api.v1.Adjustment adjustments = 4;
+   */
+  adjustments: Adjustment[] = [];
+
+  constructor(data?: PartialMessage<StageScore>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StageScore";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "score", kind: "message", T: Score },
+    { no: 4, name: "adjustments", kind: "message", T: Adjustment, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StageScore {
+    return new StageScore().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StageScore {
+    return new StageScore().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StageScore {
+    return new StageScore().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StageScore | PlainMessage<StageScore> | undefined, b: StageScore | PlainMessage<StageScore> | undefined): boolean {
+    return proto3.util.equals(StageScore, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.StageScoreData
+ */
+export class StageScoreData extends Message<StageScoreData> {
+  /**
+   * @generated from field: string stage_id = 1;
+   */
+  stageId = "";
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = "";
+
+  /**
+   * @generated from field: api.v1.ScoreData score = 3;
+   */
+  score?: ScoreData;
+
+  /**
+   * @generated from field: repeated api.v1.AdjustmentData adjustments = 4;
+   */
+  adjustments: AdjustmentData[] = [];
+
+  constructor(data?: PartialMessage<StageScoreData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StageScoreData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "score", kind: "message", T: ScoreData },
+    { no: 4, name: "adjustments", kind: "message", T: AdjustmentData, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StageScoreData {
+    return new StageScoreData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StageScoreData {
+    return new StageScoreData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StageScoreData {
+    return new StageScoreData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StageScoreData | PlainMessage<StageScoreData> | undefined, b: StageScoreData | PlainMessage<StageScoreData> | undefined): boolean {
+    return proto3.util.equals(StageScoreData, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.CreateStageScoreRequest
+ */
+export class CreateStageScoreRequest extends Message<CreateStageScoreRequest> {
+  /**
+   * @generated from field: api.v1.StageScoreData data = 1;
+   */
+  data?: StageScoreData;
+
+  /**
+   * @generated from field: optional string idempotency_key = 2;
+   */
+  idempotencyKey?: string;
+
+  constructor(data?: PartialMessage<CreateStageScoreRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.CreateStageScoreRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "data", kind: "message", T: StageScoreData },
+    { no: 2, name: "idempotency_key", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateStageScoreRequest {
+    return new CreateStageScoreRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateStageScoreRequest {
+    return new CreateStageScoreRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateStageScoreRequest {
+    return new CreateStageScoreRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateStageScoreRequest | PlainMessage<CreateStageScoreRequest> | undefined, b: CreateStageScoreRequest | PlainMessage<CreateStageScoreRequest> | undefined): boolean {
+    return proto3.util.equals(CreateStageScoreRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.CreateStageScoreResponse
+ */
+export class CreateStageScoreResponse extends Message<CreateStageScoreResponse> {
+  /**
+   * @generated from field: api.v1.StageScore score = 1;
+   */
+  score?: StageScore;
+
+  constructor(data?: PartialMessage<CreateStageScoreResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.CreateStageScoreResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "score", kind: "message", T: StageScore },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateStageScoreResponse {
+    return new CreateStageScoreResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateStageScoreResponse {
+    return new CreateStageScoreResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateStageScoreResponse {
+    return new CreateStageScoreResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateStageScoreResponse | PlainMessage<CreateStageScoreResponse> | undefined, b: CreateStageScoreResponse | PlainMessage<CreateStageScoreResponse> | undefined): boolean {
+    return proto3.util.equals(CreateStageScoreResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateStageScoreRequest
+ */
+export class UpdateStageScoreRequest extends Message<UpdateStageScoreRequest> {
+  /**
+   * @generated from field: string score_id = 1;
+   */
+  scoreId = "";
+
+  /**
+   * @generated from field: api.v1.StageScoreData score_data = 2;
+   */
+  scoreData?: StageScoreData;
+
+  constructor(data?: PartialMessage<UpdateStageScoreRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateStageScoreRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "score_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "score_data", kind: "message", T: StageScoreData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateStageScoreRequest {
+    return new UpdateStageScoreRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateStageScoreRequest {
+    return new UpdateStageScoreRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateStageScoreRequest {
+    return new UpdateStageScoreRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateStageScoreRequest | PlainMessage<UpdateStageScoreRequest> | undefined, b: UpdateStageScoreRequest | PlainMessage<UpdateStageScoreRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateStageScoreRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateStageScoreResponse
+ */
+export class UpdateStageScoreResponse extends Message<UpdateStageScoreResponse> {
+  /**
+   * @generated from field: api.v1.StageScore score = 1;
+   */
+  score?: StageScore;
+
+  constructor(data?: PartialMessage<UpdateStageScoreResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateStageScoreResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "score", kind: "message", T: StageScore },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateStageScoreResponse {
+    return new UpdateStageScoreResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateStageScoreResponse {
+    return new UpdateStageScoreResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateStageScoreResponse {
+    return new UpdateStageScoreResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateStageScoreResponse | PlainMessage<UpdateStageScoreResponse> | undefined, b: UpdateStageScoreResponse | PlainMessage<UpdateStageScoreResponse> | undefined): boolean {
+    return proto3.util.equals(UpdateStageScoreResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListStageScoresRequest
+ */
+export class ListStageScoresRequest extends Message<ListStageScoresRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  constructor(data?: PartialMessage<ListStageScoresRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListStageScoresRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListStageScoresRequest {
+    return new ListStageScoresRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListStageScoresRequest {
+    return new ListStageScoresRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListStageScoresRequest {
+    return new ListStageScoresRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListStageScoresRequest | PlainMessage<ListStageScoresRequest> | undefined, b: ListStageScoresRequest | PlainMessage<ListStageScoresRequest> | undefined): boolean {
+    return proto3.util.equals(ListStageScoresRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListStageScoresResponse
+ */
+export class ListStageScoresResponse extends Message<ListStageScoresResponse> {
+  /**
+   * @generated from field: repeated api.v1.StageScore scores = 1;
+   */
+  scores: StageScore[] = [];
+
+  constructor(data?: PartialMessage<ListStageScoresResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListStageScoresResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "scores", kind: "message", T: StageScore, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListStageScoresResponse {
+    return new ListStageScoresResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListStageScoresResponse {
+    return new ListStageScoresResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListStageScoresResponse {
+    return new ListStageScoresResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListStageScoresResponse | PlainMessage<ListStageScoresResponse> | undefined, b: ListStageScoresResponse | PlainMessage<ListStageScoresResponse> | undefined): boolean {
+    return proto3.util.equals(ListStageScoresResponse, a, b);
   }
 }
 

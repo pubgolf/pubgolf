@@ -10,6 +10,8 @@ option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;ap
 
 // AdminService allows administering events with enhanced permissions.
 service AdminService {
+  // Players
+
   // CreatePlayer creates a new player profile for a given event.
   rpc CreatePlayer(AdminServiceCreatePlayerRequest) returns (AdminServiceCreatePlayerResponse) {}
 
@@ -18,7 +20,27 @@ service AdminService {
 
   // ListPlayers returns all players for a given event.
   rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse) {}
+
+  // Event Info
+
+  // ListEventStages returns a full schedule for an event.
+  rpc ListEventStages(ListEventStagesRequest) returns (ListEventStagesResponse) {}
+
+  // Scores
+
+  // CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
+  rpc CreateStageScore(CreateStageScoreRequest) returns (CreateStageScoreResponse) {}
+
+  // CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
+  rpc UpdateStageScore(UpdateStageScoreRequest) returns (UpdateStageScoreResponse) {}
+
+  // ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time. 
+  rpc ListStageScores(ListStageScoresRequest) returns (ListStageScoresResponse) {}
 }
+
+// --------------------
+// Players
+// --------------------
 
 // CreatePlayer
 
@@ -47,4 +69,99 @@ message ListPlayersRequest {
 }
 message ListPlayersResponse {
   repeated Player players = 1;
+}
+
+// --------------------
+// Event Info
+// --------------------
+
+// Shared
+
+message Rule {
+  string id = 1;
+  string venue_description = 2;
+}
+
+message Stage {
+  string id = 1;
+  Venue venue = 2;
+  Rule rule = 3;
+}
+
+// ListEventStages
+
+message ListEventStagesRequest {
+  string event_key = 1;
+}
+message ListEventStagesResponse {
+  repeated Stage stages = 1;
+}
+
+
+// --------------------
+// Scores
+// --------------------
+
+// Shared
+
+message Score {
+  string id = 1;
+  ScoreData data = 2;
+}
+
+message ScoreData {
+  uint32 value = 1;
+}
+
+message Adjustment {
+  string id = 1;
+  AdjustmentData data = 2;
+}
+
+message AdjustmentData {
+  int32 value = 1;
+  string label = 2;
+}
+
+message StageScore {
+  string stage_id = 1;
+  string player_id = 2;
+  Score score = 3;
+  repeated Adjustment adjustments = 4;
+}
+
+message StageScoreData {
+  string stage_id = 1;
+  string player_id = 2;
+  ScoreData score = 3;
+  repeated AdjustmentData adjustments = 4;
+}
+
+// CreateStageScore
+
+message CreateStageScoreRequest {
+  StageScoreData data = 1;
+  optional string idempotency_key = 2;
+}
+message CreateStageScoreResponse {
+  StageScore score = 1;
+}
+
+// UpdateStageScore
+
+message UpdateStageScoreRequest {
+  string score_id = 1;
+  StageScoreData score_data = 2;
+}
+message UpdateStageScoreResponse {
+  StageScore score = 1;
+}
+
+// ListStageScores
+
+message ListStageScoresRequest {
+  string event_key = 1;
+}
+message ListStageScoresResponse {
+  repeated StageScore scores = 1;
 }

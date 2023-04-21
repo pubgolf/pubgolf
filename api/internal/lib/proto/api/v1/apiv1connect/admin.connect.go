@@ -44,6 +44,18 @@ const (
 	// AdminServiceListPlayersProcedure is the fully-qualified name of the AdminService's ListPlayers
 	// RPC.
 	AdminServiceListPlayersProcedure = "/api.v1.AdminService/ListPlayers"
+	// AdminServiceListEventStagesProcedure is the fully-qualified name of the AdminService's
+	// ListEventStages RPC.
+	AdminServiceListEventStagesProcedure = "/api.v1.AdminService/ListEventStages"
+	// AdminServiceCreateStageScoreProcedure is the fully-qualified name of the AdminService's
+	// CreateStageScore RPC.
+	AdminServiceCreateStageScoreProcedure = "/api.v1.AdminService/CreateStageScore"
+	// AdminServiceUpdateStageScoreProcedure is the fully-qualified name of the AdminService's
+	// UpdateStageScore RPC.
+	AdminServiceUpdateStageScoreProcedure = "/api.v1.AdminService/UpdateStageScore"
+	// AdminServiceListStageScoresProcedure is the fully-qualified name of the AdminService's
+	// ListStageScores RPC.
+	AdminServiceListStageScoresProcedure = "/api.v1.AdminService/ListStageScores"
 )
 
 // AdminServiceClient is a client for the api.v1.AdminService service.
@@ -54,6 +66,14 @@ type AdminServiceClient interface {
 	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
 	ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error)
+	// ListEventStages returns a full schedule for an event.
+	ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error)
+	// CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
+	CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error)
+	// CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
+	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
+	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
+	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the api.v1.AdminService service. By default, it
@@ -81,14 +101,38 @@ func NewAdminServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 			baseURL+AdminServiceListPlayersProcedure,
 			opts...,
 		),
+		listEventStages: connect_go.NewClient[v1.ListEventStagesRequest, v1.ListEventStagesResponse](
+			httpClient,
+			baseURL+AdminServiceListEventStagesProcedure,
+			opts...,
+		),
+		createStageScore: connect_go.NewClient[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse](
+			httpClient,
+			baseURL+AdminServiceCreateStageScoreProcedure,
+			opts...,
+		),
+		updateStageScore: connect_go.NewClient[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse](
+			httpClient,
+			baseURL+AdminServiceUpdateStageScoreProcedure,
+			opts...,
+		),
+		listStageScores: connect_go.NewClient[v1.ListStageScoresRequest, v1.ListStageScoresResponse](
+			httpClient,
+			baseURL+AdminServiceListStageScoresProcedure,
+			opts...,
+		),
 	}
 }
 
 // adminServiceClient implements AdminServiceClient.
 type adminServiceClient struct {
-	createPlayer *connect_go.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
-	updatePlayer *connect_go.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
-	listPlayers  *connect_go.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
+	createPlayer     *connect_go.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
+	updatePlayer     *connect_go.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
+	listPlayers      *connect_go.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
+	listEventStages  *connect_go.Client[v1.ListEventStagesRequest, v1.ListEventStagesResponse]
+	createStageScore *connect_go.Client[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse]
+	updateStageScore *connect_go.Client[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse]
+	listStageScores  *connect_go.Client[v1.ListStageScoresRequest, v1.ListStageScoresResponse]
 }
 
 // CreatePlayer calls api.v1.AdminService.CreatePlayer.
@@ -106,6 +150,26 @@ func (c *adminServiceClient) ListPlayers(ctx context.Context, req *connect_go.Re
 	return c.listPlayers.CallUnary(ctx, req)
 }
 
+// ListEventStages calls api.v1.AdminService.ListEventStages.
+func (c *adminServiceClient) ListEventStages(ctx context.Context, req *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error) {
+	return c.listEventStages.CallUnary(ctx, req)
+}
+
+// CreateStageScore calls api.v1.AdminService.CreateStageScore.
+func (c *adminServiceClient) CreateStageScore(ctx context.Context, req *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error) {
+	return c.createStageScore.CallUnary(ctx, req)
+}
+
+// UpdateStageScore calls api.v1.AdminService.UpdateStageScore.
+func (c *adminServiceClient) UpdateStageScore(ctx context.Context, req *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error) {
+	return c.updateStageScore.CallUnary(ctx, req)
+}
+
+// ListStageScores calls api.v1.AdminService.ListStageScores.
+func (c *adminServiceClient) ListStageScores(ctx context.Context, req *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error) {
+	return c.listStageScores.CallUnary(ctx, req)
+}
+
 // AdminServiceHandler is an implementation of the api.v1.AdminService service.
 type AdminServiceHandler interface {
 	// CreatePlayer creates a new player profile for a given event.
@@ -114,6 +178,14 @@ type AdminServiceHandler interface {
 	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
 	ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error)
+	// ListEventStages returns a full schedule for an event.
+	ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error)
+	// CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
+	CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error)
+	// CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
+	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
+	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
+	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -138,6 +210,26 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerO
 		svc.ListPlayers,
 		opts...,
 	))
+	mux.Handle(AdminServiceListEventStagesProcedure, connect_go.NewUnaryHandler(
+		AdminServiceListEventStagesProcedure,
+		svc.ListEventStages,
+		opts...,
+	))
+	mux.Handle(AdminServiceCreateStageScoreProcedure, connect_go.NewUnaryHandler(
+		AdminServiceCreateStageScoreProcedure,
+		svc.CreateStageScore,
+		opts...,
+	))
+	mux.Handle(AdminServiceUpdateStageScoreProcedure, connect_go.NewUnaryHandler(
+		AdminServiceUpdateStageScoreProcedure,
+		svc.UpdateStageScore,
+		opts...,
+	))
+	mux.Handle(AdminServiceListStageScoresProcedure, connect_go.NewUnaryHandler(
+		AdminServiceListStageScoresProcedure,
+		svc.ListStageScores,
+		opts...,
+	))
 	return "/api.v1.AdminService/", mux
 }
 
@@ -154,4 +246,20 @@ func (UnimplementedAdminServiceHandler) UpdatePlayer(context.Context, *connect_g
 
 func (UnimplementedAdminServiceHandler) ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListPlayers is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListEventStages is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.CreateStageScore is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.UpdateStageScore is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListStageScores is not implemented"))
 }
