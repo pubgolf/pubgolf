@@ -14,7 +14,7 @@
 	export let parent: ComponentProps<Modal>;
 	export let playerData: PlayerData;
 	export let operation: FormOperation;
-	export let title: string = '';
+	export let title = '';
 	export let onSubmit: (op: FormOperation, playerData: PlayerData) => Promise<DisplayError>;
 
 	let ctaText = operation === 'create' ? 'Register Player' : 'Update Player';

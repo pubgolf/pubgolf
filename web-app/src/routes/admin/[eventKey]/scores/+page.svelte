@@ -9,11 +9,11 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Stage, StageScore } from '$lib/proto/api/v1/admin_pb';
-	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
 	import { combineIds, separateIds } from '$lib/models/scores';
+	import { noop } from 'svelte/internal';
 
-	let dataReady: Promise<any> = new Promise(() => {});
+	let dataReady: Promise<[void, void, void]> = new Promise(noop);
 	let dataUpdatedAt: Date;
 	function formatTimestamp(d: Date) {
 		return new Intl.DateTimeFormat(undefined, { timeStyle: 'medium' }).format(d);
@@ -68,7 +68,7 @@
 		const props: Omit<ComponentProps<NewScoreForm>, 'parent'> = {
 			players: await players,
 			stages: await stages,
-			onSubmit: async (data, _) => {
+			onSubmit: async (data) => {
 				const rpc = await getAdminServiceClient();
 				try {
 					await rpc.createStageScore({

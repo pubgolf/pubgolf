@@ -4,7 +4,7 @@
 	import ErrorBanner, { type DisplayError } from '../ErrorBanner.svelte';
 	import { modalStore, type Modal } from '@skeletonlabs/skeleton';
 	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
-	import { PlusIcon, SkullIcon, XIcon } from 'lucide-svelte';
+	import { PlusIcon, XIcon } from 'lucide-svelte';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
 	import type { StageScoreIds, Strict } from '$lib/models/scores';
@@ -20,8 +20,8 @@
 	}
 
 	export let parent: ComponentProps<Modal>;
-	export let title: string = 'Enter a Score';
-	export let ctaText: string = 'Create Score';
+	export let title = 'Enter a Score';
+	export let ctaText = 'Create Score';
 	export let players: Player[];
 	export let stages: Stage[];
 	export let score: {
