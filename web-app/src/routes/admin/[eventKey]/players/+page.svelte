@@ -37,6 +37,7 @@
 
 		const props: Omit<ComponentProps<PlayerForm>, 'parent'> = {
 			operation,
+			title,
 			playerData,
 			onSubmit: async (op: FormOperation, playerData: PlayerData): Promise<DisplayError> => {
 				const rpc = await adminClient;
@@ -65,16 +66,11 @@
 
 		modalStore.trigger({
 			type: 'component',
-			title,
 			component: {
 				ref: PlayerForm,
 				props
 			},
-			response: (submittedForm: boolean) => {
-				if (submittedForm) {
-					refreshData();
-				}
-			}
+			response: (submittedForm: boolean) => submittedForm && refreshData()
 		});
 	}
 

@@ -9,10 +9,12 @@
 	import type { DisplayError } from '../ErrorBanner.svelte';
 	import ErrorBanner from '../ErrorBanner.svelte';
 	import type { ComponentProps } from 'svelte';
+	import { XIcon } from 'lucide-svelte';
 
 	export let parent: ComponentProps<Modal>;
 	export let playerData: PlayerData;
 	export let operation: FormOperation;
+	export let title: string = '';
 	export let onSubmit: (op: FormOperation, playerData: PlayerData) => Promise<DisplayError>;
 
 	let ctaText = operation === 'create' ? 'Register Player' : 'Update Player';
@@ -40,11 +42,14 @@
 </script>
 
 <div class="card p-4 w-modal shadow-xl space-y-4 relative">
-	{#if $modalStore[0]?.title}
-		<header class="card-header">
-			<span class="text-2xl font-bold">{$modalStore[0]?.title}</span>
-		</header>
-	{/if}
+	<header class="card-header">
+		{#if title}<span class="text-2xl font-bold">{title}</span>{/if}
+		<button
+			type="button"
+			class="btn btn-icon absolute top-4 right-4 {parent.buttonNeutral}"
+			on:click={parent.onClose}><XIcon /></button
+		>
+	</header>
 
 	<div class="px-4">
 		<ErrorBanner {error} on:dismiss={clearError} />
@@ -77,4 +82,6 @@
 		>
 		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>{ctaText}</button>
 	</footer>
+
+	<slot />
 </div>
