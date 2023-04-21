@@ -4,7 +4,7 @@
 	import '../app.postcss';
 
 	import { Drawer, Modal, Toast } from '@skeletonlabs/skeleton';
-	import SidebarContent from '$lib/components/sidebars/SidebarContent.svelte';
+	import SidebarContent from '$lib/components/sidebars/Sidebar.svelte';
 </script>
 
 <Drawer width="w-11/12 max-w-sm">

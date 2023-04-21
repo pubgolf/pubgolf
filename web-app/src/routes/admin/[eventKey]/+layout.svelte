@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { Menu } from 'lucide-svelte';
-	import { AppShell, AppBar, drawerStore } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
 	import { page } from '$app/stores';
+	import { USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
 	import type { DisplayError } from '$lib/components/ErrorBanner.svelte';
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
+	import SiteFooter from '$lib/components/SiteFooter.svelte';
 	import { getAdminServiceClient } from '$lib/rpc/client';
+	import { AppBar, AppShell, drawerStore } from '@skeletonlabs/skeleton';
+	import { Menu, RefreshCwIcon } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	let authInit = false;
 	let authError: DisplayError = null;
@@ -33,7 +34,7 @@
 </script>
 
 <AppShell>
-	<svelte:fragment slot="pageHeader">
+	<svelte:fragment slot="header">
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" shadow="shadow-xl">
 			<svelte:fragment slot="lead">
 				<button
@@ -51,7 +52,10 @@
 		{#if authInit}
 			<slot />
 		{:else}
-			Authenticating...
+			<div class="card py-12 flex flex-col items-center">
+				<p class="mb-4">Checking auth status...</p>
+				<RefreshCwIcon class="animate-spin" />
+			</div>
 		{/if}
 	</div>
 	<svelte:fragment slot="pageFooter">

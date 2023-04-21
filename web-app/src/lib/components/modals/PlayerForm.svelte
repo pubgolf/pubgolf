@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { PlayerData } from '$lib/proto/api/v1/shared_pb';
-	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
+	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
 	import type { DisplayError } from '../ErrorBanner.svelte';
 	import ErrorBanner from '../ErrorBanner.svelte';
 	import type { ComponentProps } from 'svelte';

@@ -1,33 +1,38 @@
 <script lang="ts">
-	import { modalStore } from '@skeletonlabs/skeleton';
-	import { RefreshCcwIcon, UserPlusIcon } from 'lucide-svelte';
-	import type { ComponentProps } from 'svelte';
-	import { getAdminServiceClient } from '$lib/rpc/client';
 	import { page } from '$app/stores';
-	import SetTitle from '$lib/components/util/SetTitle.svelte';
-	import PlayerForm, { type FormOperation } from '$lib/components/modals/PlayerForm.svelte';
-	import { PlayerData, type Player } from '$lib/proto/api/v1/shared_pb';
-	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
 	import type { DisplayError } from '$lib/components/ErrorBanner.svelte';
+	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
+	import NoDataCard from '$lib/components/dashboards/NoDataCard.svelte';
+	import RefreshHeader from '$lib/components/dashboards/RefreshHeader.svelte';
+	import PlayerForm, { type FormOperation } from '$lib/components/modals/PlayerForm.svelte';
+	import SetTitle from '$lib/components/util/SetTitle.svelte';
+	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
+	import { PlayerData, type Player } from '$lib/proto/api/v1/shared_pb';
+	import { getAdminServiceClient } from '$lib/rpc/client';
+	import { modalStore } from '@skeletonlabs/skeleton';
+	import { RefreshCwIcon, UserPlusIcon } from 'lucide-svelte';
+	import { onMount, type ComponentProps } from 'svelte';
+	import { noop } from 'svelte/internal';
 
-	let adminClient = getAdminServiceClient();
-	let players: Promise<Player[]> = fetchPlayers();
-	let dataUpdatedAt: Date = new Date();
+	let refreshProgress: Promise<void> = new Promise(noop);
+	let lastRefresh: Date = new Date();
 
+	let players: Player[] = [];
 	async function fetchPlayers() {
-		const rpc = await adminClient;
+		const rpc = await getAdminServiceClient();
 		const resp = await rpc.listPlayers({
 			eventKey: $page.params.eventKey
 		});
 
-		dataUpdatedAt = new Date();
-
-		return resp.players;
+		players = resp.players;
 	}
 
-	function refreshData() {
-		players = fetchPlayers();
+	async function refreshData() {
+		refreshProgress = fetchPlayers();
+		await refreshProgress;
+		lastRefresh = new Date();
 	}
+	onMount(refreshData);
 
 	function showModal(title: string, playerData: PlayerData, playerId?: string) {
 		let operation: FormOperation = 'create';
@@ -40,7 +45,7 @@
 			title,
 			playerData,
 			onSubmit: async (op: FormOperation, playerData: PlayerData): Promise<DisplayError> => {
-				const rpc = await adminClient;
+				const rpc = await getAdminServiceClient();
 				try {
 					if (operation === 'create') {
 						await rpc.createPlayer({
@@ -82,35 +87,30 @@
 <SetTitle title="Players" />
 
 <div class="max-w-3xl mx-auto">
-	<header class="flex justify-between items-start mb-4 md:mt-4">
-		<h1>Players</h1>
-		<div class="text-right">
-			<button type="button" class="btn variant-filled mb-0.5" on:click={refreshData}>
-				<span class="badge-icon"><RefreshCcwIcon /></span>
-				<span>Refresh</span>
-			</button><br />
-			<span class="text-xs"
-				>Last Fetched: {new Intl.DateTimeFormat(undefined, { timeStyle: 'medium' }).format(
-					dataUpdatedAt
-				)}</span
-			>
-		</div>
-	</header>
+	<RefreshHeader
+		title="Players"
+		refresh={refreshData}
+		loadingStatus={refreshProgress}
+		{lastRefresh}
+	/>
 
-	{#await players}
-		<p>Fetching players...</p>
-	{:then players}
-		<div class="table-container">
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>League</th>
-						<th class="table-cell-fit">Edit</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#if players.length}
+	{#await refreshProgress}
+		<div class="card py-12 flex flex-col items-center">
+			<p class="mb-4">Loading players...</p>
+			<RefreshCwIcon class="animate-spin" />
+		</div>
+	{:then}
+		{#if players.length}
+			<div class="table-container">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>League</th>
+							<th class="table-cell-fit">Edit</th>
+						</tr>
+					</thead>
+					<tbody>
 						{#each players as player (player.id)}
 							<tr>
 								<td>{player.data?.name}</td>
@@ -131,27 +131,22 @@
 								</td>
 							</tr>
 						{/each}
-					{:else}
-						<tr class="text-center">
-							<td colspan="3">
-								<div class="py-12">
-									<p class="mb-4">No Players</p>
-									<button
-										type="button"
-										class="btn btn-lg variant-filled-secondary"
-										on:click={showNewPlayerModal}
-									>
-										<span>Register a New Player</span>
-									</button>
-								</div>
-							</td>
-						</tr>
-					{/if}
-				</tbody>
-			</table>
-		</div>
+					</tbody>
+				</table>
+			</div>
+		{:else}
+			<NoDataCard
+				text="No Players to Display"
+				ctaText="Register a New Player"
+				on:click={showNewPlayerModal}
+			/>
+		{/if}
 	{:catch error}
-		<p>Error fetching players: {error}</p>
+		<ErrorBanner
+			error={{ type: 'Server Error', message: error }}
+			dismissLabel="Retry"
+			on:dismiss={refreshData}
+		/>
 	{/await}
 
 	<footer class="fixed bottom-8 right-4">

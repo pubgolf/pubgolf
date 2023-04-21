@@ -1,22 +1,17 @@
 <script lang="ts">
-	import type { ComponentProps } from 'svelte';
-	import type { PlainMessage } from '@bufbuild/protobuf';
-	import ErrorBanner, { type DisplayError } from '../ErrorBanner.svelte';
-	import { modalStore, type Modal } from '@skeletonlabs/skeleton';
+	import { formatListAnd } from '$lib/helpers/formatters';
+	import type { StageScoreIds, Strict } from '$lib/helpers/scores';
+	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
 	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
-	import { PlusIcon, XIcon } from 'lucide-svelte';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
-	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
-	import type { StageScoreIds, Strict } from '$lib/models/scores';
+	import type { PlainMessage } from '@bufbuild/protobuf';
+	import { modalStore, type Modal } from '@skeletonlabs/skeleton';
+	import { PlusIcon, XIcon } from 'lucide-svelte';
+	import type { ComponentProps } from 'svelte';
+	import ErrorBanner, { type DisplayError } from '../ErrorBanner.svelte';
 
 	function selectOnFocus(e: FocusEvent) {
 		(e.target as HTMLInputElement | null)?.select();
-	}
-
-	function formatListAnd(l: string[]) {
-		return new Intl.ListFormat(undefined, {
-			type: 'conjunction'
-		}).format(l);
 	}
 
 	export let parent: ComponentProps<Modal>;
