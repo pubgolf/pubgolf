@@ -2,11 +2,15 @@ package telemetry
 
 import (
 	"context"
+	"path/filepath"
+	"runtime"
 	"runtime/debug"
+	"strings"
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-launcher-go/launcher"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/trace"
@@ -49,4 +53,24 @@ func gitVersion() string {
 	}
 
 	return "unknown"
+}
+
+// FnSpan annotates a function with a span for tracing, automatically inferring the name.
+var FnSpan = AutoSpan("func")
+
+// AutoSpan generates an auto instrumentation for a function. For example, if you define
+//
+// var mySpan = telemetry.AutoSpan("my")
+//
+// then you would call it by adding `defer mySpan(&ctx)()` to the start of the function definition you want to annotate, resulting in a span named `my.NameOfAnnotatedFunc`.
+func AutoSpan(prefix string) func(ctx *context.Context) func() {
+	return func(ctx *context.Context) func() {
+		name := prefix + ".Unknown"
+		if pc, _, _, ok := runtime.Caller(1); ok {
+			name = prefix + "." + strings.Split(filepath.Base(runtime.FuncForPC(pc).Name()), ".")[2]
+		}
+		newCtx, span := otel.Tracer("").Start(*ctx, name)
+		*ctx = newCtx
+		return func() { span.End() }
+	}
 }
