@@ -7,8 +7,6 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-const fallbackImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
-
 // Venue contains metadata about a venue location.
 type Venue struct {
 	ID       models.VenueID
@@ -26,7 +24,7 @@ func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueK
 		VenueKey: venueKey,
 	})
 
-	imageURL := fallbackImage
+	imageURL := fallbackVenueImage
 	if v.ImageUrl.Valid {
 		imageURL = v.ImageUrl.String
 	}
