@@ -55,7 +55,7 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Test
-        run: go test -v ./tools/lib/...
+        run: go test ./tools/lib/...
       - name: Build
         run: GOOS=darwin GOARCH=amd64 go build -v ./tools/cmd/pubgolf-devctrl
       - name: Upload Built Tools as CI Artifact
@@ -77,7 +77,7 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Test
-        run: go test -v ./api/...
+        run: go test ./api/...
       - name: Build API Server Binary
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-api-server
       - name: Upload API Server Binary as CI Artifact

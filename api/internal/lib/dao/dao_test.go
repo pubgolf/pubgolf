@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -11,6 +12,11 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+)
+
+var (
+	_sharedDB        *sql.DB
+	_sharedDBCleanup func()
 )
 
 type mockDBCCall struct {
@@ -25,15 +31,24 @@ func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 	}
 }
 
+func TestMain(m *testing.M) {
+	os.Exit(executeTests(m))
+}
+
+func executeTests(m *testing.M) int {
+	_sharedDB, _sharedDBCleanup = dbtest.New("dbc-test", false)
+	defer _sharedDBCleanup()
+
+	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
+
+	return m.Run()
+}
+
 func Test_txQuerier(t *testing.T) {
 	t.Run("Succeeds when DAO is constructed with New()", func(t *testing.T) {
-		tempDB, tempDBCleanup := dbtest.New("dao-test", false)
-		defer tempDBCleanup()
-		dbtest.Migrate(tempDB, dbtest.MigrationDir())
-
 		ctx := context.Background()
 
-		dao, err := New(ctx, tempDB)
+		dao, err := New(ctx, _sharedDB)
 		assert.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(ctx, &sql.TxOptions{})
