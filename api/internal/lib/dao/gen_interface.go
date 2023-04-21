@@ -17,6 +17,8 @@ type QueryProvider interface {
 	CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.Player, error)
 	// CreateScoreForStage creates score and adjustment records for a given stage.
 	CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error
+	// DeleteScore creates score and adjustment records for a given stage.
+	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
 	// EventPlayers returns all players registered for a given event, in alphabetical order by name.
@@ -35,6 +37,8 @@ type QueryProvider interface {
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
+	// UpdateScore creates score and adjustment records for a given stage.
+	UpdateScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score models.Score, modifyAdj []models.Adjustment, createAdj []models.AdjustmentParams) error
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
 }

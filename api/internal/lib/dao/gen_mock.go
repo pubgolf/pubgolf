@@ -74,6 +74,20 @@ func (_m *MockQueryProvider) CreateScoreForStage(ctx context.Context, playerID m
 	return r0
 }
 
+// DeleteScore provides a mock function with given fields: ctx, playerID, stageID
+func (_m *MockQueryProvider) DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error {
+	ret := _m.Called(ctx, playerID, stageID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID) error); ok {
+		r0 = rf(ctx, playerID, stageID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // EventIDByKey provides a mock function with given fields: ctx, key
 func (_m *MockQueryProvider) EventIDByKey(ctx context.Context, key string) (models.EventID, error) {
 	ret := _m.Called(ctx, key)
@@ -276,6 +290,20 @@ func (_m *MockQueryProvider) UpdatePlayer(ctx context.Context, playerID models.P
 	}
 
 	return r0, r1
+}
+
+// UpdateScore provides a mock function with given fields: ctx, playerID, stageID, score, modifyAdj, createAdj
+func (_m *MockQueryProvider) UpdateScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score models.Score, modifyAdj []models.Adjustment, createAdj []models.AdjustmentParams) error {
+	ret := _m.Called(ctx, playerID, stageID, score, modifyAdj, createAdj)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, models.Score, []models.Adjustment, []models.AdjustmentParams) error); ok {
+		r0 = rf(ctx, playerID, stageID, score, modifyAdj, createAdj)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // VenueByKey provides a mock function with given fields: ctx, eventID, venueKey

@@ -913,3 +913,77 @@ export class ListStageScoresResponse extends Message<ListStageScoresResponse> {
   }
 }
 
+/**
+ * @generated from message api.v1.DeleteStageScoreRequest
+ */
+export class DeleteStageScoreRequest extends Message<DeleteStageScoreRequest> {
+  /**
+   * @generated from field: string stage_id = 1;
+   */
+  stageId = "";
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = "";
+
+  constructor(data?: PartialMessage<DeleteStageScoreRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.DeleteStageScoreRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteStageScoreRequest {
+    return new DeleteStageScoreRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteStageScoreRequest {
+    return new DeleteStageScoreRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteStageScoreRequest {
+    return new DeleteStageScoreRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteStageScoreRequest | PlainMessage<DeleteStageScoreRequest> | undefined, b: DeleteStageScoreRequest | PlainMessage<DeleteStageScoreRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteStageScoreRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.DeleteStageScoreResponse
+ */
+export class DeleteStageScoreResponse extends Message<DeleteStageScoreResponse> {
+  constructor(data?: PartialMessage<DeleteStageScoreResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.DeleteStageScoreResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteStageScoreResponse {
+    return new DeleteStageScoreResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteStageScoreResponse {
+    return new DeleteStageScoreResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteStageScoreResponse {
+    return new DeleteStageScoreResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteStageScoreResponse | PlainMessage<DeleteStageScoreResponse> | undefined, b: DeleteStageScoreResponse | PlainMessage<DeleteStageScoreResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteStageScoreResponse, a, b);
+  }
+}
+

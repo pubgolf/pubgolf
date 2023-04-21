@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateStageScoreRequest, CreateStageScoreResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
+import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateStageScoreRequest, CreateStageScoreResponse, DeleteStageScoreRequest, DeleteStageScoreResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -85,7 +85,7 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
-     * ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time. 
+     * ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
      *
      * @generated from rpc api.v1.AdminService.ListStageScores
      */
@@ -93,6 +93,17 @@ export const AdminService = {
       name: "ListStageScores",
       I: ListStageScoresRequest,
       O: ListStageScoresResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * DeleteStageScore removes all scoring data for a player/stage pair.
+     *
+     * @generated from rpc api.v1.AdminService.DeleteStageScore
+     */
+    deleteStageScore: {
+      name: "DeleteStageScore",
+      I: DeleteStageScoreRequest,
+      O: DeleteStageScoreResponse,
       kind: MethodKind.Unary,
     },
   }

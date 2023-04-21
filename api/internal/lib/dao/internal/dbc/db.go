@@ -36,6 +36,15 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createScoreStmt, err = db.PrepareContext(ctx, createScore); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateScore: %w", err)
 	}
+	if q.deleteAdjustmentStmt, err = db.PrepareContext(ctx, deleteAdjustment); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteAdjustment: %w", err)
+	}
+	if q.deleteAdjustmentsForPlayerStageStmt, err = db.PrepareContext(ctx, deleteAdjustmentsForPlayerStage); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteAdjustmentsForPlayerStage: %w", err)
+	}
+	if q.deleteScoreForPlayerStageStmt, err = db.PrepareContext(ctx, deleteScoreForPlayerStage); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteScoreForPlayerStage: %w", err)
+	}
 	if q.eventAdjustmentsStmt, err = db.PrepareContext(ctx, eventAdjustments); err != nil {
 		return nil, fmt.Errorf("error preparing query EventAdjustments: %w", err)
 	}
@@ -75,8 +84,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.setNextEventVenueKeyStmt, err = db.PrepareContext(ctx, setNextEventVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query SetNextEventVenueKey: %w", err)
 	}
+	if q.updateAdjustmentStmt, err = db.PrepareContext(ctx, updateAdjustment); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateAdjustment: %w", err)
+	}
 	if q.updatePlayerStmt, err = db.PrepareContext(ctx, updatePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdatePlayer: %w", err)
+	}
+	if q.updateScoreStmt, err = db.PrepareContext(ctx, updateScore); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateScore: %w", err)
 	}
 	if q.venueByKeyStmt, err = db.PrepareContext(ctx, venueByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query VenueByKey: %w", err)
@@ -104,6 +119,21 @@ func (q *Queries) Close() error {
 	if q.createScoreStmt != nil {
 		if cerr := q.createScoreStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createScoreStmt: %w", cerr)
+		}
+	}
+	if q.deleteAdjustmentStmt != nil {
+		if cerr := q.deleteAdjustmentStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteAdjustmentStmt: %w", cerr)
+		}
+	}
+	if q.deleteAdjustmentsForPlayerStageStmt != nil {
+		if cerr := q.deleteAdjustmentsForPlayerStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteAdjustmentsForPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.deleteScoreForPlayerStageStmt != nil {
+		if cerr := q.deleteScoreForPlayerStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteScoreForPlayerStageStmt: %w", cerr)
 		}
 	}
 	if q.eventAdjustmentsStmt != nil {
@@ -171,9 +201,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing setNextEventVenueKeyStmt: %w", cerr)
 		}
 	}
+	if q.updateAdjustmentStmt != nil {
+		if cerr := q.updateAdjustmentStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateAdjustmentStmt: %w", cerr)
+		}
+	}
 	if q.updatePlayerStmt != nil {
 		if cerr := q.updatePlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updatePlayerStmt: %w", cerr)
+		}
+	}
+	if q.updateScoreStmt != nil {
+		if cerr := q.updateScoreStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateScoreStmt: %w", cerr)
 		}
 	}
 	if q.venueByKeyStmt != nil {
@@ -218,51 +258,61 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                           DBTX
-	tx                           *sql.Tx
-	adjustmentsByPlayerStageStmt *sql.Stmt
-	createAdjustmentStmt         *sql.Stmt
-	createPlayerStmt             *sql.Stmt
-	createScoreStmt              *sql.Stmt
-	eventAdjustmentsStmt         *sql.Stmt
-	eventCacheVersionByHashStmt  *sql.Stmt
-	eventIDByKeyStmt             *sql.Stmt
-	eventPlayersStmt             *sql.Stmt
-	eventScheduleStmt            *sql.Stmt
-	eventScheduleWithDetailsStmt *sql.Stmt
-	eventScoresStmt              *sql.Stmt
-	eventStartTimeStmt           *sql.Stmt
-	eventVenueKeysAreValidStmt   *sql.Stmt
-	scoreByPlayerStageStmt       *sql.Stmt
-	setEventCacheKeysStmt        *sql.Stmt
-	setEventVenueKeysStmt        *sql.Stmt
-	setNextEventVenueKeyStmt     *sql.Stmt
-	updatePlayerStmt             *sql.Stmt
-	venueByKeyStmt               *sql.Stmt
+	db                                  DBTX
+	tx                                  *sql.Tx
+	adjustmentsByPlayerStageStmt        *sql.Stmt
+	createAdjustmentStmt                *sql.Stmt
+	createPlayerStmt                    *sql.Stmt
+	createScoreStmt                     *sql.Stmt
+	deleteAdjustmentStmt                *sql.Stmt
+	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
+	deleteScoreForPlayerStageStmt       *sql.Stmt
+	eventAdjustmentsStmt                *sql.Stmt
+	eventCacheVersionByHashStmt         *sql.Stmt
+	eventIDByKeyStmt                    *sql.Stmt
+	eventPlayersStmt                    *sql.Stmt
+	eventScheduleStmt                   *sql.Stmt
+	eventScheduleWithDetailsStmt        *sql.Stmt
+	eventScoresStmt                     *sql.Stmt
+	eventStartTimeStmt                  *sql.Stmt
+	eventVenueKeysAreValidStmt          *sql.Stmt
+	scoreByPlayerStageStmt              *sql.Stmt
+	setEventCacheKeysStmt               *sql.Stmt
+	setEventVenueKeysStmt               *sql.Stmt
+	setNextEventVenueKeyStmt            *sql.Stmt
+	updateAdjustmentStmt                *sql.Stmt
+	updatePlayerStmt                    *sql.Stmt
+	updateScoreStmt                     *sql.Stmt
+	venueByKeyStmt                      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                           tx,
-		tx:                           tx,
-		adjustmentsByPlayerStageStmt: q.adjustmentsByPlayerStageStmt,
-		createAdjustmentStmt:         q.createAdjustmentStmt,
-		createPlayerStmt:             q.createPlayerStmt,
-		createScoreStmt:              q.createScoreStmt,
-		eventAdjustmentsStmt:         q.eventAdjustmentsStmt,
-		eventCacheVersionByHashStmt:  q.eventCacheVersionByHashStmt,
-		eventIDByKeyStmt:             q.eventIDByKeyStmt,
-		eventPlayersStmt:             q.eventPlayersStmt,
-		eventScheduleStmt:            q.eventScheduleStmt,
-		eventScheduleWithDetailsStmt: q.eventScheduleWithDetailsStmt,
-		eventScoresStmt:              q.eventScoresStmt,
-		eventStartTimeStmt:           q.eventStartTimeStmt,
-		eventVenueKeysAreValidStmt:   q.eventVenueKeysAreValidStmt,
-		scoreByPlayerStageStmt:       q.scoreByPlayerStageStmt,
-		setEventCacheKeysStmt:        q.setEventCacheKeysStmt,
-		setEventVenueKeysStmt:        q.setEventVenueKeysStmt,
-		setNextEventVenueKeyStmt:     q.setNextEventVenueKeyStmt,
-		updatePlayerStmt:             q.updatePlayerStmt,
-		venueByKeyStmt:               q.venueByKeyStmt,
+		db:                                  tx,
+		tx:                                  tx,
+		adjustmentsByPlayerStageStmt:        q.adjustmentsByPlayerStageStmt,
+		createAdjustmentStmt:                q.createAdjustmentStmt,
+		createPlayerStmt:                    q.createPlayerStmt,
+		createScoreStmt:                     q.createScoreStmt,
+		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
+		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
+		deleteScoreForPlayerStageStmt:       q.deleteScoreForPlayerStageStmt,
+		eventAdjustmentsStmt:                q.eventAdjustmentsStmt,
+		eventCacheVersionByHashStmt:         q.eventCacheVersionByHashStmt,
+		eventIDByKeyStmt:                    q.eventIDByKeyStmt,
+		eventPlayersStmt:                    q.eventPlayersStmt,
+		eventScheduleStmt:                   q.eventScheduleStmt,
+		eventScheduleWithDetailsStmt:        q.eventScheduleWithDetailsStmt,
+		eventScoresStmt:                     q.eventScoresStmt,
+		eventStartTimeStmt:                  q.eventStartTimeStmt,
+		eventVenueKeysAreValidStmt:          q.eventVenueKeysAreValidStmt,
+		scoreByPlayerStageStmt:              q.scoreByPlayerStageStmt,
+		setEventCacheKeysStmt:               q.setEventCacheKeysStmt,
+		setEventVenueKeysStmt:               q.setEventVenueKeysStmt,
+		setNextEventVenueKeyStmt:            q.setNextEventVenueKeyStmt,
+		updateAdjustmentStmt:                q.updateAdjustmentStmt,
+		updatePlayerStmt:                    q.updatePlayerStmt,
+		updateScoreStmt:                     q.updateScoreStmt,
+		venueByKeyStmt:                      q.venueByKeyStmt,
 	}
 }

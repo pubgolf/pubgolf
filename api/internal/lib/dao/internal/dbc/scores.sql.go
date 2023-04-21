@@ -96,6 +96,48 @@ func (q *Queries) CreateScore(ctx context.Context, arg CreateScoreParams) error 
 	return err
 }
 
+const deleteAdjustment = `-- name: DeleteAdjustment :exec
+DELETE FROM adjustments
+WHERE id = $1
+`
+
+func (q *Queries) DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error {
+	_, err := q.exec(ctx, q.deleteAdjustmentStmt, deleteAdjustment, id)
+	return err
+}
+
+const deleteAdjustmentsForPlayerStage = `-- name: DeleteAdjustmentsForPlayerStage :exec
+DELETE FROM adjustments
+WHERE stage_id = $1
+  AND player_id = $2
+`
+
+type DeleteAdjustmentsForPlayerStageParams struct {
+	StageID  models.StageID
+	PlayerID models.PlayerID
+}
+
+func (q *Queries) DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error {
+	_, err := q.exec(ctx, q.deleteAdjustmentsForPlayerStageStmt, deleteAdjustmentsForPlayerStage, arg.StageID, arg.PlayerID)
+	return err
+}
+
+const deleteScoreForPlayerStage = `-- name: DeleteScoreForPlayerStage :exec
+DELETE FROM scores
+WHERE stage_id = $1
+  AND player_id = $2
+`
+
+type DeleteScoreForPlayerStageParams struct {
+	StageID  models.StageID
+	PlayerID models.PlayerID
+}
+
+func (q *Queries) DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error {
+	_, err := q.exec(ctx, q.deleteScoreForPlayerStageStmt, deleteScoreForPlayerStage, arg.StageID, arg.PlayerID)
+	return err
+}
+
 const eventAdjustments = `-- name: EventAdjustments :many
 SELECT
   s.stage_id,
@@ -236,4 +278,46 @@ func (q *Queries) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStage
 	var i ScoreByPlayerStageRow
 	err := row.Scan(&i.ID, &i.Value)
 	return i, err
+}
+
+const updateAdjustment = `-- name: UpdateAdjustment :exec
+UPDATE
+  adjustments
+SET
+  label = $2,
+  value = $3,
+  updated_at = now()
+WHERE
+  id = $1
+`
+
+type UpdateAdjustmentParams struct {
+	ID    models.AdjustmentID
+	Label string
+	Value int32
+}
+
+func (q *Queries) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error {
+	_, err := q.exec(ctx, q.updateAdjustmentStmt, updateAdjustment, arg.ID, arg.Label, arg.Value)
+	return err
+}
+
+const updateScore = `-- name: UpdateScore :exec
+UPDATE
+  scores
+SET
+  value = $2,
+  updated_at = now()
+WHERE
+  id = $1
+`
+
+type UpdateScoreParams struct {
+	ID    models.ScoreID
+	Value uint32
+}
+
+func (q *Queries) UpdateScore(ctx context.Context, arg UpdateScoreParams) error {
+	_, err := q.exec(ctx, q.updateScoreStmt, updateScore, arg.ID, arg.Value)
+	return err
 }

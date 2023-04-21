@@ -56,6 +56,9 @@ const (
 	// AdminServiceListStageScoresProcedure is the fully-qualified name of the AdminService's
 	// ListStageScores RPC.
 	AdminServiceListStageScoresProcedure = "/api.v1.AdminService/ListStageScores"
+	// AdminServiceDeleteStageScoreProcedure is the fully-qualified name of the AdminService's
+	// DeleteStageScore RPC.
+	AdminServiceDeleteStageScoreProcedure = "/api.v1.AdminService/DeleteStageScore"
 )
 
 // AdminServiceClient is a client for the api.v1.AdminService service.
@@ -74,6 +77,8 @@ type AdminServiceClient interface {
 	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
 	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
 	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
+	// DeleteStageScore removes all scoring data for a player/stage pair.
+	DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the api.v1.AdminService service. By default, it
@@ -121,6 +126,11 @@ func NewAdminServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 			baseURL+AdminServiceListStageScoresProcedure,
 			opts...,
 		),
+		deleteStageScore: connect_go.NewClient[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse](
+			httpClient,
+			baseURL+AdminServiceDeleteStageScoreProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -133,6 +143,7 @@ type adminServiceClient struct {
 	createStageScore *connect_go.Client[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse]
 	updateStageScore *connect_go.Client[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse]
 	listStageScores  *connect_go.Client[v1.ListStageScoresRequest, v1.ListStageScoresResponse]
+	deleteStageScore *connect_go.Client[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse]
 }
 
 // CreatePlayer calls api.v1.AdminService.CreatePlayer.
@@ -170,6 +181,11 @@ func (c *adminServiceClient) ListStageScores(ctx context.Context, req *connect_g
 	return c.listStageScores.CallUnary(ctx, req)
 }
 
+// DeleteStageScore calls api.v1.AdminService.DeleteStageScore.
+func (c *adminServiceClient) DeleteStageScore(ctx context.Context, req *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error) {
+	return c.deleteStageScore.CallUnary(ctx, req)
+}
+
 // AdminServiceHandler is an implementation of the api.v1.AdminService service.
 type AdminServiceHandler interface {
 	// CreatePlayer creates a new player profile for a given event.
@@ -186,6 +202,8 @@ type AdminServiceHandler interface {
 	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
 	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
 	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
+	// DeleteStageScore removes all scoring data for a player/stage pair.
+	DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -230,6 +248,11 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerO
 		svc.ListStageScores,
 		opts...,
 	))
+	mux.Handle(AdminServiceDeleteStageScoreProcedure, connect_go.NewUnaryHandler(
+		AdminServiceDeleteStageScoreProcedure,
+		svc.DeleteStageScore,
+		opts...,
+	))
 	return "/api.v1.AdminService/", mux
 }
 
@@ -262,4 +285,8 @@ func (UnimplementedAdminServiceHandler) UpdateStageScore(context.Context, *conne
 
 func (UnimplementedAdminServiceHandler) ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListStageScores is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.DeleteStageScore is not implemented"))
 }

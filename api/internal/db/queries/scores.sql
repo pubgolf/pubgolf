@@ -68,3 +68,36 @@ ORDER BY
   s.created_at ASC,
   a.created_at ASC;
 
+-- name: UpdateScore :exec
+UPDATE
+  scores
+SET
+  value = $2,
+  updated_at = now()
+WHERE
+  id = $1;
+
+-- name: UpdateAdjustment :exec
+UPDATE
+  adjustments
+SET
+  label = $2,
+  value = $3,
+  updated_at = now()
+WHERE
+  id = $1;
+
+-- name: DeleteScoreForPlayerStage :exec
+DELETE FROM scores
+WHERE stage_id = $1
+  AND player_id = $2;
+
+-- name: DeleteAdjustmentsForPlayerStage :exec
+DELETE FROM adjustments
+WHERE stage_id = $1
+  AND player_id = $2;
+
+-- name: DeleteAdjustment :exec
+DELETE FROM adjustments
+WHERE id = $1;
+

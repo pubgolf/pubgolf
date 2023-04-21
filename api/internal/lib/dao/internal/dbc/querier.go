@@ -16,6 +16,9 @@ type Querier interface {
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (CreatePlayerRow, error)
 	CreateScore(ctx context.Context, arg CreateScoreParams) error
+	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
+	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error
+	DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error
 	EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error)
 	EventCacheVersionByHash(ctx context.Context, arg EventCacheVersionByHashParams) (uint32, error)
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
@@ -29,7 +32,9 @@ type Querier interface {
 	SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error)
 	SetEventVenueKeys(ctx context.Context, eventID models.EventID) error
 	SetNextEventVenueKey(ctx context.Context, id models.EventID) error
+	UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) (UpdatePlayerRow, error)
+	UpdateScore(ctx context.Context, arg UpdateScoreParams) error
 	VenueByKey(ctx context.Context, arg VenueByKeyParams) (VenueByKeyRow, error)
 }
 

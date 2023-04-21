@@ -88,6 +88,48 @@ func (_m *MockQuerier) CreateScore(ctx context.Context, arg CreateScoreParams) e
 	return r0
 }
 
+// DeleteAdjustment provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.AdjustmentID) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteAdjustmentsForPlayerStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, DeleteAdjustmentsForPlayerStageParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteScoreForPlayerStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, DeleteScoreForPlayerStageParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // EventAdjustments provides a mock function with given fields: ctx, eventID
 func (_m *MockQuerier) EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error) {
 	ret := _m.Called(ctx, eventID)
@@ -357,6 +399,20 @@ func (_m *MockQuerier) SetNextEventVenueKey(ctx context.Context, id models.Event
 	return r0
 }
 
+// UpdateAdjustment provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpdateAdjustmentParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpdatePlayer provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) (UpdatePlayerRow, error) {
 	ret := _m.Called(ctx, arg)
@@ -376,6 +432,20 @@ func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams)
 	}
 
 	return r0, r1
+}
+
+// UpdateScore provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpdateScore(ctx context.Context, arg UpdateScoreParams) error {
+	ret := _m.Called(ctx, arg)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpdateScoreParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // VenueByKey provides a mock function with given fields: ctx, arg

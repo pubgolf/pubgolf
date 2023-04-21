@@ -36,6 +36,9 @@ service AdminService {
 
   // ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
   rpc ListStageScores(ListStageScoresRequest) returns (ListStageScoresResponse) {}
+
+  // DeleteStageScore removes all scoring data for a player/stage pair.
+  rpc DeleteStageScore(DeleteStageScoreRequest) returns (DeleteStageScoreResponse) {}
 }
 
 // --------------------
@@ -163,3 +166,11 @@ message ListStageScoresRequest {
 message ListStageScoresResponse {
   repeated StageScore scores = 1;
 }
+
+// DeleteStageScore
+
+message DeleteStageScoreRequest {
+  string stage_id = 1;
+  string player_id = 2;
+}
+message DeleteStageScoreResponse {}
