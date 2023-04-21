@@ -11,24 +11,21 @@ sql:
         emit_interface: true
         overrides:
           - db_type: uuid
-            go_type:
-              import: github.com/oklog/ulid/v2
-              package: ulid
-              type: ULID
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.DatabaseULID
           - db_type: uuid
             nullable: true
-            go_type:
-              import: github.com/oklog/ulid/v2
-              package: ulid
-              type: ULID
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.DatabaseULID
+          # Events
           - column: events.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
           - column: events.current_venue_key
             go_type: uint32
           - column: events.current_schedule_cache_version
             go_type: uint32
+          # Venues
           - column: venues.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
+          # Stages
           - column: stages.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
           - column: stages.event_id
@@ -41,6 +38,7 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueKey
           - column: stages.duration_minutes
             go_type: uint32
+          # Players
           - column: players.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
           - column: players.event_id
