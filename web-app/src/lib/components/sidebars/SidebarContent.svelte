@@ -38,10 +38,10 @@
 	<SidebarNav
 		title="Dashboards"
 		items={[
-			{
-				slug: 'event-info',
-				icon: '📝'
-			},
+			// {
+			// 	slug: 'event-info',
+			// 	icon: '📝'
+			// },
 			// {
 			// 	slug: 'schedule',
 			// 	icon: '⏱️'
@@ -53,11 +53,11 @@
 			{
 				slug: 'scores',
 				icon: '🏆'
-			},
-			{
-				slug: 'alerts',
-				icon: '🚨'
 			}
+			// {
+			// 	slug: 'alerts',
+			// 	icon: '🚨'
+			// }
 		]}
 	/>
 
