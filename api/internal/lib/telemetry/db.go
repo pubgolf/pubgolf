@@ -24,7 +24,7 @@ var parseDBCQueryName spanNameFormatterFn = spanNameFormatterFn(func(ctx context
 
 	if strings.HasPrefix(query, queryPrefix) {
 		qPl := len(queryPrefix)
-		return "dbc." + query[qPl:qPl+strings.Index(query[qPl:], " ")]
+		return "dbc." + strings.Split(string(method), ".")[2] + "." + query[qPl:qPl+strings.Index(query[qPl:], " ")]
 	}
 
 	return string(method)
