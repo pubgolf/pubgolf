@@ -200,7 +200,7 @@
 										{/each}
 									{/if}
 								</td>
-								<td class="table-cell-fit">
+								<td class="table-cell-fit action-btns">
 									<button
 										type="button"
 										class="btn btn-sm variant-filled"
@@ -243,3 +243,12 @@
 		</button>
 	</footer>
 </div>
+
+<style lang="postcss">
+	.table tbody td {
+		@apply align-middle;
+	}
+	.table tbody td.action-btns {
+		@apply whitespace-nowrap;
+	}
+</style>
