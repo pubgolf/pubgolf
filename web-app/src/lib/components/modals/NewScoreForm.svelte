@@ -4,9 +4,10 @@
 	import ErrorBanner, { type DisplayError } from '../ErrorBanner.svelte';
 	import { modalStore, type Modal } from '@skeletonlabs/skeleton';
 	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
-	import { PlusIcon, XIcon } from 'lucide-svelte';
+	import { PlusIcon, SkullIcon, XIcon } from 'lucide-svelte';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/models/scoring-category';
+	import type { StageScoreIds, Strict } from '$lib/models/scores';
 
 	function selectOnFocus(e: FocusEvent) {
 		(e.target as HTMLInputElement | null)?.select();
@@ -23,15 +24,64 @@
 	export let ctaText: string = 'Create Score';
 	export let players: Player[];
 	export let stages: Stage[];
-	export let onSubmit: (scoreData: Required<PlainMessage<StageScoreData>>) => Promise<DisplayError>;
+	export let score: {
+		data: Strict<StageScoreData>;
+		ids: StageScoreIds;
+	} | null = null;
+	export let onSubmit: (
+		scoreData: Strict<StageScoreData>,
+		ids?: StageScoreIds
+	) => Promise<DisplayError>;
 
-	type AdjustmentFormEntry = { id: string; adjustment: PlainMessage<AdjustmentData> };
+	let editMode = !!score;
+
+	let formInit = false;
+	$: {
+		if (!formInit && score) {
+			formData = score.data;
+
+			let newBonuses: AdjustmentFormEntry[] = [];
+			let newPenalties: AdjustmentFormEntry[] = [];
+			score.data.adjustments.forEach((a, i) => {
+				if (a.value < 0) {
+					newBonuses.push({
+						idType: 'server',
+						id: score?.ids.adjustments[i].id || '',
+						adjustment: {
+							label: a.label,
+							value: -1 * a.value
+						}
+					});
+				}
+
+				if (a.value > 0) {
+					newPenalties.push({
+						idType: 'server',
+						id: score?.ids.adjustments[i].id || '',
+						adjustment: a
+					});
+				}
+			});
+
+			bonuses = newBonuses;
+			penalties = newPenalties;
+
+			formInit = true;
+		}
+	}
+
+	type AdjustmentFormEntry = {
+		idType: 'server' | 'client';
+		id: string;
+		adjustment: PlainMessage<AdjustmentData>;
+	};
 
 	let penalties: AdjustmentFormEntry[] = [];
 	async function addPenalty() {
 		penalties = [
 			...penalties,
 			{
+				idType: 'client',
 				id: crypto.randomUUID(),
 				adjustment: {
 					value: 0,
@@ -55,6 +105,7 @@
 		bonuses = [
 			...bonuses,
 			{
+				idType: 'client',
 				id: crypto.randomUUID(),
 				adjustment: {
 					value: 0,
@@ -78,7 +129,7 @@
 		...bonuses.map((x) => ({ ...x.adjustment, value: -x.adjustment.value }))
 	];
 
-	let formData: Required<PlainMessage<StageScoreData>> = {
+	let formData: Strict<StageScoreData> = {
 		stageId: '',
 		playerId: '',
 		score: {
@@ -99,9 +150,9 @@
 			blankFields.push('Player');
 		}
 
-		// if (formData.stageId === '') {
-		// 	blankFields.push('Venue');
-		// }
+		if (formData.stageId === '') {
+			blankFields.push('Venue');
+		}
 
 		formData.adjustments.forEach((x, i) => {
 			if (x.label === '') {
@@ -152,7 +203,28 @@
 			return;
 		}
 
-		const resp = await onSubmit(formData);
+		let ids: StageScoreIds | undefined;
+		if (score?.ids) {
+			ids = {
+				score: {
+					id: score.ids.score.id
+				},
+				adjustments: [
+					...penalties.map((x) => {
+						return {
+							id: x.idType === 'server' ? x.id : ''
+						};
+					}),
+					...bonuses.map((x) => {
+						return {
+							id: x.idType === 'server' ? x.id : ''
+						};
+					})
+				]
+			};
+		}
+
+		const resp = await onSubmit(formData, ids);
 		if (resp) {
 			error = resp;
 			return;
@@ -179,7 +251,7 @@
 		<div class="grid sm:grid-cols-2 gap-4 mb-8">
 			<label class="label">
 				<span>Player</span>
-				<select class="select" required bind:value={formData.playerId}>
+				<select class="select" required disabled={editMode} bind:value={formData.playerId}>
 					{#each players as player}
 						<option value={player.id}
 							>{player.data?.name} ({player.data?.scoringCategory
@@ -191,7 +263,7 @@
 			</label>
 			<label class="label">
 				<span>Venue</span>
-				<select class="select" bind:value={formData.stageId}>
+				<select class="select" disabled={editMode} bind:value={formData.stageId}>
 					{#each stages as stage, idx (stage.id)}
 						<option value={stage.id}>{stage.venue?.name || `Venue #${idx + 1}`}</option>
 					{/each}
@@ -292,10 +364,12 @@
 	</div>
 
 	<footer class="card-footer {parent.regionFooter} pt-4">
-		<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}
-			>{parent.buttonTextCancel}</button
-		>
-		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>{ctaText}</button>
+		<div>
+			<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}
+				>{parent.buttonTextCancel}</button
+			>
+			<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>{ctaText}</button>
+		</div>
 	</footer>
 
 	<slot />
