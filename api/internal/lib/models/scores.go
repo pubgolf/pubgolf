@@ -1,5 +1,13 @@
 package models
 
+// StageScore holds all scoring data (including adjustments) for a single (player, venue) pair.
+type StageScore struct {
+	StageID     StageID
+	PlayerID    PlayerID
+	Score       Score
+	Adjustments []Adjustment
+}
+
 // Score models the base score for a stage.
 type Score struct {
 	ID    ScoreID

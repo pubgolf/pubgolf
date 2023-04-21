@@ -27,6 +27,8 @@ type QueryProvider interface {
 	EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error)
 	// EventScheduleWithDetails returns the event schedule with venue and rule details included.
 	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]models.Stage, error)
+	// EventScores returns all the scores (and their adjustments) for an event, ordered by stage and then by creation time.
+	EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.

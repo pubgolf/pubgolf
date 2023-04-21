@@ -36,6 +36,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createScoreStmt, err = db.PrepareContext(ctx, createScore); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateScore: %w", err)
 	}
+	if q.eventAdjustmentsStmt, err = db.PrepareContext(ctx, eventAdjustments); err != nil {
+		return nil, fmt.Errorf("error preparing query EventAdjustments: %w", err)
+	}
 	if q.eventCacheVersionByHashStmt, err = db.PrepareContext(ctx, eventCacheVersionByHash); err != nil {
 		return nil, fmt.Errorf("error preparing query EventCacheVersionByHash: %w", err)
 	}
@@ -50,6 +53,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.eventScheduleWithDetailsStmt, err = db.PrepareContext(ctx, eventScheduleWithDetails); err != nil {
 		return nil, fmt.Errorf("error preparing query EventScheduleWithDetails: %w", err)
+	}
+	if q.eventScoresStmt, err = db.PrepareContext(ctx, eventScores); err != nil {
+		return nil, fmt.Errorf("error preparing query EventScores: %w", err)
 	}
 	if q.eventStartTimeStmt, err = db.PrepareContext(ctx, eventStartTime); err != nil {
 		return nil, fmt.Errorf("error preparing query EventStartTime: %w", err)
@@ -100,6 +106,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createScoreStmt: %w", cerr)
 		}
 	}
+	if q.eventAdjustmentsStmt != nil {
+		if cerr := q.eventAdjustmentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing eventAdjustmentsStmt: %w", cerr)
+		}
+	}
 	if q.eventCacheVersionByHashStmt != nil {
 		if cerr := q.eventCacheVersionByHashStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing eventCacheVersionByHashStmt: %w", cerr)
@@ -123,6 +134,11 @@ func (q *Queries) Close() error {
 	if q.eventScheduleWithDetailsStmt != nil {
 		if cerr := q.eventScheduleWithDetailsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing eventScheduleWithDetailsStmt: %w", cerr)
+		}
+	}
+	if q.eventScoresStmt != nil {
+		if cerr := q.eventScoresStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing eventScoresStmt: %w", cerr)
 		}
 	}
 	if q.eventStartTimeStmt != nil {
@@ -208,11 +224,13 @@ type Queries struct {
 	createAdjustmentStmt         *sql.Stmt
 	createPlayerStmt             *sql.Stmt
 	createScoreStmt              *sql.Stmt
+	eventAdjustmentsStmt         *sql.Stmt
 	eventCacheVersionByHashStmt  *sql.Stmt
 	eventIDByKeyStmt             *sql.Stmt
 	eventPlayersStmt             *sql.Stmt
 	eventScheduleStmt            *sql.Stmt
 	eventScheduleWithDetailsStmt *sql.Stmt
+	eventScoresStmt              *sql.Stmt
 	eventStartTimeStmt           *sql.Stmt
 	eventVenueKeysAreValidStmt   *sql.Stmt
 	scoreByPlayerStageStmt       *sql.Stmt
@@ -231,11 +249,13 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createAdjustmentStmt:         q.createAdjustmentStmt,
 		createPlayerStmt:             q.createPlayerStmt,
 		createScoreStmt:              q.createScoreStmt,
+		eventAdjustmentsStmt:         q.eventAdjustmentsStmt,
 		eventCacheVersionByHashStmt:  q.eventCacheVersionByHashStmt,
 		eventIDByKeyStmt:             q.eventIDByKeyStmt,
 		eventPlayersStmt:             q.eventPlayersStmt,
 		eventScheduleStmt:            q.eventScheduleStmt,
 		eventScheduleWithDetailsStmt: q.eventScheduleWithDetailsStmt,
+		eventScoresStmt:              q.eventScoresStmt,
 		eventStartTimeStmt:           q.eventStartTimeStmt,
 		eventVenueKeysAreValidStmt:   q.eventVenueKeysAreValidStmt,
 		scoreByPlayerStageStmt:       q.scoreByPlayerStageStmt,

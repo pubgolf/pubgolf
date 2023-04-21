@@ -96,6 +96,119 @@ func (q *Queries) CreateScore(ctx context.Context, arg CreateScoreParams) error 
 	return err
 }
 
+const eventAdjustments = `-- name: EventAdjustments :many
+SELECT
+  s.stage_id,
+  s.player_id,
+  a.id AS adjustment_id,
+  a.label,
+  a.value
+FROM
+  scores s
+  JOIN stages st ON s.stage_id = st.id
+  JOIN adjustments a ON a.stage_id = s.stage_id
+    AND a.player_id = s.player_id
+WHERE
+  s.deleted_at IS NULL
+  AND st.deleted_at IS NULL
+  AND a.deleted_at IS NULL
+  AND st.event_id = $1
+ORDER BY
+  st.rank ASC,
+  s.created_at ASC,
+  a.created_at ASC
+`
+
+type EventAdjustmentsRow struct {
+	StageID      models.StageID
+	PlayerID     models.PlayerID
+	AdjustmentID models.DatabaseULID
+	Label        string
+	Value        int32
+}
+
+func (q *Queries) EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error) {
+	rows, err := q.query(ctx, q.eventAdjustmentsStmt, eventAdjustments, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []EventAdjustmentsRow
+	for rows.Next() {
+		var i EventAdjustmentsRow
+		if err := rows.Scan(
+			&i.StageID,
+			&i.PlayerID,
+			&i.AdjustmentID,
+			&i.Label,
+			&i.Value,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const eventScores = `-- name: EventScores :many
+SELECT
+  s.stage_id,
+  s.player_id,
+  s.id AS score_id,
+  s.value
+FROM
+  scores s
+  JOIN stages st ON s.stage_id = st.id
+WHERE
+  s.deleted_at IS NULL
+  AND st.deleted_at IS NULL
+  AND st.event_id = $1
+ORDER BY
+  st.rank ASC,
+  s.created_at ASC
+`
+
+type EventScoresRow struct {
+	StageID  models.StageID
+	PlayerID models.PlayerID
+	ScoreID  models.DatabaseULID
+	Value    uint32
+}
+
+func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error) {
+	rows, err := q.query(ctx, q.eventScoresStmt, eventScores, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []EventScoresRow
+	for rows.Next() {
+		var i EventScoresRow
+		if err := rows.Scan(
+			&i.StageID,
+			&i.PlayerID,
+			&i.ScoreID,
+			&i.Value,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const scoreByPlayerStage = `-- name: ScoreByPlayerStage :one
 SELECT
   id,

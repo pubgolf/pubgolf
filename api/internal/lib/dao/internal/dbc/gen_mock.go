@@ -88,6 +88,29 @@ func (_m *MockQuerier) CreateScore(ctx context.Context, arg CreateScoreParams) e
 	return r0
 }
 
+// EventAdjustments provides a mock function with given fields: ctx, eventID
+func (_m *MockQuerier) EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error) {
+	ret := _m.Called(ctx, eventID)
+
+	var r0 []EventAdjustmentsRow
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []EventAdjustmentsRow); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]EventAdjustmentsRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventCacheVersionByHash provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) EventCacheVersionByHash(ctx context.Context, arg EventCacheVersionByHashParams) (uint32, error) {
 	ret := _m.Called(ctx, arg)
@@ -186,6 +209,29 @@ func (_m *MockQuerier) EventScheduleWithDetails(ctx context.Context, eventID mod
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]EventScheduleWithDetailsRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EventScores provides a mock function with given fields: ctx, eventID
+func (_m *MockQuerier) EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error) {
+	ret := _m.Called(ctx, eventID)
+
+	var r0 []EventScoresRow
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []EventScoresRow); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]EventScoresRow)
 		}
 	}
 

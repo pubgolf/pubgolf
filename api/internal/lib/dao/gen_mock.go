@@ -192,6 +192,29 @@ func (_m *MockQueryProvider) EventScheduleWithDetails(ctx context.Context, event
 	return r0, r1
 }
 
+// EventScores provides a mock function with given fields: ctx, eventID
+func (_m *MockQueryProvider) EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error) {
+	ret := _m.Called(ctx, eventID)
+
+	var r0 []models.StageScore
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.StageScore); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.StageScore)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EventStartTime provides a mock function with given fields: ctx, id
 func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {
 	ret := _m.Called(ctx, id)

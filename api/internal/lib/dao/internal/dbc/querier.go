@@ -16,11 +16,13 @@ type Querier interface {
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (CreatePlayerRow, error)
 	CreateScore(ctx context.Context, arg CreateScoreParams) error
+	EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error)
 	EventCacheVersionByHash(ctx context.Context, arg EventCacheVersionByHashParams) (uint32, error)
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
 	EventPlayers(ctx context.Context, eventID models.EventID) ([]EventPlayersRow, error)
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]EventScheduleRow, error)
 	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]EventScheduleWithDetailsRow, error)
+	EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error)
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)
