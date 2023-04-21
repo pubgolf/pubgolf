@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
@@ -16,7 +17,7 @@ func (q *Queries) CreatePlayer(ctx context.Context, eventID models.EventID, play
 
 	p, err := q.dbc.CreatePlayer(ctx, dbc.CreatePlayerParams{
 		EventID:         eventID,
-		Name:            player.Name,
+		Name:            strings.TrimSpace(player.Name),
 		ScoringCategory: player.ScoringCategory,
 	})
 	if err != nil {
