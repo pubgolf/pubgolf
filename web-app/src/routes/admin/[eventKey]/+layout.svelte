@@ -54,4 +54,7 @@
 			Authenticating...
 		{/if}
 	</div>
+	<svelte:fragment slot="pageFooter">
+		<SiteFooter />
+	</svelte:fragment>
 </AppShell>

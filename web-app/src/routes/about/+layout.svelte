@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { AppBar, AppShell, drawerStore } from '@skeletonlabs/skeleton';
 	import { Menu } from 'lucide-svelte';
-	import AboutNav from '$lib/components/nav/AboutNav.svelte';
+	import AboutNav from '$lib/components/sidebars/AboutNav.svelte';
+	import SiteFooter from '$lib/components/SiteFooter.svelte';
 </script>
 
 <AppShell>
@@ -30,4 +31,8 @@
 	<div class="container mx-auto p-4 max-w-prose">
 		<slot />
 	</div>
+
+	<svelte:fragment slot="pageFooter">
+		<SiteFooter />
+	</svelte:fragment>
 </AppShell>
