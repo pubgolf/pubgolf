@@ -1,11 +1,8 @@
 -- name: CreatePlayer :one
 INSERT INTO players(event_id, name, scoring_category, updated_at)
   VALUES ($1, $2, $3, now())
-ON CONFLICT (event_id, name)
-  DO UPDATE SET
-    updated_at = now()
-  RETURNING
-    id, name, scoring_category;
+RETURNING
+  id, name, scoring_category;
 
 -- name: UpdatePlayer :one
 UPDATE

@@ -7,6 +7,7 @@ import (
 
 	"github.com/bufbuild/connect-go"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -34,6 +35,9 @@ func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *
 
 	player, err := s.dao.CreatePlayer(ctx, eventID, playerParams)
 	if err != nil {
+		if errors.Is(err, dao.ErrAlreadyCreated) {
+			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+		}
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 

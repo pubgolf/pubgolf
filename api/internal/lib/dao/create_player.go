@@ -3,6 +3,9 @@ package dao
 import (
 	"context"
 
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -16,6 +19,11 @@ func (q *Queries) CreatePlayer(ctx context.Context, eventID models.EventID, play
 		Name:            player.Name,
 		ScoringCategory: player.ScoringCategory,
 	})
+	if err != nil {
+		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation {
+			return models.Player{}, ErrAlreadyCreated
+		}
+	}
 
 	return models.Player{
 		ID:              p.ID,
