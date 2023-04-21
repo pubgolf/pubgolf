@@ -869,9 +869,9 @@ export class GetScoresForCategoryRequest extends Message<GetScoresForCategoryReq
  */
 export class GetScoresForCategoryResponse extends Message<GetScoresForCategoryResponse> {
   /**
-   * @generated from field: api.v1.ScoreBoard scores = 1;
+   * @generated from field: api.v1.ScoreBoard score_board = 1;
    */
-  scores?: ScoreBoard;
+  scoreBoard?: ScoreBoard;
 
   constructor(data?: PartialMessage<GetScoresForCategoryResponse>) {
     super();
@@ -881,7 +881,7 @@ export class GetScoresForCategoryResponse extends Message<GetScoresForCategoryRe
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.GetScoresForCategoryResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "scores", kind: "message", T: ScoreBoard },
+    { no: 1, name: "score_board", kind: "message", T: ScoreBoard },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetScoresForCategoryResponse {
@@ -949,9 +949,9 @@ export class GetScoresForPlayerRequest extends Message<GetScoresForPlayerRequest
  */
 export class GetScoresForPlayerResponse extends Message<GetScoresForPlayerResponse> {
   /**
-   * @generated from field: api.v1.ScoreBoard scores = 1;
+   * @generated from field: api.v1.ScoreBoard score_board = 1;
    */
-  scores?: ScoreBoard;
+  scoreBoard?: ScoreBoard;
 
   constructor(data?: PartialMessage<GetScoresForPlayerResponse>) {
     super();
@@ -961,7 +961,7 @@ export class GetScoresForPlayerResponse extends Message<GetScoresForPlayerRespon
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.GetScoresForPlayerResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "scores", kind: "message", T: ScoreBoard },
+    { no: 1, name: "score_board", kind: "message", T: ScoreBoard },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetScoresForPlayerResponse {
@@ -1029,9 +1029,9 @@ export class GetScoresForVenueRequest extends Message<GetScoresForVenueRequest> 
  */
 export class GetScoresForVenueResponse extends Message<GetScoresForVenueResponse> {
   /**
-   * @generated from field: api.v1.ScoreBoard scores = 1;
+   * @generated from field: api.v1.ScoreBoard score_board = 1;
    */
-  scores?: ScoreBoard;
+  scoreBoard?: ScoreBoard;
 
   constructor(data?: PartialMessage<GetScoresForVenueResponse>) {
     super();
@@ -1041,7 +1041,7 @@ export class GetScoresForVenueResponse extends Message<GetScoresForVenueResponse
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.GetScoresForVenueResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "scores", kind: "message", T: ScoreBoard },
+    { no: 1, name: "score_board", kind: "message", T: ScoreBoard },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetScoresForVenueResponse {

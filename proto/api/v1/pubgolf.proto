@@ -155,7 +155,7 @@ message GetScoresForCategoryRequest {
   ScoringCategory category = 2;
 }
 message GetScoresForCategoryResponse {
-  ScoreBoard scores = 1;
+  ScoreBoard score_board = 1;
 }
 
 message GetScoresForPlayerRequest {
@@ -163,7 +163,7 @@ message GetScoresForPlayerRequest {
   string player_id = 2;
 }
 message GetScoresForPlayerResponse {
-  ScoreBoard scores = 1;
+  ScoreBoard score_board = 1;
 }
 
 message GetScoresForVenueRequest {
@@ -171,5 +171,5 @@ message GetScoresForVenueRequest {
   string venue_id = 2;
 }
 message GetScoresForVenueResponse {
-  ScoreBoard scores = 1;
+  ScoreBoard score_board = 1;
 }
