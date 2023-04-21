@@ -8,9 +8,19 @@ import (
 	"database/sql"
 	"time"
 
-	ulid "github.com/oklog/ulid/v2"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
+
+type Adjustment struct {
+	ID        models.AdjustmentID
+	StageID   models.StageID
+	PlayerID  models.PlayerID
+	Value     int32
+	Label     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime
+}
 
 type EnumScoringCategory struct {
 	Value string
@@ -39,11 +49,21 @@ type Player struct {
 }
 
 type Rule struct {
-	ID          ulid.ULID
+	ID          models.DatabaseULID
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   sql.NullTime
+}
+
+type Score struct {
+	ID        models.ScoreID
+	StageID   models.StageID
+	PlayerID  models.PlayerID
+	Value     uint32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime
 }
 
 type Stage struct {
@@ -55,7 +75,7 @@ type Stage struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       sql.NullTime
-	RuleID          ulid.ULID
+	RuleID          models.DatabaseULID
 	ID              models.StageID
 }
 

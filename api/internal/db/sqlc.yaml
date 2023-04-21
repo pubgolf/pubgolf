@@ -45,3 +45,21 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
           - column: players.scoring_category
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.ScoringCategory
+          # Scores
+          - column: scores.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.ScoreID
+          - column: scores.player_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
+          - column: scores.stage_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
+          - column: scores.value
+            go_type: uint32
+          # Adjustments
+          - column: adjustments.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AdjustmentID
+          - column: adjustments.player_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
+          - column: adjustments.stage_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
+          - column: adjustments.value
+            go_type: int32
