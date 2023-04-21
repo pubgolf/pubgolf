@@ -27,7 +27,7 @@ func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 
 func Test_txQuerier(t *testing.T) {
 	t.Run("Succeeds when DAO is constructed with New()", func(t *testing.T) {
-		tempDB, tempDBCleanup := dbtest.New("dbc-test", false)
+		tempDB, tempDBCleanup := dbtest.New("dao-test", false)
 		defer tempDBCleanup()
 		dbtest.Migrate(tempDB, dbtest.MigrationDir())
 
