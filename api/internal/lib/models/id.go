@@ -9,48 +9,125 @@ import (
 // EventID uniquely identifies an event.
 type EventID struct{ DatabaseULID }
 
-// EventIDFromULID converts a plain ULID into an EventID.
+// EventIDFromULID parses an EventID from a ULID.
 func EventIDFromULID(u ulid.ULID) EventID {
-	return EventID{DatabaseULID: DatabaseULID{ULID: u}}
+	return EventID{DatabaseULID{u}}
+}
+
+// EventIDFromString parses an EventID from a string.
+func EventIDFromString(s string) (EventID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return EventID{}, fmt.Errorf("parse EventID from string: %w", err)
+	}
+
+	return EventID{DatabaseULID{u}}, err
 }
 
 // VenueID uniquely identifies a venue.
 type VenueID struct{ DatabaseULID }
 
-// VenueIDFromULID converts a plain ULID into an VenueID.
+// VenueIDFromULID parses an VenueID from a ULID.
 func VenueIDFromULID(u ulid.ULID) VenueID {
-	return VenueID{DatabaseULID: DatabaseULID{ULID: u}}
+	return VenueID{DatabaseULID{u}}
 }
 
-// StageID uniquely identifies an event.
+// VenueIDFromString parses an VenueID from a string.
+func VenueIDFromString(s string) (VenueID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return VenueID{}, fmt.Errorf("parse VenueID from string: %w", err)
+	}
+
+	return VenueID{DatabaseULID{u}}, err
+}
+
+// StageID uniquely identifies a stage.
 type StageID struct{ DatabaseULID }
 
-// StageIDFromULID converts a plain ULID into an StageID.
+// StageIDFromULID parses an StageID from a ULID.
 func StageIDFromULID(u ulid.ULID) StageID {
-	return StageID{DatabaseULID: DatabaseULID{ULID: u}}
+	return StageID{DatabaseULID{u}}
 }
 
-// RuleID uniquely identifies an event.
+// StageIDFromString parses an StageID from a string.
+func StageIDFromString(s string) (StageID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return StageID{}, fmt.Errorf("parse StageID from string: %w", err)
+	}
+
+	return StageID{DatabaseULID{u}}, err
+}
+
+// RuleID uniquely identifies an event description.
 type RuleID struct{ DatabaseULID }
 
-// RuleIDFromULID converts a plain ULID into an RuleID.
+// RuleIDFromULID parses an RuleID from a ULID.
 func RuleIDFromULID(u ulid.ULID) RuleID {
-	return RuleID{DatabaseULID: DatabaseULID{ULID: u}}
+	return RuleID{DatabaseULID{u}}
+}
+
+// RuleIDFromString parses an RuleID from a string.
+func RuleIDFromString(s string) (RuleID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return RuleID{}, fmt.Errorf("parse RuleID from string: %w", err)
+	}
+
+	return RuleID{DatabaseULID{u}}, err
 }
 
 // PlayerID uniquely identifies a player.
 type PlayerID struct{ DatabaseULID }
 
-// PlayerIDFromULID converts a plain ULID into an PlayerID.
+// PlayerIDFromULID parses an PlayerID from a ULID.
 func PlayerIDFromULID(u ulid.ULID) PlayerID {
-	return PlayerID{DatabaseULID: DatabaseULID{ULID: u}}
+	return PlayerID{DatabaseULID{u}}
 }
 
-// PlayerIDFromString converts a string-format ULID into an PlayerID.
+// PlayerIDFromString parses an PlayerID from a string.
 func PlayerIDFromString(s string) (PlayerID, error) {
-	id, err := ulid.Parse(s)
+	u, err := ulid.Parse(s)
 	if err != nil {
-		return PlayerID{}, fmt.Errorf("parse playerID from string: %w", err)
+		return PlayerID{}, fmt.Errorf("parse PlayerID from string: %w", err)
 	}
-	return PlayerID{DatabaseULID: DatabaseULID{ULID: id}}, nil
+
+	return PlayerID{DatabaseULID{u}}, err
+}
+
+// ScoreID uniquely identifies a score.
+type ScoreID struct{ DatabaseULID }
+
+// ScoreIDFromULID parses an ScoreID from a ULID.
+func ScoreIDFromULID(u ulid.ULID) ScoreID {
+	return ScoreID{DatabaseULID{u}}
+}
+
+// ScoreIDFromString parses an ScoreID from a string.
+func ScoreIDFromString(s string) (ScoreID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return ScoreID{}, fmt.Errorf("parse ScoreID from string: %w", err)
+	}
+
+	return ScoreID{DatabaseULID{u}}, err
+}
+
+// AdjustmentID uniquely identifies a bonus or penalty.
+type AdjustmentID struct{ DatabaseULID }
+
+// AdjustmentIDFromULID parses an AdjustmentID from a ULID.
+func AdjustmentIDFromULID(u ulid.ULID) AdjustmentID {
+	return AdjustmentID{DatabaseULID{u}}
+}
+
+// AdjustmentIDFromString parses an AdjustmentID from a string.
+func AdjustmentIDFromString(s string) (AdjustmentID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return AdjustmentID{}, fmt.Errorf("parse AdjustmentID from string: %w", err)
+	}
+
+	return AdjustmentID{DatabaseULID{u}}, err
 }

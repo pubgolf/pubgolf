@@ -9,6 +9,9 @@ import (
 	ulid "github.com/oklog/ulid/v2"
 )
 
+// ErrCannotScanType indicates that Scan() was called with a type which cannot be parsed as a ULID.
+var ErrCannotScanType = errors.New("source value must be a byte slice or string")
+
 // DatabaseULID is wrapper for a ULID to allow storage in a database column of type UUID.
 type DatabaseULID struct{ ulid.ULID }
 
@@ -32,7 +35,13 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 		return nil
 	}
 
-	return errors.New("EventID: source value must be a byte slice or string")
+	if src == nil {
+		u := new(ulid.ULID)
+		db.ULID = *u
+		return nil
+	}
+
+	return fmt.Errorf("invalid type %+T: %w", src, ErrCannotScanType)
 }
 
 // Value serializes a ULID into a UUID-formatted string representing the same underlying byte content.
