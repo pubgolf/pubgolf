@@ -150,8 +150,7 @@ message CreateStageScoreResponse {
 // UpdateStageScore
 
 message UpdateStageScoreRequest {
-  string score_id = 1;
-  StageScoreData score_data = 2;
+  StageScore score = 1;
 }
 message UpdateStageScoreResponse {
   StageScore score = 1;

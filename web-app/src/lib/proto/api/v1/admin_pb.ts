@@ -770,14 +770,9 @@ export class CreateStageScoreResponse extends Message<CreateStageScoreResponse> 
  */
 export class UpdateStageScoreRequest extends Message<UpdateStageScoreRequest> {
   /**
-   * @generated from field: string score_id = 1;
+   * @generated from field: api.v1.StageScore score = 1;
    */
-  scoreId = "";
-
-  /**
-   * @generated from field: api.v1.StageScoreData score_data = 2;
-   */
-  scoreData?: StageScoreData;
+  score?: StageScore;
 
   constructor(data?: PartialMessage<UpdateStageScoreRequest>) {
     super();
@@ -787,8 +782,7 @@ export class UpdateStageScoreRequest extends Message<UpdateStageScoreRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.UpdateStageScoreRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "score_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "score_data", kind: "message", T: StageScoreData },
+    { no: 1, name: "score", kind: "message", T: StageScore },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateStageScoreRequest {
