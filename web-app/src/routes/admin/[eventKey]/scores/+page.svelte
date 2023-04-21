@@ -2,7 +2,7 @@
 	import { BeerIcon, RefreshCcwIcon } from 'lucide-svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import NewScoreForm from '$lib/components/modals/NewScoreForm.svelte';
-	import { modalStore } from '@skeletonlabs/skeleton';
+	import { modalStore, toastStore } from '@skeletonlabs/skeleton';
 	import type { ComponentProps } from 'svelte';
 	import { getAdminServiceClient } from '$lib/rpc/client';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
@@ -62,6 +62,34 @@
 
 	function getPlayerName(id: string) {
 		return players.find((x) => x.id === id)?.data?.name;
+	}
+
+	async function deleteScore(score: StageScore) {
+		const rpc = await getAdminServiceClient();
+		try {
+			await rpc.deleteStageScore({
+				stageId: score.stageId,
+				playerId: score.playerId
+			});
+		} catch (error) {
+			toastStore.trigger({
+				message: `API Error: ${error}`,
+				background: 'variant-filled-error'
+			});
+		}
+
+		refreshData();
+	}
+
+	async function attemptDeleteScore(score: StageScore) {
+		modalStore.trigger({
+			type: 'confirm',
+			title: 'Confirm Deletion',
+			body: `Are you sure you wish to delete the score at ${getVenueName(
+				score.stageId
+			)} for ${getPlayerName(score.playerId)}?`,
+			response: (r: boolean) => r && deleteScore(score)
+		});
 	}
 
 	async function showNewScoreModal() {
@@ -163,7 +191,7 @@
 						<th>Venue</th>
 						<th>Player</th>
 						<th>Score</th>
-						<th class="table-cell-fit">Edit</th>
+						<th class="table-cell-fit">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -190,6 +218,13 @@
 										on:click={() => showEditScoreModal(score)}
 									>
 										<span>Edit</span>
+									</button>
+									<button
+										type="button"
+										class="btn btn-sm variant-filled-error ml-4"
+										on:click={() => attemptDeleteScore(score)}
+									>
+										<span>Delete</span>
 									</button>
 								</td>
 							</tr>
