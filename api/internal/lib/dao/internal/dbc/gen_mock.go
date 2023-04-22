@@ -329,6 +329,52 @@ func (_m *MockQuerier) EventVenueKeysAreValid(ctx context.Context, eventID model
 	return r0, r1
 }
 
+// PlayerAdjustments provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 []PlayerAdjustmentsRow
+	if rf, ok := ret.Get(0).(func(context.Context, PlayerAdjustmentsParams) []PlayerAdjustmentsRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]PlayerAdjustmentsRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, PlayerAdjustmentsParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PlayerScores provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 []PlayerScoresRow
+	if rf, ok := ret.Get(0).(func(context.Context, PlayerScoresParams) []PlayerScoresRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]PlayerScoresRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, PlayerScoresParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ScoreByPlayerStage provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error) {
 	ret := _m.Called(ctx, arg)
@@ -342,6 +388,52 @@ func (_m *MockQuerier) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayer
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, ScoreByPlayerStageParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ScoringCriteriaAllVenues provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) ScoringCriteriaAllVenues(ctx context.Context, arg ScoringCriteriaAllVenuesParams) ([]ScoringCriteriaAllVenuesRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 []ScoringCriteriaAllVenuesRow
+	if rf, ok := ret.Get(0).(func(context.Context, ScoringCriteriaAllVenuesParams) []ScoringCriteriaAllVenuesRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]ScoringCriteriaAllVenuesRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, ScoringCriteriaAllVenuesParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ScoringCriteriaEveryOtherVenue provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) ScoringCriteriaEveryOtherVenue(ctx context.Context, arg ScoringCriteriaEveryOtherVenueParams) ([]ScoringCriteriaEveryOtherVenueRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	var r0 []ScoringCriteriaEveryOtherVenueRow
+	if rf, ok := ret.Get(0).(func(context.Context, ScoringCriteriaEveryOtherVenueParams) []ScoringCriteriaEveryOtherVenueRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]ScoringCriteriaEveryOtherVenueRow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, ScoringCriteriaEveryOtherVenueParams) error); ok {
 		r1 = rf(ctx, arg)
 	} else {
 		r1 = ret.Error(1)

@@ -72,8 +72,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.eventVenueKeysAreValidStmt, err = db.PrepareContext(ctx, eventVenueKeysAreValid); err != nil {
 		return nil, fmt.Errorf("error preparing query EventVenueKeysAreValid: %w", err)
 	}
+	if q.playerAdjustmentsStmt, err = db.PrepareContext(ctx, playerAdjustments); err != nil {
+		return nil, fmt.Errorf("error preparing query PlayerAdjustments: %w", err)
+	}
+	if q.playerScoresStmt, err = db.PrepareContext(ctx, playerScores); err != nil {
+		return nil, fmt.Errorf("error preparing query PlayerScores: %w", err)
+	}
 	if q.scoreByPlayerStageStmt, err = db.PrepareContext(ctx, scoreByPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query ScoreByPlayerStage: %w", err)
+	}
+	if q.scoringCriteriaAllVenuesStmt, err = db.PrepareContext(ctx, scoringCriteriaAllVenues); err != nil {
+		return nil, fmt.Errorf("error preparing query ScoringCriteriaAllVenues: %w", err)
+	}
+	if q.scoringCriteriaEveryOtherVenueStmt, err = db.PrepareContext(ctx, scoringCriteriaEveryOtherVenue); err != nil {
+		return nil, fmt.Errorf("error preparing query ScoringCriteriaEveryOtherVenue: %w", err)
 	}
 	if q.setEventCacheKeysStmt, err = db.PrepareContext(ctx, setEventCacheKeys); err != nil {
 		return nil, fmt.Errorf("error preparing query SetEventCacheKeys: %w", err)
@@ -181,9 +193,29 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing eventVenueKeysAreValidStmt: %w", cerr)
 		}
 	}
+	if q.playerAdjustmentsStmt != nil {
+		if cerr := q.playerAdjustmentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing playerAdjustmentsStmt: %w", cerr)
+		}
+	}
+	if q.playerScoresStmt != nil {
+		if cerr := q.playerScoresStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing playerScoresStmt: %w", cerr)
+		}
+	}
 	if q.scoreByPlayerStageStmt != nil {
 		if cerr := q.scoreByPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing scoreByPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.scoringCriteriaAllVenuesStmt != nil {
+		if cerr := q.scoringCriteriaAllVenuesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing scoringCriteriaAllVenuesStmt: %w", cerr)
+		}
+	}
+	if q.scoringCriteriaEveryOtherVenueStmt != nil {
+		if cerr := q.scoringCriteriaEveryOtherVenueStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing scoringCriteriaEveryOtherVenueStmt: %w", cerr)
 		}
 	}
 	if q.setEventCacheKeysStmt != nil {
@@ -276,7 +308,11 @@ type Queries struct {
 	eventScoresStmt                     *sql.Stmt
 	eventStartTimeStmt                  *sql.Stmt
 	eventVenueKeysAreValidStmt          *sql.Stmt
+	playerAdjustmentsStmt               *sql.Stmt
+	playerScoresStmt                    *sql.Stmt
 	scoreByPlayerStageStmt              *sql.Stmt
+	scoringCriteriaAllVenuesStmt        *sql.Stmt
+	scoringCriteriaEveryOtherVenueStmt  *sql.Stmt
 	setEventCacheKeysStmt               *sql.Stmt
 	setEventVenueKeysStmt               *sql.Stmt
 	setNextEventVenueKeyStmt            *sql.Stmt
@@ -306,7 +342,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventScoresStmt:                     q.eventScoresStmt,
 		eventStartTimeStmt:                  q.eventStartTimeStmt,
 		eventVenueKeysAreValidStmt:          q.eventVenueKeysAreValidStmt,
+		playerAdjustmentsStmt:               q.playerAdjustmentsStmt,
+		playerScoresStmt:                    q.playerScoresStmt,
 		scoreByPlayerStageStmt:              q.scoreByPlayerStageStmt,
+		scoringCriteriaAllVenuesStmt:        q.scoringCriteriaAllVenuesStmt,
+		scoringCriteriaEveryOtherVenueStmt:  q.scoringCriteriaEveryOtherVenueStmt,
 		setEventCacheKeysStmt:               q.setEventCacheKeysStmt,
 		setEventVenueKeysStmt:               q.setEventVenueKeysStmt,
 		setNextEventVenueKeyStmt:            q.setNextEventVenueKeyStmt,

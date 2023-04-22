@@ -68,6 +68,37 @@ ORDER BY
   s.created_at ASC,
   a.created_at ASC;
 
+-- name: PlayerScores :many
+SELECT
+  v.id,
+  v.name,
+  s.value
+FROM
+  stages st
+  JOIN venues v ON st.venue_id = v.id
+  LEFT JOIN scores s ON s.stage_id = st.id
+    AND s.player_id = $2
+WHERE
+  st.event_id = $1
+ORDER BY
+  st.rank ASC;
+
+-- name: PlayerAdjustments :many
+SELECT
+  v.id,
+  v.name,
+  a.label,
+  a.value
+FROM
+  stages st
+  JOIN venues v ON st.venue_id = v.id
+  LEFT JOIN adjustments a ON a.stage_id = st.id
+    AND a.player_id = $2
+WHERE
+  st.event_id = $1
+ORDER BY
+  st.rank ASC;
+
 -- name: UpdateScore :exec
 UPDATE
   scores

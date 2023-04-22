@@ -7,6 +7,7 @@ package dbc
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -238,6 +239,113 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]Ev
 			&i.ScoreID,
 			&i.Value,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const playerAdjustments = `-- name: PlayerAdjustments :many
+SELECT
+  v.id,
+  v.name,
+  a.label,
+  a.value
+FROM
+  stages st
+  JOIN venues v ON st.venue_id = v.id
+  LEFT JOIN adjustments a ON a.stage_id = st.id
+    AND a.player_id = $2
+WHERE
+  st.event_id = $1
+ORDER BY
+  st.rank ASC
+`
+
+type PlayerAdjustmentsParams struct {
+	EventID  models.EventID
+	PlayerID models.PlayerID
+}
+
+type PlayerAdjustmentsRow struct {
+	ID    models.VenueID
+	Name  string
+	Label sql.NullString
+	Value int32
+}
+
+func (q *Queries) PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error) {
+	rows, err := q.query(ctx, q.playerAdjustmentsStmt, playerAdjustments, arg.EventID, arg.PlayerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PlayerAdjustmentsRow
+	for rows.Next() {
+		var i PlayerAdjustmentsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Label,
+			&i.Value,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const playerScores = `-- name: PlayerScores :many
+SELECT
+  v.id,
+  v.name,
+  s.value
+FROM
+  stages st
+  JOIN venues v ON st.venue_id = v.id
+  LEFT JOIN scores s ON s.stage_id = st.id
+    AND s.player_id = $2
+WHERE
+  st.event_id = $1
+ORDER BY
+  st.rank ASC
+`
+
+type PlayerScoresParams struct {
+	EventID  models.EventID
+	PlayerID models.PlayerID
+}
+
+type PlayerScoresRow struct {
+	ID    models.VenueID
+	Name  string
+	Value uint32
+}
+
+func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error) {
+	rows, err := q.query(ctx, q.playerScoresStmt, playerScores, arg.EventID, arg.PlayerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PlayerScoresRow
+	for rows.Next() {
+		var i PlayerScoresRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Value); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
