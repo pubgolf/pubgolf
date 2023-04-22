@@ -52,9 +52,9 @@ const (
 	// PubGolfServiceGetContentItemProcedure is the fully-qualified name of the PubGolfService's
 	// GetContentItem RPC.
 	PubGolfServiceGetContentItemProcedure = "/api.v1.PubGolfService/GetContentItem"
-	// PubGolfServiceGetPlayerByNameProcedure is the fully-qualified name of the PubGolfService's
-	// GetPlayerByName RPC.
-	PubGolfServiceGetPlayerByNameProcedure = "/api.v1.PubGolfService/GetPlayerByName"
+	// PubGolfServiceGetPlayerProcedure is the fully-qualified name of the PubGolfService's GetPlayer
+	// RPC.
+	PubGolfServiceGetPlayerProcedure = "/api.v1.PubGolfService/GetPlayer"
 	// PubGolfServiceGetScoresForCategoryProcedure is the fully-qualified name of the PubGolfService's
 	// GetScoresForCategory RPC.
 	PubGolfServiceGetScoresForCategoryProcedure = "/api.v1.PubGolfService/GetScoresForCategory"
@@ -80,8 +80,8 @@ type PubGolfServiceClient interface {
 	ListContentItems(context.Context, *connect_go.Request[v1.ListContentItemsRequest]) (*connect_go.Response[v1.ListContentItemsResponse], error)
 	// GetContentItem
 	GetContentItem(context.Context, *connect_go.Request[v1.GetContentItemRequest]) (*connect_go.Response[v1.GetContentItemResponse], error)
-	// GetPlayerByName
-	GetPlayerByName(context.Context, *connect_go.Request[v1.GetPlayerByNameRequest]) (*connect_go.Response[v1.GetPlayerByNameResponse], error)
+	// GetPlayer
+	GetPlayer(context.Context, *connect_go.Request[v1.GetPlayerRequest]) (*connect_go.Response[v1.GetPlayerResponse], error)
 	// GetScoresForCategory
 	GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error)
 	// GetScoresForPlayer
@@ -130,9 +130,9 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 			baseURL+PubGolfServiceGetContentItemProcedure,
 			opts...,
 		),
-		getPlayerByName: connect_go.NewClient[v1.GetPlayerByNameRequest, v1.GetPlayerByNameResponse](
+		getPlayer: connect_go.NewClient[v1.GetPlayerRequest, v1.GetPlayerResponse](
 			httpClient,
-			baseURL+PubGolfServiceGetPlayerByNameProcedure,
+			baseURL+PubGolfServiceGetPlayerProcedure,
 			opts...,
 		),
 		getScoresForCategory: connect_go.NewClient[v1.GetScoresForCategoryRequest, v1.GetScoresForCategoryResponse](
@@ -161,7 +161,7 @@ type pubGolfServiceClient struct {
 	getVenue             *connect_go.Client[v1.GetVenueRequest, v1.GetVenueResponse]
 	listContentItems     *connect_go.Client[v1.ListContentItemsRequest, v1.ListContentItemsResponse]
 	getContentItem       *connect_go.Client[v1.GetContentItemRequest, v1.GetContentItemResponse]
-	getPlayerByName      *connect_go.Client[v1.GetPlayerByNameRequest, v1.GetPlayerByNameResponse]
+	getPlayer            *connect_go.Client[v1.GetPlayerRequest, v1.GetPlayerResponse]
 	getScoresForCategory *connect_go.Client[v1.GetScoresForCategoryRequest, v1.GetScoresForCategoryResponse]
 	getScoresForPlayer   *connect_go.Client[v1.GetScoresForPlayerRequest, v1.GetScoresForPlayerResponse]
 	getScoresForVenue    *connect_go.Client[v1.GetScoresForVenueRequest, v1.GetScoresForVenueResponse]
@@ -197,9 +197,9 @@ func (c *pubGolfServiceClient) GetContentItem(ctx context.Context, req *connect_
 	return c.getContentItem.CallUnary(ctx, req)
 }
 
-// GetPlayerByName calls api.v1.PubGolfService.GetPlayerByName.
-func (c *pubGolfServiceClient) GetPlayerByName(ctx context.Context, req *connect_go.Request[v1.GetPlayerByNameRequest]) (*connect_go.Response[v1.GetPlayerByNameResponse], error) {
-	return c.getPlayerByName.CallUnary(ctx, req)
+// GetPlayer calls api.v1.PubGolfService.GetPlayer.
+func (c *pubGolfServiceClient) GetPlayer(ctx context.Context, req *connect_go.Request[v1.GetPlayerRequest]) (*connect_go.Response[v1.GetPlayerResponse], error) {
+	return c.getPlayer.CallUnary(ctx, req)
 }
 
 // GetScoresForCategory calls api.v1.PubGolfService.GetScoresForCategory.
@@ -231,8 +231,8 @@ type PubGolfServiceHandler interface {
 	ListContentItems(context.Context, *connect_go.Request[v1.ListContentItemsRequest]) (*connect_go.Response[v1.ListContentItemsResponse], error)
 	// GetContentItem
 	GetContentItem(context.Context, *connect_go.Request[v1.GetContentItemRequest]) (*connect_go.Response[v1.GetContentItemResponse], error)
-	// GetPlayerByName
-	GetPlayerByName(context.Context, *connect_go.Request[v1.GetPlayerByNameRequest]) (*connect_go.Response[v1.GetPlayerByNameResponse], error)
+	// GetPlayer
+	GetPlayer(context.Context, *connect_go.Request[v1.GetPlayerRequest]) (*connect_go.Response[v1.GetPlayerResponse], error)
 	// GetScoresForCategory
 	GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error)
 	// GetScoresForPlayer
@@ -278,9 +278,9 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect_go.Hand
 		svc.GetContentItem,
 		opts...,
 	))
-	mux.Handle(PubGolfServiceGetPlayerByNameProcedure, connect_go.NewUnaryHandler(
-		PubGolfServiceGetPlayerByNameProcedure,
-		svc.GetPlayerByName,
+	mux.Handle(PubGolfServiceGetPlayerProcedure, connect_go.NewUnaryHandler(
+		PubGolfServiceGetPlayerProcedure,
+		svc.GetPlayer,
 		opts...,
 	))
 	mux.Handle(PubGolfServiceGetScoresForCategoryProcedure, connect_go.NewUnaryHandler(
@@ -328,8 +328,8 @@ func (UnimplementedPubGolfServiceHandler) GetContentItem(context.Context, *conne
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetContentItem is not implemented"))
 }
 
-func (UnimplementedPubGolfServiceHandler) GetPlayerByName(context.Context, *connect_go.Request[v1.GetPlayerByNameRequest]) (*connect_go.Response[v1.GetPlayerByNameResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetPlayerByName is not implemented"))
+func (UnimplementedPubGolfServiceHandler) GetPlayer(context.Context, *connect_go.Request[v1.GetPlayerRequest]) (*connect_go.Response[v1.GetPlayerResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetPlayer is not implemented"))
 }
 
 func (UnimplementedPubGolfServiceHandler) GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error) {

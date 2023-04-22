@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, GetContentItemRequest, GetContentItemResponse, GetPlayerByNameRequest, GetPlayerByNameResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, GetContentItemRequest, GetContentItemResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -83,14 +83,14 @@ export const PubGolfService = {
       kind: MethodKind.Unary,
     },
     /**
-     * GetPlayerByName
+     * GetPlayer
      *
-     * @generated from rpc api.v1.PubGolfService.GetPlayerByName
+     * @generated from rpc api.v1.PubGolfService.GetPlayer
      */
-    getPlayerByName: {
-      name: "GetPlayerByName",
-      I: GetPlayerByNameRequest,
-      O: GetPlayerByNameResponse,
+    getPlayer: {
+      name: "GetPlayer",
+      I: GetPlayerRequest,
+      O: GetPlayerResponse,
       kind: MethodKind.Unary,
     },
     /**
