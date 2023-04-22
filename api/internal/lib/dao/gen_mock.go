@@ -271,6 +271,29 @@ func (_m *MockQueryProvider) ScoreByPlayerStage(ctx context.Context, playerID mo
 	return r0, r1
 }
 
+// ScoringCriteria provides a mock function with given fields: ctx, eventID, category
+func (_m *MockQueryProvider) ScoringCriteria(ctx context.Context, eventID models.EventID, category models.ScoringCategory) ([]models.ScoringInput, error) {
+	ret := _m.Called(ctx, eventID, category)
+
+	var r0 []models.ScoringInput
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.ScoringCategory) []models.ScoringInput); ok {
+		r0 = rf(ctx, eventID, category)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.ScoringInput)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.ScoringCategory) error); ok {
+		r1 = rf(ctx, eventID, category)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdatePlayer provides a mock function with given fields: ctx, playerID, player
 func (_m *MockQueryProvider) UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error) {
 	ret := _m.Called(ctx, playerID, player)
