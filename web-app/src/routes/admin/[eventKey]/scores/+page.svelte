@@ -6,6 +6,7 @@
 	import NewScoreForm from '$lib/components/modals/ScoreForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import { combineIds, separateIds } from '$lib/helpers/scores';
+	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
 	import type { Stage, StageScore } from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
@@ -57,11 +58,15 @@
 
 	function getVenueName(stageId: string) {
 		const i = stages.findIndex((x) => x.id === stageId);
-		return `Venue ${i + 1}: ${stages[i].venue?.name}`;
+		return `${i + 1}: ${stages[i].venue?.name}`;
 	}
 
 	function getPlayerName(id: string) {
-		return players.find((x) => x.id === id)?.data?.name;
+		const player = players.find((x) => x.id === id);
+		const cat = player.data?.scoringCategory
+			? scoringCategoryToDisplayName[player.data?.scoringCategory]
+			: 'None';
+		return `${player?.data?.name} (${cat})`;
 	}
 
 	async function deleteScore(score: StageScore) {
