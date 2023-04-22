@@ -308,6 +308,13 @@ export enum ScoreBoard_ScoreStatus {
    * @generated from enum value: SCORE_STATUS_INCOMPLETE = 3;
    */
   INCOMPLETE = 3,
+
+  /**
+   * SCORE_STATUS_NON_SCORING indicates that a player's score will not be counted towards the overall leaderboard.
+   *
+   * @generated from enum value: SCORE_STATUS_NON_SCORING = 4;
+   */
+  NON_SCORING = 4,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ScoreBoard_ScoreStatus)
 proto3.util.setEnumType(ScoreBoard_ScoreStatus, "api.v1.ScoreBoard.ScoreStatus", [
@@ -315,6 +322,7 @@ proto3.util.setEnumType(ScoreBoard_ScoreStatus, "api.v1.ScoreBoard.ScoreStatus",
   { no: 1, name: "SCORE_STATUS_PENDING" },
   { no: 2, name: "SCORE_STATUS_FINALIZED" },
   { no: 3, name: "SCORE_STATUS_INCOMPLETE" },
+  { no: 4, name: "SCORE_STATUS_NON_SCORING" },
 ]);
 
 /**
@@ -322,9 +330,9 @@ proto3.util.setEnumType(ScoreBoard_ScoreStatus, "api.v1.ScoreBoard.ScoreStatus",
  */
 export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEntry> {
   /**
-   * @generated from field: string entity_id = 1;
+   * @generated from field: optional string entity_id = 1;
    */
-  entityId = "";
+  entityId?: string;
 
   /**
    * @generated from field: string label = 2;
@@ -353,12 +361,12 @@ export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEnt
   /**
    * icon_key is an SF-Symbol name (e.g. "heart.fill").
    *
-   * @generated from field: string icon_key = 6;
+   * @generated from field: optional string icon_key = 6;
    */
-  iconKey = "";
+  iconKey?: string;
 
   /**
-   * @generated from field: api.v1.Color icon_color = 7;
+   * @generated from field: optional api.v1.Color icon_color = 7;
    */
   iconColor?: Color;
 
@@ -380,13 +388,13 @@ export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEnt
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.ScoreBoard.ScoreBoardEntry";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "entity_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
     { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "display_score_signed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "rank", kind: "scalar", T: 13 /* ScalarType.UINT32 */, opt: true },
-    { no: 6, name: "icon_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "icon_color", kind: "message", T: Color },
+    { no: 6, name: "icon_key", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 7, name: "icon_color", kind: "message", T: Color, opt: true },
     { no: 8, name: "status", kind: "enum", T: proto3.getEnumType(ScoreBoard_ScoreStatus) },
     { no: 9, name: "status_details", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
   ]);

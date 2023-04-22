@@ -49,10 +49,12 @@ message ScoreBoard {
     SCORE_STATUS_FINALIZED = 2;
     // SCORE_STATUS_INCOMPLETE indicates that a player's score is in an invalid or non-comparable state (e.g. they have dropped out of the event).
     SCORE_STATUS_INCOMPLETE = 3;
+    // SCORE_STATUS_NON_SCORING indicates that a player's score will not be counted towards the overall leaderboard.
+    SCORE_STATUS_NON_SCORING = 4;
   }
 
   message ScoreBoardEntry {
-    string entity_id = 1;
+    optional string entity_id = 1;
     string label = 2;
 
     int32 score = 3;
@@ -63,8 +65,8 @@ message ScoreBoard {
     optional uint32 rank = 5;
 
     // icon_key is an SF-Symbol name (e.g. "heart.fill").
-    string icon_key = 6;
-    Color icon_color = 7;
+    optional string icon_key = 6;
+    optional Color icon_color = 7;
     ScoreStatus status = 8;
     optional string status_details = 9;
   }
