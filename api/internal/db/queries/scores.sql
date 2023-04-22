@@ -96,7 +96,8 @@ FROM
 WHERE
   st.event_id = $1
 ORDER BY
-  st.rank ASC;
+  st.rank ASC,
+  a.created_at ASC;
 
 -- name: UpdateScore :exec
 UPDATE
