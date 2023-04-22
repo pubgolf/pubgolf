@@ -80,7 +80,7 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		if int(c.NumScores) == numScoredStages-1 {
 			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
 		}
-		if int(c.NumScores) == numScoredStages {
+		if int(c.NumScores) >= numScoredStages {
 			status = apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 			rankCopy = &rank
 		}
