@@ -36,7 +36,6 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unrecognized enum value: %w", err))
 	}
 
-	var scores []*apiv1.ScoreBoard_ScoreBoardEntry
 	sc, err := s.dao.ScoringCriteria(ctx, eventID, category)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get scoring criteria: %w", err))
@@ -68,6 +67,7 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 	}
 
 	var rank uint32 = 1
+	var scores []*apiv1.ScoreBoard_ScoreBoardEntry
 	for i, c := range sc {
 
 		var rankCopy *uint32

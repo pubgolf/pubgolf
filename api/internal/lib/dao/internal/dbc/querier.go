@@ -29,6 +29,7 @@ type Querier interface {
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error)
 	PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error)
+	PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByIDRow, error)
 	PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)
 	ScoringCriteriaAllVenues(ctx context.Context, arg ScoringCriteriaAllVenuesParams) ([]ScoringCriteriaAllVenuesRow, error)

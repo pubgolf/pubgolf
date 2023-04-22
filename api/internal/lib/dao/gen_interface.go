@@ -33,6 +33,12 @@ type QueryProvider interface {
 	EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
+	// PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.
+	PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error)
+	// PlayerByID creates a new player and adds them to the given event.
+	PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error)
+	// PlayerScores returns a list of event stages and a player's scoring info for each.
+	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// ScoringCriteria returns a list of players competing in the given category and the data necessary to rank them.

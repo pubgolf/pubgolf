@@ -250,6 +250,73 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 	return r0, r1
 }
 
+// PlayerAdjustments provides a mock function with given fields: ctx, eventID, playerID
+func (_m *MockQueryProvider) PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error) {
+	ret := _m.Called(ctx, eventID, playerID)
+
+	var r0 []PlayerVenueAdjustment
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID) []PlayerVenueAdjustment); ok {
+		r0 = rf(ctx, eventID, playerID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]PlayerVenueAdjustment)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerID) error); ok {
+		r1 = rf(ctx, eventID, playerID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PlayerByID provides a mock function with given fields: ctx, playerID
+func (_m *MockQueryProvider) PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error) {
+	ret := _m.Called(ctx, playerID)
+
+	var r0 models.Player
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) models.Player); ok {
+		r0 = rf(ctx, playerID)
+	} else {
+		r0 = ret.Get(0).(models.Player)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID) error); ok {
+		r1 = rf(ctx, playerID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PlayerScores provides a mock function with given fields: ctx, eventID, playerID
+func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error) {
+	ret := _m.Called(ctx, eventID, playerID)
+
+	var r0 []PlayerVenueScore
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID) []PlayerVenueScore); ok {
+		r0 = rf(ctx, eventID, playerID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]PlayerVenueScore)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerID) error); ok {
+		r1 = rf(ctx, eventID, playerID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ScoreByPlayerStage provides a mock function with given fields: ctx, playerID, stageID
 func (_m *MockQueryProvider) ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error) {
 	ret := _m.Called(ctx, playerID, stageID)

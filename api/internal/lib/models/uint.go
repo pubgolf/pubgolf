@@ -38,3 +38,34 @@ func (v VenueKey) UInt32() uint32 {
 func VenueKeyFromUInt32(key uint32) VenueKey {
 	return VenueKey{key}
 }
+
+// NullUInt32 allows handling nullable uint32 fields in the database.
+type NullUInt32 struct {
+	UInt32 uint32
+	Valid  bool
+}
+
+// Scan implements the Scanner interface.
+func (n *NullUInt32) Scan(value any) error {
+	if value == nil {
+		n.UInt32, n.Valid = 0, false
+		return nil
+	}
+
+	if x, ok := value.(int64); ok {
+		if x >= 0 && x <= math.MaxUint32 {
+			*n = NullUInt32{uint32(x), true}
+			return nil
+		}
+		return fmt.Errorf("VenueKey: value out of range [0,%d]: %v", math.MaxUint32, value)
+	}
+	return fmt.Errorf("VenueKey: invalid scanned value: %v of type %v", value, reflect.TypeOf(value))
+}
+
+// Value implements the driver Valuer interface.
+func (n NullUInt32) Value() (driver.Value, error) {
+	if !n.Valid {
+		return nil, nil
+	}
+	return int64(n.UInt32), nil
+}

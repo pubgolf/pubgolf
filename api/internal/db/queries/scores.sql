@@ -72,7 +72,7 @@ ORDER BY
 SELECT
   v.id,
   v.name,
-  s.value
+  s.value AS nullable_value
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -86,9 +86,8 @@ ORDER BY
 -- name: PlayerAdjustments :many
 SELECT
   v.id,
-  v.name,
   a.label,
-  a.value
+  a.value AS nullable_value
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id

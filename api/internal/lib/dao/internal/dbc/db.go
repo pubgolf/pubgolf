@@ -75,6 +75,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.playerAdjustmentsStmt, err = db.PrepareContext(ctx, playerAdjustments); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerAdjustments: %w", err)
 	}
+	if q.playerByIDStmt, err = db.PrepareContext(ctx, playerByID); err != nil {
+		return nil, fmt.Errorf("error preparing query PlayerByID: %w", err)
+	}
 	if q.playerScoresStmt, err = db.PrepareContext(ctx, playerScores); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerScores: %w", err)
 	}
@@ -198,6 +201,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing playerAdjustmentsStmt: %w", cerr)
 		}
 	}
+	if q.playerByIDStmt != nil {
+		if cerr := q.playerByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing playerByIDStmt: %w", cerr)
+		}
+	}
 	if q.playerScoresStmt != nil {
 		if cerr := q.playerScoresStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing playerScoresStmt: %w", cerr)
@@ -309,6 +317,7 @@ type Queries struct {
 	eventStartTimeStmt                  *sql.Stmt
 	eventVenueKeysAreValidStmt          *sql.Stmt
 	playerAdjustmentsStmt               *sql.Stmt
+	playerByIDStmt                      *sql.Stmt
 	playerScoresStmt                    *sql.Stmt
 	scoreByPlayerStageStmt              *sql.Stmt
 	scoringCriteriaAllVenuesStmt        *sql.Stmt
@@ -343,6 +352,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventStartTimeStmt:                  q.eventStartTimeStmt,
 		eventVenueKeysAreValidStmt:          q.eventVenueKeysAreValidStmt,
 		playerAdjustmentsStmt:               q.playerAdjustmentsStmt,
+		playerByIDStmt:                      q.playerByIDStmt,
 		playerScoresStmt:                    q.playerScoresStmt,
 		scoreByPlayerStageStmt:              q.scoreByPlayerStageStmt,
 		scoringCriteriaAllVenuesStmt:        q.scoringCriteriaAllVenuesStmt,

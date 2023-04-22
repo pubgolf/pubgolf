@@ -80,6 +80,30 @@ func (q *Queries) EventPlayers(ctx context.Context, eventID models.EventID) ([]E
 	return items, nil
 }
 
+const playerByID = `-- name: PlayerByID :one
+SELECT
+  id,
+  name,
+  scoring_category
+FROM
+  players
+WHERE
+  id = $1
+`
+
+type PlayerByIDRow struct {
+	ID              models.PlayerID
+	Name            string
+	ScoringCategory models.ScoringCategory
+}
+
+func (q *Queries) PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByIDRow, error) {
+	row := q.queryRow(ctx, q.playerByIDStmt, playerByID, id)
+	var i PlayerByIDRow
+	err := row.Scan(&i.ID, &i.Name, &i.ScoringCategory)
+	return i, err
+}
+
 const updatePlayer = `-- name: UpdatePlayer :one
 UPDATE
   players

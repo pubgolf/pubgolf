@@ -255,9 +255,8 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]Ev
 const playerAdjustments = `-- name: PlayerAdjustments :many
 SELECT
   v.id,
-  v.name,
   a.label,
-  a.value
+  a.value AS nullable_value
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -275,10 +274,9 @@ type PlayerAdjustmentsParams struct {
 }
 
 type PlayerAdjustmentsRow struct {
-	ID    models.VenueID
-	Name  string
-	Label sql.NullString
-	Value int32
+	ID            models.VenueID
+	Label         sql.NullString
+	NullableValue sql.NullInt32
 }
 
 func (q *Queries) PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error) {
@@ -290,12 +288,7 @@ func (q *Queries) PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsPa
 	var items []PlayerAdjustmentsRow
 	for rows.Next() {
 		var i PlayerAdjustmentsRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Label,
-			&i.Value,
-		); err != nil {
+		if err := rows.Scan(&i.ID, &i.Label, &i.NullableValue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -313,7 +306,7 @@ const playerScores = `-- name: PlayerScores :many
 SELECT
   v.id,
   v.name,
-  s.value
+  s.value AS nullable_value
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -331,9 +324,9 @@ type PlayerScoresParams struct {
 }
 
 type PlayerScoresRow struct {
-	ID    models.VenueID
-	Name  string
-	Value uint32
+	ID            models.VenueID
+	Name          string
+	NullableValue models.NullUInt32
 }
 
 func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error) {
@@ -345,7 +338,7 @@ func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]P
 	var items []PlayerScoresRow
 	for rows.Next() {
 		var i PlayerScoresRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.Value); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.NullableValue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

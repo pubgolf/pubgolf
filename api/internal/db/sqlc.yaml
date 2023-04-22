@@ -54,6 +54,10 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
           - column: scores.value
             go_type: uint32
+            # This is a hack to make SQLc recognize a NULL-able column of a LEFT JOIN via a column alias.
+          - column: scores.nullable_value
+            nullable: true
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.NullUInt32
           # Adjustments
           - column: adjustments.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AdjustmentID

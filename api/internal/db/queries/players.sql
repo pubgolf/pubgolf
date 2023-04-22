@@ -4,6 +4,16 @@ INSERT INTO players(event_id, name, scoring_category, updated_at)
 RETURNING
   id, name, scoring_category;
 
+-- name: PlayerByID :one
+SELECT
+  id,
+  name,
+  scoring_category
+FROM
+  players
+WHERE
+  id = $1;
+
 -- name: UpdatePlayer :one
 UPDATE
   players
