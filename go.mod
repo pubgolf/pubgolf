@@ -3,6 +3,7 @@ module github.com/pubgolf/pubgolf
 go 1.20
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/XSAM/otelsql v0.20.0
 	github.com/bufbuild/buf v1.17.0
 	github.com/bufbuild/connect-go v1.6.0
@@ -10,13 +11,17 @@ require (
 	github.com/bxcodec/faker/v3 v3.8.1
 	github.com/dmarkham/enumer v1.5.8
 	github.com/fergusstrange/embedded-postgres v1.21.0
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/cors v1.2.1
+	github.com/go-chi/httprate v0.7.4
 	github.com/go-chi/render v1.0.2
 	github.com/go-faker/faker/v4 v4.1.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.3-0.20230405045701-b94ed1a710af // Needed until v4.15.4 is released to remove pgx/v4 dependency.
 	github.com/honeycombio/honeycomb-opentelemetry-go v0.5.2
 	github.com/honeycombio/otel-launcher-go v1.6.0
+	github.com/jackc/pgconn v1.14.0
+	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kyleconroy/sqlc v1.17.2
@@ -53,7 +58,6 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
-	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
@@ -96,7 +100,6 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -129,8 +132,6 @@ require (
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.14.0
-	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
