@@ -63,7 +63,7 @@
 
 	function getPlayerName(id: string) {
 		const player = players.find((x) => x.id === id);
-		const cat = player.data?.scoringCategory
+		const cat = player?.data?.scoringCategory
 			? scoringCategoryToDisplayName[player.data?.scoringCategory]
 			: 'None';
 		return `${player?.data?.name} (${cat})`;
