@@ -57,7 +57,7 @@ var installSQLcCmd = &cobra.Command{
 	Use:   "sqlc",
 	Short: "Install the `sqlc` CLI tool",
 	Run: func(cmd *cobra.Command, args []string) {
-		installWithGolang("github.com/kyleconroy/sqlc/cmd/sqlc")
+		installWithGolang("github.com/sqlc-dev/sqlc/cmd/sqlc")
 	},
 }
 

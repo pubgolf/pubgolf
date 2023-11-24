@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
-	"github.com/honeycombio/otel-launcher-go/launcher"
+	"github.com/honeycombio/otel-config-go/otelconfig"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,10 +21,10 @@ const ServiceName = "pubgolf-api-server"
 
 // Init configures OTel and Honeycomb reporting.
 func Init(cfg *config.App) (func(), error) {
-	return launcher.ConfigureOpenTelemetry(
-		launcher.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
-		launcher.WithServiceName(ServiceName),
-		launcher.WithServiceVersion(gitVersion()),
+	return otelconfig.ConfigureOpenTelemetry(
+		otelconfig.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
+		otelconfig.WithServiceName(ServiceName),
+		otelconfig.WithServiceVersion(gitVersion()),
 		honeycomb.WithApiKey(cfg.HoneycombKey),
 	)
 }

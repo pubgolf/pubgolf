@@ -10,16 +10,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
-// spanNameFormatterFn is a helper to convert an anonymous function to an `otelsql.SpanNameFormatter`.
-type spanNameFormatterFn func(ctx context.Context, method otelsql.Method, query string) string
-
-// Format calls the `spanNameFormatterFn` as a function.
-func (s spanNameFormatterFn) Format(ctx context.Context, method otelsql.Method, query string) string {
-	return s(ctx, method, query)
-}
-
 // parseDBCQueryName parses the SQLc comment of a SQL query to override the span name.
-var parseDBCQueryName spanNameFormatterFn = spanNameFormatterFn(func(ctx context.Context, method otelsql.Method, query string) string {
+func parseDBCQueryName(ctx context.Context, method otelsql.Method, query string) string {
 	const queryPrefix = "-- name: "
 
 	if strings.HasPrefix(query, queryPrefix) {
@@ -28,7 +20,7 @@ var parseDBCQueryName spanNameFormatterFn = spanNameFormatterFn(func(ctx context
 	}
 
 	return string(method)
-})
+}
 
 func parseDBCQueryAttributes(ctx context.Context, method otelsql.Method, query string, args []driver.NamedValue) []attribute.KeyValue {
 	return []attribute.KeyValue{
