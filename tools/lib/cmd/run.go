@@ -37,7 +37,7 @@ var runAPIServerCmd = &cobra.Command{
 	Short: "Run API server",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-		watchableDopplerGoRun(cmd, config.ServerBinName, config.DopplerEnvName, binPath)
+		watchableDopplerGoRun(cmd, config.ServerBinName, config.DopplerEnvName, binPath, args)
 	},
 }
 
@@ -91,12 +91,12 @@ func dopplerDockerRun(project, env string, services ...string) {
 	guard(doppler.Run(), "execute `docker-compose up ...` command")
 }
 
-func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
+func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []string) {
 	watchFlag, err := cmd.Flags().GetBool("watch")
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	stopFn := dopplerGoRun(config.ServerBinName, config.DopplerEnvName, bin)
+	stopFn := dopplerGoRun(project, env, bin, args)
 
 	// Launch watcher, if applicable.
 	if watchFlag {
@@ -104,7 +104,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
 			watch("api", "restart API server", func(ev watcher.Event) {
 				// Start the old process and keep track of the new cleanup handler.
 				stopFn()
-				stopFn = dopplerGoRun(config.ServerBinName, config.DopplerEnvName, bin)
+				stopFn = dopplerGoRun(project, env, bin, args)
 			})
 		}()
 	}
@@ -119,15 +119,18 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string) {
 	}
 }
 
-func dopplerGoRun(project, env, bin string) func() {
-	log.Printf("Compiling '%s'...\n", bin)
-	doppler := exec.Command("doppler",
-		"run",
-		"--project", project,
-		"--config", env,
-		"--",
-		"go", "run", bin,
-	)
+func dopplerGoRun(project, env, bin string, args []string) func() {
+
+	allArgs := append(
+		[]string{
+			"run",
+			"--project", project,
+			"--config", env,
+			"--",
+			"go", "run", bin,
+		}, args...)
+
+	doppler := exec.Command("doppler", allArgs...)
 
 	doppler.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
