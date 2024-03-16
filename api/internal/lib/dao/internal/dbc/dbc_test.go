@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
@@ -34,4 +35,12 @@ func executeTests(m *testing.M) int {
 
 func initDB(t *testing.T) (context.Context, *sql.Tx, func()) {
 	return dbtest.NewTestTx(t, _sharedDB)
+}
+
+func TestPrepare(t *testing.T) {
+	ctx, tx, cleanup := initDB(t)
+	defer cleanup()
+
+	_, err := dbc.Prepare(ctx, tx)
+	assert.NoError(t, err, "Preparation of queries failed")
 }
