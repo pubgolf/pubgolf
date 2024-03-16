@@ -21,7 +21,7 @@ var stopCmd = &cobra.Command{
 	},
 }
 
-func dopplerDockerStop(project, env string, services ...string) {
+func dopplerDockerStop(project, env string) {
 	doppler := exec.Command("doppler",
 		"run",
 		"--project", project,
