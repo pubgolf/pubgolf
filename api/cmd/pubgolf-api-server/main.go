@@ -68,7 +68,7 @@ func main() {
 	bootSpan.SetAttributes(attribute.String("service.type", "server"))
 
 	// Initialize server.
-	dao, err := dao.New(ctx, dbConn)
+	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev)
 	guard(err, "init DAO")
 	server := makeServer(cfg, dao)
 	makeShutdownWatcher(server)

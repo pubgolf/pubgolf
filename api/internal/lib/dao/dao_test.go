@@ -48,7 +48,7 @@ func Test_txQuerier(t *testing.T) {
 	t.Run("Succeeds when DAO is constructed with New()", func(t *testing.T) {
 		ctx := context.Background()
 
-		dao, err := New(ctx, _sharedDB)
+		dao, err := New(ctx, _sharedDB, false)
 		assert.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(ctx, &sql.TxOptions{})

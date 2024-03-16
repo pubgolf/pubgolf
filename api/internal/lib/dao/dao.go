@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -27,10 +28,14 @@ type Queries struct {
 }
 
 // New returns a concrete implementation of `QueryProvider`.
-func New(ctx context.Context, db *sql.DB) (*Queries, error) {
+func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, error) {
 	q, err := dbc.Prepare(ctx, db)
 	if err != nil {
-		return nil, fmt.Errorf("prepare dbc queries: %w", err)
+		if forcePreparedQueries {
+			return nil, fmt.Errorf("prepare dbc queries: %w", err)
+		}
+
+		log.Printf("Failed to prepare queries, initializing DAO with lazy query parsing: %+v", err)
 	}
 
 	return &Queries{
