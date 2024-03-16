@@ -37,11 +37,8 @@ var installDopplerCmd = &cobra.Command{
 	Use:   "doppler",
 	Short: "Install the `doppler` CLI tool",
 	Run: func(cmd *cobra.Command, args []string) {
-		installWithHomebrew("libpq")
-		installer := exec.Command("bash", "-c", "(curl -Ls --tlsv1.2 --proto '=https' --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh -s -- --verify-signature")
-		installer.Stdout = os.Stdout
-		installer.Stderr = os.Stderr
-		guard(installer.Run(), "execute cURL installation command for Doppler CLI")
+		installWithHomebrew("gnupg")
+		installWithHomebrew("dopplerhq/cli/doppler")
 	},
 }
 
