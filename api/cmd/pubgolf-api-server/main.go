@@ -96,8 +96,10 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 
 	db := telemetry.WrapDB(stdlib.GetConnector(*conConfig))
 
-	err = db.PingContext(ctx)
-	guard(err, "ping database")
+	if cfg.EnvName == config.DeployEnvDev {
+		err = db.PingContext(ctx)
+		guard(err, "ping database")
+	}
 
 	return db
 }
