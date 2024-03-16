@@ -10,6 +10,7 @@ import (
 
 func init() {
 	installCmd.AddCommand(installDopplerCmd)
+	installCmd.AddCommand(installBufCmd)
 	installCmd.AddCommand(installMigrateCmd)
 	installCmd.AddCommand(installSQLcCmd)
 	installCmd.AddCommand(installMockeryCmd)
@@ -23,6 +24,7 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		installers := []*cobra.Command{
 			installDopplerCmd,
+			installBufCmd,
 			installMigrateCmd,
 			installSQLcCmd,
 			installMockeryCmd,
@@ -39,6 +41,14 @@ var installDopplerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		installWithHomebrew("gnupg")
 		installWithHomebrew("dopplerhq/cli/doppler")
+	},
+}
+
+var installBufCmd = &cobra.Command{
+	Use:   "buf",
+	Short: "Install the `buf` CLI tool",
+	Run: func(cmd *cobra.Command, args []string) {
+		installWithHomebrew("bufbuild/buf/buf")
 	},
 }
 

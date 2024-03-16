@@ -9,7 +9,7 @@ All commands in this README should be run from the **repo root**, NOT the `proto
 ```sh
 buf lint
 buf format -w
-buf breaking --against "https://github.com/pubgolf/pubgolf.git#branch=develop"
+buf breaking --against "https://github.com/pubgolf/pubgolf.git#branch=main"
 ```
 
 ## Deployment
