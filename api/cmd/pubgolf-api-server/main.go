@@ -21,6 +21,7 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -59,7 +60,9 @@ func main() {
 		log.Println("Migrator instance: starting database migrations...")
 
 		err = db.RunMigrations(dbConn)
-		guard(err, "run migrations")
+		if err != nil {
+			bootSpan.SetStatus(codes.Error, fmt.Sprintf("run migrations: %v", err))
+		}
 
 		log.Println("Migrator instance: completed migrations and shutting down...")
 		bootSpan.End()
