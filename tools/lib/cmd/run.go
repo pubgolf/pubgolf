@@ -96,7 +96,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	stopFn := dopplerGoRun(project, env, bin, args)
+	stopFn := dopplerGoRun(project, env, bin, args, !watchFlag)
 
 	// Launch watcher, if applicable.
 	if watchFlag {
@@ -104,7 +104,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 			watch("api", "restart API server", func(ev watcher.Event) {
 				// Start the old process and keep track of the new cleanup handler.
 				stopFn()
-				stopFn = dopplerGoRun(project, env, bin, args)
+				stopFn = dopplerGoRun(project, env, bin, args, false)
 			})
 		}()
 	}
@@ -119,8 +119,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	}
 }
 
-func dopplerGoRun(project, env, bin string, args []string) func() {
-
+func dopplerGoRun(project, env, bin string, args []string, stopOnExit bool) func() {
 	allArgs := append(
 		[]string{
 			"run",
@@ -140,6 +139,13 @@ func dopplerGoRun(project, env, bin string, args []string) func() {
 
 	log.Printf("Starting '%s'...\n", bin)
 	guard(doppler.Start(), "execute `go run ...` command")
+
+	if stopOnExit {
+		go func() {
+			doppler.Wait()
+			close(beginShutdown)
+		}()
+	}
 
 	return func() {
 		log.Printf("Calling Doppler shutdown for pid %d...", doppler.Process.Pid)
