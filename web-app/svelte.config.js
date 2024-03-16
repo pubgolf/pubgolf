@@ -27,7 +27,7 @@ const config = {
 		prerender: {
 			entries: [
 				'/',
-				'/event/nyc-2023',
+				'/event/nyc-2024',
 				'/about/contact',
 				'/about/privacy',
 				'/admin',
@@ -37,6 +37,12 @@ const config = {
 				'/admin/nyc-2023/players',
 				'/admin/nyc-2023/schedule',
 				'/admin/nyc-2023/scores',
+				'/admin/nyc-2024',
+				'/admin/nyc-2024/alerts',
+				'/admin/nyc-2024/event-info',
+				'/admin/nyc-2024/players',
+				'/admin/nyc-2024/schedule',
+				'/admin/nyc-2024/scores',
 				'/auth/login'
 			]
 		}
