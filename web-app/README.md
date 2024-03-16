@@ -12,7 +12,7 @@ First, ensure the app server is running, (use `pubgolf-devctrl run api` in the r
 npm run dev
 ```
 
-You can then access the app on [http://127.0.0.1:5000](http://127.0.0.1:5000) (note not `localhost:5000`). To change the port, update the dev configuration in Doppler.
+You can then access the app on [http://127.0.0.1:3000](http://127.0.0.1:3000). To change the port, update the dev configuration in Doppler.
 
 ## Lint/Check
 
