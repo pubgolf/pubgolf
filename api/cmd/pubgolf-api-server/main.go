@@ -66,7 +66,7 @@ func main() {
 
 		log.Println("Migrator instance: completed migrations and shutting down...")
 		bootSpan.End()
-		os.Exit(0)
+		return
 	}
 	bootSpan.SetAttributes(attribute.String("service.type", "server"))
 
@@ -88,7 +88,7 @@ func main() {
 // guard logs and exits on error.
 func guard(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %v", msg, err.Error())
+		log.Panicf("%s: %v", msg, err.Error())
 	}
 }
 

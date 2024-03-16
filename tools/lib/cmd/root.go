@@ -81,7 +81,7 @@ func checkVersion() {
 // guard logs and exits on error.
 func guard(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %v", msg, err.Error())
+		log.Panicf("%s: %v", msg, err.Error())
 	}
 }
 
