@@ -1,14 +1,10 @@
 package middleware
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/bufbuild/connect-go"
 	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httprate"
 	"github.com/riandyrn/otelchi"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -29,9 +25,6 @@ func ChiMiddleware(r chi.Router) chi.Middlewares {
 		otelchi.Middleware(telemetry.ServiceName, otelchi.WithChiRoutes(r)),
 		middleware.RealIP,
 		middleware.Logger,
-		httprate.Limit(10, 1*time.Second, httprate.WithKeyFuncs(func(r *http.Request) (string, error) {
-			return r.Header.Get("X-PubGolf-User-ID"), nil
-		})),
 		Recoverer,
 	}
 }

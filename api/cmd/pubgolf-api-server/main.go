@@ -17,6 +17,7 @@ import (
 	"github.com/bufbuild/connect-go"
 	"github.com/go-chi/chi/v5"
 	chim "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel"
@@ -117,7 +118,12 @@ func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
 	r.Get("/robots.txt", robots(cfg))
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
-		r.Use(chim.NoCache)
+		r.Use(
+			chim.NoCache,
+			httprate.Limit(10, 1*time.Second, httprate.WithKeyFuncs(func(r *http.Request) (string, error) {
+				return r.Header.Get("X-PubGolf-User-ID"), nil
+			})),
+		)
 
 		rpcMux := http.NewServeMux()
 		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao),
