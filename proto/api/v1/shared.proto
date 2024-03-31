@@ -29,15 +29,23 @@ message Venue {
   string image_url = 4;
 }
 
+message EventRegistration {
+  string event_key = 1;
+  ScoringCategory scoring_category = 2;
+}
+
 message Player {
   string id = 1;
   PlayerData data = 2;
+
+  // Order is not guaranteed. For now we return all registrations, but will likely have to provide visibility modifiers, pagination, archived events, etc in the future.
+  repeated EventRegistration events = 3;
 }
 
 // PlayerData contains the user-editable fields for a player.
 message PlayerData {
   string name = 1;
-  ScoringCategory scoring_category = 2;
+  ScoringCategory scoring_category = 2 [deprecated = true];
 }
 
 message ScoreBoard {

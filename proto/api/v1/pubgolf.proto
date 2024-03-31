@@ -11,11 +11,24 @@ option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;ap
 
 // PubGolfService is the API server which handles all score keeping, scheduling and account management for pub golf.
 service PubGolfService {
-  // ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
+  // ClientVersion (unauthenticated) indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
   rpc ClientVersion(ClientVersionRequest) returns (ClientVersionResponse) {}
 
+  // Auth
+
   // CreatePlayer creates a new player profile for a given event.
+  //
+  // Deprecated: Use `StartPlayerLogin` RPC instead.
   rpc CreatePlayer(PubGolfServiceCreatePlayerRequest) returns (PubGolfServiceCreatePlayerResponse) {}
+
+  // StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
+  rpc StartPlayerLogin(StartPlayerLoginRequest) returns (StartPlayerLoginResponse) {}
+
+  // CompletePlayerLogin (unauthenticated) accepts an auth code and logs in the player, returning the data necessary to bootstrap a player's session in the app.
+  rpc CompletePlayerLogin(CompletePlayerLoginRequest) returns (CompletePlayerLoginResponse) {}
+
+  // GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
+  rpc GetMyPlayer(GetMyPlayerRequest) returns (GetMyPlayerResponse) {}
 
   // Event
 
@@ -61,6 +74,10 @@ message ClientVersionResponse {
   VersionStatus version_status = 1;
 }
 
+// --------------------
+// Auth
+// --------------------
+
 // CreatePlayer
 
 message PubGolfServiceCreatePlayerRequest {
@@ -70,6 +87,37 @@ message PubGolfServiceCreatePlayerRequest {
 message PubGolfServiceCreatePlayerResponse {
   Player player = 1;
 }
+
+// StartPlayerLogin
+
+message StartPlayerLoginRequest {
+  // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phone_number = 1;
+}
+message StartPlayerLoginResponse {}
+
+// CompletePlayerLogin
+
+message CompletePlayerLoginRequest {
+  // In E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phone_number = 1;
+  string auth_code = 2;
+}
+message CompletePlayerLoginResponse {
+  Player player = 1;
+  string auth_token = 2;
+}
+
+// GetMyPlayer
+
+message GetMyPlayerRequest {}
+message GetMyPlayerResponse {
+  Player player = 1;
+}
+
+// --------------------
+// Event Info
+// --------------------
 
 // GetSchedule
 
@@ -141,6 +189,10 @@ message GetContentItemResponse {
   // content is in markdown format.
   string content = 1;
 }
+
+// --------------------
+// Scoreboard
+// --------------------
 
 message GetPlayerRequest {
   string player_id = 1;

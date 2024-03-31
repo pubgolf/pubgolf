@@ -41,6 +41,15 @@ const (
 	// PubGolfServiceCreatePlayerProcedure is the fully-qualified name of the PubGolfService's
 	// CreatePlayer RPC.
 	PubGolfServiceCreatePlayerProcedure = "/api.v1.PubGolfService/CreatePlayer"
+	// PubGolfServiceStartPlayerLoginProcedure is the fully-qualified name of the PubGolfService's
+	// StartPlayerLogin RPC.
+	PubGolfServiceStartPlayerLoginProcedure = "/api.v1.PubGolfService/StartPlayerLogin"
+	// PubGolfServiceCompletePlayerLoginProcedure is the fully-qualified name of the PubGolfService's
+	// CompletePlayerLogin RPC.
+	PubGolfServiceCompletePlayerLoginProcedure = "/api.v1.PubGolfService/CompletePlayerLogin"
+	// PubGolfServiceGetMyPlayerProcedure is the fully-qualified name of the PubGolfService's
+	// GetMyPlayer RPC.
+	PubGolfServiceGetMyPlayerProcedure = "/api.v1.PubGolfService/GetMyPlayer"
 	// PubGolfServiceGetScheduleProcedure is the fully-qualified name of the PubGolfService's
 	// GetSchedule RPC.
 	PubGolfServiceGetScheduleProcedure = "/api.v1.PubGolfService/GetSchedule"
@@ -68,10 +77,18 @@ const (
 
 // PubGolfServiceClient is a client for the api.v1.PubGolfService service.
 type PubGolfServiceClient interface {
-	// ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
+	// ClientVersion (unauthenticated) indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
 	ClientVersion(context.Context, *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error)
 	// CreatePlayer creates a new player profile for a given event.
+	//
+	// Deprecated: Use `StartPlayerLogin` RPC instead.
 	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
+	// StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
+	StartPlayerLogin(context.Context, *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error)
+	// CompletePlayerLogin (unauthenticated) accepts an auth code and logs in the player, returning the data necessary to bootstrap a player's session in the app.
+	CompletePlayerLogin(context.Context, *connect_go.Request[v1.CompletePlayerLoginRequest]) (*connect_go.Response[v1.CompletePlayerLoginResponse], error)
+	// GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
+	GetMyPlayer(context.Context, *connect_go.Request[v1.GetMyPlayerRequest]) (*connect_go.Response[v1.GetMyPlayerResponse], error)
 	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
@@ -108,6 +125,21 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 		createPlayer: connect_go.NewClient[v1.PubGolfServiceCreatePlayerRequest, v1.PubGolfServiceCreatePlayerResponse](
 			httpClient,
 			baseURL+PubGolfServiceCreatePlayerProcedure,
+			opts...,
+		),
+		startPlayerLogin: connect_go.NewClient[v1.StartPlayerLoginRequest, v1.StartPlayerLoginResponse](
+			httpClient,
+			baseURL+PubGolfServiceStartPlayerLoginProcedure,
+			opts...,
+		),
+		completePlayerLogin: connect_go.NewClient[v1.CompletePlayerLoginRequest, v1.CompletePlayerLoginResponse](
+			httpClient,
+			baseURL+PubGolfServiceCompletePlayerLoginProcedure,
+			opts...,
+		),
+		getMyPlayer: connect_go.NewClient[v1.GetMyPlayerRequest, v1.GetMyPlayerResponse](
+			httpClient,
+			baseURL+PubGolfServiceGetMyPlayerProcedure,
 			opts...,
 		),
 		getSchedule: connect_go.NewClient[v1.GetScheduleRequest, v1.GetScheduleResponse](
@@ -157,6 +189,9 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 type pubGolfServiceClient struct {
 	clientVersion        *connect_go.Client[v1.ClientVersionRequest, v1.ClientVersionResponse]
 	createPlayer         *connect_go.Client[v1.PubGolfServiceCreatePlayerRequest, v1.PubGolfServiceCreatePlayerResponse]
+	startPlayerLogin     *connect_go.Client[v1.StartPlayerLoginRequest, v1.StartPlayerLoginResponse]
+	completePlayerLogin  *connect_go.Client[v1.CompletePlayerLoginRequest, v1.CompletePlayerLoginResponse]
+	getMyPlayer          *connect_go.Client[v1.GetMyPlayerRequest, v1.GetMyPlayerResponse]
 	getSchedule          *connect_go.Client[v1.GetScheduleRequest, v1.GetScheduleResponse]
 	getVenue             *connect_go.Client[v1.GetVenueRequest, v1.GetVenueResponse]
 	listContentItems     *connect_go.Client[v1.ListContentItemsRequest, v1.ListContentItemsResponse]
@@ -175,6 +210,21 @@ func (c *pubGolfServiceClient) ClientVersion(ctx context.Context, req *connect_g
 // CreatePlayer calls api.v1.PubGolfService.CreatePlayer.
 func (c *pubGolfServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error) {
 	return c.createPlayer.CallUnary(ctx, req)
+}
+
+// StartPlayerLogin calls api.v1.PubGolfService.StartPlayerLogin.
+func (c *pubGolfServiceClient) StartPlayerLogin(ctx context.Context, req *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error) {
+	return c.startPlayerLogin.CallUnary(ctx, req)
+}
+
+// CompletePlayerLogin calls api.v1.PubGolfService.CompletePlayerLogin.
+func (c *pubGolfServiceClient) CompletePlayerLogin(ctx context.Context, req *connect_go.Request[v1.CompletePlayerLoginRequest]) (*connect_go.Response[v1.CompletePlayerLoginResponse], error) {
+	return c.completePlayerLogin.CallUnary(ctx, req)
+}
+
+// GetMyPlayer calls api.v1.PubGolfService.GetMyPlayer.
+func (c *pubGolfServiceClient) GetMyPlayer(ctx context.Context, req *connect_go.Request[v1.GetMyPlayerRequest]) (*connect_go.Response[v1.GetMyPlayerResponse], error) {
+	return c.getMyPlayer.CallUnary(ctx, req)
 }
 
 // GetSchedule calls api.v1.PubGolfService.GetSchedule.
@@ -219,10 +269,18 @@ func (c *pubGolfServiceClient) GetScoresForVenue(ctx context.Context, req *conne
 
 // PubGolfServiceHandler is an implementation of the api.v1.PubGolfService service.
 type PubGolfServiceHandler interface {
-	// ClientVersion indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
+	// ClientVersion (unauthenticated) indicates to the server that a client of a given version is attempting to connect, and allows the server to respond with a "soft" or "hard" upgrade notification.
 	ClientVersion(context.Context, *connect_go.Request[v1.ClientVersionRequest]) (*connect_go.Response[v1.ClientVersionResponse], error)
 	// CreatePlayer creates a new player profile for a given event.
+	//
+	// Deprecated: Use `StartPlayerLogin` RPC instead.
 	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
+	// StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
+	StartPlayerLogin(context.Context, *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error)
+	// CompletePlayerLogin (unauthenticated) accepts an auth code and logs in the player, returning the data necessary to bootstrap a player's session in the app.
+	CompletePlayerLogin(context.Context, *connect_go.Request[v1.CompletePlayerLoginRequest]) (*connect_go.Response[v1.CompletePlayerLoginResponse], error)
+	// GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
+	GetMyPlayer(context.Context, *connect_go.Request[v1.GetMyPlayerRequest]) (*connect_go.Response[v1.GetMyPlayerResponse], error)
 	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
@@ -247,58 +305,103 @@ type PubGolfServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	mux := http.NewServeMux()
-	mux.Handle(PubGolfServiceClientVersionProcedure, connect_go.NewUnaryHandler(
+	pubGolfServiceClientVersionHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceClientVersionProcedure,
 		svc.ClientVersion,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceCreatePlayerProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceCreatePlayerHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceCreatePlayerProcedure,
 		svc.CreatePlayer,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetScheduleProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceStartPlayerLoginHandler := connect_go.NewUnaryHandler(
+		PubGolfServiceStartPlayerLoginProcedure,
+		svc.StartPlayerLogin,
+		opts...,
+	)
+	pubGolfServiceCompletePlayerLoginHandler := connect_go.NewUnaryHandler(
+		PubGolfServiceCompletePlayerLoginProcedure,
+		svc.CompletePlayerLogin,
+		opts...,
+	)
+	pubGolfServiceGetMyPlayerHandler := connect_go.NewUnaryHandler(
+		PubGolfServiceGetMyPlayerProcedure,
+		svc.GetMyPlayer,
+		opts...,
+	)
+	pubGolfServiceGetScheduleHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetScheduleProcedure,
 		svc.GetSchedule,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetVenueProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetVenueHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetVenueProcedure,
 		svc.GetVenue,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceListContentItemsProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceListContentItemsHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceListContentItemsProcedure,
 		svc.ListContentItems,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetContentItemProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetContentItemHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetContentItemProcedure,
 		svc.GetContentItem,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetPlayerProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetPlayerHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetPlayerProcedure,
 		svc.GetPlayer,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetScoresForCategoryProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetScoresForCategoryHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetScoresForCategoryProcedure,
 		svc.GetScoresForCategory,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetScoresForPlayerProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetScoresForPlayerHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetScoresForPlayerProcedure,
 		svc.GetScoresForPlayer,
 		opts...,
-	))
-	mux.Handle(PubGolfServiceGetScoresForVenueProcedure, connect_go.NewUnaryHandler(
+	)
+	pubGolfServiceGetScoresForVenueHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetScoresForVenueProcedure,
 		svc.GetScoresForVenue,
 		opts...,
-	))
-	return "/api.v1.PubGolfService/", mux
+	)
+	return "/api.v1.PubGolfService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case PubGolfServiceClientVersionProcedure:
+			pubGolfServiceClientVersionHandler.ServeHTTP(w, r)
+		case PubGolfServiceCreatePlayerProcedure:
+			pubGolfServiceCreatePlayerHandler.ServeHTTP(w, r)
+		case PubGolfServiceStartPlayerLoginProcedure:
+			pubGolfServiceStartPlayerLoginHandler.ServeHTTP(w, r)
+		case PubGolfServiceCompletePlayerLoginProcedure:
+			pubGolfServiceCompletePlayerLoginHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetMyPlayerProcedure:
+			pubGolfServiceGetMyPlayerHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetScheduleProcedure:
+			pubGolfServiceGetScheduleHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetVenueProcedure:
+			pubGolfServiceGetVenueHandler.ServeHTTP(w, r)
+		case PubGolfServiceListContentItemsProcedure:
+			pubGolfServiceListContentItemsHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetContentItemProcedure:
+			pubGolfServiceGetContentItemHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetPlayerProcedure:
+			pubGolfServiceGetPlayerHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetScoresForCategoryProcedure:
+			pubGolfServiceGetScoresForCategoryHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetScoresForPlayerProcedure:
+			pubGolfServiceGetScoresForPlayerHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetScoresForVenueProcedure:
+			pubGolfServiceGetScoresForVenueHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 }
 
 // UnimplementedPubGolfServiceHandler returns CodeUnimplemented from all methods.
@@ -310,6 +413,18 @@ func (UnimplementedPubGolfServiceHandler) ClientVersion(context.Context, *connec
 
 func (UnimplementedPubGolfServiceHandler) CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.CreatePlayer is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) StartPlayerLogin(context.Context, *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.StartPlayerLogin is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) CompletePlayerLogin(context.Context, *connect_go.Request[v1.CompletePlayerLoginRequest]) (*connect_go.Response[v1.CompletePlayerLoginResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.CompletePlayerLogin is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) GetMyPlayer(context.Context, *connect_go.Request[v1.GetMyPlayerRequest]) (*connect_go.Response[v1.GetMyPlayerResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetMyPlayer is not implemented"))
 }
 
 func (UnimplementedPubGolfServiceHandler) GetSchedule(context.Context, *connect_go.Request[v1.GetScheduleRequest]) (*connect_go.Response[v1.GetScheduleResponse], error) {

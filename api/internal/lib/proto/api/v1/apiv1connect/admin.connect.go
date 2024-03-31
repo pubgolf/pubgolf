@@ -212,48 +212,68 @@ type AdminServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	mux := http.NewServeMux()
-	mux.Handle(AdminServiceCreatePlayerProcedure, connect_go.NewUnaryHandler(
+	adminServiceCreatePlayerHandler := connect_go.NewUnaryHandler(
 		AdminServiceCreatePlayerProcedure,
 		svc.CreatePlayer,
 		opts...,
-	))
-	mux.Handle(AdminServiceUpdatePlayerProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceUpdatePlayerHandler := connect_go.NewUnaryHandler(
 		AdminServiceUpdatePlayerProcedure,
 		svc.UpdatePlayer,
 		opts...,
-	))
-	mux.Handle(AdminServiceListPlayersProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceListPlayersHandler := connect_go.NewUnaryHandler(
 		AdminServiceListPlayersProcedure,
 		svc.ListPlayers,
 		opts...,
-	))
-	mux.Handle(AdminServiceListEventStagesProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceListEventStagesHandler := connect_go.NewUnaryHandler(
 		AdminServiceListEventStagesProcedure,
 		svc.ListEventStages,
 		opts...,
-	))
-	mux.Handle(AdminServiceCreateStageScoreProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceCreateStageScoreHandler := connect_go.NewUnaryHandler(
 		AdminServiceCreateStageScoreProcedure,
 		svc.CreateStageScore,
 		opts...,
-	))
-	mux.Handle(AdminServiceUpdateStageScoreProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceUpdateStageScoreHandler := connect_go.NewUnaryHandler(
 		AdminServiceUpdateStageScoreProcedure,
 		svc.UpdateStageScore,
 		opts...,
-	))
-	mux.Handle(AdminServiceListStageScoresProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceListStageScoresHandler := connect_go.NewUnaryHandler(
 		AdminServiceListStageScoresProcedure,
 		svc.ListStageScores,
 		opts...,
-	))
-	mux.Handle(AdminServiceDeleteStageScoreProcedure, connect_go.NewUnaryHandler(
+	)
+	adminServiceDeleteStageScoreHandler := connect_go.NewUnaryHandler(
 		AdminServiceDeleteStageScoreProcedure,
 		svc.DeleteStageScore,
 		opts...,
-	))
-	return "/api.v1.AdminService/", mux
+	)
+	return "/api.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case AdminServiceCreatePlayerProcedure:
+			adminServiceCreatePlayerHandler.ServeHTTP(w, r)
+		case AdminServiceUpdatePlayerProcedure:
+			adminServiceUpdatePlayerHandler.ServeHTTP(w, r)
+		case AdminServiceListPlayersProcedure:
+			adminServiceListPlayersHandler.ServeHTTP(w, r)
+		case AdminServiceListEventStagesProcedure:
+			adminServiceListEventStagesHandler.ServeHTTP(w, r)
+		case AdminServiceCreateStageScoreProcedure:
+			adminServiceCreateStageScoreHandler.ServeHTTP(w, r)
+		case AdminServiceUpdateStageScoreProcedure:
+			adminServiceUpdateStageScoreHandler.ServeHTTP(w, r)
+		case AdminServiceListStageScoresProcedure:
+			adminServiceListStageScoresHandler.ServeHTTP(w, r)
+		case AdminServiceDeleteStageScoreProcedure:
+			adminServiceDeleteStageScoreHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 }
 
 // UnimplementedAdminServiceHandler returns CodeUnimplemented from all methods.
