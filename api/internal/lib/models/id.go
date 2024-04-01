@@ -21,7 +21,7 @@ func EventIDFromString(s string) (EventID, error) {
 		return EventID{}, fmt.Errorf("parse EventID from string: %w", err)
 	}
 
-	return EventID{DatabaseULID{u}}, err
+	return EventID{DatabaseULID{u}}, nil
 }
 
 // VenueID uniquely identifies a venue.
@@ -39,7 +39,7 @@ func VenueIDFromString(s string) (VenueID, error) {
 		return VenueID{}, fmt.Errorf("parse VenueID from string: %w", err)
 	}
 
-	return VenueID{DatabaseULID{u}}, err
+	return VenueID{DatabaseULID{u}}, nil
 }
 
 // StageID uniquely identifies a stage.
@@ -57,7 +57,7 @@ func StageIDFromString(s string) (StageID, error) {
 		return StageID{}, fmt.Errorf("parse StageID from string: %w", err)
 	}
 
-	return StageID{DatabaseULID{u}}, err
+	return StageID{DatabaseULID{u}}, nil
 }
 
 // RuleID uniquely identifies an event description.
@@ -75,7 +75,7 @@ func RuleIDFromString(s string) (RuleID, error) {
 		return RuleID{}, fmt.Errorf("parse RuleID from string: %w", err)
 	}
 
-	return RuleID{DatabaseULID{u}}, err
+	return RuleID{DatabaseULID{u}}, nil
 }
 
 // PlayerID uniquely identifies a player.
@@ -93,7 +93,7 @@ func PlayerIDFromString(s string) (PlayerID, error) {
 		return PlayerID{}, fmt.Errorf("parse PlayerID from string: %w", err)
 	}
 
-	return PlayerID{DatabaseULID{u}}, err
+	return PlayerID{DatabaseULID{u}}, nil
 }
 
 // ScoreID uniquely identifies a score.
@@ -111,7 +111,7 @@ func ScoreIDFromString(s string) (ScoreID, error) {
 		return ScoreID{}, fmt.Errorf("parse ScoreID from string: %w", err)
 	}
 
-	return ScoreID{DatabaseULID{u}}, err
+	return ScoreID{DatabaseULID{u}}, nil
 }
 
 // AdjustmentID uniquely identifies a bonus or penalty.
@@ -129,5 +129,5 @@ func AdjustmentIDFromString(s string) (AdjustmentID, error) {
 		return AdjustmentID{}, fmt.Errorf("parse AdjustmentID from string: %w", err)
 	}
 
-	return AdjustmentID{DatabaseULID{u}}, err
+	return AdjustmentID{DatabaseULID{u}}, nil
 }

@@ -15,6 +15,7 @@ func (v *VenueKey) Scan(src interface{}) error {
 	if x, ok := src.(int64); ok {
 		if x >= 0 && x <= math.MaxUint32 {
 			*v = VenueKey{uint32(x)}
+
 			return nil
 		}
 
@@ -49,12 +50,14 @@ type NullUInt32 struct {
 func (n *NullUInt32) Scan(value any) error {
 	if value == nil {
 		n.UInt32, n.Valid = 0, false
+
 		return nil
 	}
 
 	if x, ok := value.(int64); ok {
 		if x >= 0 && x <= math.MaxUint32 {
 			*n = NullUInt32{uint32(x), true}
+
 			return nil
 		}
 		return fmt.Errorf("VenueKey: value out of range [0,%d]: %v", math.MaxUint32, value)
@@ -67,5 +70,6 @@ func (n NullUInt32) Value() (driver.Value, error) {
 	if !n.Valid {
 		return nil, nil
 	}
+
 	return int64(n.UInt32), nil
 }

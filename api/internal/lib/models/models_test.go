@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
 )
 
@@ -33,9 +34,13 @@ func executeTests(m *testing.M) int {
 }
 
 func initDB(t *testing.T) (context.Context, *sql.Tx, func()) {
+	t.Helper()
+
 	return dbtest.NewTestTx(t, _sharedEmptyDB)
 }
 
 func initMigratedDB(t *testing.T) (context.Context, *sql.Tx, func()) {
+	t.Helper()
+
 	return dbtest.NewTestTx(t, _sharedDB)
 }

@@ -22,7 +22,9 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 		if err != nil {
 			return fmt.Errorf("DatabaseULID scan: %w", err)
 		}
+
 		copy(db.ULID[:], parsed[:])
+
 		return nil
 	}
 
@@ -31,13 +33,16 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 		if err != nil {
 			return fmt.Errorf("DatabaseULID scan: %w", err)
 		}
+
 		copy(db.ULID[:], parsed[:])
+
 		return nil
 	}
 
 	if src == nil {
 		u := new(ulid.ULID)
 		db.ULID = *u
+
 		return nil
 	}
 
@@ -46,5 +51,5 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 
 // Value serializes a ULID into a UUID-formatted string representing the same underlying byte content.
 func (db DatabaseULID) Value() (driver.Value, error) {
-	return db.ULID.MarshalBinary()
+	return db.ULID.MarshalBinary() //nolint:wrapcheck
 }

@@ -32,6 +32,7 @@ func (sc ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
 func (sc *ScoringCategory) FromProtoEnum(pe apiv1.ScoringCategory) error {
 	var err error
 	*sc, err = ScoringCategoryString(pe.String())
+
 	return err
 }
 
@@ -41,7 +42,7 @@ type NullScoringCategory struct {
 	Valid           bool
 }
 
-// Scan implements the Scanner interface for NullScoringCategory
+// Scan implements the Scanner interface for NullScoringCategory.
 func (nsc *NullScoringCategory) Scan(value interface{}) error {
 	var sc ScoringCategory
 	if err := sc.Scan(value); err != nil {
@@ -49,6 +50,7 @@ func (nsc *NullScoringCategory) Scan(value interface{}) error {
 	}
 
 	*nsc = NullScoringCategory{sc, reflect.TypeOf(value) != nil}
+
 	return nil
 }
 
@@ -57,17 +59,19 @@ func (nsc NullScoringCategory) Value() (driver.Value, error) {
 	if !nsc.Valid {
 		return nil, nil
 	}
+
 	return nsc.ScoringCategory.Value()
 }
 
 // ProtoEnum returns an enum compatible with the generated proto code, or a nil pointer if the value was null.
 func (nsc NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
 	if !nsc.Valid {
-		return nil, nil
+		return nil, nil //nolint:nilnil // Nil is a valid return value.
 	}
 
 	if val, ok := apiv1.ScoringCategory_value[nsc.ScoringCategory.String()]; ok {
 		pe := apiv1.ScoringCategory(val)
+
 		return &pe, nil
 	}
 
@@ -78,6 +82,7 @@ func (nsc NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
 func (nsc *NullScoringCategory) FromProtoEnum(pe *apiv1.ScoringCategory) error {
 	if pe == nil {
 		*nsc = NullScoringCategory{ScoringCategoryUnspecified, false}
+
 		return nil
 	}
 
@@ -87,5 +92,6 @@ func (nsc *NullScoringCategory) FromProtoEnum(pe *apiv1.ScoringCategory) error {
 	}
 
 	*nsc = NullScoringCategory{sc, true}
+
 	return nil
 }

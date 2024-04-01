@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,6 +19,8 @@ func enumToPointer(e ScoringCategory) *ScoringCategory {
 }
 
 func TestScoringCategory_FromProtoEnum(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Description             string
 		Given                   apiv1.ScoringCategory
@@ -52,7 +53,9 @@ func TestScoringCategory_FromProtoEnum(t *testing.T) {
 	}
 
 	for n, v := range apiv1.ScoringCategory_value {
-		t.Run(fmt.Sprintf("Valid conversion for proto enum %s", n), func(t *testing.T) {
+		t.Run("Valid conversion for proto enum "+n, func(t *testing.T) {
+			t.Parallel()
+
 			pe := apiv1.ScoringCategory(v)
 
 			var nsc NullScoringCategory
@@ -65,6 +68,8 @@ func TestScoringCategory_FromProtoEnum(t *testing.T) {
 }
 
 func TestScoringCategory_ProtoEnum(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Description       string
 		Given             ScoringCategory
@@ -81,6 +86,8 @@ func TestScoringCategory_ProtoEnum(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.Description, func(t *testing.T) {
+			t.Parallel()
+
 			pe, err := tc.Given.ProtoEnum()
 
 			if tc.ExpectedProtoEnum != nil {
@@ -95,9 +102,10 @@ func TestScoringCategory_ProtoEnum(t *testing.T) {
 		})
 	}
 
-	for _, v := range ScoringCategoryValues() {
-		sc := ScoringCategory(v)
-		t.Run(fmt.Sprintf("Valid conversion for enum %s", sc.String()), func(t *testing.T) {
+	for _, sc := range ScoringCategoryValues() {
+		t.Run("Valid conversion for enum "+sc.String(), func(t *testing.T) {
+			t.Parallel()
+
 			pe, err := sc.ProtoEnum()
 
 			assert.Equal(t, sc.String(), pe.String())
@@ -107,9 +115,14 @@ func TestScoringCategory_ProtoEnum(t *testing.T) {
 }
 
 func TestNullScoringCategory_Scan(t *testing.T) {
+	t.Parallel()
+
 	t.Run("NULL values scan correctly", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initMigratedDB(t)
 		defer cleanup()
+
 		_, err := tx.ExecContext(ctx, `
 			CREATE TABLE TestNullScoringCategory_Scan(
 				id SERIAL PRIMARY KEY,
@@ -135,6 +148,8 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 	})
 
 	t.Run("All DB enums correctly scan", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initMigratedDB(t)
 		defer cleanup()
 
@@ -158,9 +173,14 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 }
 
 func TestNullScoringCategory_Value(t *testing.T) {
+	t.Parallel()
+
 	t.Run("NULL values save correctly", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initMigratedDB(t)
 		defer cleanup()
+
 		_, err := tx.ExecContext(ctx, `
 			CREATE TABLE TestNullScoringCategory_Value(
 				id SERIAL PRIMARY KEY,
@@ -187,10 +207,15 @@ func TestNullScoringCategory_Value(t *testing.T) {
 	})
 
 	t.Run("All enums correctly persist to the DB", func(t *testing.T) {
+		t.Parallel()
+
 		for _, sc := range ScoringCategoryValues() {
 			t.Run(sc.String(), func(t *testing.T) {
+				t.Parallel()
+
 				ctx, tx, cleanup := initMigratedDB(t)
 				defer cleanup()
+
 				_, err := tx.ExecContext(ctx, `
 					CREATE TABLE TestNullScoringCategory_Value(
 						id SERIAL PRIMARY KEY,
@@ -216,6 +241,8 @@ func TestNullScoringCategory_Value(t *testing.T) {
 }
 
 func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Description             string
 		Given                   *apiv1.ScoringCategory
@@ -248,13 +275,17 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.Description, func(t *testing.T) {
+			t.Parallel()
+
 			var nsc NullScoringCategory
 			err := nsc.FromProtoEnum(tc.Given)
 
 			if tc.ExpectedScoringCategory != nil {
 				assert.Equal(t, tc.ExpectedScoringCategory, nsc.ScoringCategory)
 			}
+
 			assert.Equal(t, tc.ExpectedValid, nsc.Valid)
+
 			if tc.ExpectedError {
 				assert.Error(t, err)
 			} else {
@@ -264,7 +295,9 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 	}
 
 	for n, v := range apiv1.ScoringCategory_value {
-		t.Run(fmt.Sprintf("Valid conversion for proto enum %s", n), func(t *testing.T) {
+		t.Run("Valid conversion for proto enum "+n, func(t *testing.T) {
+			t.Parallel()
+
 			pe := apiv1.ScoringCategory(v)
 
 			var nsc NullScoringCategory
@@ -277,6 +310,8 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 }
 
 func TestNullScoringCategory_ProtoEnum(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Description       string
 		Given             NullScoringCategory
@@ -308,6 +343,7 @@ func TestNullScoringCategory_ProtoEnum(t *testing.T) {
 			pe, err := tc.Given.ProtoEnum()
 
 			assert.Equal(t, tc.ExpectedProtoEnum, pe)
+
 			if tc.ExpectedError {
 				assert.Error(t, err)
 			} else {
@@ -316,11 +352,12 @@ func TestNullScoringCategory_ProtoEnum(t *testing.T) {
 		})
 	}
 
-	for _, v := range ScoringCategoryValues() {
-		nsc := NullScoringCategory{ScoringCategory(v), true}
-		t.Run(fmt.Sprintf("Valid conversion for enum %s", nsc.ScoringCategory.String()), func(t *testing.T) {
-			pe, err := nsc.ProtoEnum()
+	for _, sc := range ScoringCategoryValues() {
+		nsc := NullScoringCategory{sc, true}
+		t.Run("Valid conversion for enum "+nsc.ScoringCategory.String(), func(t *testing.T) {
+			t.Parallel()
 
+			pe, err := nsc.ProtoEnum()
 			assert.Equal(t, nsc.ScoringCategory.String(), pe.String())
 			assert.NoError(t, err)
 		})
