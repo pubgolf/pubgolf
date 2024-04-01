@@ -21,7 +21,7 @@ service PubGolfService {
   // Deprecated: Use `StartPlayerLogin` RPC instead.
   rpc CreatePlayer(PubGolfServiceCreatePlayerRequest) returns (PubGolfServiceCreatePlayerResponse) {
     option deprecated = true;
-  } 
+  }
 
   // StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
   rpc StartPlayerLogin(StartPlayerLoginRequest) returns (StartPlayerLoginResponse) {}
