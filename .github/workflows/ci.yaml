@@ -54,6 +54,11 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          working-directory: tools
+          args: --config=../.golangci.yaml
       - name: Test
         run: go test ./tools/lib/...
       - name: Build
@@ -76,6 +81,11 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          working-directory: api
+          args: --config=../.golangci.yaml
       - name: Test
         run: go test ./api/...
       - name: Build API Server Binary

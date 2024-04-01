@@ -1,0 +1,79 @@
+output:
+  show-stats: true
+linters:
+  enable-all: true
+  disable:
+    # TODO: Enable
+    - contextcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - gci
+    - gocritic
+    - godot
+    - gofumpt
+    - gosec
+    - intrange
+    - ireturn
+    - makezero
+    - nilnil
+    - nonamedreturns
+    - paralleltest
+    - perfsprint
+    - protogetter
+    - revive
+    - rowserrcheck
+    - testifylint
+    - thelper
+    - unconvert
+    - wrapcheck
+
+    # Investigate enabling
+
+    # Finding a lot of duplication in test files
+    - dupl
+    # False positives on stdlib configuration structs
+    - exhaustruct
+    # Takes issue with lots of our errors.New() calls
+    - goerr113
+    # Newline before return
+    - nlreturn
+    # Doesn't like random blank lines at the begging of blocks
+    - whitespace
+    # Lots of complaints about newlines between variable definitions and blocks
+    - wsl
+
+    # No plans to enable (mostly complexity measures or extremely dogmatic).
+    - cyclop
+    - depguard
+    - dogsled
+    - execinquery
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - godox
+    - gomnd
+    - lll
+    - maintidx
+    - prealloc
+    - tagalign
+    - tagliatelle
+    - testpackage
+    - unparam
+    - unused
+    - varnamelen
+
+    # Deprecated checks: deactivating to suppress warning.
+    - deadcode
+    - exhaustivestruct
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nosnakecase
+    - scopelint
+    - structcheck
+    - varcheck
