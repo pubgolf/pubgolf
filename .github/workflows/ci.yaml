@@ -57,7 +57,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v4
         with:
-          args: ./tools
+          args: ./tools/...
       - name: Test
         run: go test ./tools/lib/...
       - name: Build
@@ -83,7 +83,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v4
         with:
-          args: ./api
+          args: ./api/...
       - name: Test
         run: go test ./api/...
       - name: Build API Server Binary
