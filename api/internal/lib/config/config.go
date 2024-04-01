@@ -37,7 +37,7 @@ type App struct {
 	HoneycombKey   string `split_words:"true"`
 	AppDatabaseURL string `required:"true" split_words:"true"`
 
-	// Web App Auth
+	// 1st party credentials and entropy
 	AdminAuth WebAppAuth `required:"true" split_words:"true"`
 }
 
