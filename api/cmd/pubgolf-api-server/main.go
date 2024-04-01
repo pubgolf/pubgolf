@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -57,6 +58,7 @@ func main() {
 	// Run migrations and exit if migrator instance.
 	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
 	flag.Parse()
+
 	if *migrationFlag {
 		bootSpan.SetAttributes(attribute.String("service.type", "migrator"))
 		log.Println("Migrator instance: starting database migrations...")
@@ -68,8 +70,10 @@ func main() {
 
 		log.Println("Migrator instance: completed migrations and shutting down...")
 		bootSpan.End()
+
 		return
 	}
+
 	bootSpan.SetAttributes(attribute.String("service.type", "server"))
 
 	// Initialize server.
@@ -82,9 +86,11 @@ func main() {
 	// Run server.
 	bootSpan.End()
 	log.Printf("Listening on port %d...", cfg.Port)
-	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+
+	if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		guard(err, "listen and serve")
 	}
+
 	log.Println("Server stopped")
 }
 

@@ -5,10 +5,15 @@ import (
 	"errors"
 
 	"github.com/bufbuild/connect-go"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 )
 
-const tokenHeader = "X-PubGolf-Auth"
+const tokenHeader = "X-PubGolf-Auth" //nolint:gosec
+
+var errMissingAuthToken = errors.New("no auth token provided")
+
+var errInvalidAuthToken = errors.New("invalid auth token")
 
 // NewAdminAuthInterceptor guards against requests which don't contain a valid auth token.
 func NewAdminAuthInterceptor(cfg *config.App) connect.UnaryInterceptorFunc {
@@ -20,18 +25,20 @@ func NewAdminAuthInterceptor(cfg *config.App) connect.UnaryInterceptorFunc {
 			if req.Header().Get(tokenHeader) == "" {
 				return nil, connect.NewError(
 					connect.CodeUnauthenticated,
-					errors.New("no auth token provided"),
+					errMissingAuthToken,
 				)
 			}
 
 			if req.Header().Get(tokenHeader) != cfg.AdminAuth.AdminServiceToken {
 				return nil, connect.NewError(
-					connect.CodeUnauthenticated,
-					errors.New("invalid auth token"),
+					connect.CodePermissionDenied,
+					errInvalidAuthToken,
 				)
 			}
+
 			return next(ctx, req)
 		})
 	}
+
 	return connect.UnaryInterceptorFunc(interceptor)
 }

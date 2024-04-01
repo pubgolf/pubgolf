@@ -46,7 +46,7 @@ func Recoverer(next http.Handler) http.Handler {
 // NewRecoveringInterceptor handles panics that occur within a gRPC handler by recovering, adding the stack trace to the logs and OTel span, and returning a connect error message to the client.
 func NewRecoveringInterceptor() connect.UnaryInterceptorFunc {
 	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
-		return connect.UnaryFunc(func(ctx context.Context, req connect.AnyRequest) (res connect.AnyResponse, err error) {
+		return connect.UnaryFunc(func(ctx context.Context, req connect.AnyRequest) (res connect.AnyResponse, err error) { //nolint:nonamedreturns
 			defer func() {
 				if rvr := recover(); rvr != nil {
 					span := trace.SpanFromContext(ctx)
@@ -64,5 +64,6 @@ func NewRecoveringInterceptor() connect.UnaryInterceptorFunc {
 			return // Implicit return due to named return vars
 		})
 	}
+
 	return connect.UnaryInterceptorFunc(interceptor)
 }
