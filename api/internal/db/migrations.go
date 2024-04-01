@@ -1,3 +1,4 @@
+// Package db contains raw SQL and utilities for managing the database, such as migrations and seeds.
 package db
 
 import (

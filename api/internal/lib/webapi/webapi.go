@@ -1,3 +1,4 @@
+// Package webapi implements a "pure HTTP" (i.e. not gRPC) server to allow the web app to securely persist auth tokens as cookies, while itself remaining statically generated.
 package webapi
 
 import (

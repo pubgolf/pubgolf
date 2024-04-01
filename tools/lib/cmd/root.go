@@ -1,3 +1,4 @@
+// Package cmd contains handlers for each CLI command.
 package cmd
 
 import (

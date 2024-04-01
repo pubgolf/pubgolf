@@ -110,13 +110,8 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	}
 
 	// Hold process open
-	for {
-		select {
-		case <-shuttingDown:
-			stopFn()
-			return
-		}
-	}
+	<-shuttingDown
+	stopFn()
 }
 
 func dopplerGoRun(project, env, bin string, args []string, stopOnExit bool) func() {

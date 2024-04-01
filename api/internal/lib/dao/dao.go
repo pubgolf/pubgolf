@@ -1,3 +1,4 @@
+// Package dao contains methods for accessing the database.
 package dao
 
 import (
@@ -83,7 +84,7 @@ func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
 	case *dbc.MockQuerier:
 		return tDBC, fmt.Errorf("dbc.MockQuerier does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", ErrTransactedQuerier)
 	default:
-		return tDBC, fmt.Errorf("Type %T does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", dbc, ErrTransactedQuerier)
+		return tDBC, fmt.Errorf("type %T does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", dbc, ErrTransactedQuerier)
 	}
 }
 

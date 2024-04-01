@@ -1,3 +1,4 @@
+// Package shared contains RPC endpoint handlers that are exposed (or wrapped) in multiple RPC services (e.g. player-facing functionality that is useful for admins).
 package shared
 
 import (

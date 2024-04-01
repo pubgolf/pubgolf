@@ -42,7 +42,7 @@ func parseJSONRequest(w http.ResponseWriter, r *http.Request, dst interface{}) e
 			return &malformedRequest{OriginalErr: err, Status: errorCodeMalformedRequest, Msg: msg}
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
-			msg := fmt.Sprintf("Request body contains badly-formed JSON")
+			msg := "Request body contains badly-formed JSON"
 			return &malformedRequest{OriginalErr: err, Status: errorCodeMalformedRequest, Msg: msg}
 
 		case errors.As(err, &unmarshalTypeError):

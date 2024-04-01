@@ -89,7 +89,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 			}
 		}
 
-		var rankCopy uint32 = uint32(i + 1)
+		rankCopy := uint32(i + 1)
 		venueID := s.VenueID.String()
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 			EntityId:           &venueID,

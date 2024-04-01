@@ -1,3 +1,4 @@
+// Package telemetry contains setup and helpers for working with OpenTelemetry instrumentation (spans).
 package telemetry
 
 import (

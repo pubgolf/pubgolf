@@ -1,3 +1,4 @@
+// Package public contains endpoint handlers for the player-facing PubGolfService.
 package public
 
 import (

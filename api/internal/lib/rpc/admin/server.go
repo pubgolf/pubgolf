@@ -1,3 +1,4 @@
+// Package admin contains endpoint handlers for the AdminService.
 package admin
 
 import (

@@ -1,10 +1,11 @@
+// Package dbtest provides helpers for running queries against a live database for testing purposes.
 package dbtest
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
+	epg "github.com/fergusstrange/embedded-postgres"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jackc/pgx/v5"
@@ -31,15 +32,15 @@ func New(namespace string, enableLogging bool) (*sql.DB, func()) {
 	tempDir, err := os.MkdirTemp(os.TempDir(), "pubgolf-api-"+namespace+"-")
 	guardSetup(err, "make temp dir")
 
-	pgConfig := embeddedpostgres.DefaultConfig().
-		Version(embeddedpostgres.V15).
+	pgConfig := epg.DefaultConfig().
+		Version(epg.V15).
 		Port(uint32(port)).
 		RuntimePath(tempDir)
 	if !enableLogging {
-		pgConfig = pgConfig.Logger(ioutil.Discard)
+		pgConfig = pgConfig.Logger(io.Discard)
 	}
 
-	db := embeddedpostgres.NewDatabase(pgConfig)
+	db := epg.NewDatabase(pgConfig)
 	guardSetup(db.Start(), "start test DB")
 
 	cfg, err := pgx.ParseConfig(dbURL)

@@ -1,3 +1,4 @@
+// Package middleware contains logic for pre- or post-processing of requests at the HTTP or Connect (gRPC) level, such as auth, logging and panic recovery.
 package middleware
 
 import (

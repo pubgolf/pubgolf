@@ -1,4 +1,4 @@
-// Package config provides a typed/structured config holder.
+// Package config provides a typed/structured config holder as well as logic to parse from env vars.
 package config
 
 import (
