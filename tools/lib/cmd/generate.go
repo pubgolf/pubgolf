@@ -127,6 +127,17 @@ var generateMockCmd = &cobra.Command{
 			}),
 			"generate mock DAO",
 		)
+
+		guard(
+			generateInterfaceAndMock(mockConfig{
+				targetStruct: "Client",
+				ifaceName:    "Messenger",
+				ifaceComment: "Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.",
+				genDir:       filepath.FromSlash("api/internal/lib/sms/"),
+				pkgName:      "sms",
+			}),
+			"generate mock SMS Client",
+		)
 	},
 }
 
