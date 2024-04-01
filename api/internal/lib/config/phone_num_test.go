@@ -20,7 +20,7 @@ func TestPhoneNumSet(t *testing.T) {
 		t.Parallel()
 
 		pns := PhoneNumSet{}
-		require.NoError(t, pns.set("*"))
+		require.NoError(t, pns.Set("*"))
 
 		for range numTrials {
 			matchNum := models.PhoneNum(faker.E164PhoneNumber())
@@ -32,7 +32,7 @@ func TestPhoneNumSet(t *testing.T) {
 		t.Parallel()
 
 		pns := PhoneNumSet{}
-		require.NoError(t, pns.set(""))
+		require.NoError(t, pns.Set(""))
 
 		for range numTrials {
 			matchNum := models.PhoneNum(faker.E164PhoneNumber())
@@ -58,7 +58,7 @@ func TestPhoneNumSet(t *testing.T) {
 
 			// Valid matches
 			pns := PhoneNumSet{}
-			require.NoError(t, pns.set(strings.Join(inputElems, ",")))
+			require.NoError(t, pns.Set(strings.Join(inputElems, ",")))
 			assert.True(t, pns.Match(models.PhoneNum(matchNum)))
 
 			// Invalid matches
@@ -92,7 +92,7 @@ func TestPhoneNumSet(t *testing.T) {
 			}
 
 			pns := PhoneNumSet{}
-			require.NoError(t, pns.set(strings.Join(matchedStrings, ",")))
+			require.NoError(t, pns.Set(strings.Join(matchedStrings, ",")))
 
 			// All expected numbers match.
 			for num := range matchedNums {

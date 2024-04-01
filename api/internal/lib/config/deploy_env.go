@@ -31,7 +31,7 @@ func allDeployEnvs() []DeployEnv {
 var errInvalidDeployEnvValue = errors.New("invalid enum value")
 
 // Set attempts to parse a `DeployEnv` value from a string and returns an error on invalid values.
-func (env *DeployEnv) set(value string) error {
+func (env *DeployEnv) Set(value string) error {
 	v := strings.ToLower(value)
 	for _, e := range allDeployEnvs() {
 		if v == string(e) {

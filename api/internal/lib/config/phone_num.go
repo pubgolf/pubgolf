@@ -14,7 +14,7 @@ type PhoneNumSet struct {
 }
 
 // Set parses a PhoneNumSet from a comma-separated list of E.164 formatted phone numbers, or treats the literal "*" as a wildcard. Extra commas will be ignored, and an error will be thrown on any malformed phone numbers.
-func (pns *PhoneNumSet) set(value string) error {
+func (pns *PhoneNumSet) Set(value string) error {
 	if value == "*" {
 		*pns = PhoneNumSet{
 			universal: true,
