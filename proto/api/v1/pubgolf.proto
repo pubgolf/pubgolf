@@ -19,7 +19,9 @@ service PubGolfService {
   // CreatePlayer creates a new player profile for a given event.
   //
   // Deprecated: Use `StartPlayerLogin` RPC instead.
-  rpc CreatePlayer(PubGolfServiceCreatePlayerRequest) returns (PubGolfServiceCreatePlayerResponse) {}
+  rpc CreatePlayer(PubGolfServiceCreatePlayerRequest) returns (PubGolfServiceCreatePlayerResponse) {
+    option deprecated = true;
+  } 
 
   // StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
   rpc StartPlayerLogin(StartPlayerLoginRequest) returns (StartPlayerLoginResponse) {}

@@ -28,7 +28,8 @@ func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *
 	playerParams := models.PlayerParams{
 		Name: playerData.Name,
 	}
-	err = playerParams.ScoringCategory.FromProtoEnum(playerData.ScoringCategory)
+	// Ignore deprecation warning because entire RPC is slated for deprecation.
+	err = playerParams.ScoringCategory.FromProtoEnum(playerData.ScoringCategory) //nolint:staticcheck
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}

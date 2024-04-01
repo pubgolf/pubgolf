@@ -82,6 +82,8 @@ type PubGolfServiceClient interface {
 	// CreatePlayer creates a new player profile for a given event.
 	//
 	// Deprecated: Use `StartPlayerLogin` RPC instead.
+	//
+	// Deprecated: do not use.
 	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
 	// StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
 	StartPlayerLogin(context.Context, *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error)
@@ -208,6 +210,8 @@ func (c *pubGolfServiceClient) ClientVersion(ctx context.Context, req *connect_g
 }
 
 // CreatePlayer calls api.v1.PubGolfService.CreatePlayer.
+//
+// Deprecated: do not use.
 func (c *pubGolfServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error) {
 	return c.createPlayer.CallUnary(ctx, req)
 }
@@ -274,6 +278,8 @@ type PubGolfServiceHandler interface {
 	// CreatePlayer creates a new player profile for a given event.
 	//
 	// Deprecated: Use `StartPlayerLogin` RPC instead.
+	//
+	// Deprecated: do not use.
 	CreatePlayer(context.Context, *connect_go.Request[v1.PubGolfServiceCreatePlayerRequest]) (*connect_go.Response[v1.PubGolfServiceCreatePlayerResponse], error)
 	// StartPlayerLogin (unauthenticated) registers the player's contact info if the player doesn't exist, then sends an auth code.
 	StartPlayerLogin(context.Context, *connect_go.Request[v1.StartPlayerLoginRequest]) (*connect_go.Response[v1.StartPlayerLoginResponse], error)

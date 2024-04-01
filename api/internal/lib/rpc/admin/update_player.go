@@ -19,7 +19,8 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 		Name: req.Msg.PlayerData.Name,
 	}
 
-	err := playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory)
+	// TODO: Move this functionality to another RPC since scoring category is no longer inherent to a player.
+	err := playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory) //nolint:staticcheck
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument Player.ScoringCategory: %w", err))
 	}

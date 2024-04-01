@@ -33,6 +33,7 @@ export const PubGolfService = {
      * Deprecated: Use `StartPlayerLogin` RPC instead.
      *
      * @generated from rpc api.v1.PubGolfService.CreatePlayer
+     * @deprecated
      */
     createPlayer: {
       name: "CreatePlayer",
