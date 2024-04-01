@@ -34,6 +34,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/admin"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/public"
+	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 	"github.com/pubgolf/pubgolf/api/internal/lib/webapi"
 )
@@ -74,7 +75,8 @@ func main() {
 	// Initialize server.
 	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev)
 	guard(err, "init DAO")
-	server := makeServer(cfg, dao)
+	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
+	server := makeServer(cfg, dao, mes)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -109,7 +111,7 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
+func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.ChiMiddleware(r)...)
 
@@ -126,7 +128,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider) *http.Server {
 		)
 
 		rpcMux := http.NewServeMux()
-		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao),
+		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes),
 			connect.WithInterceptors(middleware.ConnectInterceptors()...),
 		))
 		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),

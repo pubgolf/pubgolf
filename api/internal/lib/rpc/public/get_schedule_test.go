@@ -115,7 +115,7 @@ func assertTimestampsMatch(t *testing.T, expected, actual time.Time) {
 func TestGetSchedule(t *testing.T) {
 	t.Run("Does not error on empty event schedule", func(t *testing.T) {
 		mockDAO := new(dao.MockQueryProvider)
-		s := NewServer(mockDAO)
+		s := makeTestServer(mockDAO)
 
 		eventKey := "my-testing-key"
 		eventID := models.EventIDFromULID(ulid.Make())
@@ -135,7 +135,7 @@ func TestGetSchedule(t *testing.T) {
 	t.Run("Calculating event schedule", func(t *testing.T) {
 		t.Run("Handles pre-event state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -160,7 +160,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles first venue, pre-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -185,7 +185,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles first venue, post-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -210,7 +210,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles fifth venue, pre-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -235,7 +235,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles fifth venue, post-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -260,7 +260,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles last venue, pre-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -285,7 +285,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles last venue, post-visibility state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -310,7 +310,7 @@ func TestGetSchedule(t *testing.T) {
 
 		t.Run("Handles post-event state", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -339,7 +339,7 @@ func TestGetSchedule(t *testing.T) {
 	t.Run("Calculating data cache", func(t *testing.T) {
 		t.Run("Returns data version from EventScheduleCacheVersion call", func(t *testing.T) {
 			mockDAO := new(dao.MockQueryProvider)
-			s := NewServer(mockDAO)
+			s := makeTestServer(mockDAO)
 
 			eventKey := "my-testing-key"
 			eventID := models.EventIDFromULID(ulid.Make())
@@ -361,7 +361,7 @@ func TestGetSchedule(t *testing.T) {
 		t.Run("When request is missing CachedDataVersion", func(t *testing.T) {
 			t.Run("Returns schedule when hash matches", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -381,7 +381,7 @@ func TestGetSchedule(t *testing.T) {
 			})
 			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -404,7 +404,7 @@ func TestGetSchedule(t *testing.T) {
 		t.Run("When request has lower cache data version", func(t *testing.T) {
 			t.Run("Returns schedule when hash matches", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -424,7 +424,7 @@ func TestGetSchedule(t *testing.T) {
 			})
 			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -447,7 +447,7 @@ func TestGetSchedule(t *testing.T) {
 		t.Run("When request has matching cache data version", func(t *testing.T) {
 			t.Run("Does not return schedule when hash matches", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -467,7 +467,7 @@ func TestGetSchedule(t *testing.T) {
 			})
 			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -490,7 +490,7 @@ func TestGetSchedule(t *testing.T) {
 		t.Run("When request has greater cache data version", func(t *testing.T) {
 			t.Run("Returns schedule when hash matches", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
@@ -510,7 +510,7 @@ func TestGetSchedule(t *testing.T) {
 			})
 			t.Run("Returns schedule when hash doesn't match", func(t *testing.T) {
 				mockDAO := new(dao.MockQueryProvider)
-				s := NewServer(mockDAO)
+				s := makeTestServer(mockDAO)
 
 				eventKey := "my-testing-key"
 				eventID := models.EventIDFromULID(ulid.Make())
