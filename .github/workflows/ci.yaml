@@ -31,17 +31,17 @@ jobs:
         uses: bufbuild/buf-breaking-action@v1
         with:
           against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
-      - name: Generate Protos
+      - name: Generate Client Libs
         run: |
           buf generate --template buf.gen.ci.yaml
           cd build/proto/swift
-          zip -r ${{ github.workspace }}/build/proto.zip ./*
-      - name: Upload Generated Protos as CI Artifact
+          zip -r ${{ github.workspace }}/build/swift-client-lib.zip ./*
+      - name: Upload Generated Client Libs as CI Artifact
         uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
           name: generated-protos
-          path: build/proto.zip
+          path: build/swift-client-lib.zip
 
   tools_build_and_check:
     name: Build and Check Tools
@@ -145,7 +145,7 @@ jobs:
       - tools_build_and_check
     runs-on: ubuntu-latest
     steps:
-      - name: Download CI Artifact
+      - name: Download Generated RPC Client Libs
         uses: actions/download-artifact@v4
         with:
           name: generated-protos
@@ -159,7 +159,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            proto.zip
+            swift-client-lib.zip
             pubgolf-devctrl
           tag_name: sha-${{ env.SHORT_SHA }}
 
