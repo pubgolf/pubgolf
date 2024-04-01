@@ -33,12 +33,23 @@ type App struct {
 	WebAppUpstreamHost string    `split_words:"true"`
 	HostOrigin         string    `required:"true" split_words:"true"`
 
+	// Behavioral config
+	SMSAllowList PhoneNumSet `split_words:"true" default:"*"`
+
 	// Credentials
-	HoneycombKey   string `split_words:"true"`
-	AppDatabaseURL string `required:"true" split_words:"true"`
+	HoneycombKey   string     `split_words:"true"`
+	AppDatabaseURL string     `required:"true" split_words:"true"`
+	Twilio         TwilioAuth `required:"true" split_words:"true"`
 
 	// 1st party credentials and entropy
 	AdminAuth WebAppAuth `required:"true" split_words:"true"`
+}
+
+// TwilioAuth contains Twilio credentials.
+type TwilioAuth struct {
+	AccountSID      string `required:"true" split_words:"true"`
+	AuthToken       string `required:"true" split_words:"true"`
+	VerificationSID string `required:"true" split_words:"true"`
 }
 
 // WebAppAuth contains auth params for the admin user.
