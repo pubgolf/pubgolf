@@ -29,10 +29,16 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 			span := trace.SpanFromContext(ctx)
 			span.SetAttributes(attribute.String("rpc.args", string(args)))
 
-			if connectErr := new(connect.Error); errors.As(err, &connectErr) {
-				span.SetAttributes(attribute.String("error.message", connectErr.Message()))
+			if err != nil {
+				if connectErr := new(connect.Error); errors.As(err, &connectErr) {
+					span.SetAttributes(attribute.String("error.message", connectErr.Message()))
 
-				log.Printf("%s.%s(%s) completed in %q with code: \"%d %s\" error: %q\n", service, method, args, duration, connectErr.Code(), connectErr.Code(), connectErr.Message())
+					log.Printf("%s.%s(%s) completed in %q with code: \"%d %s\" error: %q\n", service, method, args, duration, connectErr.Code(), connectErr.Code(), connectErr.Message())
+				} else {
+					span.SetAttributes(attribute.String("error.message", err.Error()))
+
+					log.Printf("%s.%s(%s) completed in %q with an unhandled error: %q\n", service, method, args, duration, err)
+				}
 			} else {
 				log.Printf("%s.%s(%s) completed in %q successfully\n", service, method, args, duration)
 			}
@@ -40,5 +46,6 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 			return resp, err
 		})
 	}
+
 	return connect.UnaryInterceptorFunc(interceptor)
 }
