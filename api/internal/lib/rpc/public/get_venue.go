@@ -14,23 +14,25 @@ import (
 
 // GetVenue returns display information for the provided venue keys.
 func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVenueRequest]) (*connect.Response[apiv1.GetVenueResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	venues := make(map[uint32]*apiv1.GetVenueResponse_VenueWrapper, len(req.Msg.VenueKeys))
-	for _, vk := range req.Msg.VenueKeys {
+	venues := make(map[uint32]*apiv1.GetVenueResponse_VenueWrapper, len(req.Msg.GetVenueKeys()))
+	for _, vk := range req.Msg.GetVenueKeys() {
 		v, err := s.dao.VenueByKey(ctx, eventID, models.VenueKeyFromUInt32(vk))
 		if err != nil {
 			// Invalid keys likely mean an out of date schedule, so return an empty venue wrapper as a signal for the client to re-fetch.
 			if errors.Is(err, sql.ErrNoRows) {
 				venues[vk] = nil
+
 				continue
 			}
 

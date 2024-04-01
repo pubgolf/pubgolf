@@ -14,7 +14,7 @@ import (
 
 // GetPlayer returns a full player object as specified by ID.
 func (s *Server) GetPlayer(ctx context.Context, req *connect.Request[apiv1.GetPlayerRequest]) (*connect.Response[apiv1.GetPlayerResponse], error) {
-	playerID, err := models.PlayerIDFromString(req.Msg.PlayerId)
+	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
@@ -24,6 +24,7 @@ func (s *Server) GetPlayer(ctx context.Context, req *connect.Request[apiv1.GetPl
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 

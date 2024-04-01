@@ -16,17 +16,18 @@ import (
 
 // GetScoresForPlayer returns a player's personal scorecard.
 func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[apiv1.GetScoresForPlayerRequest]) (*connect.Response[apiv1.GetScoresForPlayerResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	playerID, err := models.PlayerIDFromString(req.Msg.PlayerId)
+	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
@@ -132,8 +133,10 @@ func decorateAdjustmentLabel(l string, v int32) string {
 	if v < 0 {
 		return "😇 " + l
 	}
+
 	if v > 0 {
 		return "😈 " + l
 	}
+
 	return l
 }

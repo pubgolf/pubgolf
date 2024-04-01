@@ -20,13 +20,14 @@ const nextVenueVisibilityDuration = time.Duration(10) * time.Minute
 
 // GetSchedule returns the list of past venues, the current venue, and next venue plus transition time (if currently visible to clients).
 func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.GetScheduleRequest]) (*connect.Response[apiv1.GetScheduleResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
@@ -95,6 +96,7 @@ func venueKeysUntilIndex(venues []dao.VenueStop, idx int) []uint32 {
 func venueKeyAtIndex(venues []dao.VenueStop, idx int) *uint32 {
 	if idx >= 0 && idx < len(venues) {
 		v := venues[idx].VenueKey.UInt32()
+
 		return &v
 	}
 
@@ -105,6 +107,7 @@ func venueKeyAtIndex(venues []dao.VenueStop, idx int) *uint32 {
 func descriptionAtIndex(venues []dao.VenueStop, idx int) *string {
 	if idx >= 0 && idx < len(venues) {
 		v := venues[idx].Description
+
 		return &v
 	}
 
@@ -112,7 +115,7 @@ func descriptionAtIndex(venues []dao.VenueStop, idx int) *string {
 }
 
 // nextVenueStartOffset returns an offset duration from the event's start time, indicating the starting time for the next venue. If there is no next venue, `ok` will be false.
-func nextVenueStartOffset(venues []dao.VenueStop, idx int) (offset time.Duration, ok bool) {
+func nextVenueStartOffset(venues []dao.VenueStop, idx int) (time.Duration, bool) {
 	if idx < 0 {
 		return time.Duration(0), true
 	}
@@ -128,6 +131,7 @@ func nextVenueStartOffset(venues []dao.VenueStop, idx int) (offset time.Duration
 func nextVenueStart(eventStart time.Time, venueOffset time.Duration, hasNextVenue bool) *time.Time {
 	if hasNextVenue {
 		t := eventStart.Add(venueOffset)
+
 		return &t
 	}
 
@@ -139,6 +143,7 @@ func nextVenue(venues []dao.VenueStop, idx int, nextVenueStart *time.Time) *uint
 	nextVenueExists := nextVenueStart != nil
 	inPreviewPeriod := func() bool { return time.Until(*nextVenueStart) < nextVenueVisibilityDuration }
 	eventHasNotStarted := idx == -1
+
 	if nextVenueExists && (inPreviewPeriod() || eventHasNotStarted) {
 		return venueKeyAtIndex(venues, idx+1)
 	}
@@ -152,6 +157,7 @@ func totalDuration(venues []dao.VenueStop) time.Duration {
 	for _, v := range venues {
 		total += v.Duration
 	}
+
 	return total
 }
 

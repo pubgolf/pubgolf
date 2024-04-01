@@ -14,9 +14,9 @@ const (
 )
 
 // ClientVersion accepts the API version from the client and returns whether or not it is compatible with the current server version.
-func (s *Server) ClientVersion(ctx context.Context, req *connect.Request[apiv1.ClientVersionRequest]) (*connect.Response[apiv1.ClientVersionResponse], error) {
+func (s *Server) ClientVersion(_ context.Context, req *connect.Request[apiv1.ClientVersionRequest]) (*connect.Response[apiv1.ClientVersionResponse], error) {
 	return connect.NewResponse(&apiv1.ClientVersionResponse{
-		VersionStatus: statusForVersion(req.Msg.ClientVersion),
+		VersionStatus: statusForVersion(req.Msg.GetClientVersion()),
 	}), nil
 }
 

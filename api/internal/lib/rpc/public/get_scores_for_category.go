@@ -16,22 +16,24 @@ import (
 
 // GetScoresForCategory returns a scoreboard for the overall competition.
 func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[apiv1.GetScoresForCategoryRequest]) (*connect.Response[apiv1.GetScoresForCategoryResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	if req.Msg.Category.Enum() == nil {
+	if req.Msg.GetCategory().Enum() == nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("missing argument `category`"))
 	}
 
 	var category models.ScoringCategory
-	err = category.FromProtoEnum(*req.Msg.Category.Enum())
+
+	err = category.FromProtoEnum(*req.Msg.GetCategory().Enum())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unrecognized enum value: %w", err))
 	}
@@ -77,9 +79,11 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		}
 
 		status := apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
+
 		if int(c.NumScores) == numScoredStages-1 {
 			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
 		}
+
 		if int(c.NumScores) >= numScoredStages {
 			status = apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 			rankCopy = &rank
