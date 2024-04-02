@@ -4,37 +4,24 @@ linters:
   enable-all: true
   disable:
     # TODO: Enable
-    - contextcheck
     - errcheck
-    - errname
-    - errorlint
     - exhaustive
     - gci
     - gocritic
-    - godot
     - gofumpt
     - gosec
-    - intrange
-    - ireturn
-    - makezero
-    - nilnil
-    - nonamedreturns
     - paralleltest
     - perfsprint
     - protogetter
     - revive
-    - rowserrcheck
     - testifylint
     - thelper
-    - unconvert
     - wrapcheck
 
     # Investigate enabling
 
     # Finding a lot of duplication in test files
     - dupl
-    # False positives on stdlib configuration structs
-    - exhaustruct
     # Takes issue with lots of our errors.New() calls
     - goerr113
     # Newline before return
@@ -49,6 +36,7 @@ linters:
     - depguard
     - dogsled
     - execinquery
+    - exhaustruct
     - funlen
     - gochecknoglobals
     - gochecknoinits
@@ -59,6 +47,7 @@ linters:
     - lll
     - maintidx
     - prealloc
+    - rowserrcheck
     - tagalign
     - tagliatelle
     - testpackage
