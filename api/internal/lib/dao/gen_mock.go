@@ -46,27 +46,27 @@ func (_m *MockQueryProvider) AdjustmentsByPlayerStage(ctx context.Context, playe
 	return r0, r1
 }
 
-// CreatePlayer provides a mock function with given fields: ctx, eventID, player
-func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.Player, error) {
-	ret := _m.Called(ctx, eventID, player)
+// CreatePlayerAndRegistration provides a mock function with given fields: ctx, player, eventID, cat
+func (_m *MockQueryProvider) CreatePlayerAndRegistration(ctx context.Context, player models.PlayerParams, eventID models.EventID, cat models.ScoringCategory) (models.Player, error) {
+	ret := _m.Called(ctx, player, eventID, cat)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CreatePlayer")
+		panic("no return value specified for CreatePlayerAndRegistration")
 	}
 
 	var r0 models.Player
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerParams) (models.Player, error)); ok {
-		return rf(ctx, eventID, player)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerParams, models.EventID, models.ScoringCategory) (models.Player, error)); ok {
+		return rf(ctx, player, eventID, cat)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerParams) models.Player); ok {
-		r0 = rf(ctx, eventID, player)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerParams, models.EventID, models.ScoringCategory) models.Player); ok {
+		r0 = rf(ctx, player, eventID, cat)
 	} else {
 		r0 = ret.Get(0).(models.Player)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerParams) error); ok {
-		r1 = rf(ctx, eventID, player)
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerParams, models.EventID, models.ScoringCategory) error); ok {
+		r1 = rf(ctx, player, eventID, cat)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -138,9 +138,9 @@ func (_m *MockQueryProvider) EventIDByKey(ctx context.Context, key string) (mode
 	return r0, r1
 }
 
-// EventPlayers provides a mock function with given fields: ctx, eventID
-func (_m *MockQueryProvider) EventPlayers(ctx context.Context, eventID models.EventID) ([]models.Player, error) {
-	ret := _m.Called(ctx, eventID)
+// EventPlayers provides a mock function with given fields: ctx, eventKey
+func (_m *MockQueryProvider) EventPlayers(ctx context.Context, eventKey string) ([]models.Player, error) {
+	ret := _m.Called(ctx, eventKey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EventPlayers")
@@ -148,19 +148,19 @@ func (_m *MockQueryProvider) EventPlayers(ctx context.Context, eventID models.Ev
 
 	var r0 []models.Player
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]models.Player, error)); ok {
-		return rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, string) ([]models.Player, error)); ok {
+		return rf(ctx, eventKey)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.Player); ok {
-		r0 = rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, string) []models.Player); ok {
+		r0 = rf(ctx, eventKey)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]models.Player)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, eventKey)
 	} else {
 		r1 = ret.Error(1)
 	}

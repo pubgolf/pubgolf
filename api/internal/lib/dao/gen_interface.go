@@ -14,15 +14,15 @@ type QueryProvider interface {
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
 	// CreatePlayer creates a new player and adds them to the given event.
-	CreatePlayer(ctx context.Context, eventID models.EventID, player models.PlayerParams) (models.Player, error)
+	CreatePlayerAndRegistration(ctx context.Context, player models.PlayerParams, eventID models.EventID, cat models.ScoringCategory) (models.Player, error)
 	// CreateScoreForStage creates score and adjustment records for a given stage.
 	CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error
 	// DeleteScore creates score and adjustment records for a given stage.
 	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
-	// EventPlayers returns all players registered for a given event, in alphabetical order by name.
-	EventPlayers(ctx context.Context, eventID models.EventID) ([]models.Player, error)
+	// EventPlayers returns all players registered for a given event, in alphabetical order by name. The player's event registrations will only include the specified event.
+	EventPlayers(ctx context.Context, eventKey string) ([]models.Player, error)
 	// EventSchedule returns a slice of venue keys and durations for the given event ID.
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error)
 	// EventScheduleCacheVersion returns the integer version number of the latest schedule version, as well as whether or not the provided hash triggered a cache break.
@@ -35,7 +35,7 @@ type QueryProvider interface {
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.
 	PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error)
-	// PlayerByID creates a new player and adds them to the given event.
+	// PlayerByID returns a player's profile data and event registrations.
 	PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error)
 	// PlayerScores returns a list of event stages and a player's scoring info for each.
 	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)

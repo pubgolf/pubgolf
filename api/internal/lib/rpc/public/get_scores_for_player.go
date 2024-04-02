@@ -14,6 +14,8 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
+var errNotRegistered = errors.New("user not registered for event")
+
 // GetScoresForPlayer returns a player's personal scorecard.
 func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[apiv1.GetScoresForPlayerRequest]) (*connect.Response[apiv1.GetScoresForPlayerResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
@@ -35,6 +37,20 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 	player, err := s.dao.PlayerByID(ctx, playerID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("lookup player info: %w", err))
+	}
+
+	var playerCategory models.ScoringCategory
+	foundEventReg := false
+	for _, reg := range player.Events {
+		if reg.EventKey == req.Msg.GetEventKey() {
+			playerCategory = reg.ScoringCategory
+			foundEventReg = true
+			break
+		}
+	}
+
+	if !foundEventReg {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", playerID.String(), req.Msg.GetEventKey(), errNotRegistered))
 	}
 
 	scores, err := s.dao.PlayerScores(ctx, eventID, playerID)
@@ -79,7 +95,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		}
 
 		status := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
-		if player.ScoringCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
+		if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
 			status = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
 		} else {
 			if s.Score == 0 {
@@ -105,7 +121,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 			a := adjustments[adjIdx]
 
 			adjStatus := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
-			if player.ScoringCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
+			if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
 				adjStatus = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
 			}
 

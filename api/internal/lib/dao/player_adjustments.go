@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -22,21 +23,24 @@ func (q *Queries) PlayerAdjustments(ctx context.Context, eventID models.EventID,
 		EventID:  eventID,
 		PlayerID: playerID,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("fetch adjustments: %w", err)
+	}
 
 	var scores []PlayerVenueAdjustment
-	for _, s := range dbAdjustments {
 
+	for _, s := range dbAdjustments {
 		// Don't add it to the list if there isn't adjustment data, since dao.PlayerScores() makes up the "left side" of our client-side join.
-		if !s.NullableValue.Valid {
+		if !s.Value.Valid {
 			continue
 		}
 
 		scores = append(scores, PlayerVenueAdjustment{
 			VenueID:          s.ID,
 			AdjustmentLabel:  s.Label.String,
-			AdjustmentAmount: s.NullableValue.Int32,
+			AdjustmentAmount: s.Value.Int32,
 		})
 	}
 
-	return scores, err
+	return scores, nil
 }

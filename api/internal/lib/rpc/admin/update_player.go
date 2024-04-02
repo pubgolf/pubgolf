@@ -15,38 +15,31 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 	// TODO: Fetch the event key based on the player ID.
 	// telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
-	playerParams := models.PlayerParams{
-		Name: req.Msg.PlayerData.Name,
-	}
-
 	// TODO: Move this functionality to another RPC since scoring category is no longer inherent to a player.
-	err := playerParams.ScoringCategory.FromProtoEnum(req.Msg.PlayerData.ScoringCategory) //nolint:staticcheck
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument Player.ScoringCategory: %w", err))
-	}
+	// var cat models.ScoringCategory
+	// err := cat.FromProtoEnum(req.Msg.PlayerData.GetScoringCategory()) //nolint:staticcheck
+	// if err != nil {
+	// 	return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument Player.ScoringCategory: %w", err))
+	// }
 
-	playerID, err := models.PlayerIDFromString(req.Msg.PlayerId)
+	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid argument PlayerID: %w", err))
 	}
 
-	updatedPlayer, err := s.dao.UpdatePlayer(ctx, playerID, playerParams)
+	updatedPlayer, err := s.dao.UpdatePlayer(ctx, playerID, models.PlayerParams{
+		Name: req.Msg.PlayerData.GetName(),
+	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update player info: %w", err))
 	}
 
-	cat, err := updatedPlayer.ScoringCategory.ProtoEnum()
+	up, err := updatedPlayer.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.UpdatePlayerResponse{
-		Player: &apiv1.Player{
-			Id: updatedPlayer.ID.String(),
-			Data: &apiv1.PlayerData{
-				Name:            updatedPlayer.Name,
-				ScoringCategory: cat,
-			},
-		},
+		Player: up,
 	}), nil
 }

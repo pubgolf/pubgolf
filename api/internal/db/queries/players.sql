@@ -1,43 +1,63 @@
 -- name: CreatePlayer :one
-INSERT INTO players(event_id, name, scoring_category, updated_at)
-  VALUES ($1, $2, $3, now())
+INSERT INTO players(name, updated_at)
+  VALUES ($1, now())
 RETURNING
-  id, name, scoring_category;
+  id;
 
 -- name: PlayerByID :one
 SELECT
   id,
-  name,
-  scoring_category
+  name
 FROM
   players
 WHERE
-  id = $1;
+  id = $1
+  AND deleted_at IS NULL;
 
--- name: UpdatePlayer :one
+-- name: PlayerRegistrationsByID :many
+SELECT
+  e.key AS event_key,
+  ep.scoring_category
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+  JOIN events e ON ep.event_id = e.id
+WHERE
+  p.deleted_at IS NULL
+  AND p.id = $1
+  AND ep.deleted_at IS NULL
+  AND e.deleted_at IS NULL;
+
+-- name: UpdatePlayer :exec
 UPDATE
   players
 SET
-  name = $2,
-  scoring_category = $3,
+  name = @name,
   updated_at = now()
 WHERE
-  id = $1
-RETURNING
-  id,
-  name,
-  scoring_category;
+  id = @id;
+
+-- name: UpsertRegistration :exec
+INSERT INTO event_players(event_id, player_id, scoring_category, deleted_at)
+  VALUES (@event_id, @player_id, @scoring_category, NULL)
+ON CONFLICT (event_id, player_id)
+  DO UPDATE SET
+    scoring_category = EXCLUDED.scoring_category, deleted_at = NULL;
 
 -- name: EventPlayers :many
 SELECT
-  id,
-  name,
-  scoring_category
+  p.id,
+  p.name,
+  ep.scoring_category
 FROM
-  players
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+  JOIN events e ON ep.event_id = e.id
 WHERE
-  event_id = $1
-  AND deleted_at IS NULL
+  e.key = @event_key
+  AND e.deleted_at IS NULL
+  AND ep.deleted_at IS NULL
+  AND p.deleted_at IS NULL
 ORDER BY
   name ASC;
 

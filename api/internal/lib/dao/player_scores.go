@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -22,15 +23,18 @@ func (q *Queries) PlayerScores(ctx context.Context, eventID models.EventID, play
 		EventID:  eventID,
 		PlayerID: playerID,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("fetch scores: %w", err)
+	}
 
 	var scores []PlayerVenueScore
 	for _, s := range dbScores {
 		scores = append(scores, PlayerVenueScore{
 			VenueID:   s.ID,
 			VenueName: s.Name,
-			Score:     s.NullableValue.UInt32,
+			Score:     s.Value,
 		})
 	}
 
-	return scores, err
+	return scores, nil
 }

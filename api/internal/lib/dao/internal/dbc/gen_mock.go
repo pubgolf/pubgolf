@@ -64,27 +64,27 @@ func (_m *MockQuerier) CreateAdjustment(ctx context.Context, arg CreateAdjustmen
 	return r0
 }
 
-// CreatePlayer provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (CreatePlayerRow, error) {
-	ret := _m.Called(ctx, arg)
+// CreatePlayer provides a mock function with given fields: ctx, name
+func (_m *MockQuerier) CreatePlayer(ctx context.Context, name string) (models.PlayerID, error) {
+	ret := _m.Called(ctx, name)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreatePlayer")
 	}
 
-	var r0 CreatePlayerRow
+	var r0 models.PlayerID
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, CreatePlayerParams) (CreatePlayerRow, error)); ok {
-		return rf(ctx, arg)
+	if rf, ok := ret.Get(0).(func(context.Context, string) (models.PlayerID, error)); ok {
+		return rf(ctx, name)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, CreatePlayerParams) CreatePlayerRow); ok {
-		r0 = rf(ctx, arg)
+	if rf, ok := ret.Get(0).(func(context.Context, string) models.PlayerID); ok {
+		r0 = rf(ctx, name)
 	} else {
-		r0 = ret.Get(0).(CreatePlayerRow)
+		r0 = ret.Get(0).(models.PlayerID)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, CreatePlayerParams) error); ok {
-		r1 = rf(ctx, arg)
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, name)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -250,9 +250,9 @@ func (_m *MockQuerier) EventIDByKey(ctx context.Context, key string) (models.Eve
 	return r0, r1
 }
 
-// EventPlayers provides a mock function with given fields: ctx, eventID
-func (_m *MockQuerier) EventPlayers(ctx context.Context, eventID models.EventID) ([]EventPlayersRow, error) {
-	ret := _m.Called(ctx, eventID)
+// EventPlayers provides a mock function with given fields: ctx, eventKey
+func (_m *MockQuerier) EventPlayers(ctx context.Context, eventKey string) ([]EventPlayersRow, error) {
+	ret := _m.Called(ctx, eventKey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EventPlayers")
@@ -260,19 +260,19 @@ func (_m *MockQuerier) EventPlayers(ctx context.Context, eventID models.EventID)
 
 	var r0 []EventPlayersRow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]EventPlayersRow, error)); ok {
-		return rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, string) ([]EventPlayersRow, error)); ok {
+		return rf(ctx, eventKey)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []EventPlayersRow); ok {
-		r0 = rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, string) []EventPlayersRow); ok {
+		r0 = rf(ctx, eventKey)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]EventPlayersRow)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, eventKey)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -473,6 +473,36 @@ func (_m *MockQuerier) PlayerByID(ctx context.Context, id models.PlayerID) (Play
 		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(PlayerByIDRow)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PlayerRegistrationsByID provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerRegistrationsByID")
+	}
+
+	var r0 []PlayerRegistrationsByIDRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) ([]PlayerRegistrationsByIDRow, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) []PlayerRegistrationsByIDRow); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]PlayerRegistrationsByIDRow)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID) error); ok {
@@ -685,31 +715,21 @@ func (_m *MockQuerier) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmen
 }
 
 // UpdatePlayer provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) (UpdatePlayerRow, error) {
+func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error {
 	ret := _m.Called(ctx, arg)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdatePlayer")
 	}
 
-	var r0 UpdatePlayerRow
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, UpdatePlayerParams) (UpdatePlayerRow, error)); ok {
-		return rf(ctx, arg)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, UpdatePlayerParams) UpdatePlayerRow); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpdatePlayerParams) error); ok {
 		r0 = rf(ctx, arg)
 	} else {
-		r0 = ret.Get(0).(UpdatePlayerRow)
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, UpdatePlayerParams) error); ok {
-		r1 = rf(ctx, arg)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // UpdateScore provides a mock function with given fields: ctx, arg
@@ -722,6 +742,24 @@ func (_m *MockQuerier) UpdateScore(ctx context.Context, arg UpdateScoreParams) e
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, UpdateScoreParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpsertRegistration provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpsertRegistration")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpsertRegistrationParams) error); ok {
 		r0 = rf(ctx, arg)
 	} else {
 		r0 = ret.Error(0)

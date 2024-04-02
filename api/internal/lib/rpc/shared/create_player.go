@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/bufbuild/connect-go"
 
@@ -20,38 +21,38 @@ func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *
 	eventID, err := s.dao.EventIDByKey(ctx, eventKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("lookup event key: %w", err))
 		}
-		return nil, connect.NewError(connect.CodeUnknown, err)
+
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("lookup event key: %w", err))
 	}
 
-	playerParams := models.PlayerParams{
-		Name: playerData.Name,
-	}
-	// Ignore deprecation warning because entire RPC is slated for deprecation.
-	err = playerParams.ScoringCategory.FromProtoEnum(playerData.ScoringCategory) //nolint:staticcheck
+	var cat models.ScoringCategory
+
+	err = cat.FromProtoEnum(playerData.ScoringCategory) //nolint:staticcheck // Ignore deprecation warning because entire RPC is slated for deprecation.
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoring category: %w", err))
 	}
 
-	player, err := s.dao.CreatePlayer(ctx, eventID, playerParams)
+	player, err := s.dao.CreatePlayerAndRegistration(ctx,
+		models.PlayerParams{
+			Name: playerData.GetName(),
+		},
+		eventID,
+		cat,
+	)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
-			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+			return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("store player: %w", err))
 		}
-		return nil, connect.NewError(connect.CodeUnknown, err)
+
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("store player: %w", err))
 	}
 
-	cat, err := player.ScoringCategory.ProtoEnum()
+	pp, err := player.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("serialize player: %w", err))
 	}
 
-	return &apiv1.Player{
-		Id: player.ID.String(),
-		Data: &apiv1.PlayerData{
-			Name:            player.Name,
-			ScoringCategory: cat,
-		},
-	}, nil
+	return pp, nil
 }

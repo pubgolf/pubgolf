@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -11,15 +12,13 @@ import (
 func (q *Queries) UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error) {
 	defer daoSpan(&ctx)()
 
-	p, err := q.dbc.UpdatePlayer(ctx, dbc.UpdatePlayerParams{
-		ID:              playerID,
-		Name:            player.Name,
-		ScoringCategory: player.ScoringCategory,
+	err := q.dbc.UpdatePlayer(ctx, dbc.UpdatePlayerParams{
+		ID:   playerID,
+		Name: player.Name,
 	})
+	if err != nil {
+		return models.Player{}, fmt.Errorf("update player: %w", err)
+	}
 
-	return models.Player{
-		ID:              p.ID,
-		Name:            p.Name,
-		ScoringCategory: p.ScoringCategory,
-	}, err
+	return q.PlayerByID(ctx, playerID)
 }

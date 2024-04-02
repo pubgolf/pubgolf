@@ -41,9 +41,12 @@ sql:
           # Players
           - column: players.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
-          - column: players.event_id
+          # Event Players
+          - column: event_players.player_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
+          - column: event_players.event_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
-          - column: players.scoring_category
+          - column: event_players.scoring_category
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.ScoringCategory
           # Scores
           - column: scores.id

@@ -6,7 +6,8 @@ WITH st AS (
   FROM
     stages st
   WHERE
-    st.event_id = @event_id
+    st.deleted_at IS NULL
+    AND st.event_id = @event_id
 )
 SELECT
   s.player_id,
@@ -28,13 +29,20 @@ SELECT
 FROM
   scores s
   JOIN players p ON s.player_id = p.id
+  JOIN event_players ep ON p.id = ep.player_id
   JOIN st ON s.stage_id = st.id
   LEFT JOIN adjustments a ON a.stage_id = s.stage_id
     AND a.player_id = s.player_id
 WHERE
-  st.event_id = @event_id
-  AND p.scoring_category = @scoring_category
+  s.deleted_at IS NULL
+  AND p.deleted_at IS NULL
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id
+  AND ep.scoring_category = @scoring_category
+  AND st.deleted_at IS NULL
+  AND st.event_id = @event_id
   AND st.is_odd
+  AND a.deleted_at IS NULL
 GROUP BY
   s.player_id,
   p.name
@@ -65,12 +73,19 @@ SELECT
 FROM
   scores s
   JOIN players p ON s.player_id = p.id
+  JOIN event_players ep ON p.id = ep.player_id
   JOIN stages st ON s.stage_id = st.id
   LEFT JOIN adjustments a ON a.stage_id = s.stage_id
     AND a.player_id = s.player_id
 WHERE
-  st.event_id = @event_id
-  AND p.scoring_category = @scoring_category
+  s.deleted_at IS NULL
+  AND p.deleted_at IS NULL
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id
+  AND ep.scoring_category = @scoring_category
+  AND st.deleted_at IS NULL
+  AND st.event_id = @event_id
+  AND a.deleted_at IS NULL
 GROUP BY
   s.player_id,
   p.name
