@@ -27,7 +27,7 @@ func New(namespace string, enableLogging bool) (*sql.DB, func()) {
 	port, err := freeport.GetFreePort()
 	guardSetup(err, "find open port")
 
-	var dbURL = fmt.Sprintf("host=localhost port=%d user=postgres password=postgres dbname=postgres sslmode=disable", port)
+	dbURL := fmt.Sprintf("host=localhost port=%d user=postgres password=postgres dbname=postgres sslmode=disable", port)
 
 	tempDir, err := os.MkdirTemp(os.TempDir(), "pubgolf-api-"+namespace+"-")
 	guardSetup(err, "make temp dir")
@@ -45,6 +45,7 @@ func New(namespace string, enableLogging bool) (*sql.DB, func()) {
 
 	cfg, err := pgx.ParseConfig(dbURL)
 	guardSetup(err, "prase test DB config")
+
 	conn := stdlib.OpenDB(*cfg)
 
 	return conn, func() {
@@ -67,13 +68,17 @@ func MigrationDir() string {
 	testDir := filepath.Dir(filename)
 	parts := strings.Split(testDir, filepath.FromSlash("/pubgolf/api/"))
 	numDirs := strings.Count(parts[1], string(filepath.Separator))
+
 	return filepath.FromSlash(strings.Repeat("../", numDirs) + "db/migrations")
 }
 
 // NewTestTx returns a context, transaction and cleanup function to isolate a test run into a rolled-back transaction.
 func NewTestTx(t *testing.T, db *sql.DB) (context.Context, *sql.Tx, func()) {
+	t.Helper()
+
 	ctx, cancel := newTestContext(t)
 	tx, rollback := newTx(ctx, t, db)
+
 	return ctx, tx, func() {
 		rollback()
 		cancel()
@@ -82,6 +87,8 @@ func NewTestTx(t *testing.T, db *sql.DB) (context.Context, *sql.Tx, func()) {
 
 // newTestContext returns a context.Context which respects the test's timeout.
 func newTestContext(t *testing.T) (context.Context, func()) {
+	t.Helper()
+
 	ctx := context.Background()
 	cancel := func() {}
 
@@ -94,8 +101,11 @@ func newTestContext(t *testing.T) (context.Context, func()) {
 
 // newTx returns a transaction and a cleanup function to roll back changes from aa test case.
 func newTx(ctx context.Context, t *testing.T, db *sql.DB) (*sql.Tx, func()) {
+	t.Helper()
+
 	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
 	require.NoError(t, err)
+
 	return tx, func() {
 		err = tx.Rollback()
 		require.NoError(t, err)

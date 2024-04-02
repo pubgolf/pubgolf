@@ -10,11 +10,12 @@ import (
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
-	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 )
 
 // ServiceName provides the attribute value for "service.name".
@@ -22,7 +23,7 @@ const ServiceName = "pubgolf-api-server"
 
 // Init configures OTel and Honeycomb reporting.
 func Init(cfg *config.App) (func(), error) {
-	return otelconfig.ConfigureOpenTelemetry(
+	return otelconfig.ConfigureOpenTelemetry( //nolint:wrapcheck // Trivial pass-through function.
 		otelconfig.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
 		otelconfig.WithServiceName(ServiceName),
 		otelconfig.WithServiceVersion(gitVersion()),
@@ -70,8 +71,10 @@ func AutoSpan(prefix string) func(ctx *context.Context) func() {
 		if pc, _, _, ok := runtime.Caller(1); ok {
 			name = prefix + "." + strings.Split(filepath.Base(runtime.FuncForPC(pc).Name()), ".")[2]
 		}
+
 		newCtx, span := otel.Tracer("").Start(*ctx, name)
 		*ctx = newCtx
+
 		return func() { span.End() }
 	}
 }

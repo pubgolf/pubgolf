@@ -26,10 +26,11 @@ var errorCodeHTTPStatuses = map[errorCode]int{
 }
 
 func allErrorCodes() []errorCode {
-	all := make([]errorCode, len(errorCodeHTTPStatuses))
+	all := make([]errorCode, 0, len(errorCodeHTTPStatuses))
 	for e := range errorCodeHTTPStatuses {
 		all = append(all, e)
 	}
+
 	return all
 }
 

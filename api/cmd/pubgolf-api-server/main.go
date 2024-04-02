@@ -77,8 +77,10 @@ func main() {
 	bootSpan.SetAttributes(attribute.String("service.type", "server"))
 
 	// Initialize server.
+
 	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev)
 	guard(err, "init DAO")
+
 	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
 	server := makeServer(cfg, dao, mes)
 	makeShutdownWatcher(server)
@@ -168,6 +170,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http
 func makeShutdownWatcher(server *http.Server) {
 	beginShutdown := make(chan os.Signal, 1)
 	signal.Notify(beginShutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	go shutdownWatcher(server, beginShutdown)
 }
 

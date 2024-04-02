@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
 func TestPhoneNumSet(t *testing.T) {

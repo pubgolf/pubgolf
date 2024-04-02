@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 )
 
@@ -13,9 +14,7 @@ const (
 	authCookieName = "web_admin_user_token"
 )
 
-var (
-	errUserAuth = errors.New("missing or invalid auth credential")
-)
+var errUserAuth = errors.New("missing or invalid auth credential")
 
 type logInRequestBody struct {
 	Password string `json:"password"`
@@ -36,6 +35,7 @@ func logIn(cfg *config.App) http.HandlerFunc {
 
 		if req.Password != cfg.AdminAuth.Password {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Incorrect password", errUserAuth).Render(w, r)
+
 			return
 		}
 
@@ -65,15 +65,18 @@ func logOut(cfg *config.App) http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
 				newErrorResponse(ctx, errorCodeNotAuthorized, "Missing auth cookie", errUserAuth).Render(w, r)
+
 				return
 			}
 
 			newErrorResponse(ctx, errorCodeGenericNonRetryable, "Could not read auth cookie", err).Render(w, r)
+
 			return
 		}
 
 		if c.Value != cfg.AdminAuth.CookieToken {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Invalid auth cookie", errUserAuth).Render(w, r)
+
 			return
 		}
 
@@ -104,15 +107,18 @@ func getAPIToken(cfg *config.App) http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
 				newErrorResponse(ctx, errorCodeNotAuthorized, "Missing auth cookie", errUserAuth).Render(w, r)
+
 				return
 			}
 
 			newErrorResponse(ctx, errorCodeGenericNonRetryable, "Could not read auth cookie", err).Render(w, r)
+
 			return
 		}
 
 		if c.Value != cfg.AdminAuth.CookieToken {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Invalid auth cookie", errUserAuth).Render(w, r)
+
 			return
 		}
 

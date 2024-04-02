@@ -37,8 +37,10 @@ func RunMigrations(db *sql.DB) error {
 	if err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			log.Println("No pending migrations.")
+
 			return nil
 		}
+
 		return fmt.Errorf("run migration: %w", err)
 	}
 
