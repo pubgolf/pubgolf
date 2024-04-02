@@ -64,11 +64,17 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 
 	err = query(ctx, &Queries{tx: tx, dbc: tDBC})
 	if err != nil {
-		tx.Rollback()
+		tx.Rollback() //nolint:errcheck // Already recovering from query error.
+
 		return err
 	}
 
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+
+	return nil
 }
 
 func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
@@ -77,10 +83,10 @@ func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
 	}
 
 	var tDBC dbc.Querier
+
 	switch dbc := q.dbc.(type) {
 	case *dbc.Queries:
-		tDBC = dbc.WithTx(tx)
-		return tDBC, nil
+		return dbc.WithTx(tx), nil
 	case *dbc.MockQuerier:
 		return tDBC, fmt.Errorf("dbc.MockQuerier does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", ErrTransactedQuerier)
 	default:

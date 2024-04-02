@@ -34,10 +34,14 @@ func executeTests(m *testing.M) int {
 }
 
 func initDB(t *testing.T) (context.Context, *sql.Tx, func()) {
+	t.Helper()
+
 	return dbtest.NewTestTx(t, _sharedDB)
 }
 
 func TestPrepare(t *testing.T) {
+	t.Parallel()
+
 	ctx, tx, cleanup := initDB(t)
 	defer cleanup()
 

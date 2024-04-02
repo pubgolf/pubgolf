@@ -27,6 +27,7 @@ func (q *Queries) CreateScoreForStage(ctx context.Context, playerID models.Playe
 			if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 				return ErrAlreadyCreated
 			}
+
 			return fmt.Errorf("insert base score: %w", err)
 		}
 

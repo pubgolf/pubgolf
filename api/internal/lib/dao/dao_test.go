@@ -8,7 +8,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
@@ -45,22 +45,28 @@ func executeTests(m *testing.M) int {
 }
 
 func Test_txQuerier(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Succeeds when DAO is constructed with New()", func(t *testing.T) {
+		t.Parallel()
+
 		ctx := context.Background()
 
 		dao, err := New(ctx, _sharedDB, false)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(ctx, &sql.TxOptions{})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, err = dao.txQuerier(tx)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("Fails with mock DAO", func(t *testing.T) {
+		t.Parallel()
+
 		db, dbMock, err := sqlmock.New()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		defer db.Close()
 
 		dbMock.ExpectBegin()
@@ -69,7 +75,7 @@ func Test_txQuerier(t *testing.T) {
 		dao := Queries{dbc: m, db: db}
 
 		tx, err := dao.db.BeginTx(context.Background(), &sql.TxOptions{})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, err = dao.txQuerier(tx)
 		assert.Error(t, err)

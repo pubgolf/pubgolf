@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -12,12 +13,12 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 
 	rows, err := q.dbc.EventScheduleWithDetails(ctx, eventID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("fetch event schedule data: %w", err)
 	}
 
 	var stages []models.Stage
-	for _, row := range rows {
 
+	for _, row := range rows {
 		imageURL := fallbackVenueImage
 		if row.ImageUrl.Valid {
 			imageURL = row.ImageUrl.String

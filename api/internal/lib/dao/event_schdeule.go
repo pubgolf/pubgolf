@@ -21,25 +21,26 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 
 	validKeys, err := q.dbc.EventVenueKeysAreValid(ctx, eventID)
 	if err != nil {
-		return nil, fmt.Errorf("check venue keys are valid: %v", err)
+		return nil, fmt.Errorf("check venue keys are valid: %w", err)
 	}
 
 	if !validKeys {
 		if err := q.dbc.SetEventVenueKeys(ctx, eventID); err != nil {
-			return nil, fmt.Errorf("set venue keys: %v", err)
+			return nil, fmt.Errorf("set venue keys: %w", err)
 		}
 
 		if err := q.dbc.SetNextEventVenueKey(ctx, eventID); err != nil {
-			return nil, fmt.Errorf("reset venue key iterator: %v", err)
+			return nil, fmt.Errorf("reset venue key iterator: %w", err)
 		}
 	}
 
 	schedule, err := q.dbc.EventSchedule(ctx, eventID)
 	if err != nil {
-		return nil, fmt.Errorf("query event schedule: %v", err)
+		return nil, fmt.Errorf("query event schedule: %w", err)
 	}
 
 	var venueStops []VenueStop
+
 	for _, v := range schedule {
 		desc := ""
 		if v.Description.Valid {

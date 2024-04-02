@@ -15,6 +15,8 @@ import (
 )
 
 func setupEvent(ctx context.Context, t *testing.T, tx *sql.Tx) models.EventID {
+	t.Helper()
+
 	row := tx.QueryRowContext(ctx, `
 		INSERT INTO events 
 			(key, starts_at) 
@@ -26,10 +28,13 @@ func setupEvent(ctx context.Context, t *testing.T, tx *sql.Tx) models.EventID {
 
 	var e models.EventID
 	require.NoError(t, row.Scan(&e), "scan returned event ID")
+
 	return e
 }
 
 func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.VenueID {
+	t.Helper()
+
 	row := tx.QueryRowContext(ctx, `
 		INSERT INTO venues 
 			(name, address) 
@@ -42,11 +47,16 @@ func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.VenueID {
 
 	var v models.VenueID
 	require.NoError(t, row.Scan(&v), "scan returned venue ID")
+
 	return v
 }
 
 func TestEventIDByKey(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Returns ID for matching event key", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initDB(t)
 		defer cleanup()
 
@@ -68,6 +78,8 @@ func TestEventIDByKey(t *testing.T) {
 	})
 
 	t.Run("Returns sql.ErrNoRows when no matching event key", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initDB(t)
 		defer cleanup()
 
@@ -88,6 +100,8 @@ func TestEventIDByKey(t *testing.T) {
 	})
 
 	t.Run("Does not return event when deleted_at is set", func(t *testing.T) {
+		t.Parallel()
+
 		ctx, tx, cleanup := initDB(t)
 		defer cleanup()
 
@@ -109,10 +123,14 @@ func TestEventIDByKey(t *testing.T) {
 }
 
 func TestEventVenueKeysAreValid(t *testing.T) {
+	t.Parallel()
+
 	venueCounts := []int{1, 3, 9}
 
 	for _, numVenues := range venueCounts {
 		t.Run(fmt.Sprintf("Returns true if all event venues have a lookup key (%d venues)", numVenues), func(t *testing.T) {
+			t.Parallel()
+
 			ctx, tx, cleanup := initDB(t)
 			defer cleanup()
 
@@ -120,7 +138,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			eventID := setupEvent(ctx, t, tx)
 
 			var venueIDs []models.VenueID
-			for i := 0; i < numVenues; i++ {
+			for range numVenues {
 				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
 			}
 
@@ -141,6 +159,8 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("Returns false if first event venue has a NULL lookup key (%d venues)", numVenues), func(t *testing.T) {
+			t.Parallel()
+
 			ctx, tx, cleanup := initDB(t)
 			defer cleanup()
 
@@ -149,7 +169,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			eventID := setupEvent(ctx, t, tx)
 
 			var venueIDs []models.VenueID
-			for i := 0; i < numVenues; i++ {
+			for range numVenues {
 				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
 			}
 
@@ -162,6 +182,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 						($1, $2, 30, $3, NULL);
 				`, eventID, vID, i)
 					require.NoError(t, err)
+
 					continue
 				}
 
@@ -188,7 +209,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			eventID := setupEvent(ctx, t, tx)
 
 			var venueIDs []models.VenueID
-			for i := 0; i < numVenues; i++ {
+			for range numVenues {
 				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
 			}
 
@@ -201,6 +222,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 						($1, $2, 30, $3, NULL);
 				`, eventID, vID, i)
 					require.NoError(t, err)
+
 					continue
 				}
 
@@ -228,7 +250,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			eventID := setupEvent(ctx, t, tx)
 
 			var venueIDs []models.VenueID
-			for i := 0; i < numVenues; i++ {
+			for range numVenues {
 				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
 			}
 

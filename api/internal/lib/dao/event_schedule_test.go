@@ -9,6 +9,7 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -69,7 +70,11 @@ func mockEventSchedule(m *dbc.MockQuerier, eventID models.EventID, schedule []db
 }
 
 func TestEventSchedule(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Venue key setters aren't called when EventVenueKeysAreValid returns true", func(t *testing.T) {
+		t.Parallel()
+
 		m := new(dbc.MockQuerier)
 		d := Queries{dbc: m}
 		eventID := models.EventIDFromULID(ulid.Make())
@@ -80,11 +85,13 @@ func TestEventSchedule(t *testing.T) {
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 
 		_, err := d.EventSchedule(context.Background(), eventID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
 
 	t.Run("Venue key setters are called when EventVenueKeysAreValid returns false", func(t *testing.T) {
+		t.Parallel()
+
 		m := dbc.NewMockQuerier(t)
 		d := Queries{dbc: m}
 		eventID := models.EventIDFromULID(ulid.Make())
@@ -95,11 +102,13 @@ func TestEventSchedule(t *testing.T) {
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 
 		_, err := d.EventSchedule(context.Background(), eventID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
 
 	t.Run("EventScheduleRow structs are correctly translated into VenueStop structs", func(t *testing.T) {
+		t.Parallel()
+
 		m := new(dbc.MockQuerier)
 		d := Queries{dbc: m}
 		eventID := models.EventIDFromULID(ulid.Make())
@@ -111,9 +120,11 @@ func TestEventSchedule(t *testing.T) {
 			Key      uint32
 			Duration uint32
 		}
-		for i := 0; i < numVenues; i++ {
+
+		for range numVenues {
 			err := faker.FakeData(&sr)
-			assert.NoError(t, err, "generate random data")
+			require.NoError(t, err, "generate random data")
+
 			scheduleRows = append(scheduleRows, dbc.EventScheduleRow{
 				VenueKey:        models.VenueKeyFromUInt32(sr.Key),
 				DurationMinutes: sr.Duration,
@@ -124,7 +135,7 @@ func TestEventSchedule(t *testing.T) {
 		mockEventSchedule(m, eventID, scheduleRows)
 
 		venues, err := d.EventSchedule(context.Background(), eventID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		m.AssertExpectations(t)
 
 		for i, v := range venues {

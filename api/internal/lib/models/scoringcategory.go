@@ -2,11 +2,15 @@ package models
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"reflect"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
+
+// errInvalidScoringCategory indicates a non-convertible value.
+var errInvalidScoringCategory = errors.New("invalid apiv1.ScoringCategory_name")
 
 // ScoringCategory describes a game type for purposes of calculating scores.
 type ScoringCategory int
@@ -25,7 +29,7 @@ func (sc ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
 		return apiv1.ScoringCategory(val), nil
 	}
 
-	return apiv1.ScoringCategory(0), fmt.Errorf("convert NullScoringCategory to protobuf enum: invalid apiv1.ScoringCategory_name: %s", sc.String())
+	return apiv1.ScoringCategory(0), fmt.Errorf("convert NullScoringCategory(%q) to protobuf enum: %w", sc.String(), errInvalidScoringCategory)
 }
 
 // FromProtoEnum parses an enum from a proto message into an internal representation.
@@ -75,7 +79,7 @@ func (nsc NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
 		return &pe, nil
 	}
 
-	return nil, fmt.Errorf("convert NullScoringCategory to protobuf enum: invalid apiv1.ScoringCategory_name: %s", nsc.ScoringCategory.String())
+	return nil, fmt.Errorf("convert NullScoringCategory(%q) to protobuf enum: %w", nsc.ScoringCategory.String(), errInvalidScoringCategory)
 }
 
 // FromProtoEnum parses an enum from a proto message into an internal representation. If the provided pointer is nil, a NULL-serializable value will be created.

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -15,9 +16,12 @@ func (q *Queries) ScoreByPlayerStage(ctx context.Context, playerID models.Player
 		PlayerID: playerID,
 		StageID:  stageID,
 	})
+	if err != nil {
+		return models.Score{}, fmt.Errorf("fetch score: %w", err)
+	}
 
 	return models.Score{
 		ID:    score.ID,
 		Value: score.Value,
-	}, err
+	}, nil
 }

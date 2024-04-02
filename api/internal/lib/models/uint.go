@@ -2,10 +2,17 @@ package models
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
 )
+
+// errValueOutOfRange indicates a failed conversion due to exceeding the range of acceptable values.
+var errValueOutOfRange = errors.New("value not within range")
+
+// errNoScanConversionDefined indicates the type was not explicitly handled by the scanner.
+var errNoScanConversionDefined = errors.New("no scan conversion for type")
 
 // VenueKey identifies a venue within the context of a specific event's schedule.
 type VenueKey struct{ uint32 }
@@ -19,10 +26,10 @@ func (v *VenueKey) Scan(src interface{}) error {
 			return nil
 		}
 
-		return fmt.Errorf("VenueKey: value out of range [0,%d]: %v", math.MaxUint32, src)
+		return fmt.Errorf("type \"VenueKey\" only supports range [0,%d], got value %v: %w", math.MaxUint32, src, errValueOutOfRange)
 	}
 
-	return fmt.Errorf("VenueKey: invalid scanned value: %v of type %v", src, reflect.TypeOf(src))
+	return fmt.Errorf("type \"VenueKey\" attempted to scan value %v of type %v: %w", src, reflect.TypeOf(src), errNoScanConversionDefined)
 }
 
 // Value serializes the VenueKey as an int64.
@@ -47,22 +54,24 @@ type NullUInt32 struct {
 }
 
 // Scan implements the Scanner interface.
-func (n *NullUInt32) Scan(value any) error {
-	if value == nil {
+func (n *NullUInt32) Scan(src any) error {
+	if src == nil {
 		n.UInt32, n.Valid = 0, false
 
 		return nil
 	}
 
-	if x, ok := value.(int64); ok {
+	if x, ok := src.(int64); ok {
 		if x >= 0 && x <= math.MaxUint32 {
 			*n = NullUInt32{uint32(x), true}
 
 			return nil
 		}
-		return fmt.Errorf("VenueKey: value out of range [0,%d]: %v", math.MaxUint32, value)
+
+		return fmt.Errorf("type \"NullUInt32\" only supports range [0,%d], got value %v: %w", math.MaxUint32, src, errValueOutOfRange)
 	}
-	return fmt.Errorf("VenueKey: invalid scanned value: %v of type %v", value, reflect.TypeOf(value))
+
+	return fmt.Errorf("type \"NullUInt32\" attempted to scan value %v of type %v: %w", src, reflect.TypeOf(src), errNoScanConversionDefined)
 }
 
 // Value implements the driver Valuer interface.

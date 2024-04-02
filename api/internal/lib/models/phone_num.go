@@ -23,6 +23,7 @@ func NewPhoneNum(num string) (PhoneNum, error) {
 	return PhoneNum(num), nil
 }
 
+// String returns a string representation of the phone number in E.164 format.
 func (pn PhoneNum) String() string {
 	return string(pn)
 }

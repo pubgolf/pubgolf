@@ -11,7 +11,7 @@ import (
 )
 
 // EventScheduleCacheVersion returns the integer version number of the latest schedule version, as well as whether or not the provided hash triggered a cache break.
-func (q *Queries) EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error) {
+func (q *Queries) EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error) { //nolint:nonamedreturns // 3+ return values
 	defer daoSpan(&ctx)()
 
 	version, err := q.dbc.EventCacheVersionByHash(ctx, dbc.EventCacheVersionByHashParams{
@@ -31,6 +31,9 @@ func (q *Queries) EventScheduleCacheVersion(ctx context.Context, eventID models.
 		ID:                       eventID,
 		CurrentScheduleCacheHash: hash,
 	})
+	if err == nil {
+		return version, false, fmt.Errorf("set cache keys: %w", err)
+	}
 
-	return version, false, err
+	return version, false, nil
 }

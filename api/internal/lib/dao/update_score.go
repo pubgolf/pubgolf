@@ -37,6 +37,7 @@ func (q *Queries) UpdateScore(ctx context.Context, playerID models.PlayerID, sta
 
 		for _, adj := range modifyAdj {
 			seen[adj.ID] = struct{}{}
+
 			err = q.dbc.UpdateAdjustment(ctx, dbc.UpdateAdjustmentParams{
 				ID:    adj.ID,
 				Label: adj.Label,

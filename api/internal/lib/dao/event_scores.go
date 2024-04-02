@@ -23,8 +23,9 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]mo
 			return fmt.Errorf("get event adjustments: %w", err)
 		}
 
-		aIdx := 0
 		var adj []models.Adjustment
+
+		aIdx := 0
 		for _, s := range sRows {
 			for aIdx < len(aRows) && aRows[aIdx].StageID == s.StageID && aRows[aIdx].PlayerID == s.PlayerID {
 				adj = append(adj, models.Adjustment{

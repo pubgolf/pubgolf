@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -17,8 +18,12 @@ func (q *Queries) AdjustmentsByPlayerStage(ctx context.Context, playerID models.
 		PlayerID: playerID,
 		StageID:  stageID,
 	})
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("fetch adjustments: %w", err)
 	}
 
 	var adj []models.Adjustment
@@ -30,5 +35,5 @@ func (q *Queries) AdjustmentsByPlayerStage(ctx context.Context, playerID models.
 		})
 	}
 
-	return adj, err
+	return adj, nil
 }

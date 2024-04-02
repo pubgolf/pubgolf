@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -23,6 +24,9 @@ func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueK
 		EventID:  eventID,
 		VenueKey: venueKey,
 	})
+	if err != nil {
+		return Venue{}, fmt.Errorf("fetch venue: %w", err)
+	}
 
 	imageURL := fallbackVenueImage
 	if v.ImageUrl.Valid {
@@ -34,5 +38,5 @@ func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueK
 		Name:     v.Name,
 		Address:  v.Address,
 		ImageURL: imageURL,
-	}, err
+	}, nil
 }
