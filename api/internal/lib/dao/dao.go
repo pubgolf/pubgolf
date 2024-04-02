@@ -48,6 +48,7 @@ func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, 
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
 	defer telemetry.FnSpan(&ctx)()
 
+	// Avoid nested transactions.
 	if q.tx != nil {
 		return query(ctx, q)
 	}
@@ -77,7 +78,7 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 	return nil
 }
 
-func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
+func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) { //nolint:ireturn // Needed to wrap type-specific logic for mocking.
 	if q.tx != nil {
 		return q.dbc, nil
 	}
@@ -88,7 +89,7 @@ func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
 	case *dbc.Queries:
 		return dbc.WithTx(tx), nil
 	case *dbc.MockQuerier:
-		return tDBC, fmt.Errorf("dbc.MockQuerier does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", ErrTransactedQuerier)
+		return q.dbc, nil
 	default:
 		return tDBC, fmt.Errorf("type %T does not implement WithTx(tx *sql.Tx) dbc.Querier: %w", dbc, ErrTransactedQuerier)
 	}

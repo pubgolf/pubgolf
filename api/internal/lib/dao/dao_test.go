@@ -62,7 +62,7 @@ func Test_txQuerier(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("Fails with mock DAO", func(t *testing.T) {
+	t.Run("Succeeds with mock DAO", func(t *testing.T) {
 		t.Parallel()
 
 		db, dbMock, err := sqlmock.New()
@@ -78,7 +78,6 @@ func Test_txQuerier(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = dao.txQuerier(tx)
-		assert.Error(t, err)
-		assert.ErrorIs(t, err, ErrTransactedQuerier)
+		require.NoError(t, err)
 	})
 }
