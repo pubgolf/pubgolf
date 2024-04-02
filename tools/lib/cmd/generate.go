@@ -13,6 +13,9 @@ import (
 )
 
 func init() {
+	generateMockCmd.AddCommand(generateDBCMockCmd)
+	generateMockCmd.AddCommand(generateDAOMockCmd)
+	generateMockCmd.AddCommand(generateSMSMockCmd)
 	generateCmd.AddCommand(generateProtoCmd)
 	generateCmd.AddCommand(generateSQLcCmd)
 	generateCmd.AddCommand(generateEnumCmd)
@@ -112,11 +115,30 @@ var generateMockCmd = &cobra.Command{
 	Use:   "mock",
 	Short: "Generate IO clients' (DAO and SMS) interfaces and mocks",
 	Run: func(cmd *cobra.Command, args []string) {
+		runPar(cmd, args,
+			generateDBCMockCmd,
+			generateSMSMockCmd,
+		)
+		// generateDAOMockCmd must be called after generateDBCMockCmd.
+		generateDAOMockCmd.Run(cmd, args)
+	},
+}
+
+var generateDBCMockCmd = &cobra.Command{
+	Use:   "dbc",
+	Short: "Generate DBC mock",
+	Run: func(cmd *cobra.Command, args []string) {
 		guard(
 			generateMock("Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
 			"generate mock DBC",
 		)
+	},
+}
 
+var generateDAOMockCmd = &cobra.Command{
+	Use:   "dao",
+	Short: "Generate DAO interface and mock",
+	Run: func(cmd *cobra.Command, args []string) {
 		guard(
 			generateInterfaceAndMock(mockConfig{
 				targetStruct: "Queries",
@@ -127,7 +149,13 @@ var generateMockCmd = &cobra.Command{
 			}),
 			"generate mock DAO",
 		)
+	},
+}
 
+var generateSMSMockCmd = &cobra.Command{
+	Use:   "sms",
+	Short: "Generate SMS client interface and mock",
+	Run: func(cmd *cobra.Command, args []string) {
 		guard(
 			generateInterfaceAndMock(mockConfig{
 				targetStruct: "Client",
