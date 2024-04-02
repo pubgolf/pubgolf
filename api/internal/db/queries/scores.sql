@@ -77,9 +77,12 @@ FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
   LEFT JOIN scores s ON s.stage_id = st.id
-    AND s.player_id = $2
+    AND s.player_id = @player_id
 WHERE
-  st.event_id = $1
+  st.deleted_at IS NOT NULL
+  AND st.event_id = @event_id
+  AND v.deleted_at IS NOT NULL
+  AND s.deleted_at IS NOT NULL
 ORDER BY
   st.rank ASC;
 
@@ -94,7 +97,10 @@ FROM
   LEFT JOIN adjustments a ON a.stage_id = st.id
     AND a.player_id = $2
 WHERE
-  st.event_id = $1
+  st.deleted_at IS NOT NULL
+  AND st.event_id = $1
+  AND v.deleted_at IS NOT NULL
+  AND a.deleted_at IS NOT NULL
 ORDER BY
   st.rank ASC,
   a.created_at ASC;
