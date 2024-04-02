@@ -72,7 +72,7 @@ ORDER BY
 SELECT
   v.id,
   v.name,
-  s.value AS nullable_value
+  COALESCE(s.value, 0)
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -87,7 +87,7 @@ ORDER BY
 SELECT
   v.id,
   a.label,
-  a.value AS nullable_value
+  a.value
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
