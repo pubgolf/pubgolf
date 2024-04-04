@@ -6,11 +6,12 @@ import (
 	"os"
 	"testing"
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 var (

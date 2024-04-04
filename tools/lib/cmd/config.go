@@ -27,12 +27,15 @@ func (d DBDriver) driverString(isMigrator bool) string {
 		if isMigrator {
 			return "pgx5"
 		}
+
 		return "pgx"
 	case SQLite3:
 		return "sqlite3"
+	case None:
+		return ""
+	default:
+		return ""
 	}
-
-	return ""
 }
 
 // CLIConfig sets naming and capabilities for the generated CLI tool.
@@ -114,6 +117,7 @@ func readDopplerVars(project, env, prefix string, vars []string) map[string]stri
 	guard(json.NewDecoder(&dopplerContent).Decode(&data), "read JSON output from doppler")
 
 	outData := make(map[string]string)
+
 	for _, key := range vars {
 		secret, ok := data[prefix+key]
 		if !ok {
@@ -146,5 +150,6 @@ func getStr(m map[string]string, k, def string) string {
 	if v, ok := m[k]; ok {
 		return v
 	}
+
 	return def
 }

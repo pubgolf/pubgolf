@@ -14,13 +14,14 @@ import (
 
 // ListStageScores records the score and any adjustments (i.e. bonuses or penalties) for a (player, stage) pair.
 func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1.ListStageScoresRequest]) (*connect.Response[apiv1.ListStageScoresResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("lookup event key: %w", err))
 	}
 
@@ -30,6 +31,7 @@ func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1
 	}
 
 	var stageScores []*apiv1.StageScore
+
 	for _, s := range dbStageScores {
 		var adj []*apiv1.Adjustment
 		for _, a := range s.Adjustments {

@@ -13,13 +13,14 @@ import (
 
 // ListEventStages returns stage IDs (and the associated venue) for an entire event.
 func (s *Server) ListEventStages(ctx context.Context, req *connect.Request[apiv1.ListEventStagesRequest]) (*connect.Response[apiv1.ListEventStagesResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.EventKey)
+	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 

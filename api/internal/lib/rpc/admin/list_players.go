@@ -22,6 +22,7 @@ func (s *Server) ListPlayers(ctx context.Context, req *connect.Request[apiv1.Lis
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("event %q not found: %w", eventKey, err))
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
@@ -31,8 +32,10 @@ func (s *Server) ListPlayers(ctx context.Context, req *connect.Request[apiv1.Lis
 	}
 
 	players := make([]*apiv1.Player, 0, len(dbPlayers))
+
 	for _, p := range dbPlayers {
 		regs := make([]*apiv1.EventRegistration, 0, len(p.Events))
+
 		for _, e := range p.Events {
 			cat, err := e.ScoringCategory.ProtoEnum()
 			if err != nil {

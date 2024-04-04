@@ -12,12 +12,12 @@ import (
 
 // DeleteStageScore removes all scoring data for a player/stage pair.
 func (s *Server) DeleteStageScore(ctx context.Context, req *connect.Request[apiv1.DeleteStageScoreRequest]) (*connect.Response[apiv1.DeleteStageScoreResponse], error) {
-	playerID, err := models.PlayerIDFromString(req.Msg.PlayerId)
+	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
 
-	stageID, err := models.StageIDFromString(req.Msg.StageId)
+	stageID, err := models.StageIDFromString(req.Msg.GetStageId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse stageID as ULID: %w", err))
 	}

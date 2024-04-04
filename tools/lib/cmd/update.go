@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,13 +16,15 @@ func init() {
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Compiles the latest changes into the devctl binary",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		curToolsHash, err := dirhash.HashDir("tools", "", dirhash.DefaultHash)
 		guard(err, "hash tools dir")
 
-		compiler := exec.Command("go",
+		// TODO: include go.sum in generated hash.
+
+		compiler := exec.Command("go", //nolint:gosec // Input is not dynamically provided by end-user.
 			"install",
-			"-ldflags", fmt.Sprintf("-X main.toolsHash=%s", curToolsHash),
+			"-ldflags", "-X main.toolsHash="+curToolsHash,
 			filepath.FromSlash("./tools/cmd/"+config.CLIName),
 		)
 		compiler.Stderr = os.Stderr

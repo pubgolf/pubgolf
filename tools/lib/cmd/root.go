@@ -43,6 +43,7 @@ func Execute(toolsDirHash string, c CLIConfig) {
 	config = c
 
 	log.SetPrefix(fmt.Sprintf("[%s] ", config.CLIName))
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -53,7 +54,7 @@ var rootCmd = &cobra.Command{
 	Use:   config.CLIName,
 	Short: "DevCtrl is a task runner for local dev",
 	Long:  `An opinionated task runner for personal use by @thedeerchild`,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 		// Skip the update warning for the update command itself
 		if cmd.CommandPath() != " update" {
 			checkVersion()
@@ -125,5 +126,6 @@ func watch(dir, label string, callback func(watcher.Event)) {
 
 	guard(w.AddRecursive(dir), "create watcher")
 	log.Printf("Watching '%s' for changes...\n", dir)
+
 	go guard(w.Start(100*time.Millisecond), "start watcher")
 }

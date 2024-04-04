@@ -11,7 +11,7 @@ import (
 )
 
 // UpdatePlayer updates the given player's profile and settings, returning the full player object.
-func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerRequest]) (*connect.Response[apiv1.UpdatePlayerResponse], error) {
+func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerRequest]) (*connect.Response[apiv1.UpdatePlayerResponse], error) { //nolint:wsl // Leading comment.
 	// TODO: Fetch the event key based on the player ID.
 	// telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.EventKey)
 
@@ -28,7 +28,7 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 	}
 
 	updatedPlayer, err := s.dao.UpdatePlayer(ctx, playerID, models.PlayerParams{
-		Name: req.Msg.PlayerData.GetName(),
+		Name: req.Msg.GetPlayerData().GetName(),
 	})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update player info: %w", err))

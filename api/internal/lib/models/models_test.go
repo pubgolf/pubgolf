@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 var (

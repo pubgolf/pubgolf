@@ -41,7 +41,7 @@ var generateCmd = &cobra.Command{
 var generateProtoCmd = &cobra.Command{
 	Use:   "proto",
 	Short: "Generate protobuf and gRPC code",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
@@ -50,7 +50,7 @@ var generateProtoCmd = &cobra.Command{
 			return
 		}
 
-		go watch(filepath.FromSlash("proto/"), "Proto codegen", func(ev watcher.Event) {
+		go watch(filepath.FromSlash("proto/"), "Proto codegen", func(_ watcher.Event) {
 			if err := generateProto(); err != nil {
 				log.Printf("Encountered error while running 'Proto codegen' task. Waiting to re-run...")
 			}
@@ -61,16 +61,22 @@ var generateProtoCmd = &cobra.Command{
 }
 
 func generateProto() error {
-	buf := exec.Command("buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml"))
+	buf := exec.Command("buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
 	buf.Stdout = os.Stdout
 	buf.Stderr = os.Stderr
-	return buf.Run()
+
+	err := buf.Run()
+	if err != nil {
+		return fmt.Errorf("run buf generate cmd: %w", err)
+	}
+
+	return nil
 }
 
 var generateSQLcCmd = &cobra.Command{
 	Use:   "sqlc",
 	Short: "Generate SQLc queries and data holders",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
@@ -79,7 +85,7 @@ var generateSQLcCmd = &cobra.Command{
 			return
 		}
 
-		go watch(filepath.FromSlash("api/internal/db/"), "SQLc codegen", func(ev watcher.Event) {
+		go watch(filepath.FromSlash("api/internal/db/"), "SQLc codegen", func(_ watcher.Event) {
 			if err := generateSQLc(); err != nil {
 				log.Printf("Encountered error while running 'SQLc codegen' task. Waiting to re-run...")
 			}
@@ -90,16 +96,22 @@ var generateSQLcCmd = &cobra.Command{
 }
 
 func generateSQLc() error {
-	sqlc := exec.Command("sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml"))
+	sqlc := exec.Command("sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
 	sqlc.Stdout = os.Stdout
 	sqlc.Stderr = os.Stderr
-	return sqlc.Run()
+
+	err := sqlc.Run()
+	if err != nil {
+		return fmt.Errorf("run sqlc generate cmd: %w", err)
+	}
+
+	return nil
 }
 
 var generateEnumCmd = &cobra.Command{
 	Use:   "enum",
 	Short: "Generate enum stringers",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		guard(generateEnum("ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
 	},
 }
@@ -108,7 +120,13 @@ func generateEnum(typ, pkg string) error {
 	enumer := exec.Command("enumer", "-sql", "-transform", "snake-upper", "-type", typ, pkg)
 	enumer.Stdout = os.Stdout
 	enumer.Stderr = os.Stderr
-	return enumer.Run()
+
+	err := enumer.Run()
+	if err != nil {
+		return fmt.Errorf("run enumer cmd: %w", err)
+	}
+
+	return nil
 }
 
 var generateMockCmd = &cobra.Command{
@@ -127,7 +145,7 @@ var generateMockCmd = &cobra.Command{
 var generateDBCMockCmd = &cobra.Command{
 	Use:   "dbc",
 	Short: "Generate DBC mock",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		guard(
 			generateMock("Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
 			"generate mock DBC",
@@ -138,7 +156,7 @@ var generateDBCMockCmd = &cobra.Command{
 var generateDAOMockCmd = &cobra.Command{
 	Use:   "dao",
 	Short: "Generate DAO interface and mock",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		guard(
 			generateInterfaceAndMock(mockConfig{
 				targetStruct: "Queries",
@@ -155,7 +173,7 @@ var generateDAOMockCmd = &cobra.Command{
 var generateSMSMockCmd = &cobra.Command{
 	Use:   "sms",
 	Short: "Generate SMS client interface and mock",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		guard(
 			generateInterfaceAndMock(mockConfig{
 				targetStruct: "Client",
@@ -227,6 +245,7 @@ func generateInterface(mc mockConfig) error {
 
 	iface.Stdout = os.Stdout
 	iface.Stderr = os.Stderr
+
 	if err := iface.Run(); err != nil {
 		return fmt.Errorf("run interface generator command: %w", err)
 	}
@@ -244,6 +263,7 @@ func generateMock(ifaceName, genDir string) error {
 
 	mock.Stdout = os.Stdout
 	mock.Stderr = os.Stderr
+
 	if err := mock.Run(); err != nil {
 		return fmt.Errorf("run mock generator command: %w", err)
 	}

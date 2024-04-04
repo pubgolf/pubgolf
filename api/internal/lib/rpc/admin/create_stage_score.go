@@ -14,31 +14,32 @@ import (
 
 // CreateStageScore records the score and any adjustments (i.e. bonuses or penalties) for a (player, stage) pair.
 func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv1.CreateStageScoreRequest]) (*connect.Response[apiv1.CreateStageScoreResponse], error) {
-	reqData := req.Msg.Data
+	reqData := req.Msg.GetData()
 
-	playerID, err := models.PlayerIDFromString(reqData.PlayerId)
+	playerID, err := models.PlayerIDFromString(reqData.GetPlayerId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
 
-	stageID, err := models.StageIDFromString(reqData.StageId)
+	stageID, err := models.StageIDFromString(reqData.GetStageId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse stageID as ULID: %w", err))
 	}
 
 	var adjP []models.AdjustmentParams
-	for _, adj := range reqData.Adjustments {
+	for _, adj := range reqData.GetAdjustments() {
 		adjP = append(adjP, models.AdjustmentParams{
-			Label: adj.Label,
-			Value: adj.Value,
+			Label: adj.GetLabel(),
+			Value: adj.GetValue(),
 		})
 	}
 
-	err = s.dao.CreateScoreForStage(ctx, playerID, stageID, reqData.Score.Value, adjP)
+	err = s.dao.CreateScoreForStage(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
+
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("insert score: %w", err))
 	}
 

@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 var (

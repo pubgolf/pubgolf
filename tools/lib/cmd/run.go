@@ -44,7 +44,7 @@ var runAPIServerCmd = &cobra.Command{
 var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			// "api-blob-storage",
@@ -55,7 +55,7 @@ var runAPIBgCmd = &cobra.Command{
 var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-db")
 	},
 }
@@ -101,7 +101,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	// Launch watcher, if applicable.
 	if watchFlag {
 		go func() {
-			watch("api", "restart API server", func(ev watcher.Event) {
+			watch("api", "restart API server", func(_ watcher.Event) {
 				// Start the old process and keep track of the new cleanup handler.
 				stopFn()
 				stopFn = dopplerGoRun(project, env, bin, args, false)
@@ -137,18 +137,21 @@ func dopplerGoRun(project, env, bin string, args []string, stopOnExit bool) func
 
 	if stopOnExit {
 		go func() {
-			doppler.Wait()
+			guard(doppler.Wait(), "wait on process")
 			close(beginShutdown)
 		}()
 	}
 
 	return func() {
 		log.Printf("Calling Doppler shutdown for pid %d...", doppler.Process.Pid)
+
 		pgid, err := syscall.Getpgid(doppler.Process.Pid)
 		if err != nil {
 			log.Println("Could not get pgid. Assuming process has already shut down.")
+
 			return
 		}
+
 		guard(syscall.Kill(-pgid, syscall.SIGKILL), "send SIGINT to running process")
 	}
 }

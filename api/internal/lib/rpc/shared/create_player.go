@@ -29,7 +29,7 @@ func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *
 
 	var cat models.ScoringCategory
 
-	err = cat.FromProtoEnum(playerData.ScoringCategory) //nolint:staticcheck // Ignore deprecation warning because entire RPC is slated for deprecation.
+	err = cat.FromProtoEnum(playerData.GetScoringCategory()) //nolint:staticcheck // Ignore deprecation warning because entire RPC is slated for deprecation.
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoring category: %w", err))
 	}

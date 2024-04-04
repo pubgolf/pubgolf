@@ -18,9 +18,9 @@ func init() {
 var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run all automated tests",
-	Run: func(cmd *cobra.Command, args []string) {
-		var coverageDir = filepath.FromSlash("./data/go-test-coverage")
-		var coverageFile = filepath.Join(coverageDir, "api.cover")
+	Run: func(cmd *cobra.Command, _ []string) {
+		coverageDir := filepath.FromSlash("./data/go-test-coverage")
+		coverageFile := filepath.Join(coverageDir, "api.cover")
 
 		coverageFlag, err := cmd.Flags().GetBool("coverage")
 		guard(err, "check '--coverage' flag")
@@ -44,7 +44,7 @@ var testCmd = &cobra.Command{
 			)
 
 			guard(os.RemoveAll(coverageDir), "clean old output dir: %w")
-			guard(os.MkdirAll(coverageDir, 0755), "make new output dir: %w")
+			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir: %w")
 		}
 
 		tester := exec.Command("go", testArgs...)
@@ -53,7 +53,13 @@ var testCmd = &cobra.Command{
 		tester.Stderr = os.Stderr
 		tester.Stdin = os.Stdin
 
-		guard(tester.Run(), "execute `go test ...` command")
+		err = tester.Run()
+		if err != nil {
+			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+			if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+				guard(err, "execute `go test ...` command")
+			}
+		}
 
 		if coverageFlag {
 			cover := exec.Command("go",
