@@ -33,7 +33,7 @@ func New(namespace string, enableLogging bool) (*sql.DB, func()) {
 	guardSetup(err, "make temp dir")
 
 	pgConfig := epg.DefaultConfig().
-		Version(epg.V15).
+		Version(epg.V16).
 		Port(uint32(port)).
 		RuntimePath(tempDir)
 	if !enableLogging {
