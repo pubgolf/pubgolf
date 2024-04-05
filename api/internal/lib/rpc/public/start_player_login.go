@@ -2,6 +2,8 @@ package public
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/bufbuild/connect-go"
 	"go.opentelemetry.io/otel/attribute"
@@ -20,16 +22,27 @@ func (s *Server) StartPlayerLogin(ctx context.Context, req *connect.Request[apiv
 	}
 
 	playerExists := false
+	span := trace.SpanFromContext(ctx)
+
 	_, err = s.dao.CreatePlayer(ctx, "", num)
 	if err != nil {
-		if err != dao.ErrAlreadyCreated {
+		if !errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeUnknown, err)
 		}
+
+		// Player already exists. Do not return an error, but check and log if we've already verified the phone number.
+
+		isVerified, err := s.dao.PhoneNumberIsVerified(ctx, num)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("check if phone number is verified: %w", err))
+		}
+
+		span.SetAttributes(attribute.Bool("player.phone_number_verified", isVerified))
+
 		playerExists = true
 	}
 
-	span := trace.SpanFromContext(ctx)
-	span.SetAttributes(attribute.Bool("login_request.player_exists", playerExists))
+	span.SetAttributes(attribute.Bool("player.new_phone_number", !playerExists))
 
 	err = s.mes.SendVerification(num)
 	if err != nil {
