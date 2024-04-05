@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgerrcode"
-
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -21,7 +18,10 @@ func (q *Queries) CreatePlayer(ctx context.Context, name string, phoneNum models
 		PhoneNumber: phoneNum,
 	})
 	if err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation { //nolint:errorlint
+		// Technically the following is the correct way to handle this, but for some reason the type assertion is failing.
+		// var pgErr *pgconn.PgError
+		// notUniqErr := errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation
+		if strings.HasSuffix(err.Error(), "(SQLSTATE 23505)") {
 			return models.Player{}, ErrAlreadyCreated
 		}
 
