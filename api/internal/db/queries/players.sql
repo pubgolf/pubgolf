@@ -20,7 +20,7 @@ SET
   phone_number_verified = TRUE,
   updated_at = now()
 WHERE
-  deleted_at
+  deleted_at IS NULL
   AND phone_number = @phone_number
   AND phone_number_verified = FALSE
 RETURNING
