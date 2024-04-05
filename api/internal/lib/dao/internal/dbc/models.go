@@ -22,19 +22,9 @@ type Adjustment struct {
 	DeletedAt sql.NullTime
 }
 
-type AuthCode struct {
-	PlayerID  models.DatabaseULID
-	CodeHash  string
-	CodeSalt  string
-	CreatedAt time.Time
-	DeletedAt sql.NullTime
-}
-
 type AuthToken struct {
 	ID        models.DatabaseULID
 	PlayerID  models.DatabaseULID
-	TokenHash string
-	TokenSalt string
 	CreatedAt time.Time
 	DeletedAt sql.NullTime
 }
@@ -69,7 +59,7 @@ type Player struct {
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	DeletedAt           sql.NullTime
-	PhoneNumber         interface{}
+	PhoneNumber         models.PhoneNum
 	PhoneNumberVerified bool
 }
 

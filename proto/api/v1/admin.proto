@@ -50,6 +50,7 @@ service AdminService {
 message AdminServiceCreatePlayerRequest {
   string event_key = 1;
   PlayerData player_data = 2;
+  string phone_number = 3;
 }
 message AdminServiceCreatePlayerResponse {
   Player player = 1;

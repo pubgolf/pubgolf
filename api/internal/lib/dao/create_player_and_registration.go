@@ -13,10 +13,13 @@ import (
 )
 
 // CreatePlayer creates a new player and adds them to the given event.
-func (q *Queries) CreatePlayerAndRegistration(ctx context.Context, player models.PlayerParams, eventID models.EventID, cat models.ScoringCategory) (models.Player, error) {
+func (q *Queries) CreatePlayerAndRegistration(ctx context.Context, name string, phoneNum models.PhoneNum, eventID models.EventID, cat models.ScoringCategory) (models.Player, error) {
 	defer daoSpan(&ctx)()
 
-	pID, err := q.dbc.CreatePlayer(ctx, strings.TrimSpace(player.Name))
+	pID, err := q.dbc.CreatePlayer(ctx, dbc.CreatePlayerParams{
+		Name:        strings.TrimSpace(name),
+		PhoneNumber: phoneNum,
+	})
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation { //nolint:errorlint
 			return models.Player{}, ErrAlreadyCreated

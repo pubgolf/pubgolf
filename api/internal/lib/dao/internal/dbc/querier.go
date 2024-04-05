@@ -14,7 +14,7 @@ import (
 type Querier interface {
 	AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error)
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
-	CreatePlayer(ctx context.Context, name string) (models.PlayerID, error)
+	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error)
 	CreateScore(ctx context.Context, arg CreateScoreParams) error
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
 	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error

@@ -12,14 +12,19 @@ import (
 )
 
 const createPlayer = `-- name: CreatePlayer :one
-INSERT INTO players(name, updated_at)
-  VALUES ($1, now())
+INSERT INTO players(name, phone_number, updated_at)
+  VALUES ($1, $2, now())
 RETURNING
   id
 `
 
-func (q *Queries) CreatePlayer(ctx context.Context, name string) (models.PlayerID, error) {
-	row := q.queryRow(ctx, q.createPlayerStmt, createPlayer, name)
+type CreatePlayerParams struct {
+	Name        string
+	PhoneNumber models.PhoneNum
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error) {
+	row := q.queryRow(ctx, q.createPlayerStmt, createPlayer, arg.Name, arg.PhoneNumber)
 	var id models.PlayerID
 	err := row.Scan(&id)
 	return id, err

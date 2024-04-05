@@ -1,6 +1,6 @@
 -- name: CreatePlayer :one
-INSERT INTO players(name, updated_at)
-  VALUES ($1, now())
+INSERT INTO players(name, phone_number, updated_at)
+  VALUES (@name, @phone_number, now())
 RETURNING
   id;
 

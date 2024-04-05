@@ -13,8 +13,10 @@ import (
 type QueryProvider interface {
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
+	// CreatePlayer creates a new player.
+	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
 	// CreatePlayer creates a new player and adds them to the given event.
-	CreatePlayerAndRegistration(ctx context.Context, player models.PlayerParams, eventID models.EventID, cat models.ScoringCategory) (models.Player, error)
+	CreatePlayerAndRegistration(ctx context.Context, name string, phoneNum models.PhoneNum, eventID models.EventID, cat models.ScoringCategory) (models.Player, error)
 	// CreateScoreForStage creates score and adjustment records for a given stage.
 	CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error
 	// DeleteScore creates score and adjustment records for a given stage.

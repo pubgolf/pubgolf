@@ -41,6 +41,8 @@ sql:
           # Players
           - column: players.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
+          - column: players.phone_number
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PhoneNum
           # Event Players
           - column: event_players.player_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID

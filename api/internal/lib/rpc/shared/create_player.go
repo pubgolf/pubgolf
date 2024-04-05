@@ -15,7 +15,7 @@ import (
 )
 
 // CreatePlayer registers a player in the given event, returning the created player object. This method is idempotent, so if the player is already registered the request will still succeed.
-func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *apiv1.PlayerData) (*apiv1.Player, error) {
+func (s *Server) CreatePlayer(ctx context.Context, eventKey, phoneNum string, playerData *apiv1.PlayerData) (*apiv1.Player, error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", eventKey)
 
 	eventID, err := s.dao.EventIDByKey(ctx, eventKey)
@@ -34,13 +34,12 @@ func (s *Server) CreatePlayer(ctx context.Context, eventKey string, playerData *
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoring category: %w", err))
 	}
 
-	player, err := s.dao.CreatePlayerAndRegistration(ctx,
-		models.PlayerParams{
-			Name: playerData.GetName(),
-		},
-		eventID,
-		cat,
-	)
+	pn, err := models.NewPhoneNum(phoneNum)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse phone num: %w", err))
+	}
+
+	player, err := s.dao.CreatePlayerAndRegistration(ctx, playerData.GetName(), pn, eventID, cat)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("store player: %w", err))
