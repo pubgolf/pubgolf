@@ -77,6 +77,23 @@ func (q *Queries) EventPlayers(ctx context.Context, eventKey string) ([]EventPla
 	return items, nil
 }
 
+const phoneNumberIsVerified = `-- name: PhoneNumberIsVerified :one
+SELECT
+  phone_number_verified
+FROM
+  players
+WHERE
+  deleted_at IS NULL
+  AND phone_number = $1
+`
+
+func (q *Queries) PhoneNumberIsVerified(ctx context.Context, phoneNumber models.PhoneNum) (bool, error) {
+	row := q.queryRow(ctx, q.phoneNumberIsVerifiedStmt, phoneNumberIsVerified, phoneNumber)
+	var phone_number_verified bool
+	err := row.Scan(&phone_number_verified)
+	return phone_number_verified, err
+}
+
 const playerByID = `-- name: PlayerByID :one
 SELECT
   id,
@@ -180,4 +197,25 @@ type UpsertRegistrationParams struct {
 func (q *Queries) UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error {
 	_, err := q.exec(ctx, q.upsertRegistrationStmt, upsertRegistration, arg.EventID, arg.PlayerID, arg.ScoringCategory)
 	return err
+}
+
+const verifyPhoneNumber = `-- name: VerifyPhoneNumber :one
+UPDATE
+  players
+SET
+  phone_number_verified = TRUE,
+  updated_at = now()
+WHERE
+  deleted_at
+  AND phone_number = $1
+  AND phone_number_verified = FALSE
+RETURNING
+  TRUE AS did_update
+`
+
+func (q *Queries) VerifyPhoneNumber(ctx context.Context, phoneNumber models.PhoneNum) (bool, error) {
+	row := q.queryRow(ctx, q.verifyPhoneNumberStmt, verifyPhoneNumber, phoneNumber)
+	var did_update bool
+	err := row.Scan(&did_update)
+	return did_update, err
 }

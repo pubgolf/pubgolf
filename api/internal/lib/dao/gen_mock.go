@@ -349,6 +349,69 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 	return r0, r1
 }
 
+// GenerateAuthToken provides a mock function with given fields: ctx, num
+func (_m *MockQueryProvider) GenerateAuthToken(ctx context.Context, num models.PhoneNum) (models.PlayerID, models.AuthToken, error) {
+	ret := _m.Called(ctx, num)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GenerateAuthToken")
+	}
+
+	var r0 models.PlayerID
+	var r1 models.AuthToken
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (models.PlayerID, models.AuthToken, error)); ok {
+		return rf(ctx, num)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) models.PlayerID); ok {
+		r0 = rf(ctx, num)
+	} else {
+		r0 = ret.Get(0).(models.PlayerID)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) models.AuthToken); ok {
+		r1 = rf(ctx, num)
+	} else {
+		r1 = ret.Get(1).(models.AuthToken)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, models.PhoneNum) error); ok {
+		r2 = rf(ctx, num)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// PhoneNumberIsVerified provides a mock function with given fields: ctx, num
+func (_m *MockQueryProvider) PhoneNumberIsVerified(ctx context.Context, num models.PhoneNum) (bool, error) {
+	ret := _m.Called(ctx, num)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PhoneNumberIsVerified")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (bool, error)); ok {
+		return rf(ctx, num)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) bool); ok {
+		r0 = rf(ctx, num)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) error); ok {
+		r1 = rf(ctx, num)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // PlayerAdjustments provides a mock function with given fields: ctx, eventID, playerID
 func (_m *MockQueryProvider) PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error) {
 	ret := _m.Called(ctx, eventID, playerID)
@@ -562,6 +625,34 @@ func (_m *MockQueryProvider) VenueByKey(ctx context.Context, eventID models.Even
 
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.VenueKey) error); ok {
 		r1 = rf(ctx, eventID, venueKey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// VerifyPhoneNumber provides a mock function with given fields: ctx, num
+func (_m *MockQueryProvider) VerifyPhoneNumber(ctx context.Context, num models.PhoneNum) (bool, error) {
+	ret := _m.Called(ctx, num)
+
+	if len(ret) == 0 {
+		panic("no return value specified for VerifyPhoneNumber")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (bool, error)); ok {
+		return rf(ctx, num)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) bool); ok {
+		r0 = rf(ctx, num)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) error); ok {
+		r1 = rf(ctx, num)
 	} else {
 		r1 = ret.Error(1)
 	}

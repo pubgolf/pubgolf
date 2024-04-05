@@ -23,8 +23,8 @@ type Adjustment struct {
 }
 
 type AuthToken struct {
-	ID        models.DatabaseULID
-	PlayerID  models.DatabaseULID
+	ID        models.AuthToken
+	PlayerID  models.PlayerID
 	CreatedAt time.Time
 	DeletedAt sql.NullTime
 }

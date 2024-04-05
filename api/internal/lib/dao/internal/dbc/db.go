@@ -72,6 +72,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.eventVenueKeysAreValidStmt, err = db.PrepareContext(ctx, eventVenueKeysAreValid); err != nil {
 		return nil, fmt.Errorf("error preparing query EventVenueKeysAreValid: %w", err)
 	}
+	if q.generateAuthTokenStmt, err = db.PrepareContext(ctx, generateAuthToken); err != nil {
+		return nil, fmt.Errorf("error preparing query GenerateAuthToken: %w", err)
+	}
+	if q.phoneNumberIsVerifiedStmt, err = db.PrepareContext(ctx, phoneNumberIsVerified); err != nil {
+		return nil, fmt.Errorf("error preparing query PhoneNumberIsVerified: %w", err)
+	}
 	if q.playerAdjustmentsStmt, err = db.PrepareContext(ctx, playerAdjustments); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerAdjustments: %w", err)
 	}
@@ -116,6 +122,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.venueByKeyStmt, err = db.PrepareContext(ctx, venueByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query VenueByKey: %w", err)
+	}
+	if q.verifyPhoneNumberStmt, err = db.PrepareContext(ctx, verifyPhoneNumber); err != nil {
+		return nil, fmt.Errorf("error preparing query VerifyPhoneNumber: %w", err)
 	}
 	return &q, nil
 }
@@ -202,6 +211,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing eventVenueKeysAreValidStmt: %w", cerr)
 		}
 	}
+	if q.generateAuthTokenStmt != nil {
+		if cerr := q.generateAuthTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing generateAuthTokenStmt: %w", cerr)
+		}
+	}
+	if q.phoneNumberIsVerifiedStmt != nil {
+		if cerr := q.phoneNumberIsVerifiedStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing phoneNumberIsVerifiedStmt: %w", cerr)
+		}
+	}
 	if q.playerAdjustmentsStmt != nil {
 		if cerr := q.playerAdjustmentsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing playerAdjustmentsStmt: %w", cerr)
@@ -277,6 +296,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing venueByKeyStmt: %w", cerr)
 		}
 	}
+	if q.verifyPhoneNumberStmt != nil {
+		if cerr := q.verifyPhoneNumberStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing verifyPhoneNumberStmt: %w", cerr)
+		}
+	}
 	return err
 }
 
@@ -332,6 +356,8 @@ type Queries struct {
 	eventScoresStmt                     *sql.Stmt
 	eventStartTimeStmt                  *sql.Stmt
 	eventVenueKeysAreValidStmt          *sql.Stmt
+	generateAuthTokenStmt               *sql.Stmt
+	phoneNumberIsVerifiedStmt           *sql.Stmt
 	playerAdjustmentsStmt               *sql.Stmt
 	playerByIDStmt                      *sql.Stmt
 	playerRegistrationsByIDStmt         *sql.Stmt
@@ -347,6 +373,7 @@ type Queries struct {
 	updateScoreStmt                     *sql.Stmt
 	upsertRegistrationStmt              *sql.Stmt
 	venueByKeyStmt                      *sql.Stmt
+	verifyPhoneNumberStmt               *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -369,6 +396,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventScoresStmt:                     q.eventScoresStmt,
 		eventStartTimeStmt:                  q.eventStartTimeStmt,
 		eventVenueKeysAreValidStmt:          q.eventVenueKeysAreValidStmt,
+		generateAuthTokenStmt:               q.generateAuthTokenStmt,
+		phoneNumberIsVerifiedStmt:           q.phoneNumberIsVerifiedStmt,
 		playerAdjustmentsStmt:               q.playerAdjustmentsStmt,
 		playerByIDStmt:                      q.playerByIDStmt,
 		playerRegistrationsByIDStmt:         q.playerRegistrationsByIDStmt,
@@ -384,5 +413,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updateScoreStmt:                     q.updateScoreStmt,
 		upsertRegistrationStmt:              q.upsertRegistrationStmt,
 		venueByKeyStmt:                      q.venueByKeyStmt,
+		verifyPhoneNumberStmt:               q.verifyPhoneNumberStmt,
 	}
 }

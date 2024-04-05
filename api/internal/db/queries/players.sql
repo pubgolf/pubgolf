@@ -4,6 +4,28 @@ INSERT INTO players(name, phone_number, updated_at)
 RETURNING
   id;
 
+-- name: PhoneNumberIsVerified :one
+SELECT
+  phone_number_verified
+FROM
+  players
+WHERE
+  deleted_at IS NULL
+  AND phone_number = @phone_number;
+
+-- name: VerifyPhoneNumber :one
+UPDATE
+  players
+SET
+  phone_number_verified = TRUE,
+  updated_at = now()
+WHERE
+  deleted_at
+  AND phone_number = @phone_number
+  AND phone_number_verified = FALSE
+RETURNING
+  TRUE AS did_update;
+
 -- name: PlayerByID :one
 SELECT
   id,

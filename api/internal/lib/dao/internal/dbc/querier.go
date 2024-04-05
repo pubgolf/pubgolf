@@ -28,6 +28,8 @@ type Querier interface {
 	EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error)
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error)
+	GenerateAuthToken(ctx context.Context, phoneNumber models.PhoneNum) (GenerateAuthTokenRow, error)
+	PhoneNumberIsVerified(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error)
 	PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByIDRow, error)
 	PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error)
@@ -43,6 +45,7 @@ type Querier interface {
 	UpdateScore(ctx context.Context, arg UpdateScoreParams) error
 	UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error
 	VenueByKey(ctx context.Context, arg VenueByKeyParams) (VenueByKeyRow, error)
+	VerifyPhoneNumber(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 }
 
 var _ Querier = (*Queries)(nil)

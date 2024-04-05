@@ -35,6 +35,10 @@ type QueryProvider interface {
 	EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
+	// GenerateAuthToken generates an auth token for the player with the given phone number, returning the auth token and the player's ID.
+	GenerateAuthToken(ctx context.Context, num models.PhoneNum) (models.PlayerID, models.AuthToken, error)
+	// PhoneNumberIsVerified returns true if the phone number has been verified via an auth code.
+	PhoneNumberIsVerified(ctx context.Context, num models.PhoneNum) (bool, error)
 	// PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.
 	PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error)
 	// PlayerByID returns a player's profile data and event registrations.
@@ -51,4 +55,6 @@ type QueryProvider interface {
 	UpdateScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score models.Score, modifyAdj []models.Adjustment, createAdj []models.AdjustmentParams) error
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
+	// VerifyPhoneNumber sets the player's phone number as verified, returning a boolean to indicate whether the phone number was previously unverified (i.e. false means the DB row was not updated).
+	VerifyPhoneNumber(ctx context.Context, num models.PhoneNum) (bool, error)
 }
