@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -8,34 +9,90 @@ import (
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/fatih/color"
+
+	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
 
-var cleanup func()
+type LogWriter struct {
+	logger *log.Logger
+}
+
+func NewPrefixLogWriter(p string) *LogWriter {
+	l := log.New(log.Writer(), fmt.Sprintf("[%s] ", p), log.Flags())
+	l.SetFlags(0)
+
+	return NewLogWriter(l)
+}
+
+func NewLogWriter(l *log.Logger) *LogWriter {
+	return &LogWriter{
+		logger: l,
+	}
+}
+
+func (lw LogWriter) Write(p []byte) (int, error) {
+	lw.logger.Print(string(p))
+
+	return len(p), nil
+}
 
 func TestMain(m *testing.M) {
 	testguard.E2ETest()
 
-	cleanup = runAPIServer()
+	color.NoColor = false
+
+	dbURL, dbCleanupFn := dbtest.NewURL("pubgolf-e2e", false)
+
+	runAPIMigrator(dbURL)
+
+	serverCleanup := runAPIServer(dbURL)
+
 	ret := m.Run()
 
-	cleanup()
+	serverCleanup()
+	dbCleanupFn()
 	os.Exit(ret)
 }
 
-func runAPIServer() func() {
+func runAPIMigrator(dbURL string) {
+	migrator := exec.Command(
+		"doppler", "run",
+		"--project", "pubgolf-api-server",
+		"--config", "e2e",
+		"--preserve-env",
+		"--",
+		"go", "run", "../../cmd/pubgolf-api-server", "--run-migrations",
+	)
+
+	migrator.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
+
+	migratorLog := NewPrefixLogWriter(color.RedString("Migrator"))
+	migrator.Stdout = migratorLog
+	migrator.Stderr = migratorLog
+	migrator.Stdin = os.Stdin
+
+	guard(migrator.Run(), "run API migrator")
+}
+
+func runAPIServer(dbURL string) func() {
 	server := exec.Command(
 		"doppler", "run",
 		"--project", "pubgolf-api-server",
 		"--config", "e2e",
+		"--preserve-env",
 		"--",
 		"go", "run", "../../cmd/pubgolf-api-server",
 	)
 
-	serverLog := log.New(log.Writer(), "[API Server] ", log.LstdFlags)
-
+	server.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
 	server.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	server.Stdout = serverLog.Writer()
-	server.Stderr = serverLog.Writer()
+
+	serverLog := NewPrefixLogWriter(color.BlueString("API Server"))
+	server.Stdout = serverLog
+	server.Stderr = serverLog
 	server.Stdin = os.Stdin
 
 	guard(server.Start(), "start API server")
