@@ -22,8 +22,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// New returns an empty, ephemeral database. Namespace must be a unique identifier for the instance.
-func New(namespace string, enableLogging bool) (*sql.DB, func()) {
+// NewURL returns a URL for an empty, ephemeral database, as well as a cleanup function. Namespace must be a unique identifier for the instance.
+func NewURL(namespace string, enableLogging bool) (string, func()) {
 	port, err := freeport.GetFreePort()
 	guardSetup(err, "find open port")
 
@@ -43,14 +43,21 @@ func New(namespace string, enableLogging bool) (*sql.DB, func()) {
 	db := epg.NewDatabase(pgConfig)
 	guardSetup(db.Start(), "start test DB")
 
+	return dbURL, func() {
+		guardSetup(db.Stop(), "stop test DB")
+	}
+}
+
+// NewConn returns a connection to an empty, ephemeral database, as well as a cleanup function. Namespace must be a unique identifier for the instance.
+func NewConn(namespace string, enableLogging bool) (*sql.DB, func()) {
+	dbURL, cleanup := NewURL(namespace, enableLogging)
+
 	cfg, err := pgx.ParseConfig(dbURL)
 	guardSetup(err, "prase test DB config")
 
 	conn := stdlib.OpenDB(*cfg)
 
-	return conn, func() {
-		guardSetup(db.Stop(), "stop test DB")
-	}
+	return conn, cleanup
 }
 
 // Migrate migrates a test DB to the current schema.

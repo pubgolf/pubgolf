@@ -25,10 +25,10 @@ func TestMain(m *testing.M) {
 }
 
 func executeTests(m *testing.M) int {
-	_sharedEmptyDB, _sharedEmptyDBCleanup = dbtest.New("models-test", false)
+	_sharedEmptyDB, _sharedEmptyDBCleanup = dbtest.NewConn("models-test", false)
 	defer _sharedEmptyDBCleanup()
 
-	_sharedDB, _sharedDBCleanup = dbtest.New("models-test-migrated", false)
+	_sharedDB, _sharedDBCleanup = dbtest.NewConn("models-test-migrated", false)
 	defer _sharedDBCleanup()
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
 
