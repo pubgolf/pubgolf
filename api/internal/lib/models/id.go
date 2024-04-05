@@ -6,6 +6,24 @@ import (
 	ulid "github.com/oklog/ulid/v2"
 )
 
+// AdjustmentID uniquely identifies a bonus or penalty.
+type AdjustmentID struct{ DatabaseULID }
+
+// AdjustmentIDFromULID parses an AdjustmentID from a ULID.
+func AdjustmentIDFromULID(u ulid.ULID) AdjustmentID {
+	return AdjustmentID{DatabaseULID{u}}
+}
+
+// AdjustmentIDFromString parses an AdjustmentID from a string.
+func AdjustmentIDFromString(s string) (AdjustmentID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return AdjustmentID{}, fmt.Errorf("parse AdjustmentID from string: %w", err)
+	}
+
+	return AdjustmentID{DatabaseULID{u}}, nil
+}
+
 // EventID uniquely identifies an event.
 type EventID struct{ DatabaseULID }
 
@@ -42,22 +60,22 @@ func VenueIDFromString(s string) (VenueID, error) {
 	return VenueID{DatabaseULID{u}}, nil
 }
 
-// StageID uniquely identifies a stage.
-type StageID struct{ DatabaseULID }
+// PlayerID uniquely identifies a player.
+type PlayerID struct{ DatabaseULID }
 
-// StageIDFromULID parses an StageID from a ULID.
-func StageIDFromULID(u ulid.ULID) StageID {
-	return StageID{DatabaseULID{u}}
+// PlayerIDFromULID parses an PlayerID from a ULID.
+func PlayerIDFromULID(u ulid.ULID) PlayerID {
+	return PlayerID{DatabaseULID{u}}
 }
 
-// StageIDFromString parses an StageID from a string.
-func StageIDFromString(s string) (StageID, error) {
+// PlayerIDFromString parses an PlayerID from a string.
+func PlayerIDFromString(s string) (PlayerID, error) {
 	u, err := ulid.Parse(s)
 	if err != nil {
-		return StageID{}, fmt.Errorf("parse StageID from string: %w", err)
+		return PlayerID{}, fmt.Errorf("parse PlayerID from string: %w", err)
 	}
 
-	return StageID{DatabaseULID{u}}, nil
+	return PlayerID{DatabaseULID{u}}, nil
 }
 
 // RuleID uniquely identifies an event description.
@@ -78,24 +96,6 @@ func RuleIDFromString(s string) (RuleID, error) {
 	return RuleID{DatabaseULID{u}}, nil
 }
 
-// PlayerID uniquely identifies a player.
-type PlayerID struct{ DatabaseULID }
-
-// PlayerIDFromULID parses an PlayerID from a ULID.
-func PlayerIDFromULID(u ulid.ULID) PlayerID {
-	return PlayerID{DatabaseULID{u}}
-}
-
-// PlayerIDFromString parses an PlayerID from a string.
-func PlayerIDFromString(s string) (PlayerID, error) {
-	u, err := ulid.Parse(s)
-	if err != nil {
-		return PlayerID{}, fmt.Errorf("parse PlayerID from string: %w", err)
-	}
-
-	return PlayerID{DatabaseULID{u}}, nil
-}
-
 // ScoreID uniquely identifies a score.
 type ScoreID struct{ DatabaseULID }
 
@@ -114,20 +114,20 @@ func ScoreIDFromString(s string) (ScoreID, error) {
 	return ScoreID{DatabaseULID{u}}, nil
 }
 
-// AdjustmentID uniquely identifies a bonus or penalty.
-type AdjustmentID struct{ DatabaseULID }
+// StageID uniquely identifies a stage.
+type StageID struct{ DatabaseULID }
 
-// AdjustmentIDFromULID parses an AdjustmentID from a ULID.
-func AdjustmentIDFromULID(u ulid.ULID) AdjustmentID {
-	return AdjustmentID{DatabaseULID{u}}
+// StageIDFromULID parses an StageID from a ULID.
+func StageIDFromULID(u ulid.ULID) StageID {
+	return StageID{DatabaseULID{u}}
 }
 
-// AdjustmentIDFromString parses an AdjustmentID from a string.
-func AdjustmentIDFromString(s string) (AdjustmentID, error) {
+// StageIDFromString parses an StageID from a string.
+func StageIDFromString(s string) (StageID, error) {
 	u, err := ulid.Parse(s)
 	if err != nil {
-		return AdjustmentID{}, fmt.Errorf("parse AdjustmentID from string: %w", err)
+		return StageID{}, fmt.Errorf("parse StageID from string: %w", err)
 	}
 
-	return AdjustmentID{DatabaseULID{u}}, nil
+	return StageID{DatabaseULID{u}}, nil
 }
