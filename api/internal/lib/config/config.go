@@ -34,7 +34,7 @@ type App struct {
 	HostOrigin         string    `required:"true" split_words:"true"`
 
 	// Behavioral config
-	SMSAllowList PhoneNumSet `split_words:"true" default:"*"`
+	SMSAllowList PhoneNumSet `split_words:"true"`
 
 	// Credentials
 	HoneycombKey   string     `split_words:"true"`
