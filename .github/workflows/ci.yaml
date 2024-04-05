@@ -86,6 +86,8 @@ jobs:
           args: ./api/...
       - name: Test
         run: go test ./api/...
+      - name: Test E2E
+        run: go test ./api/internal/e2e -v -e2e=true
       - name: Build API Server Binary
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-api-server
       - name: Upload API Server Binary as CI Artifact
