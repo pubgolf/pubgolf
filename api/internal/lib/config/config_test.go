@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pubgolf/pubgolf/api/internal/e2e"
+	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
 
 func TestMain(m *testing.M) {
-	e2e.GuardUnitTests()
+	testguard.UnitTest()
 	os.Exit(m.Run())
 }

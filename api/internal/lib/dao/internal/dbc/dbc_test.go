@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/pubgolf/pubgolf/api/internal/e2e"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
+	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	e2e.GuardUnitTests()
+	testguard.UnitTest()
 	os.Exit(executeTests(m))
 }
 

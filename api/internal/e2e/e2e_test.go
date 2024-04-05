@@ -13,7 +13,7 @@ import (
 var cleanup func()
 
 func TestMain(m *testing.M) {
-	GuardE2ETests()
+	testguard.E2ETest()
 
 	cleanup = runAPIServer()
 	ret := m.Run()
