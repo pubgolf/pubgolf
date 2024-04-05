@@ -90,7 +90,7 @@ message PubGolfServiceCreatePlayerRequest {
 }
 message PubGolfServiceCreatePlayerResponse {
   option deprecated = true;
-  
+
   Player player = 1;
 }
 
