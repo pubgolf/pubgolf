@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pubgolf/pubgolf/api/internal/e2e"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
 
@@ -33,6 +34,7 @@ func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 }
 
 func TestMain(m *testing.M) {
+	e2e.GuardUnitTests()
 	os.Exit(executeTests(m))
 }
 

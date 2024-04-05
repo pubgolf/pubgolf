@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/pubgolf/pubgolf/api/internal/e2e"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -19,6 +20,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	e2e.GuardUnitTests()
 	os.Exit(executeTests(m))
 }
 

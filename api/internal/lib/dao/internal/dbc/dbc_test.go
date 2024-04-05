@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/pubgolf/pubgolf/api/internal/e2e"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
 
@@ -21,6 +22,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	e2e.GuardUnitTests()
 	os.Exit(executeTests(m))
 }
 
