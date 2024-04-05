@@ -26,6 +26,7 @@ func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVen
 	}
 
 	venues := make(map[uint32]*apiv1.GetVenueResponse_VenueWrapper, len(req.Msg.GetVenueKeys()))
+
 	for _, vk := range req.Msg.GetVenueKeys() {
 		v, err := s.dao.VenueByKey(ctx, eventID, models.VenueKeyFromUInt32(vk))
 		if err != nil {

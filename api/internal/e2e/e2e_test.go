@@ -1,7 +1,6 @@
 package e2e
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -44,18 +43,22 @@ func runAPIServer() func() {
 	serverStarted := false
 
 	for range 60 {
-		res, _ := http.Get("http://localhost:3100/health-check")
-		if res != nil && res.StatusCode == http.StatusOK {
-			serverStarted = true
+		res, _ := http.Get("http://localhost:3100/health-check") //nolint:noctx
+		if res != nil {
+			res.Body.Close()
 
-			break
+			if res.StatusCode == http.StatusOK {
+				serverStarted = true
+
+				break
+			}
 		}
 
 		time.Sleep(1 * time.Second)
 	}
 
 	if !serverStarted {
-		guard(errors.New("health check timed out"), "start API server")
+		log.Panicln("API server startup timed out")
 	}
 
 	return func() {

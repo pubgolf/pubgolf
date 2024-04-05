@@ -27,10 +27,6 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}
 
-	if req.Msg.GetCategory().Enum() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("missing argument `category`"))
-	}
-
 	var category models.ScoringCategory
 
 	err = category.FromProtoEnum(*req.Msg.GetCategory().Enum())
@@ -57,7 +53,6 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 
 	numScoredStages := 0
 	if currentVenueIdx > -1 {
-
 		numScoredStages = currentVenueIdx
 		if currentVenueIdx < len(venues) {
 			numScoredStages++
@@ -70,9 +65,10 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 
 	var rank uint32 = 1
 	var scores []*apiv1.ScoreBoard_ScoreBoardEntry
-	for i, c := range sc {
 
+	for i, c := range sc {
 		var rankCopy *uint32
+
 		if i > 0 && c.TotalPoints > sc[i-1].TotalPoints {
 			// Increase the rank when we've stopped tying, but when we do we jump up to the 1-index of the leaderboard.
 			rank = uint32(i) + 1

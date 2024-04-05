@@ -41,10 +41,12 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 
 	var playerCategory models.ScoringCategory
 	foundEventReg := false
+
 	for _, reg := range player.Events {
 		if reg.EventKey == req.Msg.GetEventKey() {
 			playerCategory = reg.ScoringCategory
 			foundEventReg = true
+
 			break
 		}
 	}
@@ -89,6 +91,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 
 	adjIdx := 0
 	var entries []*apiv1.ScoreBoard_ScoreBoardEntry
+
 	for i, s := range scores {
 		if i > stopIdx {
 			break
@@ -97,12 +100,10 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		status := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 		if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
 			status = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
-		} else {
-			if s.Score == 0 {
-				status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
-				if i < currentVenueIdx {
-					status = apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
-				}
+		} else if s.Score == 0 {
+			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
+			if i < currentVenueIdx {
+				status = apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
 			}
 		}
 
