@@ -22,6 +22,11 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
           - column: adjustments.stage_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
+          # auth_tokens
+          - column: auth_tokens.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AuthToken
+          - column: auth_tokens.player_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
           # events
           - column: events.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID

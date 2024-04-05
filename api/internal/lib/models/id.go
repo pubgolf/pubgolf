@@ -24,6 +24,24 @@ func AdjustmentIDFromString(s string) (AdjustmentID, error) {
 	return AdjustmentID{DatabaseULID{u}}, nil
 }
 
+// AuthToken uniquely identifies a bonus or penalty.
+type AuthToken struct{ DatabaseULID }
+
+// AuthTokenFromULID parses an AuthToken from a ULID.
+func AuthTokenFromULID(u ulid.ULID) AuthToken {
+	return AuthToken{DatabaseULID{u}}
+}
+
+// AuthTokenFromString parses an AuthToken from a string.
+func AuthTokenFromString(s string) (AuthToken, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return AuthToken{}, fmt.Errorf("parse AuthToken from string: %w", err)
+	}
+
+	return AuthToken{DatabaseULID{u}}, nil
+}
+
 // EventID uniquely identifies an event.
 type EventID struct{ DatabaseULID }
 
