@@ -117,6 +117,7 @@ proto3.util.setEnumType(ClientVersionResponse_VersionStatus, "api.v1.ClientVersi
 
 /**
  * @generated from message api.v1.PubGolfServiceCreatePlayerRequest
+ * @deprecated
  */
 export class PubGolfServiceCreatePlayerRequest extends Message<PubGolfServiceCreatePlayerRequest> {
   /**
@@ -160,6 +161,7 @@ export class PubGolfServiceCreatePlayerRequest extends Message<PubGolfServiceCre
 
 /**
  * @generated from message api.v1.PubGolfServiceCreatePlayerResponse
+ * @deprecated
  */
 export class PubGolfServiceCreatePlayerResponse extends Message<PubGolfServiceCreatePlayerResponse> {
   /**

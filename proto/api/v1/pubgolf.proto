@@ -83,10 +83,14 @@ message ClientVersionResponse {
 // CreatePlayer
 
 message PubGolfServiceCreatePlayerRequest {
+  option deprecated = true;
+
   string event_key = 1;
   PlayerData player_data = 2;
 }
 message PubGolfServiceCreatePlayerResponse {
+  option deprecated = true;
+  
   Player player = 1;
 }
 
