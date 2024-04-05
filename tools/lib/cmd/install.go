@@ -11,7 +11,7 @@ import (
 var goTools = map[string]string{
 	"migrate":    "github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0",
 	"sqlc":       "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0",
-	"mockery":    "github.com/vektra/mockery/v2@v2.38.0",
+	"mockery":    "github.com/vektra/mockery/v2@v2.42.2",
 	"ifacemaker": "github.com/vburenin/ifacemaker@v1.2.1",
 	"enumer":     "github.com/dmarkham/enumer@v1.5.9",
 }
