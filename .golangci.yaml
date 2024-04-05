@@ -1,35 +1,25 @@
 output:
   show-stats: true
+linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - blank
+      - prefix(github.com/pubgolf/pubgolf)
+  wsl:
+    # allow-assign-and-anything: true
+    allow-cuddle-declarations: true
+    force-err-cuddling: true
+  exhaustive:
+    check:
+      - switch
+      - map
 linters:
   enable-all: true
   disable:
-    # TODO: Enable
-    - errcheck
-    - exhaustive
-    - gci
-    - gocritic
-    - gofumpt
-    - gosec
-    - paralleltest
-    - perfsprint
-    - protogetter
-    - revive
-    - testifylint
-    - thelper
-    - wrapcheck
-
-    # Investigate enabling
-
-    # Finding a lot of duplication in test files
+    # TODO: enable...finding a lot of duplication in rpc GetSchedule tests
     - dupl
-    # Takes issue with lots of our errors.New() calls
-    - goerr113
-    # Newline before return
-    - nlreturn
-    # Doesn't like random blank lines at the begging of blocks
-    - whitespace
-    # Lots of complaints about newlines between variable definitions and blocks
-    - wsl
 
     # No plans to enable (mostly complexity measures or extremely dogmatic).
     - cyclop
