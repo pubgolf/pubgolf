@@ -96,7 +96,7 @@ jobs:
           path: pubgolf-api-server
 
   api_e2e_test:
-    name: Run E2E Tests Against API Server
+    name: Run E2E Tests
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -109,7 +109,7 @@ jobs:
           cache: true
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
-      - name: Run E2E Test
+      - name: Run E2E Tests
         run: go test ./api/internal/e2e -v -e2e=true
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_E2E_TOKEN }}
