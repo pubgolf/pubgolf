@@ -109,6 +109,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Debug
+        run: |
+          pwd
+          ls
+          echo $PATH
+          which doppler
       - name: Run E2E Test
         run: go test ./api/internal/e2e -v -e2e=true
         env:
