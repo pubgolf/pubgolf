@@ -100,8 +100,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Install Doppler CLI
-        uses: dopplerhq/cli-action@v3
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Set up Go
@@ -109,12 +107,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Debug
-        run: |
-          pwd
-          ls
-          echo $PATH
-          which doppler
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
       - name: Run E2E Test
         run: go test ./api/internal/e2e -v -e2e=true
         env:
