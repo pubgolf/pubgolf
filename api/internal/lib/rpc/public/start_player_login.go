@@ -44,7 +44,7 @@ func (s *Server) StartPlayerLogin(ctx context.Context, req *connect.Request[apiv
 
 	span.SetAttributes(attribute.Bool("player.new_phone_number", !playerExists))
 
-	err = s.mes.SendVerification(num)
+	err = s.mes.SendVerification(ctx, num)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, err)
 	}

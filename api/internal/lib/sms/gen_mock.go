@@ -3,6 +3,8 @@
 package sms
 
 import (
+	context "context"
+
 	models "github.com/pubgolf/pubgolf/api/internal/lib/models"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -12,9 +14,9 @@ type MockMessenger struct {
 	mock.Mock
 }
 
-// CheckVerification provides a mock function with given fields: to, code
-func (_m *MockMessenger) CheckVerification(to models.PhoneNum, code string) (bool, error) {
-	ret := _m.Called(to, code)
+// CheckVerification provides a mock function with given fields: ctx, to, code
+func (_m *MockMessenger) CheckVerification(ctx context.Context, to models.PhoneNum, code string) (bool, error) {
+	ret := _m.Called(ctx, to, code)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CheckVerification")
@@ -22,17 +24,17 @@ func (_m *MockMessenger) CheckVerification(to models.PhoneNum, code string) (boo
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(models.PhoneNum, string) (bool, error)); ok {
-		return rf(to, code)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum, string) (bool, error)); ok {
+		return rf(ctx, to, code)
 	}
-	if rf, ok := ret.Get(0).(func(models.PhoneNum, string) bool); ok {
-		r0 = rf(to, code)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum, string) bool); ok {
+		r0 = rf(ctx, to, code)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(models.PhoneNum, string) error); ok {
-		r1 = rf(to, code)
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum, string) error); ok {
+		r1 = rf(ctx, to, code)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -40,17 +42,17 @@ func (_m *MockMessenger) CheckVerification(to models.PhoneNum, code string) (boo
 	return r0, r1
 }
 
-// SendVerification provides a mock function with given fields: to
-func (_m *MockMessenger) SendVerification(to models.PhoneNum) error {
-	ret := _m.Called(to)
+// SendVerification provides a mock function with given fields: ctx, to
+func (_m *MockMessenger) SendVerification(ctx context.Context, to models.PhoneNum) error {
+	ret := _m.Called(ctx, to)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SendVerification")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(models.PhoneNum) error); ok {
-		r0 = rf(to)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) error); ok {
+		r0 = rf(ctx, to)
 	} else {
 		r0 = ret.Error(0)
 	}

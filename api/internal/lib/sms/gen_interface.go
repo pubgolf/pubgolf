@@ -3,11 +3,13 @@
 package sms
 
 import (
+	"context"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
 // Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.
 type Messenger interface {
-	SendVerification(to models.PhoneNum) error
-	CheckVerification(to models.PhoneNum, code string) (bool, error)
+	SendVerification(ctx context.Context, to models.PhoneNum) error
+	CheckVerification(ctx context.Context, to models.PhoneNum, code string) (bool, error)
 }

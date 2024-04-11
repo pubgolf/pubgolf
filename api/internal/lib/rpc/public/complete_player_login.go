@@ -28,7 +28,7 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("incorrect auth code format: %w", errInvalidAuthCode))
 	}
 
-	valid, err := s.mes.CheckVerification(num, authCode)
+	valid, err := s.mes.CheckVerification(ctx, num, authCode)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("check auth code: %w", err))
 	}
