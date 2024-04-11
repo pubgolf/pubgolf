@@ -35,3 +35,22 @@ func (q *Queries) GenerateAuthToken(ctx context.Context, phoneNumber models.Phon
 	err := row.Scan(&i.PlayerID, &i.AuthToken)
 	return i, err
 }
+
+const playerIDByAuthToken = `-- name: PlayerIDByAuthToken :one
+SELECT
+  p.id
+FROM
+  players p
+  JOIN auth_tokens at ON p.id = at.player_id
+WHERE
+  p.deleted_at IS NULL
+  AND at.deleted_at IS NULL
+  AND at.id = $1
+`
+
+func (q *Queries) PlayerIDByAuthToken(ctx context.Context, authToken models.AuthToken) (models.PlayerID, error) {
+	row := q.queryRow(ctx, q.playerIDByAuthTokenStmt, playerIDByAuthToken, authToken)
+	var id models.PlayerID
+	err := row.Scan(&id)
+	return id, err
+}

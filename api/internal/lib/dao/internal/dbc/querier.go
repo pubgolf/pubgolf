@@ -32,6 +32,7 @@ type Querier interface {
 	PhoneNumberIsVerified(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error)
 	PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByIDRow, error)
+	PlayerIDByAuthToken(ctx context.Context, authToken models.AuthToken) (models.PlayerID, error)
 	PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error)
 	PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)
