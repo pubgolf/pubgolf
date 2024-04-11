@@ -9,6 +9,7 @@ import (
 )
 
 func init() {
+	testCmd.AddCommand(testE2ECmd)
 	rootCmd.AddCommand(testCmd)
 
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
@@ -17,7 +18,7 @@ func init() {
 
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Run all automated tests",
+	Short: "Run all automated unit/integration tests",
 	Run: func(cmd *cobra.Command, _ []string) {
 		coverageDir := filepath.FromSlash("./data/go-test-coverage")
 		coverageFile := filepath.Join(coverageDir, "api.cover")
@@ -30,7 +31,6 @@ var testCmd = &cobra.Command{
 
 		testArgs := []string{
 			"test",
-
 			filepath.FromSlash("./api/..."),
 		}
 
@@ -72,6 +72,26 @@ var testCmd = &cobra.Command{
 			cover.Stdin = os.Stdin
 
 			guard(cover.Run(), "execute `go tool cover ...` command")
+		}
+	},
+}
+
+var testE2ECmd = &cobra.Command{
+	Use:   "e2e",
+	Short: "Run all automated e2e tests",
+	Run: func(_ *cobra.Command, _ []string) {
+		tester := exec.Command("go", "test", filepath.FromSlash("./api/internal/e2e"), "-v", "-e2e=true") //nolint:gosec // Input is not dynamically provided by end-user.
+
+		tester.Stdout = os.Stdout
+		tester.Stderr = os.Stderr
+		tester.Stdin = os.Stdin
+
+		err := tester.Run()
+		if err != nil {
+			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+			if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+				guard(err, "execute `go test ...` command")
+			}
 		}
 	},
 }
