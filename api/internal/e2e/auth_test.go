@@ -57,6 +57,12 @@ func Test_AuthFlow(t *testing.T) {
 
 	// Fetch player info
 
+	gmpRes, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	require.NoError(t, err)
+
+	require.Equal(t, playerID, gmpRes.Msg.GetPlayer().GetId(), "has matching player ID")
+	require.Empty(t, gmpRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
+
 	gpRes, err := c.GetPlayer(context.Background(), requestWithAuth(&apiv1.GetPlayerRequest{
 		PlayerId: playerID,
 	}, authToken))
