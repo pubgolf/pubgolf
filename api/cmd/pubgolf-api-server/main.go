@@ -138,6 +138,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http
 		rpcMux := http.NewServeMux()
 		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes),
 			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+			connect.WithInterceptors(middleware.NewAuthInterceptor(dao)),
 		))
 		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
 			connect.WithInterceptors(middleware.ConnectInterceptors()...),

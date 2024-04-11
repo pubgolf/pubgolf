@@ -15,6 +15,13 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 )
 
+func requestWithAuth[T any](msg *T, token string) *connect.Request[T] {
+	req := connect.NewRequest(msg)
+	req.Header().Set("X-PubGolf-AuthToken", token)
+
+	return req
+}
+
 func Test_ClientVersion(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
@@ -28,6 +35,8 @@ func Test_ClientVersion(t *testing.T) {
 func Test_AuthFlow(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
+	// Log in
+
 	_, err := c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 		PhoneNumber: "+15551231234",
 	}))
@@ -40,14 +49,17 @@ func Test_AuthFlow(t *testing.T) {
 	require.NoError(t, err)
 
 	playerID := cplRes.Msg.GetPlayer().GetId()
+	authToken := cplRes.Msg.GetAuthToken()
 
 	require.NotEmpty(t, playerID, "has player ID")
-	require.NotEmpty(t, cplRes.Msg.GetAuthToken(), "has auth token")
+	require.NotEmpty(t, authToken, "has auth token")
 	require.Empty(t, cplRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
 
-	gpRes, err := c.GetPlayer(context.Background(), connect.NewRequest(&apiv1.GetPlayerRequest{
+	// Fetch player info
+
+	gpRes, err := c.GetPlayer(context.Background(), requestWithAuth(&apiv1.GetPlayerRequest{
 		PlayerId: playerID,
-	}))
+	}, authToken))
 	require.NoError(t, err)
 
 	require.Equal(t, playerID, gpRes.Msg.GetPlayer().GetId(), "has matching player ID")
