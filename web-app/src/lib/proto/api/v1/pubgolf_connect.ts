@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse, UpdatePlayerDataRequest, UpdatePlayerDataResponse, UpdateRegistrationRequest, UpdateRegistrationResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -75,6 +75,39 @@ export const PubGolfService = {
       kind: MethodKind.Unary,
     },
     /**
+     * GetPlayer returns the player object including profile data and event registrations, given a player_id.
+     *
+     * @generated from rpc api.v1.PubGolfService.GetPlayer
+     */
+    getPlayer: {
+      name: "GetPlayer",
+      I: GetPlayerRequest,
+      O: GetPlayerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * UpdateRegistration upserts an event registration for the given player.
+     *
+     * @generated from rpc api.v1.PubGolfService.UpdateRegistration
+     */
+    updateRegistration: {
+      name: "UpdateRegistration",
+      I: UpdateRegistrationRequest,
+      O: UpdateRegistrationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * UpdatePlayerData updates the given player's profile data.
+     *
+     * @generated from rpc api.v1.PubGolfService.UpdatePlayerData
+     */
+    updatePlayerData: {
+      name: "UpdatePlayerData",
+      I: UpdatePlayerDataRequest,
+      O: UpdatePlayerDataResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
      *
      * @generated from rpc api.v1.PubGolfService.GetSchedule
@@ -116,17 +149,6 @@ export const PubGolfService = {
       name: "GetContentItem",
       I: GetContentItemRequest,
       O: GetContentItemResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * GetPlayer
-     *
-     * @generated from rpc api.v1.PubGolfService.GetPlayer
-     */
-    getPlayer: {
-      name: "GetPlayer",
-      I: GetPlayerRequest,
-      O: GetPlayerResponse,
       kind: MethodKind.Unary,
     },
     /**

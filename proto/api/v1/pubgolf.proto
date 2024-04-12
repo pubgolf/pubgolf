@@ -29,8 +29,19 @@ service PubGolfService {
   // CompletePlayerLogin (unauthenticated) accepts an auth code and logs in the player, returning the data necessary to bootstrap a player's session in the app.
   rpc CompletePlayerLogin(CompletePlayerLoginRequest) returns (CompletePlayerLoginResponse) {}
 
+  // Player
+
   // GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
   rpc GetMyPlayer(GetMyPlayerRequest) returns (GetMyPlayerResponse) {}
+
+  // GetPlayer returns the player object including profile data and event registrations, given a player_id.
+  rpc GetPlayer(GetPlayerRequest) returns (GetPlayerResponse) {}
+
+  // UpdateRegistration upserts an event registration for the given player.
+  rpc UpdateRegistration(UpdateRegistrationRequest) returns (UpdateRegistrationResponse) {}
+
+  // UpdatePlayerData updates the given player's profile data.
+  rpc UpdatePlayerData(UpdatePlayerDataRequest) returns (UpdatePlayerDataResponse) {}
 
   // Event
 
@@ -47,9 +58,6 @@ service PubGolfService {
   rpc GetContentItem(GetContentItemRequest) returns (GetContentItemResponse) {}
 
   // Scoreboard
-
-  // GetPlayer
-  rpc GetPlayer(GetPlayerRequest) returns (GetPlayerResponse) {}
 
   // GetScoresForCategory
   rpc GetScoresForCategory(GetScoresForCategoryRequest) returns (GetScoresForCategoryResponse) {}
@@ -114,11 +122,36 @@ message CompletePlayerLoginResponse {
   string auth_token = 2;
 }
 
-// GetMyPlayer
+// --------------------
+// Player Info
+// --------------------
 
 message GetMyPlayerRequest {}
 message GetMyPlayerResponse {
   Player player = 1;
+}
+
+message GetPlayerRequest {
+  string player_id = 1;
+}
+message GetPlayerResponse {
+  Player player = 1;
+}
+
+message UpdateRegistrationRequest {
+  string player_id = 1;
+  EventRegistration event_registration = 2;
+}
+message UpdateRegistrationResponse {
+  EventRegistration event_registration = 1;
+}
+
+message UpdatePlayerDataRequest {
+  string player_id = 1;
+  PlayerData data = 2;
+}
+message UpdatePlayerDataResponse {
+  PlayerData data = 1;
 }
 
 // --------------------
@@ -199,13 +232,6 @@ message GetContentItemResponse {
 // --------------------
 // Scoreboard
 // --------------------
-
-message GetPlayerRequest {
-  string player_id = 1;
-}
-message GetPlayerResponse {
-  Player player = 1;
-}
 
 message GetScoresForCategoryRequest {
   string event_key = 1;
