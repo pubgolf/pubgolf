@@ -12,7 +12,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-// CreatePlayer creates a new player and adds them to the given event.
+// CreatePlayerAndRegistration creates a new player and adds them to the given event.
 func (q *Queries) CreatePlayerAndRegistration(ctx context.Context, name string, phoneNum models.PhoneNum, eventID models.EventID, cat models.ScoringCategory) (models.Player, error) {
 	defer daoSpan(&ctx)()
 
