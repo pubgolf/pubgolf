@@ -140,10 +140,10 @@ message GetPlayerResponse {
 
 message UpdateRegistrationRequest {
   string player_id = 1;
-  EventRegistration event_registration = 2;
+  EventRegistration registration = 2;
 }
 message UpdateRegistrationResponse {
-  EventRegistration event_registration = 1;
+  EventRegistration registration = 1;
 }
 
 message UpdatePlayerDataRequest {

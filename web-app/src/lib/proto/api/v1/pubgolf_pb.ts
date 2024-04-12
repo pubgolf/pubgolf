@@ -507,9 +507,9 @@ export class UpdateRegistrationRequest extends Message<UpdateRegistrationRequest
   playerId = "";
 
   /**
-   * @generated from field: api.v1.EventRegistration event_registration = 2;
+   * @generated from field: api.v1.EventRegistration registration = 2;
    */
-  eventRegistration?: EventRegistration;
+  registration?: EventRegistration;
 
   constructor(data?: PartialMessage<UpdateRegistrationRequest>) {
     super();
@@ -520,7 +520,7 @@ export class UpdateRegistrationRequest extends Message<UpdateRegistrationRequest
   static readonly typeName = "api.v1.UpdateRegistrationRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "event_registration", kind: "message", T: EventRegistration },
+    { no: 2, name: "registration", kind: "message", T: EventRegistration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRegistrationRequest {
@@ -545,9 +545,9 @@ export class UpdateRegistrationRequest extends Message<UpdateRegistrationRequest
  */
 export class UpdateRegistrationResponse extends Message<UpdateRegistrationResponse> {
   /**
-   * @generated from field: api.v1.EventRegistration event_registration = 1;
+   * @generated from field: api.v1.EventRegistration registration = 1;
    */
-  eventRegistration?: EventRegistration;
+  registration?: EventRegistration;
 
   constructor(data?: PartialMessage<UpdateRegistrationResponse>) {
     super();
@@ -557,7 +557,7 @@ export class UpdateRegistrationResponse extends Message<UpdateRegistrationRespon
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.UpdateRegistrationResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "event_registration", kind: "message", T: EventRegistration },
+    { no: 1, name: "registration", kind: "message", T: EventRegistration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRegistrationResponse {
