@@ -625,6 +625,24 @@ func (_m *MockQueryProvider) UpdateScore(ctx context.Context, playerID models.Pl
 	return r0
 }
 
+// UpsertRegistration provides a mock function with given fields: ctx, playerID, eventKey, cat
+func (_m *MockQueryProvider) UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error {
+	ret := _m.Called(ctx, playerID, eventKey, cat)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpsertRegistration")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, string, models.ScoringCategory) error); ok {
+		r0 = rf(ctx, playerID, eventKey, cat)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // VenueByKey provides a mock function with given fields: ctx, eventID, venueKey
 func (_m *MockQueryProvider) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error) {
 	ret := _m.Called(ctx, eventID, venueKey)

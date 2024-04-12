@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +16,8 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
 	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
+
+const testEventKey = "test-event-key"
 
 type LogWriter struct {
 	logger *log.Logger
@@ -47,6 +50,7 @@ func TestMain(m *testing.M) {
 	dbURL, dbCleanupFn := dbtest.NewURL("pubgolf-e2e", false)
 
 	runAPIMigrator(dbURL)
+	seedDB(dbURL)
 
 	serverCleanup := runAPIServer(dbURL)
 
@@ -55,6 +59,14 @@ func TestMain(m *testing.M) {
 	serverCleanup()
 	dbCleanupFn()
 	os.Exit(ret)
+}
+
+func seedDB(dbURL string) {
+	db, err := sql.Open("pgx", dbURL)
+	guard(err, "open DB connection")
+
+	_, err = db.Exec("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
+	guard(err, "seed DB")
 }
 
 func runAPIMigrator(dbURL string) {

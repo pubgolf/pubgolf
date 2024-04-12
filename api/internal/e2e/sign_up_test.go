@@ -32,7 +32,7 @@ func Test_ClientVersion(t *testing.T) {
 	assert.Equal(t, apiv1.ClientVersionResponse_VERSION_STATUS_OK, res.Msg.GetVersionStatus())
 }
 
-func Test_AuthFlow(t *testing.T) {
+func Test_SignUpFlow(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Log in
@@ -55,19 +55,53 @@ func Test_AuthFlow(t *testing.T) {
 	require.NotEmpty(t, authToken, "has auth token")
 	require.Empty(t, cplRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
 
+	// Register for event
+
+	expectedCategory := apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE
+	_, err = c.UpdateRegistration(context.Background(), requestWithAuth(&apiv1.UpdateRegistrationRequest{
+		PlayerId: playerID,
+		Registration: &apiv1.EventRegistration{
+			EventKey:        testEventKey,
+			ScoringCategory: expectedCategory,
+		},
+	}, authToken))
+	require.NoError(t, err)
+
 	// Fetch player info
 
 	gmpRes, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.NoError(t, err)
 
 	require.Equal(t, playerID, gmpRes.Msg.GetPlayer().GetId(), "has matching player ID")
-	require.Empty(t, gmpRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
+	require.Len(t, gmpRes.Msg.GetPlayer().GetEvents(), 1, "registered for one event")
 
-	gpRes, err := c.GetPlayer(context.Background(), requestWithAuth(&apiv1.GetPlayerRequest{
+	reg := gmpRes.Msg.GetPlayer().GetEvents()[0]
+
+	require.Equal(t, testEventKey, reg.GetEventKey(), "event key matches")
+	require.Equal(t, expectedCategory, reg.GetScoringCategory(), "event category matches")
+
+	// Change scoring category
+
+	expectedCategory = apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE
+	_, err = c.UpdateRegistration(context.Background(), requestWithAuth(&apiv1.UpdateRegistrationRequest{
 		PlayerId: playerID,
+		Registration: &apiv1.EventRegistration{
+			EventKey:        testEventKey,
+			ScoringCategory: expectedCategory,
+		},
 	}, authToken))
 	require.NoError(t, err)
 
-	require.Equal(t, playerID, gpRes.Msg.GetPlayer().GetId(), "has matching player ID")
-	require.Empty(t, gpRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
+	// Fetch player info again
+
+	gmpRes2, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	require.NoError(t, err)
+
+	require.Equal(t, playerID, gmpRes2.Msg.GetPlayer().GetId(), "has matching player ID")
+	require.Len(t, gmpRes2.Msg.GetPlayer().GetEvents(), 1, "registered for one event")
+
+	reg = gmpRes2.Msg.GetPlayer().GetEvents()[0]
+
+	require.Equal(t, testEventKey, reg.GetEventKey(), "event key matches")
+	require.Equal(t, expectedCategory, reg.GetScoringCategory(), "event category matches")
 }
