@@ -37,13 +37,14 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Log in
 
+	phoneNum := "+15551231234"
 	_, err := c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
-		PhoneNumber: "+15551231234",
+		PhoneNumber: phoneNum,
 	}))
 	require.NoError(t, err)
 
 	cplRes, err := c.CompletePlayerLogin(context.Background(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
-		PhoneNumber: "+15551231234",
+		PhoneNumber: phoneNum,
 		AuthCode:    sms.MockAuthCode,
 	}))
 	require.NoError(t, err)
@@ -54,6 +55,7 @@ func Test_SignUpFlow(t *testing.T) {
 	require.NotEmpty(t, playerID, "has player ID")
 	require.NotEmpty(t, authToken, "has auth token")
 	require.Empty(t, cplRes.Msg.GetPlayer().GetEvents(), "not registered for any events")
+	require.Empty(t, cplRes.Msg.GetPlayer().GetData().GetName(), "name is unset")
 
 	// Register for event
 
@@ -67,12 +69,24 @@ func Test_SignUpFlow(t *testing.T) {
 	}, authToken))
 	require.NoError(t, err)
 
+	// Set player's display name
+
+	playerName := "Bob Smith"
+	_, err = c.UpdatePlayerData(context.Background(), requestWithAuth(&apiv1.UpdatePlayerDataRequest{
+		PlayerId: playerID,
+		Data: &apiv1.PlayerData{
+			Name: playerName,
+		},
+	}, authToken))
+	require.NoError(t, err)
+
 	// Fetch player info
 
 	gmpRes, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.NoError(t, err)
 
 	require.Equal(t, playerID, gmpRes.Msg.GetPlayer().GetId(), "has matching player ID")
+	require.Equal(t, playerName, gmpRes.Msg.GetPlayer().GetData().GetName(), "name is set")
 	require.Len(t, gmpRes.Msg.GetPlayer().GetEvents(), 1, "registered for one event")
 
 	reg := gmpRes.Msg.GetPlayer().GetEvents()[0]
@@ -82,26 +96,44 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Change scoring category
 
-	expectedCategory = apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE
+	expectedNewCategory := apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE
 	_, err = c.UpdateRegistration(context.Background(), requestWithAuth(&apiv1.UpdateRegistrationRequest{
 		PlayerId: playerID,
 		Registration: &apiv1.EventRegistration{
 			EventKey:        testEventKey,
-			ScoringCategory: expectedCategory,
+			ScoringCategory: expectedNewCategory,
 		},
 	}, authToken))
 	require.NoError(t, err)
 
-	// Fetch player info again
+	// Log in again
 
-	gmpRes2, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	_, err = c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
+		PhoneNumber: phoneNum,
+	}))
 	require.NoError(t, err)
 
-	require.Equal(t, playerID, gmpRes2.Msg.GetPlayer().GetId(), "has matching player ID")
-	require.Len(t, gmpRes2.Msg.GetPlayer().GetEvents(), 1, "registered for one event")
+	cplRes2, err := c.CompletePlayerLogin(context.Background(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
+		PhoneNumber: phoneNum,
+		AuthCode:    sms.MockAuthCode,
+	}))
+	require.NoError(t, err)
 
-	reg = gmpRes2.Msg.GetPlayer().GetEvents()[0]
+	authToken2 := cplRes2.Msg.GetAuthToken()
+
+	require.Equal(t, playerID, cplRes2.Msg.GetPlayer().GetId(), "has same player ID")
+	require.NotEqual(t, authToken, authToken2, "has new auth token")
+	require.Equal(t, playerName, cplRes2.Msg.GetPlayer().GetData().GetName(), "name is still set")
+	require.Len(t, cplRes2.Msg.GetPlayer().GetEvents(), 1, "registered for one event")
+
+	reg = cplRes2.Msg.GetPlayer().GetEvents()[0]
 
 	require.Equal(t, testEventKey, reg.GetEventKey(), "event key matches")
-	require.Equal(t, expectedCategory, reg.GetScoringCategory(), "event category matches")
+	require.Equal(t, expectedNewCategory, reg.GetScoringCategory(), "new event category matches")
+
+	// Old auth token now fails
+
+	_, err = c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	require.Error(t, err)
+	require.Equal(t, connect.CodePermissionDenied, connect.CodeOf(err))
 }

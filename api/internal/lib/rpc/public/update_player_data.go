@@ -3,6 +3,7 @@ package public
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/bufbuild/connect-go"
 
@@ -11,8 +12,8 @@ import (
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
-// UpdateRegistration registers the player to the event or updates the details of their registration.
-func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[apiv1.UpdateRegistrationRequest]) (*connect.Response[apiv1.UpdateRegistrationResponse], error) {
+// UpdatePlayerData update's a player's profile data.
+func (s *Server) UpdatePlayerData(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerDataRequest]) (*connect.Response[apiv1.UpdatePlayerDataResponse], error) {
 	infPlayerID, ok := middleware.PlayerID(ctx)
 	if !ok {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errNoInferredPlayerID)
@@ -27,19 +28,21 @@ func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("player_id doesn't match auth token: %w", errUnownedEntity))
 	}
 
-	var cat models.ScoringCategory
-
-	err = cat.FromProtoEnum(req.Msg.GetRegistration().GetScoringCategory())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoring category: %w", err))
-	}
-
-	err = s.dao.UpsertRegistration(ctx, playerID, req.Msg.GetRegistration().GetEventKey(), cat)
+	player, err := s.dao.UpdatePlayer(ctx, playerID, models.PlayerParams{
+		Name: req.Msg.GetData().GetName(),
+	})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update registration: %w", err))
 	}
 
-	return connect.NewResponse(&apiv1.UpdateRegistrationResponse{
-		Registration: req.Msg.GetRegistration(),
+	log.Printf("dao.UpdatePlayer returned(%+v)\n", player)
+
+	p, err := player.Proto()
+	if err != nil {
+		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+	}
+
+	return connect.NewResponse(&apiv1.UpdatePlayerDataResponse{
+		Data: p.GetData(),
 	}), nil
 }
