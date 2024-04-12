@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"strings"
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
@@ -69,7 +68,7 @@ func AutoSpan(prefix string) func(ctx *context.Context) func() {
 	return func(ctx *context.Context) func() {
 		name := prefix + ".Unknown"
 		if pc, _, _, ok := runtime.Caller(1); ok {
-			name = prefix + "." + strings.Split(filepath.Base(runtime.FuncForPC(pc).Name()), ".")[2]
+			name = prefix + "." + filepath.Base(runtime.FuncForPC(pc).Name())
 		}
 
 		newCtx, span := otel.Tracer("").Start(*ctx, name)
