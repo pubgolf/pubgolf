@@ -4,12 +4,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 
+	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	testCmd.AddCommand(testE2ECmd)
+	testE2ECmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically restart the e2e test")
+
 	rootCmd.AddCommand(testCmd)
 
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
@@ -79,19 +83,66 @@ var testCmd = &cobra.Command{
 var testE2ECmd = &cobra.Command{
 	Use:   "e2e",
 	Short: "Run all automated e2e tests",
-	Run: func(_ *cobra.Command, _ []string) {
-		tester := exec.Command("go", "test", filepath.FromSlash("./api/internal/e2e"), "-v", "-e2e=true") //nolint:gosec // Input is not dynamically provided by end-user.
+	Run: func(cmd *cobra.Command, _ []string) {
+		watchFlag, err := cmd.Flags().GetBool("watch")
+		guard(err, "check '--watch' flag")
 
-		tester.Stdout = os.Stdout
-		tester.Stderr = os.Stderr
-		tester.Stdin = os.Stdin
+		// Start initial process.
+		stopFn := runE2ETest(!watchFlag)
 
-		err := tester.Run()
-		if err != nil {
-			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-			if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
-				guard(err, "execute `go test ...` command")
-			}
+		// Launch watcher, if applicable.
+		if watchFlag {
+			go func() {
+				watch("api", "e2e test", func(_ watcher.Event) {
+					stopFn()
+					stopFn = runE2ETest(false)
+				})
+			}()
 		}
+
+		// Hold process open
+		<-shuttingDown
 	},
+}
+
+func runE2ETest(stopOnExit bool) func() {
+	tester := exec.Command("go", "test", filepath.FromSlash("./api/internal/e2e"), "-v", "-e2e=true") //nolint:gosec // Input is not dynamically provided by end-user.
+
+	tester.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+
+	tester.Stdout = os.Stdout
+	tester.Stderr = os.Stderr
+	tester.Stdin = os.Stdin
+
+	err := tester.Start()
+	if err != nil {
+		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+		if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+			guard(err, "execute `go test ...` command")
+		}
+	}
+
+	if stopOnExit {
+		go func() {
+			defer close(beginShutdown)
+
+			err := tester.Start()
+			if err != nil {
+				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+				if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+					guard(err, "execute `go test ...` command")
+				}
+			}
+		}()
+	}
+
+	return func() {
+		pgid, err := syscall.Getpgid(tester.Process.Pid)
+		if err != nil {
+			// Previous run has already finished.
+			return
+		}
+
+		guard(syscall.Kill(-pgid, syscall.SIGINT), "send SIGINT to running process")
+	}
 }
