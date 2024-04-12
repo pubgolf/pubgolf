@@ -16,6 +16,7 @@ type Querier interface {
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error)
 	CreateScore(ctx context.Context, arg CreateScoreParams) error
+	DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
 	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error
 	DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error

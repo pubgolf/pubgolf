@@ -1,3 +1,21 @@
+-- name: DeactivateAuthTokens :one
+UPDATE
+  auth_tokens at
+SET
+  deleted_at = now()
+WHERE
+  at.deleted_at IS NULL
+  AND at.player_id =(
+    SELECT
+      p.id
+    FROM
+      players p
+    WHERE
+      p.deleted_at IS NULL
+      AND p.phone_number = @phone_number)
+RETURNING
+  TRUE AS did_update;
+
 -- name: GenerateAuthToken :one
 INSERT INTO auth_tokens(player_id)
 SELECT

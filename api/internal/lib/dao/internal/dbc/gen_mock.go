@@ -110,6 +110,34 @@ func (_m *MockQuerier) CreateScore(ctx context.Context, arg CreateScoreParams) e
 	return r0
 }
 
+// DeactivateAuthTokens provides a mock function with given fields: ctx, phoneNumber
+func (_m *MockQuerier) DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error) {
+	ret := _m.Called(ctx, phoneNumber)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeactivateAuthTokens")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (bool, error)); ok {
+		return rf(ctx, phoneNumber)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) bool); ok {
+		r0 = rf(ctx, phoneNumber)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) error); ok {
+		r1 = rf(ctx, phoneNumber)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DeleteAdjustment provides a mock function with given fields: ctx, id
 func (_m *MockQuerier) DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error {
 	ret := _m.Called(ctx, id)

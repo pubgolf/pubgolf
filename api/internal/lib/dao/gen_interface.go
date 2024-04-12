@@ -36,7 +36,7 @@ type QueryProvider interface {
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// GenerateAuthToken generates an auth token for the player with the given phone number, returning the auth token and the player's ID.
-	GenerateAuthToken(ctx context.Context, num models.PhoneNum) (models.PlayerID, models.AuthToken, error)
+	GenerateAuthToken(ctx context.Context, num models.PhoneNum) (GenerateAuthTokenResult, error)
 	// PhoneNumberIsVerified returns true if the phone number has been verified via an auth code.
 	PhoneNumberIsVerified(ctx context.Context, num models.PhoneNum) (bool, error)
 	// PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.

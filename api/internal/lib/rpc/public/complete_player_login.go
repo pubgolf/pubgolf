@@ -45,12 +45,14 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.Bool("player.phone_number_verified", !didVerify))
 
-	playerID, authToken, err := s.dao.GenerateAuthToken(ctx, num)
+	gat, err := s.dao.GenerateAuthToken(ctx, num)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("generate auth token: %w", err))
 	}
 
-	player, err := s.dao.PlayerByID(ctx, playerID)
+	span.SetAttributes(attribute.Bool("player.prev_auth_token_invalidated", gat.DidInvalidate))
+
+	player, err := s.dao.PlayerByID(ctx, gat.PlayerID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get player from DB: %w", err))
 	}
@@ -62,6 +64,6 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 
 	return connect.NewResponse(&apiv1.CompletePlayerLoginResponse{
 		Player:    p,
-		AuthToken: authToken.String(),
+		AuthToken: gat.AuthToken.String(),
 	}), nil
 }

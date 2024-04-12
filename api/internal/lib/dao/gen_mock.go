@@ -350,38 +350,31 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 }
 
 // GenerateAuthToken provides a mock function with given fields: ctx, num
-func (_m *MockQueryProvider) GenerateAuthToken(ctx context.Context, num models.PhoneNum) (models.PlayerID, models.AuthToken, error) {
+func (_m *MockQueryProvider) GenerateAuthToken(ctx context.Context, num models.PhoneNum) (GenerateAuthTokenResult, error) {
 	ret := _m.Called(ctx, num)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GenerateAuthToken")
 	}
 
-	var r0 models.PlayerID
-	var r1 models.AuthToken
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (models.PlayerID, models.AuthToken, error)); ok {
+	var r0 GenerateAuthTokenResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (GenerateAuthTokenResult, error)); ok {
 		return rf(ctx, num)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) models.PlayerID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) GenerateAuthTokenResult); ok {
 		r0 = rf(ctx, num)
 	} else {
-		r0 = ret.Get(0).(models.PlayerID)
+		r0 = ret.Get(0).(GenerateAuthTokenResult)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) models.AuthToken); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) error); ok {
 		r1 = rf(ctx, num)
 	} else {
-		r1 = ret.Get(1).(models.AuthToken)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, models.PhoneNum) error); ok {
-		r2 = rf(ctx, num)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // PhoneNumberIsVerified provides a mock function with given fields: ctx, num

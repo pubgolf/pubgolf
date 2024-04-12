@@ -36,6 +36,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createScoreStmt, err = db.PrepareContext(ctx, createScore); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateScore: %w", err)
 	}
+	if q.deactivateAuthTokensStmt, err = db.PrepareContext(ctx, deactivateAuthTokens); err != nil {
+		return nil, fmt.Errorf("error preparing query DeactivateAuthTokens: %w", err)
+	}
 	if q.deleteAdjustmentStmt, err = db.PrepareContext(ctx, deleteAdjustment); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteAdjustment: %w", err)
 	}
@@ -152,6 +155,11 @@ func (q *Queries) Close() error {
 	if q.createScoreStmt != nil {
 		if cerr := q.createScoreStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createScoreStmt: %w", cerr)
+		}
+	}
+	if q.deactivateAuthTokensStmt != nil {
+		if cerr := q.deactivateAuthTokensStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deactivateAuthTokensStmt: %w", cerr)
 		}
 	}
 	if q.deleteAdjustmentStmt != nil {
@@ -352,6 +360,7 @@ type Queries struct {
 	createAdjustmentStmt                *sql.Stmt
 	createPlayerStmt                    *sql.Stmt
 	createScoreStmt                     *sql.Stmt
+	deactivateAuthTokensStmt            *sql.Stmt
 	deleteAdjustmentStmt                *sql.Stmt
 	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
 	deleteScoreForPlayerStageStmt       *sql.Stmt
@@ -393,6 +402,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createAdjustmentStmt:                q.createAdjustmentStmt,
 		createPlayerStmt:                    q.createPlayerStmt,
 		createScoreStmt:                     q.createScoreStmt,
+		deactivateAuthTokensStmt:            q.deactivateAuthTokensStmt,
 		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
 		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
 		deleteScoreForPlayerStageStmt:       q.deleteScoreForPlayerStageStmt,

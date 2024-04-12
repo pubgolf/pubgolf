@@ -11,6 +11,32 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+const deactivateAuthTokens = `-- name: DeactivateAuthTokens :one
+UPDATE
+  auth_tokens at
+SET
+  deleted_at = now()
+WHERE
+  at.deleted_at IS NULL
+  AND at.player_id =(
+    SELECT
+      p.id
+    FROM
+      players p
+    WHERE
+      p.deleted_at IS NULL
+      AND p.phone_number = $1)
+RETURNING
+  TRUE AS did_update
+`
+
+func (q *Queries) DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error) {
+	row := q.queryRow(ctx, q.deactivateAuthTokensStmt, deactivateAuthTokens, phoneNumber)
+	var did_update bool
+	err := row.Scan(&did_update)
+	return did_update, err
+}
+
 const generateAuthToken = `-- name: GenerateAuthToken :one
 INSERT INTO auth_tokens(player_id)
 SELECT
