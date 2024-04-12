@@ -30,7 +30,7 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 
 	valid, err := s.mes.CheckVerification(ctx, num, authCode)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("check auth code: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check auth code: %w", err))
 	}
 
 	if !valid {
@@ -39,7 +39,7 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 
 	didVerify, err := s.dao.VerifyPhoneNumber(ctx, num)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("mark phone number as verified: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("mark phone number as verified: %w", err))
 	}
 
 	span := trace.SpanFromContext(ctx)
@@ -47,12 +47,12 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 
 	playerID, authToken, err := s.dao.GenerateAuthToken(ctx, num)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("generate auth token: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("generate auth token: %w", err))
 	}
 
 	player, err := s.dao.PlayerByID(ctx, playerID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get player from DB: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get player from DB: %w", err))
 	}
 
 	p, err := player.Proto()
