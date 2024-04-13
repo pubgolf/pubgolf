@@ -6,15 +6,14 @@ import (
 
 	"github.com/bufbuild/connect-go"
 
-	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
 // GetMyPlayer returns a full player object as specified by ID.
 func (s *Server) GetMyPlayer(ctx context.Context, _ *connect.Request[apiv1.GetMyPlayerRequest]) (*connect.Response[apiv1.GetMyPlayerResponse], error) {
-	playerID, ok := middleware.PlayerID(ctx)
-	if !ok {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errNoInferredPlayerID)
+	playerID, err := s.guardInferredPlayerID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	player, err := s.dao.PlayerByID(ctx, playerID)

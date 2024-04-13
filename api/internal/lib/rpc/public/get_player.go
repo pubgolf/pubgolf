@@ -6,15 +6,14 @@ import (
 
 	"github.com/bufbuild/connect-go"
 
-	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
 // GetPlayer returns a full player object as specified by ID.
 func (s *Server) GetPlayer(ctx context.Context, req *connect.Request[apiv1.GetPlayerRequest]) (*connect.Response[apiv1.GetPlayerResponse], error) {
-	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
+	playerID, err := s.guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
+		return nil, err
 	}
 
 	player, err := s.dao.PlayerByID(ctx, playerID)
