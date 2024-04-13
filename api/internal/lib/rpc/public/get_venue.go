@@ -16,13 +16,14 @@ import (
 func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVenueRequest]) (*connect.Response[apiv1.GetVenueResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
+	playerID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
-		}
+		return nil, err
+	}
 
-		return nil, connect.NewError(connect.CodeUnknown, err)
+	eventID, err := s.guardRegisteredForEvent(ctx, playerID, req.Msg.GetEventKey())
+	if err != nil {
+		return nil, err
 	}
 
 	venues := make(map[uint32]*apiv1.GetVenueResponse_VenueWrapper, len(req.Msg.GetVenueKeys()))

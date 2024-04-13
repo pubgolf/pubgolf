@@ -2,6 +2,8 @@ package public
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/bufbuild/connect-go"
@@ -37,4 +39,27 @@ func (s *Server) guardPlayerIDMatchesSelf(ctx context.Context, playerID string) 
 	}
 
 	return pID, nil
+}
+
+// guardRegisteredForEvent ensures the given player is registered for the given event.
+func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventKey string) (models.EventID, error) {
+	eventID, err := s.dao.EventIDByKey(ctx, eventKey)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.EventID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("unknown event key: %w", err))
+		}
+
+		return models.EventID{}, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event ID from database: %w", err))
+	}
+
+	reg, err := s.dao.PlayerRegisteredForEvent(ctx, playerID, eventID)
+	if err != nil {
+		return models.EventID{}, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check event registration: %w", err))
+	}
+
+	if !reg {
+		return models.EventID{}, connect.NewError(connect.CodePermissionDenied, errNotRegistered)
+	}
+
+	return eventID, nil
 }

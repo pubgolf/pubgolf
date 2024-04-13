@@ -2,9 +2,7 @@ package public
 
 import (
 	"context"
-	"database/sql"
 	"encoding/binary"
-	"errors"
 	"time"
 
 	"github.com/bufbuild/connect-go"
@@ -22,13 +20,14 @@ const nextVenueVisibilityDuration = time.Duration(10) * time.Minute
 func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.GetScheduleRequest]) (*connect.Response[apiv1.GetScheduleResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
+	playerID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
-		}
+		return nil, err
+	}
 
-		return nil, connect.NewError(connect.CodeUnknown, err)
+	eventID, err := s.guardRegisteredForEvent(ctx, playerID, req.Msg.GetEventKey())
+	if err != nil {
+		return nil, err
 	}
 
 	startTime, err := s.dao.EventStartTime(ctx, eventID)

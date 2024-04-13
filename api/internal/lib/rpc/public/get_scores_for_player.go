@@ -2,8 +2,6 @@ package public
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -18,13 +16,14 @@ import (
 func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[apiv1.GetScoresForPlayerRequest]) (*connect.Response[apiv1.GetScoresForPlayerResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
 
-	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
+	callerPID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
-		}
+		return nil, err
+	}
 
-		return nil, connect.NewError(connect.CodeUnknown, err)
+	eventID, err := s.guardRegisteredForEvent(ctx, callerPID, req.Msg.GetEventKey())
+	if err != nil {
+		return nil, err
 	}
 
 	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
