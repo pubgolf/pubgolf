@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bufbuild/connect-go"
+
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
