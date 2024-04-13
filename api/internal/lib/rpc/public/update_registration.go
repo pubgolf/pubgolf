@@ -12,7 +12,7 @@ import (
 
 // UpdateRegistration registers the player to the event or updates the details of their registration.
 func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[apiv1.UpdateRegistrationRequest]) (*connect.Response[apiv1.UpdateRegistrationResponse], error) {
-	playerID, err := guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
+	playerID, err := s.guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, err
 	}

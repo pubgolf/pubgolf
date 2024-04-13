@@ -13,7 +13,7 @@ import (
 
 // UpdatePlayerData update's a player's profile data.
 func (s *Server) UpdatePlayerData(ctx context.Context, req *connect.Request[apiv1.UpdatePlayerDataRequest]) (*connect.Response[apiv1.UpdatePlayerDataResponse], error) {
-	playerID, err := guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
+	playerID, err := s.guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
 	if err != nil {
 		return nil, err
 	}

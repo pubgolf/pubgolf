@@ -10,7 +10,7 @@ import (
 )
 
 // guardPlayerIDMatchesSelf returns an error if the provided playerID param doesn't match the auth token or is invalid.
-func guardPlayerIDMatchesSelf(ctx context.Context, playerID string) (models.PlayerID, error) {
+func (s *Server) guardPlayerIDMatchesSelf(ctx context.Context, playerID string) (models.PlayerID, error) {
 	infPlayerID, ok := middleware.PlayerID(ctx)
 	if !ok {
 		return models.PlayerID{}, connect.NewError(connect.CodeInvalidArgument, errNoInferredPlayerID)
