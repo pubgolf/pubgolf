@@ -14,8 +14,6 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
-var errNotRegistered = errors.New("user not registered for event")
-
 // GetScoresForPlayer returns a player's personal scorecard.
 func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[apiv1.GetScoresForPlayerRequest]) (*connect.Response[apiv1.GetScoresForPlayerResponse], error) {
 	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())

@@ -10,7 +10,14 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 )
 
-var errUnownedEntity = errors.New("not permitted to access this entity")
+var (
+	// errUnownedEntity indicates a player doesn't control this entity.
+	errUnownedEntity = errors.New("not permitted to access this entity")
+	// errNotRegistered indicates the player isn't registered for this event.
+	errNotRegistered = errors.New("must be registered for event")
+	// errNoInferredPlayerID indicates an invariant failure, in which a token-guarded route did not have a valid player ID inferred from the auth token.
+	errNoInferredPlayerID = errors.New("could not infer player ID from auth token")
+)
 
 // Server implements the gRPC handlers for the PubGolf API.
 type Server struct {
