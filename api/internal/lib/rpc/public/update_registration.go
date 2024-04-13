@@ -6,25 +6,15 @@ import (
 
 	"github.com/bufbuild/connect-go"
 
-	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
 // UpdateRegistration registers the player to the event or updates the details of their registration.
 func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[apiv1.UpdateRegistrationRequest]) (*connect.Response[apiv1.UpdateRegistrationResponse], error) {
-	infPlayerID, ok := middleware.PlayerID(ctx)
-	if !ok {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errNoInferredPlayerID)
-	}
-
-	playerID, err := models.PlayerIDFromString(req.Msg.GetPlayerId())
+	playerID, err := guardPlayerIDMatchesSelf(ctx, req.Msg.GetPlayerId())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
-	}
-
-	if playerID != infPlayerID {
-		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("player_id doesn't match auth token: %w", errUnownedEntity))
+		return nil, err
 	}
 
 	var cat models.ScoringCategory
