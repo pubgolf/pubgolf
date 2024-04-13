@@ -36,6 +36,18 @@ WHERE
   id = $1
   AND deleted_at IS NULL;
 
+-- name: PlayerRegisteredForEvent :one
+SELECT
+  TRUE AS registration_found
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+WHERE
+  p.deleted_at IS NULL
+  AND p.id = @player_id
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id;
+
 -- name: PlayerRegistrationsByID :many
 SELECT
   e.key AS event_key,

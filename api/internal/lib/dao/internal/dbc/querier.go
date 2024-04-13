@@ -34,6 +34,7 @@ type Querier interface {
 	PlayerAdjustments(ctx context.Context, arg PlayerAdjustmentsParams) ([]PlayerAdjustmentsRow, error)
 	PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByIDRow, error)
 	PlayerIDByAuthToken(ctx context.Context, authToken models.AuthToken) (models.PlayerID, error)
+	PlayerRegisteredForEvent(ctx context.Context, arg PlayerRegisteredForEventParams) (bool, error)
 	PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error)
 	PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)

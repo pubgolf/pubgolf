@@ -117,6 +117,31 @@ func (q *Queries) PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByI
 	return i, err
 }
 
+const playerRegisteredForEvent = `-- name: PlayerRegisteredForEvent :one
+SELECT
+  TRUE AS registration_found
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+WHERE
+  p.deleted_at IS NULL
+  AND p.id = $1
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = $2
+`
+
+type PlayerRegisteredForEventParams struct {
+	PlayerID models.PlayerID
+	EventID  models.EventID
+}
+
+func (q *Queries) PlayerRegisteredForEvent(ctx context.Context, arg PlayerRegisteredForEventParams) (bool, error) {
+	row := q.queryRow(ctx, q.playerRegisteredForEventStmt, playerRegisteredForEvent, arg.PlayerID, arg.EventID)
+	var registration_found bool
+	err := row.Scan(&registration_found)
+	return registration_found, err
+}
+
 const playerRegistrationsByID = `-- name: PlayerRegistrationsByID :many
 SELECT
   e.key AS event_key,

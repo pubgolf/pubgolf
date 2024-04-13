@@ -491,6 +491,34 @@ func (_m *MockQueryProvider) PlayerIDByAuthToken(ctx context.Context, token mode
 	return r0, r1
 }
 
+// PlayerRegisteredForEvent provides a mock function with given fields: ctx, playerID, eventID
+func (_m *MockQueryProvider) PlayerRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (bool, error) {
+	ret := _m.Called(ctx, playerID, eventID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerRegisteredForEvent")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.EventID) (bool, error)); ok {
+		return rf(ctx, playerID, eventID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.EventID) bool); ok {
+		r0 = rf(ctx, playerID, eventID)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PlayerID, models.EventID) error); ok {
+		r1 = rf(ctx, playerID, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // PlayerScores provides a mock function with given fields: ctx, eventID, playerID
 func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error) {
 	ret := _m.Called(ctx, eventID, playerID)
