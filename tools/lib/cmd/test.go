@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -114,6 +115,8 @@ func runE2ETest(stopOnExit bool) func() {
 	tester.Stderr = os.Stderr
 	tester.Stdin = os.Stdin
 
+	log.Println("Starting e2e test run...")
+
 	err := tester.Start()
 	if err != nil {
 		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
@@ -126,7 +129,7 @@ func runE2ETest(stopOnExit bool) func() {
 		go func() {
 			defer close(beginShutdown)
 
-			err := tester.Start()
+			err := tester.Wait()
 			if err != nil {
 				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
 				if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
