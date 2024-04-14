@@ -836,6 +836,34 @@ func (_m *MockQuerier) SetNextEventVenueKey(ctx context.Context, id models.Event
 	return r0
 }
 
+// StageIDByVenueKey provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StageIDByVenueKey")
+	}
+
+	var r0 models.StageID
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, StageIDByVenueKeyParams) (models.StageID, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, StageIDByVenueKeyParams) models.StageID); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(models.StageID)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, StageIDByVenueKeyParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateAdjustment provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error {
 	ret := _m.Called(ctx, arg)

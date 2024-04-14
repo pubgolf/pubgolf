@@ -117,6 +117,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.setNextEventVenueKeyStmt, err = db.PrepareContext(ctx, setNextEventVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query SetNextEventVenueKey: %w", err)
 	}
+	if q.stageIDByVenueKeyStmt, err = db.PrepareContext(ctx, stageIDByVenueKey); err != nil {
+		return nil, fmt.Errorf("error preparing query StageIDByVenueKey: %w", err)
+	}
 	if q.updateAdjustmentStmt, err = db.PrepareContext(ctx, updateAdjustment); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateAdjustment: %w", err)
 	}
@@ -295,6 +298,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing setNextEventVenueKeyStmt: %w", cerr)
 		}
 	}
+	if q.stageIDByVenueKeyStmt != nil {
+		if cerr := q.stageIDByVenueKeyStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing stageIDByVenueKeyStmt: %w", cerr)
+		}
+	}
 	if q.updateAdjustmentStmt != nil {
 		if cerr := q.updateAdjustmentStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateAdjustmentStmt: %w", cerr)
@@ -395,6 +403,7 @@ type Queries struct {
 	setEventCacheKeysStmt               *sql.Stmt
 	setEventVenueKeysStmt               *sql.Stmt
 	setNextEventVenueKeyStmt            *sql.Stmt
+	stageIDByVenueKeyStmt               *sql.Stmt
 	updateAdjustmentStmt                *sql.Stmt
 	updatePlayerStmt                    *sql.Stmt
 	updateScoreStmt                     *sql.Stmt
@@ -438,6 +447,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		setEventCacheKeysStmt:               q.setEventCacheKeysStmt,
 		setEventVenueKeysStmt:               q.setEventVenueKeysStmt,
 		setNextEventVenueKeyStmt:            q.setNextEventVenueKeyStmt,
+		stageIDByVenueKeyStmt:               q.stageIDByVenueKeyStmt,
 		updateAdjustmentStmt:                q.updateAdjustmentStmt,
 		updatePlayerStmt:                    q.updatePlayerStmt,
 		updateScoreStmt:                     q.updateScoreStmt,

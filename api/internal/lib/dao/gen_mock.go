@@ -607,6 +607,34 @@ func (_m *MockQueryProvider) ScoringCriteria(ctx context.Context, eventID models
 	return r0, r1
 }
 
+// StageIDByVenueKey provides a mock function with given fields: ctx, eventID, venueKey
+func (_m *MockQueryProvider) StageIDByVenueKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.StageID, error) {
+	ret := _m.Called(ctx, eventID, venueKey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StageIDByVenueKey")
+	}
+
+	var r0 models.StageID
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) (models.StageID, error)); ok {
+		return rf(ctx, eventID, venueKey)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) models.StageID); ok {
+		r0 = rf(ctx, eventID, venueKey)
+	} else {
+		r0 = ret.Get(0).(models.StageID)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.VenueKey) error); ok {
+		r1 = rf(ctx, eventID, venueKey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdatePlayer provides a mock function with given fields: ctx, playerID, player
 func (_m *MockQueryProvider) UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error) {
 	ret := _m.Called(ctx, playerID, player)

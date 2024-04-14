@@ -12,6 +12,29 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+const stageIDByVenueKey = `-- name: StageIDByVenueKey :one
+SELECT
+  s.id
+FROM
+  stages s
+WHERE
+  s.deleted_at IS NULL
+  AND s.event_id = $1
+  AND s.venue_key = $2
+`
+
+type StageIDByVenueKeyParams struct {
+	EventID  models.EventID
+	VenueKey models.VenueKey
+}
+
+func (q *Queries) StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error) {
+	row := q.queryRow(ctx, q.stageIDByVenueKeyStmt, stageIDByVenueKey, arg.EventID, arg.VenueKey)
+	var id models.StageID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const venueByKey = `-- name: VenueByKey :one
 SELECT
   v.id,
@@ -22,9 +45,9 @@ FROM
   stages s
   JOIN venues v ON s.venue_id = v.id
 WHERE
-  s.event_id = $1
+  s.deleted_at IS NULL
+  AND s.event_id = $1
   AND s.venue_key = $2
-  AND s.deleted_at IS NULL
   AND v.deleted_at IS NULL
 `
 

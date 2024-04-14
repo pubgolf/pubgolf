@@ -53,6 +53,8 @@ type QueryProvider interface {
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// ScoringCriteria returns a list of players competing in the given category and the data necessary to rank them.
 	ScoringCriteria(ctx context.Context, eventID models.EventID, category models.ScoringCategory) ([]models.ScoringInput, error)
+	// StageIDByVenueKey looks up the stage ID given the client-facing version of the identifier (the venueKey).
+	StageIDByVenueKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.StageID, error)
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
 	// UpdateScore creates score and adjustment records for a given stage.

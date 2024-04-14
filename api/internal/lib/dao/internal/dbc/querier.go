@@ -43,6 +43,7 @@ type Querier interface {
 	SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error)
 	SetEventVenueKeys(ctx context.Context, eventID models.EventID) error
 	SetNextEventVenueKey(ctx context.Context, id models.EventID) error
+	StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error)
 	UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error
 	UpdateScore(ctx context.Context, arg UpdateScoreParams) error
