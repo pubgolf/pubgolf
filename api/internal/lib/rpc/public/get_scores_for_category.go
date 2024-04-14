@@ -84,9 +84,8 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 			rankCopy = &rank
 		}
 
-		playerID := c.PlayerID.String()
 		scores = append(scores, &apiv1.ScoreBoard_ScoreBoardEntry{
-			EntityId:           &playerID,
+			EntityId:           p(c.PlayerID.String()),
 			Label:              c.Name,
 			Score:              c.TotalPoints,
 			DisplayScoreSigned: false,

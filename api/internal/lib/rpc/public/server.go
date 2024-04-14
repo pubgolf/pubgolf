@@ -35,3 +35,11 @@ func NewServer(q dao.QueryProvider, mes sms.Messenger) *Server {
 		mes:    mes,
 	}
 }
+
+// p converts a literal into a pointer.
+func p[T any](val T) *T {
+	return &val
+}
+
+// i converts an int literal into an int64 pointer.
+var i = p[int64]
