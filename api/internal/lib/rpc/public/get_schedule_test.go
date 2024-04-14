@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
+	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
@@ -28,6 +29,21 @@ func mockEventIDByKey(m *dao.MockQueryProvider, eventKey string, eventID models.
 			nil,
 		},
 	}.Bind(m, "EventIDByKey")
+}
+
+func mockPlayerRegisteredForEvent(m *dao.MockQueryProvider, playerID models.PlayerID, eventID models.EventID) {
+	dao.MockDAOCall{
+		ShouldCall: true,
+		Args: []interface{}{
+			mock.Anything,
+			playerID,
+			eventID,
+		},
+		Return: []interface{}{
+			true,
+			nil,
+		},
+	}.Bind(m, "PlayerRegisteredForEvent")
 }
 
 func mockEventStartTime(m *dao.MockQueryProvider, eventID models.EventID, startTime time.Time) {
@@ -86,12 +102,18 @@ var _testSchedule = []dao.VenueStop{
 	{VenueKey: models.VenueKeyFromUInt32(9), Duration: 30 * time.Minute},
 }
 
+var _testPlayerID = models.PlayerIDFromULID(ulid.Make())
+
 func _venueKeyAtIndex(schedule []dao.VenueStop, index int) uint32 {
 	return schedule[index].VenueKey.UInt32()
 }
 
 func pointerFromUInt32(u uint32) *uint32 {
 	return &u
+}
+
+func makeGameContext() context.Context {
+	return middleware.ContextWithPlayerID(context.Background(), _testPlayerID)
 }
 
 func assertTimestampsMatch(t *testing.T, expected, actual time.Time) {
@@ -113,11 +135,12 @@ func TestGetSchedule(t *testing.T) {
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventIDByKey(mockDAO, eventKey, eventID)
+		mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 		mockEventStartTime(mockDAO, eventID, time.Now().Add(time.Minute*5))
 		mockEventSchedule(mockDAO, eventID, []dao.VenueStop{})
 		mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-		resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+		resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 			Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 		})
 
@@ -139,11 +162,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * 5)
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -166,11 +190,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * -15)
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -193,11 +218,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * -25)
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -220,11 +246,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * (-1*(30*4) - 15))
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -247,11 +274,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * (-1*(30*4) - 25))
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -274,11 +302,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * (-1*(30*8) - 15))
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -301,11 +330,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * (-1*(30*8) - 25))
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -328,11 +358,12 @@ func TestGetSchedule(t *testing.T) {
 			startTime := time.Now().Add(time.Minute * (-1 * (30 * 10)))
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, 0, false)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -362,11 +393,12 @@ func TestGetSchedule(t *testing.T) {
 			cacheVersion := uint32(999)
 
 			mockEventIDByKey(mockDAO, eventKey, eventID)
+			mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 			mockEventStartTime(mockDAO, eventID, startTime)
 			mockEventSchedule(mockDAO, eventID, _testSchedule)
 			mockEventScheduleCacheVersion(mockDAO, eventID, cacheVersion, true)
 
-			resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+			resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 				Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 			})
 			require.NoError(t, err)
@@ -387,11 +419,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 1, true)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 				})
 				require.NoError(t, err)
@@ -409,11 +442,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 1, false)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: nil},
 				})
 				require.NoError(t, err)
@@ -436,11 +470,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(1)},
 				})
 				require.NoError(t, err)
@@ -458,11 +493,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(1)},
 				})
 				require.NoError(t, err)
@@ -485,11 +521,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(2)},
 				})
 				require.NoError(t, err)
@@ -507,11 +544,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(2)},
 				})
 				require.NoError(t, err)
@@ -534,11 +572,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, true)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(3)},
 				})
 				require.NoError(t, err)
@@ -556,11 +595,12 @@ func TestGetSchedule(t *testing.T) {
 				startTime := time.Now().Add(time.Minute * 5)
 
 				mockEventIDByKey(mockDAO, eventKey, eventID)
+				mockPlayerRegisteredForEvent(mockDAO, _testPlayerID, eventID)
 				mockEventStartTime(mockDAO, eventID, startTime)
 				mockEventSchedule(mockDAO, eventID, _testSchedule)
 				mockEventScheduleCacheVersion(mockDAO, eventID, 2, false)
 
-				resp, err := s.GetSchedule(context.Background(), &connect.Request[apiv1.GetScheduleRequest]{
+				resp, err := s.GetSchedule(makeGameContext(), &connect.Request[apiv1.GetScheduleRequest]{
 					Msg: &apiv1.GetScheduleRequest{EventKey: eventKey, CachedDataVersion: pointerFromUInt32(3)},
 				})
 				require.NoError(t, err)

@@ -47,6 +47,11 @@ func nonAuthRoute(req connect.AnyRequest) bool {
 	return match
 }
 
+// ContextWithPlayerID adds a playerID to a context. Used for testing RPCs without utilizing the full middleware.
+func ContextWithPlayerID(ctx context.Context, playerID models.PlayerID) context.Context {
+	return context.WithValue(ctx, ctxKeyPlayerID{}, playerID)
+}
+
 // PlayerID returns the playerID inferred from the request's auth token.
 func PlayerID(ctx context.Context) (models.PlayerID, bool) {
 	pID := ctx.Value(ctxKeyPlayerID{})
@@ -82,7 +87,7 @@ func NewAuthInterceptor(q dao.QueryProvider) connect.UnaryInterceptorFunc {
 				return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup auth token: %w", err))
 			}
 
-			return next(context.WithValue(ctx, ctxKeyPlayerID{}, playerID), req)
+			return next(ContextWithPlayerID(ctx, playerID), req)
 		})
 	}
 
