@@ -3,10 +3,10 @@ module github.com/pubgolf/pubgolf
 go 1.22.1
 
 require (
+	connectrpc.com/connect v1.16.0
+	connectrpc.com/otelconnect v0.7.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/XSAM/otelsql v0.29.0
-	github.com/bufbuild/connect-go v1.10.0
-	github.com/bufbuild/connect-opentelemetry-go v0.4.0
 	github.com/fatih/color v1.16.0
 	github.com/fergusstrange/embedded-postgres v1.26.0
 	github.com/go-chi/chi/v5 v5.0.12

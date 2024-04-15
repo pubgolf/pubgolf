@@ -3,12 +3,12 @@ plugins:
   - plugin: buf.build/protocolbuffers/go
     out: api/internal/lib/proto
     opt: paths=source_relative
-  - plugin: buf.build/bufbuild/connect-go
+  - plugin: buf.build/connectrpc/go:v1.16.0
     out: api/internal/lib/proto
     opt: paths=source_relative
   - plugin: buf.build/bufbuild/es
     out: web-app/src/lib/proto
     opt: target=ts
-  - plugin: buf.build/bufbuild/connect-es
+  - plugin: buf.build/connectrpc/es:v1.4.0
     out: web-app/src/lib/proto
     opt: target=ts

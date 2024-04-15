@@ -7,9 +7,9 @@
 package apiv1connect
 
 import (
+	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	connect_go "github.com/bufbuild/connect-go"
 	v1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	http "net/http"
 	strings "strings"
@@ -20,7 +20,7 @@ import (
 // generated with a version of connect newer than the one compiled into your binary. You can fix the
 // problem by either regenerating this code with an older version of connect or updating the connect
 // version compiled into your binary.
-const _ = connect_go.IsAtLeastVersion0_1_0
+const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// AdminServiceName is the fully-qualified name of the AdminService service.
@@ -61,24 +61,37 @@ const (
 	AdminServiceDeleteStageScoreProcedure = "/api.v1.AdminService/DeleteStageScore"
 )
 
+// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
+var (
+	adminServiceServiceDescriptor                = v1.File_api_v1_admin_proto.Services().ByName("AdminService")
+	adminServiceCreatePlayerMethodDescriptor     = adminServiceServiceDescriptor.Methods().ByName("CreatePlayer")
+	adminServiceUpdatePlayerMethodDescriptor     = adminServiceServiceDescriptor.Methods().ByName("UpdatePlayer")
+	adminServiceListPlayersMethodDescriptor      = adminServiceServiceDescriptor.Methods().ByName("ListPlayers")
+	adminServiceListEventStagesMethodDescriptor  = adminServiceServiceDescriptor.Methods().ByName("ListEventStages")
+	adminServiceCreateStageScoreMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("CreateStageScore")
+	adminServiceUpdateStageScoreMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("UpdateStageScore")
+	adminServiceListStageScoresMethodDescriptor  = adminServiceServiceDescriptor.Methods().ByName("ListStageScores")
+	adminServiceDeleteStageScoreMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("DeleteStageScore")
+)
+
 // AdminServiceClient is a client for the api.v1.AdminService service.
 type AdminServiceClient interface {
 	// CreatePlayer creates a new player profile for a given event.
-	CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error)
+	CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
-	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
+	UpdatePlayer(context.Context, *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
-	ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error)
+	ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error)
 	// ListEventStages returns a full schedule for an event.
-	ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error)
+	ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error)
 	// CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
-	CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error)
+	CreateStageScore(context.Context, *connect.Request[v1.CreateStageScoreRequest]) (*connect.Response[v1.CreateStageScoreResponse], error)
 	// CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
-	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
+	UpdateStageScore(context.Context, *connect.Request[v1.UpdateStageScoreRequest]) (*connect.Response[v1.UpdateStageScoreResponse], error)
 	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
-	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
+	ListStageScores(context.Context, *connect.Request[v1.ListStageScoresRequest]) (*connect.Response[v1.ListStageScoresResponse], error)
 	// DeleteStageScore removes all scoring data for a player/stage pair.
-	DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error)
+	DeleteStageScore(context.Context, *connect.Request[v1.DeleteStageScoreRequest]) (*connect.Response[v1.DeleteStageScoreResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the api.v1.AdminService service. By default, it
@@ -88,122 +101,130 @@ type AdminServiceClient interface {
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewAdminServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) AdminServiceClient {
+func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AdminServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &adminServiceClient{
-		createPlayer: connect_go.NewClient[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse](
+		createPlayer: connect.NewClient[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse](
 			httpClient,
 			baseURL+AdminServiceCreatePlayerProcedure,
-			opts...,
+			connect.WithSchema(adminServiceCreatePlayerMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		updatePlayer: connect_go.NewClient[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse](
+		updatePlayer: connect.NewClient[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse](
 			httpClient,
 			baseURL+AdminServiceUpdatePlayerProcedure,
-			opts...,
+			connect.WithSchema(adminServiceUpdatePlayerMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		listPlayers: connect_go.NewClient[v1.ListPlayersRequest, v1.ListPlayersResponse](
+		listPlayers: connect.NewClient[v1.ListPlayersRequest, v1.ListPlayersResponse](
 			httpClient,
 			baseURL+AdminServiceListPlayersProcedure,
-			opts...,
+			connect.WithSchema(adminServiceListPlayersMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		listEventStages: connect_go.NewClient[v1.ListEventStagesRequest, v1.ListEventStagesResponse](
+		listEventStages: connect.NewClient[v1.ListEventStagesRequest, v1.ListEventStagesResponse](
 			httpClient,
 			baseURL+AdminServiceListEventStagesProcedure,
-			opts...,
+			connect.WithSchema(adminServiceListEventStagesMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		createStageScore: connect_go.NewClient[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse](
+		createStageScore: connect.NewClient[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse](
 			httpClient,
 			baseURL+AdminServiceCreateStageScoreProcedure,
-			opts...,
+			connect.WithSchema(adminServiceCreateStageScoreMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		updateStageScore: connect_go.NewClient[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse](
+		updateStageScore: connect.NewClient[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse](
 			httpClient,
 			baseURL+AdminServiceUpdateStageScoreProcedure,
-			opts...,
+			connect.WithSchema(adminServiceUpdateStageScoreMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		listStageScores: connect_go.NewClient[v1.ListStageScoresRequest, v1.ListStageScoresResponse](
+		listStageScores: connect.NewClient[v1.ListStageScoresRequest, v1.ListStageScoresResponse](
 			httpClient,
 			baseURL+AdminServiceListStageScoresProcedure,
-			opts...,
+			connect.WithSchema(adminServiceListStageScoresMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
-		deleteStageScore: connect_go.NewClient[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse](
+		deleteStageScore: connect.NewClient[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse](
 			httpClient,
 			baseURL+AdminServiceDeleteStageScoreProcedure,
-			opts...,
+			connect.WithSchema(adminServiceDeleteStageScoreMethodDescriptor),
+			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
 // adminServiceClient implements AdminServiceClient.
 type adminServiceClient struct {
-	createPlayer     *connect_go.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
-	updatePlayer     *connect_go.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
-	listPlayers      *connect_go.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
-	listEventStages  *connect_go.Client[v1.ListEventStagesRequest, v1.ListEventStagesResponse]
-	createStageScore *connect_go.Client[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse]
-	updateStageScore *connect_go.Client[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse]
-	listStageScores  *connect_go.Client[v1.ListStageScoresRequest, v1.ListStageScoresResponse]
-	deleteStageScore *connect_go.Client[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse]
+	createPlayer     *connect.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
+	updatePlayer     *connect.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
+	listPlayers      *connect.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
+	listEventStages  *connect.Client[v1.ListEventStagesRequest, v1.ListEventStagesResponse]
+	createStageScore *connect.Client[v1.CreateStageScoreRequest, v1.CreateStageScoreResponse]
+	updateStageScore *connect.Client[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse]
+	listStageScores  *connect.Client[v1.ListStageScoresRequest, v1.ListStageScoresResponse]
+	deleteStageScore *connect.Client[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse]
 }
 
 // CreatePlayer calls api.v1.AdminService.CreatePlayer.
-func (c *adminServiceClient) CreatePlayer(ctx context.Context, req *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error) {
+func (c *adminServiceClient) CreatePlayer(ctx context.Context, req *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error) {
 	return c.createPlayer.CallUnary(ctx, req)
 }
 
 // UpdatePlayer calls api.v1.AdminService.UpdatePlayer.
-func (c *adminServiceClient) UpdatePlayer(ctx context.Context, req *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error) {
+func (c *adminServiceClient) UpdatePlayer(ctx context.Context, req *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error) {
 	return c.updatePlayer.CallUnary(ctx, req)
 }
 
 // ListPlayers calls api.v1.AdminService.ListPlayers.
-func (c *adminServiceClient) ListPlayers(ctx context.Context, req *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error) {
+func (c *adminServiceClient) ListPlayers(ctx context.Context, req *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error) {
 	return c.listPlayers.CallUnary(ctx, req)
 }
 
 // ListEventStages calls api.v1.AdminService.ListEventStages.
-func (c *adminServiceClient) ListEventStages(ctx context.Context, req *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error) {
+func (c *adminServiceClient) ListEventStages(ctx context.Context, req *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error) {
 	return c.listEventStages.CallUnary(ctx, req)
 }
 
 // CreateStageScore calls api.v1.AdminService.CreateStageScore.
-func (c *adminServiceClient) CreateStageScore(ctx context.Context, req *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error) {
+func (c *adminServiceClient) CreateStageScore(ctx context.Context, req *connect.Request[v1.CreateStageScoreRequest]) (*connect.Response[v1.CreateStageScoreResponse], error) {
 	return c.createStageScore.CallUnary(ctx, req)
 }
 
 // UpdateStageScore calls api.v1.AdminService.UpdateStageScore.
-func (c *adminServiceClient) UpdateStageScore(ctx context.Context, req *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error) {
+func (c *adminServiceClient) UpdateStageScore(ctx context.Context, req *connect.Request[v1.UpdateStageScoreRequest]) (*connect.Response[v1.UpdateStageScoreResponse], error) {
 	return c.updateStageScore.CallUnary(ctx, req)
 }
 
 // ListStageScores calls api.v1.AdminService.ListStageScores.
-func (c *adminServiceClient) ListStageScores(ctx context.Context, req *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error) {
+func (c *adminServiceClient) ListStageScores(ctx context.Context, req *connect.Request[v1.ListStageScoresRequest]) (*connect.Response[v1.ListStageScoresResponse], error) {
 	return c.listStageScores.CallUnary(ctx, req)
 }
 
 // DeleteStageScore calls api.v1.AdminService.DeleteStageScore.
-func (c *adminServiceClient) DeleteStageScore(ctx context.Context, req *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error) {
+func (c *adminServiceClient) DeleteStageScore(ctx context.Context, req *connect.Request[v1.DeleteStageScoreRequest]) (*connect.Response[v1.DeleteStageScoreResponse], error) {
 	return c.deleteStageScore.CallUnary(ctx, req)
 }
 
 // AdminServiceHandler is an implementation of the api.v1.AdminService service.
 type AdminServiceHandler interface {
 	// CreatePlayer creates a new player profile for a given event.
-	CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error)
+	CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
-	UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error)
+	UpdatePlayer(context.Context, *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
-	ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error)
+	ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error)
 	// ListEventStages returns a full schedule for an event.
-	ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error)
+	ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error)
 	// CreateStageScore sets the score and adjustments for a given pair of player and stage IDs.
-	CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error)
+	CreateStageScore(context.Context, *connect.Request[v1.CreateStageScoreRequest]) (*connect.Response[v1.CreateStageScoreResponse], error)
 	// CreateStageScore updates the score and adjustments for a player/stage pair, based on their IDs.
-	UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error)
+	UpdateStageScore(context.Context, *connect.Request[v1.UpdateStageScoreRequest]) (*connect.Response[v1.UpdateStageScoreResponse], error)
 	// ListStageScores returns all sets of (scores, adjustments[]) for an event, ordered chronologically by event stage, then chronologically by score creation time.
-	ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error)
+	ListStageScores(context.Context, *connect.Request[v1.ListStageScoresRequest]) (*connect.Response[v1.ListStageScoresResponse], error)
 	// DeleteStageScore removes all scoring data for a player/stage pair.
-	DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error)
+	DeleteStageScore(context.Context, *connect.Request[v1.DeleteStageScoreRequest]) (*connect.Response[v1.DeleteStageScoreResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -211,46 +232,54 @@ type AdminServiceHandler interface {
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	adminServiceCreatePlayerHandler := connect_go.NewUnaryHandler(
+func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	adminServiceCreatePlayerHandler := connect.NewUnaryHandler(
 		AdminServiceCreatePlayerProcedure,
 		svc.CreatePlayer,
-		opts...,
+		connect.WithSchema(adminServiceCreatePlayerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceUpdatePlayerHandler := connect_go.NewUnaryHandler(
+	adminServiceUpdatePlayerHandler := connect.NewUnaryHandler(
 		AdminServiceUpdatePlayerProcedure,
 		svc.UpdatePlayer,
-		opts...,
+		connect.WithSchema(adminServiceUpdatePlayerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceListPlayersHandler := connect_go.NewUnaryHandler(
+	adminServiceListPlayersHandler := connect.NewUnaryHandler(
 		AdminServiceListPlayersProcedure,
 		svc.ListPlayers,
-		opts...,
+		connect.WithSchema(adminServiceListPlayersMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceListEventStagesHandler := connect_go.NewUnaryHandler(
+	adminServiceListEventStagesHandler := connect.NewUnaryHandler(
 		AdminServiceListEventStagesProcedure,
 		svc.ListEventStages,
-		opts...,
+		connect.WithSchema(adminServiceListEventStagesMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceCreateStageScoreHandler := connect_go.NewUnaryHandler(
+	adminServiceCreateStageScoreHandler := connect.NewUnaryHandler(
 		AdminServiceCreateStageScoreProcedure,
 		svc.CreateStageScore,
-		opts...,
+		connect.WithSchema(adminServiceCreateStageScoreMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceUpdateStageScoreHandler := connect_go.NewUnaryHandler(
+	adminServiceUpdateStageScoreHandler := connect.NewUnaryHandler(
 		AdminServiceUpdateStageScoreProcedure,
 		svc.UpdateStageScore,
-		opts...,
+		connect.WithSchema(adminServiceUpdateStageScoreMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceListStageScoresHandler := connect_go.NewUnaryHandler(
+	adminServiceListStageScoresHandler := connect.NewUnaryHandler(
 		AdminServiceListStageScoresProcedure,
 		svc.ListStageScores,
-		opts...,
+		connect.WithSchema(adminServiceListStageScoresMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
-	adminServiceDeleteStageScoreHandler := connect_go.NewUnaryHandler(
+	adminServiceDeleteStageScoreHandler := connect.NewUnaryHandler(
 		AdminServiceDeleteStageScoreProcedure,
 		svc.DeleteStageScore,
-		opts...,
+		connect.WithSchema(adminServiceDeleteStageScoreMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
 	)
 	return "/api.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -279,34 +308,34 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect_go.HandlerO
 // UnimplementedAdminServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAdminServiceHandler struct{}
 
-func (UnimplementedAdminServiceHandler) CreatePlayer(context.Context, *connect_go.Request[v1.AdminServiceCreatePlayerRequest]) (*connect_go.Response[v1.AdminServiceCreatePlayerResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.CreatePlayer is not implemented"))
+func (UnimplementedAdminServiceHandler) CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.CreatePlayer is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) UpdatePlayer(context.Context, *connect_go.Request[v1.UpdatePlayerRequest]) (*connect_go.Response[v1.UpdatePlayerResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.UpdatePlayer is not implemented"))
+func (UnimplementedAdminServiceHandler) UpdatePlayer(context.Context, *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.UpdatePlayer is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) ListPlayers(context.Context, *connect_go.Request[v1.ListPlayersRequest]) (*connect_go.Response[v1.ListPlayersResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListPlayers is not implemented"))
+func (UnimplementedAdminServiceHandler) ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.ListPlayers is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) ListEventStages(context.Context, *connect_go.Request[v1.ListEventStagesRequest]) (*connect_go.Response[v1.ListEventStagesResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListEventStages is not implemented"))
+func (UnimplementedAdminServiceHandler) ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.ListEventStages is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) CreateStageScore(context.Context, *connect_go.Request[v1.CreateStageScoreRequest]) (*connect_go.Response[v1.CreateStageScoreResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.CreateStageScore is not implemented"))
+func (UnimplementedAdminServiceHandler) CreateStageScore(context.Context, *connect.Request[v1.CreateStageScoreRequest]) (*connect.Response[v1.CreateStageScoreResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.CreateStageScore is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) UpdateStageScore(context.Context, *connect_go.Request[v1.UpdateStageScoreRequest]) (*connect_go.Response[v1.UpdateStageScoreResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.UpdateStageScore is not implemented"))
+func (UnimplementedAdminServiceHandler) UpdateStageScore(context.Context, *connect.Request[v1.UpdateStageScoreRequest]) (*connect.Response[v1.UpdateStageScoreResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.UpdateStageScore is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) ListStageScores(context.Context, *connect_go.Request[v1.ListStageScoresRequest]) (*connect_go.Response[v1.ListStageScoresResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.ListStageScores is not implemented"))
+func (UnimplementedAdminServiceHandler) ListStageScores(context.Context, *connect.Request[v1.ListStageScoresRequest]) (*connect.Response[v1.ListStageScoresResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.ListStageScores is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) DeleteStageScore(context.Context, *connect_go.Request[v1.DeleteStageScoreRequest]) (*connect_go.Response[v1.DeleteStageScoreResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.AdminService.DeleteStageScore is not implemented"))
+func (UnimplementedAdminServiceHandler) DeleteStageScore(context.Context, *connect.Request[v1.DeleteStageScoreRequest]) (*connect.Response[v1.DeleteStageScoreResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.DeleteStageScore is not implemented"))
 }

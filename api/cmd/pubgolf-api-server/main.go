@@ -15,7 +15,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bufbuild/connect-go"
+	"connectrpc.com/connect"
 	"github.com/go-chi/chi/v5"
 	chim "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
@@ -136,12 +136,15 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http
 		)
 
 		rpcMux := http.NewServeMux()
+		stdInterceptors, err := middleware.ConnectInterceptors()
+		guard(err, "construct interceptors")
+
 		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes),
-			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAuthInterceptor(dao)),
 		))
 		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
-			connect.WithInterceptors(middleware.ConnectInterceptors()...),
+			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAdminAuthInterceptor(cfg)),
 		))
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))

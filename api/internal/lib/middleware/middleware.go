@@ -2,8 +2,10 @@
 package middleware
 
 import (
-	"github.com/bufbuild/connect-go"
-	otelconnect "github.com/bufbuild/connect-opentelemetry-go"
+	"fmt"
+
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/riandyrn/otelchi"
@@ -12,12 +14,17 @@ import (
 )
 
 // ConnectInterceptors returns the standard set of middleware for the gRPC servers.
-func ConnectInterceptors() []connect.Interceptor {
+func ConnectInterceptors() ([]connect.Interceptor, error) {
+	otel, err := otelconnect.NewInterceptor()
+	if err != nil {
+		return nil, fmt.Errorf("construct OTel interceptor: %w", err)
+	}
+
 	return []connect.Interceptor{
-		otelconnect.NewInterceptor(),
+		otel,
 		NewLoggingInterceptor(),
 		NewRecoveringInterceptor(),
-	}
+	}, nil
 }
 
 // ChiMiddleware returns the standard set of middleware for the HTTP handlers.

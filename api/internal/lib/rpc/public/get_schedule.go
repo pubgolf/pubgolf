@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/bufbuild/connect-go"
+	"connectrpc.com/connect"
 	"github.com/mitchellh/hashstructure/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
