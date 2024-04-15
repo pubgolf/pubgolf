@@ -81,3 +81,101 @@ message ScoreBoard {
 
   repeated ScoreBoardEntry scores = 1;
 }
+
+// --------------------
+// Forms
+// --------------------
+
+// Rendering
+
+message TextInput {
+  optional string default_value = 1;
+  optional int64 min_length = 2;
+  optional int64 max_length = 3;
+  optional string match_pattern = 4;
+}
+
+message NumericInput {
+  optional int64 default_value = 1;
+  optional int64 min_value = 2;
+  optional int64 max_value = 3;
+}
+
+message SelectManyInputOption {
+  string id = 1;
+  string label = 2;
+  optional bool default_value = 3;
+}
+
+enum SelectManyInputVariant {
+  SELECT_MANY_INPUT_VARIANT_UNSPECIFIED = 0;
+  SELECT_MANY_INPUT_VARIANT_CHECKBOX = 1;
+}
+
+message SelectManyInput {
+  repeated SelectManyInputOption options = 1;
+  SelectManyInputVariant variant = 2;
+}
+
+message SelectOneInputOption {
+  string id = 1;
+  string label = 2;
+}
+
+enum SelectOneInputVariant {
+  SELECT_ONE_INPUT_VARIANT_UNSPECIFIED = 0;
+  SELECT_ONE_INPUT_VARIANT_DROPDOWN = 1;
+  SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS = 2;
+}
+
+message SelectOneInput {
+  repeated SelectOneInputOption options = 1;
+  optional string default_value_option_id = 2;
+  SelectOneInputVariant variant = 3;
+}
+
+message FormInput {
+  string id = 1;
+  optional string label = 2;
+  bool required = 3;
+
+  oneof variant {
+    TextInput text = 4;
+    NumericInput numeric = 5;
+    SelectManyInput select_many = 6;
+    SelectOneInput select_one = 7;
+  }
+}
+
+message FormGroup {
+  optional string label = 1;
+  repeated FormInput inputs = 2;
+  optional string client_style_hook = 3;
+}
+
+message Form {
+  repeated FormGroup groups = 1;
+  optional string label = 2;
+  optional string action_label = 3;
+  optional string client_style_hook = 4;
+}
+
+// Submission
+
+message SelectManyValue {
+  repeated string selected_ids = 1;
+}
+
+message FormValue {
+  string id = 1;
+  oneof value {
+    string text = 2;
+    int64 numeric = 3;
+    SelectManyValue select_many = 4;
+    string select_one_selected_id = 5;
+  }
+}
+
+message FormSubmission {
+  repeated FormValue values = 1;
+}

@@ -41,6 +41,52 @@ proto3.util.setEnumType(ScoringCategory, "api.v1.ScoringCategory", [
 ]);
 
 /**
+ * @generated from enum api.v1.SelectManyInputVariant
+ */
+export enum SelectManyInputVariant {
+  /**
+   * @generated from enum value: SELECT_MANY_INPUT_VARIANT_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SELECT_MANY_INPUT_VARIANT_CHECKBOX = 1;
+   */
+  CHECKBOX = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(SelectManyInputVariant)
+proto3.util.setEnumType(SelectManyInputVariant, "api.v1.SelectManyInputVariant", [
+  { no: 0, name: "SELECT_MANY_INPUT_VARIANT_UNSPECIFIED" },
+  { no: 1, name: "SELECT_MANY_INPUT_VARIANT_CHECKBOX" },
+]);
+
+/**
+ * @generated from enum api.v1.SelectOneInputVariant
+ */
+export enum SelectOneInputVariant {
+  /**
+   * @generated from enum value: SELECT_ONE_INPUT_VARIANT_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SELECT_ONE_INPUT_VARIANT_DROPDOWN = 1;
+   */
+  DROPDOWN = 1,
+
+  /**
+   * @generated from enum value: SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS = 2;
+   */
+  RADIO_BUTTONS = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(SelectOneInputVariant)
+proto3.util.setEnumType(SelectOneInputVariant, "api.v1.SelectOneInputVariant", [
+  { no: 0, name: "SELECT_ONE_INPUT_VARIANT_UNSPECIFIED" },
+  { no: 1, name: "SELECT_ONE_INPUT_VARIANT_DROPDOWN" },
+  { no: 2, name: "SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS" },
+]);
+
+/**
  * @generated from message api.v1.Color
  */
 export class Color extends Message<Color> {
@@ -465,6 +511,624 @@ export class ScoreBoard_ScoreBoardEntry extends Message<ScoreBoard_ScoreBoardEnt
 
   static equals(a: ScoreBoard_ScoreBoardEntry | PlainMessage<ScoreBoard_ScoreBoardEntry> | undefined, b: ScoreBoard_ScoreBoardEntry | PlainMessage<ScoreBoard_ScoreBoardEntry> | undefined): boolean {
     return proto3.util.equals(ScoreBoard_ScoreBoardEntry, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.TextInput
+ */
+export class TextInput extends Message<TextInput> {
+  /**
+   * @generated from field: optional string default_value = 1;
+   */
+  defaultValue?: string;
+
+  /**
+   * @generated from field: optional int64 min_length = 2;
+   */
+  minLength?: bigint;
+
+  /**
+   * @generated from field: optional int64 max_length = 3;
+   */
+  maxLength?: bigint;
+
+  /**
+   * @generated from field: optional string match_pattern = 4;
+   */
+  matchPattern?: string;
+
+  constructor(data?: PartialMessage<TextInput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.TextInput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "default_value", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "min_length", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+    { no: 3, name: "max_length", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+    { no: 4, name: "match_pattern", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TextInput {
+    return new TextInput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TextInput {
+    return new TextInput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TextInput {
+    return new TextInput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TextInput | PlainMessage<TextInput> | undefined, b: TextInput | PlainMessage<TextInput> | undefined): boolean {
+    return proto3.util.equals(TextInput, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.NumericInput
+ */
+export class NumericInput extends Message<NumericInput> {
+  /**
+   * @generated from field: optional int64 default_value = 1;
+   */
+  defaultValue?: bigint;
+
+  /**
+   * @generated from field: optional int64 min_value = 2;
+   */
+  minValue?: bigint;
+
+  /**
+   * @generated from field: optional int64 max_value = 3;
+   */
+  maxValue?: bigint;
+
+  constructor(data?: PartialMessage<NumericInput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.NumericInput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "default_value", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+    { no: 2, name: "min_value", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+    { no: 3, name: "max_value", kind: "scalar", T: 3 /* ScalarType.INT64 */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NumericInput {
+    return new NumericInput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NumericInput {
+    return new NumericInput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NumericInput {
+    return new NumericInput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: NumericInput | PlainMessage<NumericInput> | undefined, b: NumericInput | PlainMessage<NumericInput> | undefined): boolean {
+    return proto3.util.equals(NumericInput, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SelectManyInputOption
+ */
+export class SelectManyInputOption extends Message<SelectManyInputOption> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string label = 2;
+   */
+  label = "";
+
+  /**
+   * @generated from field: optional bool default_value = 3;
+   */
+  defaultValue?: boolean;
+
+  constructor(data?: PartialMessage<SelectManyInputOption>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SelectManyInputOption";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "default_value", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SelectManyInputOption {
+    return new SelectManyInputOption().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SelectManyInputOption {
+    return new SelectManyInputOption().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SelectManyInputOption {
+    return new SelectManyInputOption().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SelectManyInputOption | PlainMessage<SelectManyInputOption> | undefined, b: SelectManyInputOption | PlainMessage<SelectManyInputOption> | undefined): boolean {
+    return proto3.util.equals(SelectManyInputOption, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SelectManyInput
+ */
+export class SelectManyInput extends Message<SelectManyInput> {
+  /**
+   * @generated from field: repeated api.v1.SelectManyInputOption options = 1;
+   */
+  options: SelectManyInputOption[] = [];
+
+  /**
+   * @generated from field: api.v1.SelectManyInputVariant variant = 2;
+   */
+  variant = SelectManyInputVariant.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<SelectManyInput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SelectManyInput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "options", kind: "message", T: SelectManyInputOption, repeated: true },
+    { no: 2, name: "variant", kind: "enum", T: proto3.getEnumType(SelectManyInputVariant) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SelectManyInput {
+    return new SelectManyInput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SelectManyInput {
+    return new SelectManyInput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SelectManyInput {
+    return new SelectManyInput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SelectManyInput | PlainMessage<SelectManyInput> | undefined, b: SelectManyInput | PlainMessage<SelectManyInput> | undefined): boolean {
+    return proto3.util.equals(SelectManyInput, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SelectOneInputOption
+ */
+export class SelectOneInputOption extends Message<SelectOneInputOption> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string label = 2;
+   */
+  label = "";
+
+  constructor(data?: PartialMessage<SelectOneInputOption>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SelectOneInputOption";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SelectOneInputOption {
+    return new SelectOneInputOption().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SelectOneInputOption {
+    return new SelectOneInputOption().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SelectOneInputOption {
+    return new SelectOneInputOption().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SelectOneInputOption | PlainMessage<SelectOneInputOption> | undefined, b: SelectOneInputOption | PlainMessage<SelectOneInputOption> | undefined): boolean {
+    return proto3.util.equals(SelectOneInputOption, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SelectOneInput
+ */
+export class SelectOneInput extends Message<SelectOneInput> {
+  /**
+   * @generated from field: repeated api.v1.SelectOneInputOption options = 1;
+   */
+  options: SelectOneInputOption[] = [];
+
+  /**
+   * @generated from field: optional string default_value_option_id = 2;
+   */
+  defaultValueOptionId?: string;
+
+  /**
+   * @generated from field: api.v1.SelectOneInputVariant variant = 3;
+   */
+  variant = SelectOneInputVariant.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<SelectOneInput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SelectOneInput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "options", kind: "message", T: SelectOneInputOption, repeated: true },
+    { no: 2, name: "default_value_option_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 3, name: "variant", kind: "enum", T: proto3.getEnumType(SelectOneInputVariant) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SelectOneInput {
+    return new SelectOneInput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SelectOneInput {
+    return new SelectOneInput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SelectOneInput {
+    return new SelectOneInput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SelectOneInput | PlainMessage<SelectOneInput> | undefined, b: SelectOneInput | PlainMessage<SelectOneInput> | undefined): boolean {
+    return proto3.util.equals(SelectOneInput, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.FormInput
+ */
+export class FormInput extends Message<FormInput> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: optional string label = 2;
+   */
+  label?: string;
+
+  /**
+   * @generated from field: bool required = 3;
+   */
+  required = false;
+
+  /**
+   * @generated from oneof api.v1.FormInput.variant
+   */
+  variant: {
+    /**
+     * @generated from field: api.v1.TextInput text = 4;
+     */
+    value: TextInput;
+    case: "text";
+  } | {
+    /**
+     * @generated from field: api.v1.NumericInput numeric = 5;
+     */
+    value: NumericInput;
+    case: "numeric";
+  } | {
+    /**
+     * @generated from field: api.v1.SelectManyInput select_many = 6;
+     */
+    value: SelectManyInput;
+    case: "selectMany";
+  } | {
+    /**
+     * @generated from field: api.v1.SelectOneInput select_one = 7;
+     */
+    value: SelectOneInput;
+    case: "selectOne";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<FormInput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.FormInput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 3, name: "required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "text", kind: "message", T: TextInput, oneof: "variant" },
+    { no: 5, name: "numeric", kind: "message", T: NumericInput, oneof: "variant" },
+    { no: 6, name: "select_many", kind: "message", T: SelectManyInput, oneof: "variant" },
+    { no: 7, name: "select_one", kind: "message", T: SelectOneInput, oneof: "variant" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FormInput {
+    return new FormInput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FormInput {
+    return new FormInput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FormInput {
+    return new FormInput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FormInput | PlainMessage<FormInput> | undefined, b: FormInput | PlainMessage<FormInput> | undefined): boolean {
+    return proto3.util.equals(FormInput, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.FormGroup
+ */
+export class FormGroup extends Message<FormGroup> {
+  /**
+   * @generated from field: optional string label = 1;
+   */
+  label?: string;
+
+  /**
+   * @generated from field: repeated api.v1.FormInput inputs = 2;
+   */
+  inputs: FormInput[] = [];
+
+  /**
+   * @generated from field: optional string client_style_hook = 3;
+   */
+  clientStyleHook?: string;
+
+  constructor(data?: PartialMessage<FormGroup>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.FormGroup";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 2, name: "inputs", kind: "message", T: FormInput, repeated: true },
+    { no: 3, name: "client_style_hook", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FormGroup {
+    return new FormGroup().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FormGroup {
+    return new FormGroup().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FormGroup {
+    return new FormGroup().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FormGroup | PlainMessage<FormGroup> | undefined, b: FormGroup | PlainMessage<FormGroup> | undefined): boolean {
+    return proto3.util.equals(FormGroup, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.Form
+ */
+export class Form extends Message<Form> {
+  /**
+   * @generated from field: repeated api.v1.FormGroup groups = 1;
+   */
+  groups: FormGroup[] = [];
+
+  /**
+   * @generated from field: optional string label = 2;
+   */
+  label?: string;
+
+  /**
+   * @generated from field: optional string action_label = 3;
+   */
+  actionLabel?: string;
+
+  /**
+   * @generated from field: optional string client_style_hook = 4;
+   */
+  clientStyleHook?: string;
+
+  constructor(data?: PartialMessage<Form>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.Form";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "groups", kind: "message", T: FormGroup, repeated: true },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 3, name: "action_label", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 4, name: "client_style_hook", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Form {
+    return new Form().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Form {
+    return new Form().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Form {
+    return new Form().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Form | PlainMessage<Form> | undefined, b: Form | PlainMessage<Form> | undefined): boolean {
+    return proto3.util.equals(Form, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SelectManyValue
+ */
+export class SelectManyValue extends Message<SelectManyValue> {
+  /**
+   * @generated from field: repeated string selected_ids = 1;
+   */
+  selectedIds: string[] = [];
+
+  constructor(data?: PartialMessage<SelectManyValue>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SelectManyValue";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "selected_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SelectManyValue {
+    return new SelectManyValue().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SelectManyValue {
+    return new SelectManyValue().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SelectManyValue {
+    return new SelectManyValue().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SelectManyValue | PlainMessage<SelectManyValue> | undefined, b: SelectManyValue | PlainMessage<SelectManyValue> | undefined): boolean {
+    return proto3.util.equals(SelectManyValue, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.FormValue
+ */
+export class FormValue extends Message<FormValue> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from oneof api.v1.FormValue.value
+   */
+  value: {
+    /**
+     * @generated from field: string text = 2;
+     */
+    value: string;
+    case: "text";
+  } | {
+    /**
+     * @generated from field: int64 numeric = 3;
+     */
+    value: bigint;
+    case: "numeric";
+  } | {
+    /**
+     * @generated from field: api.v1.SelectManyValue select_many = 4;
+     */
+    value: SelectManyValue;
+    case: "selectMany";
+  } | {
+    /**
+     * @generated from field: string select_one_selected_id = 5;
+     */
+    value: string;
+    case: "selectOneSelectedId";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<FormValue>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.FormValue";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "text", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "value" },
+    { no: 3, name: "numeric", kind: "scalar", T: 3 /* ScalarType.INT64 */, oneof: "value" },
+    { no: 4, name: "select_many", kind: "message", T: SelectManyValue, oneof: "value" },
+    { no: 5, name: "select_one_selected_id", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "value" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FormValue {
+    return new FormValue().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FormValue {
+    return new FormValue().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FormValue {
+    return new FormValue().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FormValue | PlainMessage<FormValue> | undefined, b: FormValue | PlainMessage<FormValue> | undefined): boolean {
+    return proto3.util.equals(FormValue, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.FormSubmission
+ */
+export class FormSubmission extends Message<FormSubmission> {
+  /**
+   * @generated from field: repeated api.v1.FormValue values = 1;
+   */
+  values: FormValue[] = [];
+
+  constructor(data?: PartialMessage<FormSubmission>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.FormSubmission";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "values", kind: "message", T: FormValue, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FormSubmission {
+    return new FormSubmission().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FormSubmission {
+    return new FormSubmission().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FormSubmission {
+    return new FormSubmission().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FormSubmission | PlainMessage<FormSubmission> | undefined, b: FormSubmission | PlainMessage<FormSubmission> | undefined): boolean {
+    return proto3.util.equals(FormSubmission, a, b);
   }
 }
 

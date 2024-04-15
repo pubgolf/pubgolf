@@ -74,6 +74,101 @@ func (ScoringCategory) EnumDescriptor() ([]byte, []int) {
 	return file_api_v1_shared_proto_rawDescGZIP(), []int{0}
 }
 
+type SelectManyInputVariant int32
+
+const (
+	SelectManyInputVariant_SELECT_MANY_INPUT_VARIANT_UNSPECIFIED SelectManyInputVariant = 0
+	SelectManyInputVariant_SELECT_MANY_INPUT_VARIANT_CHECKBOX    SelectManyInputVariant = 1
+)
+
+// Enum value maps for SelectManyInputVariant.
+var (
+	SelectManyInputVariant_name = map[int32]string{
+		0: "SELECT_MANY_INPUT_VARIANT_UNSPECIFIED",
+		1: "SELECT_MANY_INPUT_VARIANT_CHECKBOX",
+	}
+	SelectManyInputVariant_value = map[string]int32{
+		"SELECT_MANY_INPUT_VARIANT_UNSPECIFIED": 0,
+		"SELECT_MANY_INPUT_VARIANT_CHECKBOX":    1,
+	}
+)
+
+func (x SelectManyInputVariant) Enum() *SelectManyInputVariant {
+	p := new(SelectManyInputVariant)
+	*p = x
+	return p
+}
+
+func (x SelectManyInputVariant) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SelectManyInputVariant) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_v1_shared_proto_enumTypes[1].Descriptor()
+}
+
+func (SelectManyInputVariant) Type() protoreflect.EnumType {
+	return &file_api_v1_shared_proto_enumTypes[1]
+}
+
+func (x SelectManyInputVariant) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SelectManyInputVariant.Descriptor instead.
+func (SelectManyInputVariant) EnumDescriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{1}
+}
+
+type SelectOneInputVariant int32
+
+const (
+	SelectOneInputVariant_SELECT_ONE_INPUT_VARIANT_UNSPECIFIED   SelectOneInputVariant = 0
+	SelectOneInputVariant_SELECT_ONE_INPUT_VARIANT_DROPDOWN      SelectOneInputVariant = 1
+	SelectOneInputVariant_SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS SelectOneInputVariant = 2
+)
+
+// Enum value maps for SelectOneInputVariant.
+var (
+	SelectOneInputVariant_name = map[int32]string{
+		0: "SELECT_ONE_INPUT_VARIANT_UNSPECIFIED",
+		1: "SELECT_ONE_INPUT_VARIANT_DROPDOWN",
+		2: "SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS",
+	}
+	SelectOneInputVariant_value = map[string]int32{
+		"SELECT_ONE_INPUT_VARIANT_UNSPECIFIED":   0,
+		"SELECT_ONE_INPUT_VARIANT_DROPDOWN":      1,
+		"SELECT_ONE_INPUT_VARIANT_RADIO_BUTTONS": 2,
+	}
+)
+
+func (x SelectOneInputVariant) Enum() *SelectOneInputVariant {
+	p := new(SelectOneInputVariant)
+	*p = x
+	return p
+}
+
+func (x SelectOneInputVariant) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SelectOneInputVariant) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_v1_shared_proto_enumTypes[2].Descriptor()
+}
+
+func (SelectOneInputVariant) Type() protoreflect.EnumType {
+	return &file_api_v1_shared_proto_enumTypes[2]
+}
+
+func (x SelectOneInputVariant) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SelectOneInputVariant.Descriptor instead.
+func (SelectOneInputVariant) EnumDescriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{2}
+}
+
 type ScoreBoard_ScoreStatus int32
 
 const (
@@ -117,11 +212,11 @@ func (x ScoreBoard_ScoreStatus) String() string {
 }
 
 func (ScoreBoard_ScoreStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_v1_shared_proto_enumTypes[1].Descriptor()
+	return file_api_v1_shared_proto_enumTypes[3].Descriptor()
 }
 
 func (ScoreBoard_ScoreStatus) Type() protoreflect.EnumType {
-	return &file_api_v1_shared_proto_enumTypes[1]
+	return &file_api_v1_shared_proto_enumTypes[3]
 }
 
 func (x ScoreBoard_ScoreStatus) Number() protoreflect.EnumNumber {
@@ -501,6 +596,854 @@ func (x *ScoreBoard) GetScores() []*ScoreBoard_ScoreBoardEntry {
 	return nil
 }
 
+type TextInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DefaultValue *string `protobuf:"bytes,1,opt,name=default_value,json=defaultValue,proto3,oneof" json:"default_value,omitempty"`
+	MinLength    *int64  `protobuf:"varint,2,opt,name=min_length,json=minLength,proto3,oneof" json:"min_length,omitempty"`
+	MaxLength    *int64  `protobuf:"varint,3,opt,name=max_length,json=maxLength,proto3,oneof" json:"max_length,omitempty"`
+	MatchPattern *string `protobuf:"bytes,4,opt,name=match_pattern,json=matchPattern,proto3,oneof" json:"match_pattern,omitempty"`
+}
+
+func (x *TextInput) Reset() {
+	*x = TextInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TextInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TextInput) ProtoMessage() {}
+
+func (x *TextInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TextInput.ProtoReflect.Descriptor instead.
+func (*TextInput) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *TextInput) GetDefaultValue() string {
+	if x != nil && x.DefaultValue != nil {
+		return *x.DefaultValue
+	}
+	return ""
+}
+
+func (x *TextInput) GetMinLength() int64 {
+	if x != nil && x.MinLength != nil {
+		return *x.MinLength
+	}
+	return 0
+}
+
+func (x *TextInput) GetMaxLength() int64 {
+	if x != nil && x.MaxLength != nil {
+		return *x.MaxLength
+	}
+	return 0
+}
+
+func (x *TextInput) GetMatchPattern() string {
+	if x != nil && x.MatchPattern != nil {
+		return *x.MatchPattern
+	}
+	return ""
+}
+
+type NumericInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DefaultValue *int64 `protobuf:"varint,1,opt,name=default_value,json=defaultValue,proto3,oneof" json:"default_value,omitempty"`
+	MinValue     *int64 `protobuf:"varint,2,opt,name=min_value,json=minValue,proto3,oneof" json:"min_value,omitempty"`
+	MaxValue     *int64 `protobuf:"varint,3,opt,name=max_value,json=maxValue,proto3,oneof" json:"max_value,omitempty"`
+}
+
+func (x *NumericInput) Reset() {
+	*x = NumericInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NumericInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NumericInput) ProtoMessage() {}
+
+func (x *NumericInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NumericInput.ProtoReflect.Descriptor instead.
+func (*NumericInput) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *NumericInput) GetDefaultValue() int64 {
+	if x != nil && x.DefaultValue != nil {
+		return *x.DefaultValue
+	}
+	return 0
+}
+
+func (x *NumericInput) GetMinValue() int64 {
+	if x != nil && x.MinValue != nil {
+		return *x.MinValue
+	}
+	return 0
+}
+
+func (x *NumericInput) GetMaxValue() int64 {
+	if x != nil && x.MaxValue != nil {
+		return *x.MaxValue
+	}
+	return 0
+}
+
+type SelectManyInputOption struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id           string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label        string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	DefaultValue *bool  `protobuf:"varint,3,opt,name=default_value,json=defaultValue,proto3,oneof" json:"default_value,omitempty"`
+}
+
+func (x *SelectManyInputOption) Reset() {
+	*x = SelectManyInputOption{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SelectManyInputOption) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectManyInputOption) ProtoMessage() {}
+
+func (x *SelectManyInputOption) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectManyInputOption.ProtoReflect.Descriptor instead.
+func (*SelectManyInputOption) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SelectManyInputOption) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SelectManyInputOption) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *SelectManyInputOption) GetDefaultValue() bool {
+	if x != nil && x.DefaultValue != nil {
+		return *x.DefaultValue
+	}
+	return false
+}
+
+type SelectManyInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Options []*SelectManyInputOption `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
+	Variant SelectManyInputVariant   `protobuf:"varint,2,opt,name=variant,proto3,enum=api.v1.SelectManyInputVariant" json:"variant,omitempty"`
+}
+
+func (x *SelectManyInput) Reset() {
+	*x = SelectManyInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SelectManyInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectManyInput) ProtoMessage() {}
+
+func (x *SelectManyInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectManyInput.ProtoReflect.Descriptor instead.
+func (*SelectManyInput) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SelectManyInput) GetOptions() []*SelectManyInputOption {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *SelectManyInput) GetVariant() SelectManyInputVariant {
+	if x != nil {
+		return x.Variant
+	}
+	return SelectManyInputVariant_SELECT_MANY_INPUT_VARIANT_UNSPECIFIED
+}
+
+type SelectOneInputOption struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+}
+
+func (x *SelectOneInputOption) Reset() {
+	*x = SelectOneInputOption{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SelectOneInputOption) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectOneInputOption) ProtoMessage() {}
+
+func (x *SelectOneInputOption) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectOneInputOption.ProtoReflect.Descriptor instead.
+func (*SelectOneInputOption) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *SelectOneInputOption) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SelectOneInputOption) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+type SelectOneInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Options              []*SelectOneInputOption `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
+	DefaultValueOptionId *string                 `protobuf:"bytes,2,opt,name=default_value_option_id,json=defaultValueOptionId,proto3,oneof" json:"default_value_option_id,omitempty"`
+	Variant              SelectOneInputVariant   `protobuf:"varint,3,opt,name=variant,proto3,enum=api.v1.SelectOneInputVariant" json:"variant,omitempty"`
+}
+
+func (x *SelectOneInput) Reset() {
+	*x = SelectOneInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SelectOneInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectOneInput) ProtoMessage() {}
+
+func (x *SelectOneInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectOneInput.ProtoReflect.Descriptor instead.
+func (*SelectOneInput) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SelectOneInput) GetOptions() []*SelectOneInputOption {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *SelectOneInput) GetDefaultValueOptionId() string {
+	if x != nil && x.DefaultValueOptionId != nil {
+		return *x.DefaultValueOptionId
+	}
+	return ""
+}
+
+func (x *SelectOneInput) GetVariant() SelectOneInputVariant {
+	if x != nil {
+		return x.Variant
+	}
+	return SelectOneInputVariant_SELECT_ONE_INPUT_VARIANT_UNSPECIFIED
+}
+
+type FormInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id       string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label    *string `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	Required bool    `protobuf:"varint,3,opt,name=required,proto3" json:"required,omitempty"`
+	// Types that are assignable to Variant:
+	//
+	//	*FormInput_Text
+	//	*FormInput_Numeric
+	//	*FormInput_SelectMany
+	//	*FormInput_SelectOne
+	Variant isFormInput_Variant `protobuf_oneof:"variant"`
+}
+
+func (x *FormInput) Reset() {
+	*x = FormInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FormInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FormInput) ProtoMessage() {}
+
+func (x *FormInput) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FormInput.ProtoReflect.Descriptor instead.
+func (*FormInput) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *FormInput) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *FormInput) GetLabel() string {
+	if x != nil && x.Label != nil {
+		return *x.Label
+	}
+	return ""
+}
+
+func (x *FormInput) GetRequired() bool {
+	if x != nil {
+		return x.Required
+	}
+	return false
+}
+
+func (m *FormInput) GetVariant() isFormInput_Variant {
+	if m != nil {
+		return m.Variant
+	}
+	return nil
+}
+
+func (x *FormInput) GetText() *TextInput {
+	if x, ok := x.GetVariant().(*FormInput_Text); ok {
+		return x.Text
+	}
+	return nil
+}
+
+func (x *FormInput) GetNumeric() *NumericInput {
+	if x, ok := x.GetVariant().(*FormInput_Numeric); ok {
+		return x.Numeric
+	}
+	return nil
+}
+
+func (x *FormInput) GetSelectMany() *SelectManyInput {
+	if x, ok := x.GetVariant().(*FormInput_SelectMany); ok {
+		return x.SelectMany
+	}
+	return nil
+}
+
+func (x *FormInput) GetSelectOne() *SelectOneInput {
+	if x, ok := x.GetVariant().(*FormInput_SelectOne); ok {
+		return x.SelectOne
+	}
+	return nil
+}
+
+type isFormInput_Variant interface {
+	isFormInput_Variant()
+}
+
+type FormInput_Text struct {
+	Text *TextInput `protobuf:"bytes,4,opt,name=text,proto3,oneof"`
+}
+
+type FormInput_Numeric struct {
+	Numeric *NumericInput `protobuf:"bytes,5,opt,name=numeric,proto3,oneof"`
+}
+
+type FormInput_SelectMany struct {
+	SelectMany *SelectManyInput `protobuf:"bytes,6,opt,name=select_many,json=selectMany,proto3,oneof"`
+}
+
+type FormInput_SelectOne struct {
+	SelectOne *SelectOneInput `protobuf:"bytes,7,opt,name=select_one,json=selectOne,proto3,oneof"`
+}
+
+func (*FormInput_Text) isFormInput_Variant() {}
+
+func (*FormInput_Numeric) isFormInput_Variant() {}
+
+func (*FormInput_SelectMany) isFormInput_Variant() {}
+
+func (*FormInput_SelectOne) isFormInput_Variant() {}
+
+type FormGroup struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Label           *string      `protobuf:"bytes,1,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	Inputs          []*FormInput `protobuf:"bytes,2,rep,name=inputs,proto3" json:"inputs,omitempty"`
+	ClientStyleHook *string      `protobuf:"bytes,3,opt,name=client_style_hook,json=clientStyleHook,proto3,oneof" json:"client_style_hook,omitempty"`
+}
+
+func (x *FormGroup) Reset() {
+	*x = FormGroup{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FormGroup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FormGroup) ProtoMessage() {}
+
+func (x *FormGroup) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FormGroup.ProtoReflect.Descriptor instead.
+func (*FormGroup) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *FormGroup) GetLabel() string {
+	if x != nil && x.Label != nil {
+		return *x.Label
+	}
+	return ""
+}
+
+func (x *FormGroup) GetInputs() []*FormInput {
+	if x != nil {
+		return x.Inputs
+	}
+	return nil
+}
+
+func (x *FormGroup) GetClientStyleHook() string {
+	if x != nil && x.ClientStyleHook != nil {
+		return *x.ClientStyleHook
+	}
+	return ""
+}
+
+type Form struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Groups          []*FormGroup `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
+	Label           *string      `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	ActionLabel     *string      `protobuf:"bytes,3,opt,name=action_label,json=actionLabel,proto3,oneof" json:"action_label,omitempty"`
+	ClientStyleHook *string      `protobuf:"bytes,4,opt,name=client_style_hook,json=clientStyleHook,proto3,oneof" json:"client_style_hook,omitempty"`
+}
+
+func (x *Form) Reset() {
+	*x = Form{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Form) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Form) ProtoMessage() {}
+
+func (x *Form) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Form.ProtoReflect.Descriptor instead.
+func (*Form) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *Form) GetGroups() []*FormGroup {
+	if x != nil {
+		return x.Groups
+	}
+	return nil
+}
+
+func (x *Form) GetLabel() string {
+	if x != nil && x.Label != nil {
+		return *x.Label
+	}
+	return ""
+}
+
+func (x *Form) GetActionLabel() string {
+	if x != nil && x.ActionLabel != nil {
+		return *x.ActionLabel
+	}
+	return ""
+}
+
+func (x *Form) GetClientStyleHook() string {
+	if x != nil && x.ClientStyleHook != nil {
+		return *x.ClientStyleHook
+	}
+	return ""
+}
+
+type SelectManyValue struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SelectedIds []string `protobuf:"bytes,1,rep,name=selected_ids,json=selectedIds,proto3" json:"selected_ids,omitempty"`
+}
+
+func (x *SelectManyValue) Reset() {
+	*x = SelectManyValue{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SelectManyValue) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectManyValue) ProtoMessage() {}
+
+func (x *SelectManyValue) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectManyValue.ProtoReflect.Descriptor instead.
+func (*SelectManyValue) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *SelectManyValue) GetSelectedIds() []string {
+	if x != nil {
+		return x.SelectedIds
+	}
+	return nil
+}
+
+type FormValue struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Types that are assignable to Value:
+	//
+	//	*FormValue_Text
+	//	*FormValue_Numeric
+	//	*FormValue_SelectMany
+	//	*FormValue_SelectOneSelectedId
+	Value isFormValue_Value `protobuf_oneof:"value"`
+}
+
+func (x *FormValue) Reset() {
+	*x = FormValue{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FormValue) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FormValue) ProtoMessage() {}
+
+func (x *FormValue) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FormValue.ProtoReflect.Descriptor instead.
+func (*FormValue) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *FormValue) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (m *FormValue) GetValue() isFormValue_Value {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
+func (x *FormValue) GetText() string {
+	if x, ok := x.GetValue().(*FormValue_Text); ok {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *FormValue) GetNumeric() int64 {
+	if x, ok := x.GetValue().(*FormValue_Numeric); ok {
+		return x.Numeric
+	}
+	return 0
+}
+
+func (x *FormValue) GetSelectMany() *SelectManyValue {
+	if x, ok := x.GetValue().(*FormValue_SelectMany); ok {
+		return x.SelectMany
+	}
+	return nil
+}
+
+func (x *FormValue) GetSelectOneSelectedId() string {
+	if x, ok := x.GetValue().(*FormValue_SelectOneSelectedId); ok {
+		return x.SelectOneSelectedId
+	}
+	return ""
+}
+
+type isFormValue_Value interface {
+	isFormValue_Value()
+}
+
+type FormValue_Text struct {
+	Text string `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
+}
+
+type FormValue_Numeric struct {
+	Numeric int64 `protobuf:"varint,3,opt,name=numeric,proto3,oneof"`
+}
+
+type FormValue_SelectMany struct {
+	SelectMany *SelectManyValue `protobuf:"bytes,4,opt,name=select_many,json=selectMany,proto3,oneof"`
+}
+
+type FormValue_SelectOneSelectedId struct {
+	SelectOneSelectedId string `protobuf:"bytes,5,opt,name=select_one_selected_id,json=selectOneSelectedId,proto3,oneof"`
+}
+
+func (*FormValue_Text) isFormValue_Value() {}
+
+func (*FormValue_Numeric) isFormValue_Value() {}
+
+func (*FormValue_SelectMany) isFormValue_Value() {}
+
+func (*FormValue_SelectOneSelectedId) isFormValue_Value() {}
+
+type FormSubmission struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Values []*FormValue `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
+}
+
+func (x *FormSubmission) Reset() {
+	*x = FormSubmission{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_shared_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FormSubmission) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FormSubmission) ProtoMessage() {}
+
+func (x *FormSubmission) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FormSubmission.ProtoReflect.Descriptor instead.
+func (*FormSubmission) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *FormSubmission) GetValues() []*FormValue {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
 type ScoreBoard_ScoreBoardEntry struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -523,7 +1466,7 @@ type ScoreBoard_ScoreBoardEntry struct {
 func (x *ScoreBoard_ScoreBoardEntry) Reset() {
 	*x = ScoreBoard_ScoreBoardEntry{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_shared_proto_msgTypes[6]
+		mi := &file_api_v1_shared_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -536,7 +1479,7 @@ func (x *ScoreBoard_ScoreBoardEntry) String() string {
 func (*ScoreBoard_ScoreBoardEntry) ProtoMessage() {}
 
 func (x *ScoreBoard_ScoreBoardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[6]
+	mi := &file_api_v1_shared_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -692,18 +1635,157 @@ var file_api_v1_shared_proto_rawDesc = []byte{
 	0x12, 0x1b, 0x0a, 0x17, 0x53, 0x43, 0x4f, 0x52, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53,
 	0x5f, 0x49, 0x4e, 0x43, 0x4f, 0x4d, 0x50, 0x4c, 0x45, 0x54, 0x45, 0x10, 0x03, 0x12, 0x1c, 0x0a,
 	0x18, 0x53, 0x43, 0x4f, 0x52, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x4e, 0x4f,
-	0x4e, 0x5f, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x10, 0x04, 0x2a, 0xaf, 0x01, 0x0a, 0x0f,
-	0x53, 0x63, 0x6f, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x12,
-	0x20, 0x0a, 0x1c, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47,
-	0x4f, 0x52, 0x59, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10,
-	0x00, 0x12, 0x27, 0x0a, 0x23, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54,
-	0x45, 0x47, 0x4f, 0x52, 0x59, 0x5f, 0x50, 0x55, 0x42, 0x5f, 0x47, 0x4f, 0x4c, 0x46, 0x5f, 0x4e,
-	0x49, 0x4e, 0x45, 0x5f, 0x48, 0x4f, 0x4c, 0x45, 0x10, 0x01, 0x12, 0x27, 0x0a, 0x23, 0x53, 0x43,
-	0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47, 0x4f, 0x52, 0x59, 0x5f, 0x50,
-	0x55, 0x42, 0x5f, 0x47, 0x4f, 0x4c, 0x46, 0x5f, 0x46, 0x49, 0x56, 0x45, 0x5f, 0x48, 0x4f, 0x4c,
-	0x45, 0x10, 0x02, 0x12, 0x28, 0x0a, 0x24, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43,
-	0x41, 0x54, 0x45, 0x47, 0x4f, 0x52, 0x59, 0x5f, 0x50, 0x55, 0x42, 0x5f, 0x47, 0x4f, 0x4c, 0x46,
-	0x5f, 0x43, 0x48, 0x41, 0x4c, 0x4c, 0x45, 0x4e, 0x47, 0x45, 0x53, 0x10, 0x03, 0x42, 0x40, 0x5a,
+	0x4e, 0x5f, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x10, 0x04, 0x22, 0xe9, 0x01, 0x0a, 0x09,
+	0x54, 0x65, 0x78, 0x74, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x28, 0x0a, 0x0d, 0x64, 0x65, 0x66,
+	0x61, 0x75, 0x6c, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x48, 0x00, 0x52, 0x0c, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65,
+	0x88, 0x01, 0x01, 0x12, 0x22, 0x0a, 0x0a, 0x6d, 0x69, 0x6e, 0x5f, 0x6c, 0x65, 0x6e, 0x67, 0x74,
+	0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x48, 0x01, 0x52, 0x09, 0x6d, 0x69, 0x6e, 0x4c, 0x65,
+	0x6e, 0x67, 0x74, 0x68, 0x88, 0x01, 0x01, 0x12, 0x22, 0x0a, 0x0a, 0x6d, 0x61, 0x78, 0x5f, 0x6c,
+	0x65, 0x6e, 0x67, 0x74, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x48, 0x02, 0x52, 0x09, 0x6d,
+	0x61, 0x78, 0x4c, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x88, 0x01, 0x01, 0x12, 0x28, 0x0a, 0x0d, 0x6d,
+	0x61, 0x74, 0x63, 0x68, 0x5f, 0x70, 0x61, 0x74, 0x74, 0x65, 0x72, 0x6e, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x03, 0x52, 0x0c, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x50, 0x61, 0x74, 0x74, 0x65,
+	0x72, 0x6e, 0x88, 0x01, 0x01, 0x42, 0x10, 0x0a, 0x0e, 0x5f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c,
+	0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x0d, 0x0a, 0x0b, 0x5f, 0x6d, 0x69, 0x6e, 0x5f,
+	0x6c, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x42, 0x0d, 0x0a, 0x0b, 0x5f, 0x6d, 0x61, 0x78, 0x5f, 0x6c,
+	0x65, 0x6e, 0x67, 0x74, 0x68, 0x42, 0x10, 0x0a, 0x0e, 0x5f, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x5f,
+	0x70, 0x61, 0x74, 0x74, 0x65, 0x72, 0x6e, 0x22, 0xaa, 0x01, 0x0a, 0x0c, 0x4e, 0x75, 0x6d, 0x65,
+	0x72, 0x69, 0x63, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x28, 0x0a, 0x0d, 0x64, 0x65, 0x66, 0x61,
+	0x75, 0x6c, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x48,
+	0x00, 0x52, 0x0c, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x88,
+	0x01, 0x01, 0x12, 0x20, 0x0a, 0x09, 0x6d, 0x69, 0x6e, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x03, 0x48, 0x01, 0x52, 0x08, 0x6d, 0x69, 0x6e, 0x56, 0x61, 0x6c, 0x75,
+	0x65, 0x88, 0x01, 0x01, 0x12, 0x20, 0x0a, 0x09, 0x6d, 0x61, 0x78, 0x5f, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x48, 0x02, 0x52, 0x08, 0x6d, 0x61, 0x78, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x88, 0x01, 0x01, 0x42, 0x10, 0x0a, 0x0e, 0x5f, 0x64, 0x65, 0x66, 0x61, 0x75,
+	0x6c, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x6d, 0x69, 0x6e,
+	0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x6d, 0x61, 0x78, 0x5f, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x22, 0x79, 0x0a, 0x15, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61,
+	0x6e, 0x79, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a,
+	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0x12, 0x28, 0x0a, 0x0d, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x0c, 0x64, 0x65,
+	0x66, 0x61, 0x75, 0x6c, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x88, 0x01, 0x01, 0x42, 0x10, 0x0a,
+	0x0e, 0x5f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22,
+	0x84, 0x01, 0x0a, 0x0f, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x49, 0x6e,
+	0x70, 0x75, 0x74, 0x12, 0x37, 0x0a, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65,
+	0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x38, 0x0a, 0x07,
+	0x76, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e,
+	0x79, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x52, 0x07, 0x76,
+	0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x22, 0x3c, 0x0a, 0x14, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74,
+	0x4f, 0x6e, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14,
+	0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c,
+	0x61, 0x62, 0x65, 0x6c, 0x22, 0xd9, 0x01, 0x0a, 0x0e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4f,
+	0x6e, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x36, 0x0a, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4f, 0x6e, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74,
+	0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12,
+	0x3a, 0x0a, 0x17, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x48, 0x00, 0x52, 0x14, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65,
+	0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x37, 0x0a, 0x07, 0x76,
+	0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1d, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4f, 0x6e, 0x65, 0x49,
+	0x6e, 0x70, 0x75, 0x74, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74, 0x52, 0x07, 0x76, 0x61, 0x72,
+	0x69, 0x61, 0x6e, 0x74, 0x42, 0x1a, 0x0a, 0x18, 0x5f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74,
+	0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64,
+	0x22, 0xb7, 0x02, 0x0a, 0x09, 0x46, 0x6f, 0x72, 0x6d, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x19,
+	0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52,
+	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x88, 0x01, 0x01, 0x12, 0x1a, 0x0a, 0x08, 0x72, 0x65, 0x71,
+	0x75, 0x69, 0x72, 0x65, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x72, 0x65, 0x71,
+	0x75, 0x69, 0x72, 0x65, 0x64, 0x12, 0x27, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x65, 0x78,
+	0x74, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x12, 0x30,
+	0x0a, 0x07, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x69, 0x63, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x14, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4e, 0x75, 0x6d, 0x65, 0x72, 0x69, 0x63,
+	0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00, 0x52, 0x07, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x69, 0x63,
+	0x12, 0x3a, 0x0a, 0x0b, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x5f, 0x6d, 0x61, 0x6e, 0x79, 0x18,
+	0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53,
+	0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00,
+	0x52, 0x0a, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x12, 0x37, 0x0a, 0x0a,
+	0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x5f, 0x6f, 0x6e, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74,
+	0x4f, 0x6e, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00, 0x52, 0x09, 0x73, 0x65, 0x6c, 0x65,
+	0x63, 0x74, 0x4f, 0x6e, 0x65, 0x42, 0x09, 0x0a, 0x07, 0x76, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74,
+	0x42, 0x08, 0x0a, 0x06, 0x5f, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x22, 0xa2, 0x01, 0x0a, 0x09, 0x46,
+	0x6f, 0x72, 0x6d, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x19, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65,
+	0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c,
+	0x88, 0x01, 0x01, 0x12, 0x29, 0x0a, 0x06, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x18, 0x02, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6f, 0x72,
+	0x6d, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x52, 0x06, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x12, 0x2f,
+	0x0a, 0x11, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x5f, 0x68,
+	0x6f, 0x6f, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x0f, 0x63, 0x6c, 0x69,
+	0x65, 0x6e, 0x74, 0x53, 0x74, 0x79, 0x6c, 0x65, 0x48, 0x6f, 0x6f, 0x6b, 0x88, 0x01, 0x01, 0x42,
+	0x08, 0x0a, 0x06, 0x5f, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x42, 0x14, 0x0a, 0x12, 0x5f, 0x63, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x5f, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x5f, 0x68, 0x6f, 0x6f, 0x6b, 0x22,
+	0xd6, 0x01, 0x0a, 0x04, 0x46, 0x6f, 0x72, 0x6d, 0x12, 0x29, 0x0a, 0x06, 0x67, 0x72, 0x6f, 0x75,
+	0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x46, 0x6f, 0x72, 0x6d, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x52, 0x06, 0x67, 0x72, 0x6f,
+	0x75, 0x70, 0x73, 0x12, 0x19, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x00, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x88, 0x01, 0x01, 0x12, 0x26,
+	0x0a, 0x0c, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x0b, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4c, 0x61,
+	0x62, 0x65, 0x6c, 0x88, 0x01, 0x01, 0x12, 0x2f, 0x0a, 0x11, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x5f, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x5f, 0x68, 0x6f, 0x6f, 0x6b, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x48, 0x02, 0x52, 0x0f, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x79, 0x6c, 0x65,
+	0x48, 0x6f, 0x6f, 0x6b, 0x88, 0x01, 0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x6c, 0x61, 0x62, 0x65,
+	0x6c, 0x42, 0x0f, 0x0a, 0x0d, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6c, 0x61, 0x62,
+	0x65, 0x6c, 0x42, 0x14, 0x0a, 0x12, 0x5f, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x73, 0x74,
+	0x79, 0x6c, 0x65, 0x5f, 0x68, 0x6f, 0x6f, 0x6b, 0x22, 0x34, 0x0a, 0x0f, 0x53, 0x65, 0x6c, 0x65,
+	0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x73,
+	0x65, 0x6c, 0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x09, 0x52, 0x0b, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x65, 0x64, 0x49, 0x64, 0x73, 0x22, 0xc9,
+	0x01, 0x0a, 0x09, 0x46, 0x6f, 0x72, 0x6d, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x04,
+	0x74, 0x65, 0x78, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x04, 0x74, 0x65,
+	0x78, 0x74, 0x12, 0x1a, 0x0a, 0x07, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x69, 0x63, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x03, 0x48, 0x00, 0x52, 0x07, 0x6e, 0x75, 0x6d, 0x65, 0x72, 0x69, 0x63, 0x12, 0x3a,
+	0x0a, 0x0b, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x5f, 0x6d, 0x61, 0x6e, 0x79, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x6c,
+	0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x48, 0x00, 0x52, 0x0a,
+	0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x12, 0x35, 0x0a, 0x16, 0x73, 0x65,
+	0x6c, 0x65, 0x63, 0x74, 0x5f, 0x6f, 0x6e, 0x65, 0x5f, 0x73, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x65,
+	0x64, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x13, 0x73, 0x65,
+	0x6c, 0x65, 0x63, 0x74, 0x4f, 0x6e, 0x65, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x65, 0x64, 0x49,
+	0x64, 0x42, 0x07, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x3b, 0x0a, 0x0e, 0x46, 0x6f,
+	0x72, 0x6d, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x29, 0x0a, 0x06,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6f, 0x72, 0x6d, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52,
+	0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x2a, 0xaf, 0x01, 0x0a, 0x0f, 0x53, 0x63, 0x6f, 0x72,
+	0x69, 0x6e, 0x67, 0x43, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x12, 0x20, 0x0a, 0x1c, 0x53,
+	0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47, 0x4f, 0x52, 0x59, 0x5f,
+	0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x27, 0x0a,
+	0x23, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47, 0x4f, 0x52,
+	0x59, 0x5f, 0x50, 0x55, 0x42, 0x5f, 0x47, 0x4f, 0x4c, 0x46, 0x5f, 0x4e, 0x49, 0x4e, 0x45, 0x5f,
+	0x48, 0x4f, 0x4c, 0x45, 0x10, 0x01, 0x12, 0x27, 0x0a, 0x23, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e,
+	0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47, 0x4f, 0x52, 0x59, 0x5f, 0x50, 0x55, 0x42, 0x5f, 0x47,
+	0x4f, 0x4c, 0x46, 0x5f, 0x46, 0x49, 0x56, 0x45, 0x5f, 0x48, 0x4f, 0x4c, 0x45, 0x10, 0x02, 0x12,
+	0x28, 0x0a, 0x24, 0x53, 0x43, 0x4f, 0x52, 0x49, 0x4e, 0x47, 0x5f, 0x43, 0x41, 0x54, 0x45, 0x47,
+	0x4f, 0x52, 0x59, 0x5f, 0x50, 0x55, 0x42, 0x5f, 0x47, 0x4f, 0x4c, 0x46, 0x5f, 0x43, 0x48, 0x41,
+	0x4c, 0x4c, 0x45, 0x4e, 0x47, 0x45, 0x53, 0x10, 0x03, 0x2a, 0x6b, 0x0a, 0x16, 0x53, 0x65, 0x6c,
+	0x65, 0x63, 0x74, 0x4d, 0x61, 0x6e, 0x79, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x56, 0x61, 0x72, 0x69,
+	0x61, 0x6e, 0x74, 0x12, 0x29, 0x0a, 0x25, 0x53, 0x45, 0x4c, 0x45, 0x43, 0x54, 0x5f, 0x4d, 0x41,
+	0x4e, 0x59, 0x5f, 0x49, 0x4e, 0x50, 0x55, 0x54, 0x5f, 0x56, 0x41, 0x52, 0x49, 0x41, 0x4e, 0x54,
+	0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x26,
+	0x0a, 0x22, 0x53, 0x45, 0x4c, 0x45, 0x43, 0x54, 0x5f, 0x4d, 0x41, 0x4e, 0x59, 0x5f, 0x49, 0x4e,
+	0x50, 0x55, 0x54, 0x5f, 0x56, 0x41, 0x52, 0x49, 0x41, 0x4e, 0x54, 0x5f, 0x43, 0x48, 0x45, 0x43,
+	0x4b, 0x42, 0x4f, 0x58, 0x10, 0x01, 0x2a, 0x94, 0x01, 0x0a, 0x15, 0x53, 0x65, 0x6c, 0x65, 0x63,
+	0x74, 0x4f, 0x6e, 0x65, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x56, 0x61, 0x72, 0x69, 0x61, 0x6e, 0x74,
+	0x12, 0x28, 0x0a, 0x24, 0x53, 0x45, 0x4c, 0x45, 0x43, 0x54, 0x5f, 0x4f, 0x4e, 0x45, 0x5f, 0x49,
+	0x4e, 0x50, 0x55, 0x54, 0x5f, 0x56, 0x41, 0x52, 0x49, 0x41, 0x4e, 0x54, 0x5f, 0x55, 0x4e, 0x53,
+	0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x25, 0x0a, 0x21, 0x53, 0x45,
+	0x4c, 0x45, 0x43, 0x54, 0x5f, 0x4f, 0x4e, 0x45, 0x5f, 0x49, 0x4e, 0x50, 0x55, 0x54, 0x5f, 0x56,
+	0x41, 0x52, 0x49, 0x41, 0x4e, 0x54, 0x5f, 0x44, 0x52, 0x4f, 0x50, 0x44, 0x4f, 0x57, 0x4e, 0x10,
+	0x01, 0x12, 0x2a, 0x0a, 0x26, 0x53, 0x45, 0x4c, 0x45, 0x43, 0x54, 0x5f, 0x4f, 0x4e, 0x45, 0x5f,
+	0x49, 0x4e, 0x50, 0x55, 0x54, 0x5f, 0x56, 0x41, 0x52, 0x49, 0x41, 0x4e, 0x54, 0x5f, 0x52, 0x41,
+	0x44, 0x49, 0x4f, 0x5f, 0x42, 0x55, 0x54, 0x54, 0x4f, 0x4e, 0x53, 0x10, 0x02, 0x42, 0x40, 0x5a,
 	0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x70, 0x75, 0x62, 0x67,
 	0x6f, 0x6c, 0x66, 0x2f, 0x70, 0x75, 0x62, 0x67, 0x6f, 0x6c, 0x66, 0x2f, 0x61, 0x70, 0x69, 0x2f,
 	0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x6c, 0x69, 0x62, 0x2f, 0x70, 0x72, 0x6f,
@@ -723,32 +1805,58 @@ func file_api_v1_shared_proto_rawDescGZIP() []byte {
 	return file_api_v1_shared_proto_rawDescData
 }
 
-var file_api_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_api_v1_shared_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_api_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_api_v1_shared_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_api_v1_shared_proto_goTypes = []interface{}{
 	(ScoringCategory)(0),               // 0: api.v1.ScoringCategory
-	(ScoreBoard_ScoreStatus)(0),        // 1: api.v1.ScoreBoard.ScoreStatus
-	(*Color)(nil),                      // 2: api.v1.Color
-	(*Venue)(nil),                      // 3: api.v1.Venue
-	(*EventRegistration)(nil),          // 4: api.v1.EventRegistration
-	(*Player)(nil),                     // 5: api.v1.Player
-	(*PlayerData)(nil),                 // 6: api.v1.PlayerData
-	(*ScoreBoard)(nil),                 // 7: api.v1.ScoreBoard
-	(*ScoreBoard_ScoreBoardEntry)(nil), // 8: api.v1.ScoreBoard.ScoreBoardEntry
+	(SelectManyInputVariant)(0),        // 1: api.v1.SelectManyInputVariant
+	(SelectOneInputVariant)(0),         // 2: api.v1.SelectOneInputVariant
+	(ScoreBoard_ScoreStatus)(0),        // 3: api.v1.ScoreBoard.ScoreStatus
+	(*Color)(nil),                      // 4: api.v1.Color
+	(*Venue)(nil),                      // 5: api.v1.Venue
+	(*EventRegistration)(nil),          // 6: api.v1.EventRegistration
+	(*Player)(nil),                     // 7: api.v1.Player
+	(*PlayerData)(nil),                 // 8: api.v1.PlayerData
+	(*ScoreBoard)(nil),                 // 9: api.v1.ScoreBoard
+	(*TextInput)(nil),                  // 10: api.v1.TextInput
+	(*NumericInput)(nil),               // 11: api.v1.NumericInput
+	(*SelectManyInputOption)(nil),      // 12: api.v1.SelectManyInputOption
+	(*SelectManyInput)(nil),            // 13: api.v1.SelectManyInput
+	(*SelectOneInputOption)(nil),       // 14: api.v1.SelectOneInputOption
+	(*SelectOneInput)(nil),             // 15: api.v1.SelectOneInput
+	(*FormInput)(nil),                  // 16: api.v1.FormInput
+	(*FormGroup)(nil),                  // 17: api.v1.FormGroup
+	(*Form)(nil),                       // 18: api.v1.Form
+	(*SelectManyValue)(nil),            // 19: api.v1.SelectManyValue
+	(*FormValue)(nil),                  // 20: api.v1.FormValue
+	(*FormSubmission)(nil),             // 21: api.v1.FormSubmission
+	(*ScoreBoard_ScoreBoardEntry)(nil), // 22: api.v1.ScoreBoard.ScoreBoardEntry
 }
 var file_api_v1_shared_proto_depIdxs = []int32{
-	0, // 0: api.v1.EventRegistration.scoring_category:type_name -> api.v1.ScoringCategory
-	6, // 1: api.v1.Player.data:type_name -> api.v1.PlayerData
-	4, // 2: api.v1.Player.events:type_name -> api.v1.EventRegistration
-	0, // 3: api.v1.PlayerData.scoring_category:type_name -> api.v1.ScoringCategory
-	8, // 4: api.v1.ScoreBoard.scores:type_name -> api.v1.ScoreBoard.ScoreBoardEntry
-	2, // 5: api.v1.ScoreBoard.ScoreBoardEntry.icon_color:type_name -> api.v1.Color
-	1, // 6: api.v1.ScoreBoard.ScoreBoardEntry.status:type_name -> api.v1.ScoreBoard.ScoreStatus
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	0,  // 0: api.v1.EventRegistration.scoring_category:type_name -> api.v1.ScoringCategory
+	8,  // 1: api.v1.Player.data:type_name -> api.v1.PlayerData
+	6,  // 2: api.v1.Player.events:type_name -> api.v1.EventRegistration
+	0,  // 3: api.v1.PlayerData.scoring_category:type_name -> api.v1.ScoringCategory
+	22, // 4: api.v1.ScoreBoard.scores:type_name -> api.v1.ScoreBoard.ScoreBoardEntry
+	12, // 5: api.v1.SelectManyInput.options:type_name -> api.v1.SelectManyInputOption
+	1,  // 6: api.v1.SelectManyInput.variant:type_name -> api.v1.SelectManyInputVariant
+	14, // 7: api.v1.SelectOneInput.options:type_name -> api.v1.SelectOneInputOption
+	2,  // 8: api.v1.SelectOneInput.variant:type_name -> api.v1.SelectOneInputVariant
+	10, // 9: api.v1.FormInput.text:type_name -> api.v1.TextInput
+	11, // 10: api.v1.FormInput.numeric:type_name -> api.v1.NumericInput
+	13, // 11: api.v1.FormInput.select_many:type_name -> api.v1.SelectManyInput
+	15, // 12: api.v1.FormInput.select_one:type_name -> api.v1.SelectOneInput
+	16, // 13: api.v1.FormGroup.inputs:type_name -> api.v1.FormInput
+	17, // 14: api.v1.Form.groups:type_name -> api.v1.FormGroup
+	19, // 15: api.v1.FormValue.select_many:type_name -> api.v1.SelectManyValue
+	20, // 16: api.v1.FormSubmission.values:type_name -> api.v1.FormValue
+	4,  // 17: api.v1.ScoreBoard.ScoreBoardEntry.icon_color:type_name -> api.v1.Color
+	3,  // 18: api.v1.ScoreBoard.ScoreBoardEntry.status:type_name -> api.v1.ScoreBoard.ScoreStatus
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_shared_proto_init() }
@@ -830,6 +1938,150 @@ func file_api_v1_shared_proto_init() {
 			}
 		}
 		file_api_v1_shared_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TextInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NumericInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SelectManyInputOption); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SelectManyInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SelectOneInputOption); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SelectOneInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FormInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FormGroup); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Form); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SelectManyValue); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FormValue); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FormSubmission); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_shared_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ScoreBoard_ScoreBoardEntry); i {
 			case 0:
 				return &v.state
@@ -843,13 +2095,31 @@ func file_api_v1_shared_proto_init() {
 		}
 	}
 	file_api_v1_shared_proto_msgTypes[6].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[7].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[8].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[11].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[12].OneofWrappers = []interface{}{
+		(*FormInput_Text)(nil),
+		(*FormInput_Numeric)(nil),
+		(*FormInput_SelectMany)(nil),
+		(*FormInput_SelectOne)(nil),
+	}
+	file_api_v1_shared_proto_msgTypes[13].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[14].OneofWrappers = []interface{}{}
+	file_api_v1_shared_proto_msgTypes[16].OneofWrappers = []interface{}{
+		(*FormValue_Text)(nil),
+		(*FormValue_Numeric)(nil),
+		(*FormValue_SelectMany)(nil),
+		(*FormValue_SelectOneSelectedId)(nil),
+	}
+	file_api_v1_shared_proto_msgTypes[18].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_v1_shared_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   7,
+			NumEnums:      4,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
