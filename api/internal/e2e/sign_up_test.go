@@ -15,13 +15,6 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 )
 
-func requestWithAuth[T any](msg *T, token string) *connect.Request[T] {
-	req := connect.NewRequest(msg)
-	req.Header().Set("X-PubGolf-AuthToken", token)
-
-	return req
-}
-
 func Test_ClientVersion(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
@@ -33,12 +26,16 @@ func Test_ClientVersion(t *testing.T) {
 }
 
 func Test_SignUpFlow(t *testing.T) {
+	testEventKey := "test-event-key-sign-up"
+	_, err := sharedTestDB.Exec("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
+	require.NoError(t, err, "seed DB: insert future event")
+
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Log in
 
 	phoneNum := "+15551231234"
-	_, err := c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
+	_, err = c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 		PhoneNumber: phoneNum,
 	}))
 	require.NoError(t, err)
