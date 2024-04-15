@@ -31,7 +31,7 @@ func (q *Queries) EventScheduleCacheVersion(ctx context.Context, eventID models.
 		ID:                       eventID,
 		CurrentScheduleCacheHash: hash,
 	})
-	if err == nil {
+	if err != nil {
 		return version, false, fmt.Errorf("set cache keys: %w", err)
 	}
 
