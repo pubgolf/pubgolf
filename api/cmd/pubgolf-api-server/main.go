@@ -78,7 +78,7 @@ func main() {
 
 	// Initialize server.
 
-	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev)
+	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest)
 	guard(err, "init DAO")
 
 	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
@@ -110,7 +110,7 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 
 	db := telemetry.WrapDB(stdlib.GetConnector(*conConfig))
 
-	if cfg.EnvName == config.DeployEnvDev {
+	if cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest {
 		err = db.PingContext(ctx)
 		guard(err, "ping database")
 	}
@@ -128,12 +128,15 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http
 	r.Get("/robots.txt", robots(cfg))
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
-		r.Use(
-			chim.NoCache,
-			httprate.Limit(10, 1*time.Second, httprate.WithKeyFuncs(func(r *http.Request) (string, error) {
-				return r.Header.Get("X-PubGolf-User-ID"), nil
-			})),
-		)
+		r.Use(chim.NoCache)
+
+		if cfg.EnvName != config.DeployEnvE2ETest {
+			r.Use(
+				httprate.Limit(10, 1*time.Second, httprate.WithKeyFuncs(func(r *http.Request) (string, error) {
+					return r.Header.Get("X-PubGolf-User-ID"), nil
+				})),
+			)
+		}
 
 		rpcMux := http.NewServeMux()
 		stdInterceptors, err := middleware.ConnectInterceptors()

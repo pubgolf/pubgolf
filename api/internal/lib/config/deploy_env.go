@@ -12,6 +12,7 @@ type DeployEnv string
 // Values for DeployEnv.
 const (
 	DeployEnvDev       DeployEnv = "development"
+	DeployEnvE2ETest   DeployEnv = "e2e_test"
 	DeployEnvPRPreview DeployEnv = "pr_preview"
 	DeployEnvStaging   DeployEnv = "staging"
 	DeployEnvProd      DeployEnv = "production"
@@ -21,6 +22,7 @@ const (
 func allDeployEnvs() []DeployEnv {
 	return []DeployEnv{
 		DeployEnvDev,
+		DeployEnvE2ETest,
 		DeployEnvPRPreview,
 		DeployEnvStaging,
 		DeployEnvProd,
