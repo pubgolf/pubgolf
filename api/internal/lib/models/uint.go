@@ -85,7 +85,7 @@ func (n NullUInt32) Value() (driver.Value, error) {
 
 // UInt32FromInt64 converts an int64 to a uint32 if within the valid range.
 func UInt32FromInt64(x int64) (uint32, error) {
-	if x >= 0 && x <= math.MaxUint32 {
+	if x < 0 || x > math.MaxUint32 {
 		return 0, fmt.Errorf("type \"UInt32\" only supports range [0,%d], got value %v: %w", math.MaxUint32, x, errValueOutOfRange)
 	}
 
