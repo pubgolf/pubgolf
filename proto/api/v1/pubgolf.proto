@@ -57,6 +57,14 @@ service PubGolfService {
   // GetContentItem
   rpc GetContentItem(GetContentItemRequest) returns (GetContentItemResponse) {}
 
+  // Scores
+
+  // GetSubmitScoreForm returns the form definition for submitting or revising a player's score at a specific event venue.
+  rpc GetSubmitScoreForm(GetSubmitScoreFormRequest) returns (GetSubmitScoreFormResponse) {}
+
+  // GetSubmitScoreForm submits a player's proposed score at a specific event venue.
+  rpc SubmitScore(SubmitScoreRequest) returns (SubmitScoreResponse) {}
+
   // Scoreboard
 
   // GetScoresForCategory
@@ -227,6 +235,40 @@ message GetContentItemRequest {
 message GetContentItemResponse {
   // content is in markdown format.
   string content = 1;
+}
+
+// --------------------
+// Scores
+// --------------------
+
+enum ScoreStatus {
+  SCORE_STATUS_UNSPECIFIED = 0;
+  SCORE_STATUS_REQUIRED = 1;
+  SCORE_STATUS_OPTIONAL = 2;
+  SCORE_STATUS_NOT_REQUIRED = 3;
+  SCORE_STATUS_SUBMITTED_EDITABLE = 4;
+  SCORE_STATUS_SUBMITTED_NON_EDITABLE = 5;
+}
+
+message GetSubmitScoreFormRequest {
+  string event_key = 1;
+  uint32 venue_key = 2;
+  string player_id = 3;
+}
+message GetSubmitScoreFormResponse {
+  ScoreStatus status = 1;
+  Form form = 2;
+}
+
+message SubmitScoreRequest {
+  string event_key = 1;
+  uint32 venue_key = 2;
+  string player_id = 3;
+  optional string idempotency_key = 4;
+  FormSubmission data = 5;
+}
+message SubmitScoreResponse {
+  ScoreStatus status = 1;
 }
 
 // --------------------

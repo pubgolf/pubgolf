@@ -7,7 +7,51 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Color, EventRegistration, Player, PlayerData, ScoreBoard, ScoringCategory, Venue } from "./shared_pb.js";
+import { Color, EventRegistration, Form, FormSubmission, Player, PlayerData, ScoreBoard, ScoringCategory, Venue } from "./shared_pb.js";
+
+/**
+ * @generated from enum api.v1.ScoreStatus
+ */
+export enum ScoreStatus {
+  /**
+   * @generated from enum value: SCORE_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SCORE_STATUS_REQUIRED = 1;
+   */
+  REQUIRED = 1,
+
+  /**
+   * @generated from enum value: SCORE_STATUS_OPTIONAL = 2;
+   */
+  OPTIONAL = 2,
+
+  /**
+   * @generated from enum value: SCORE_STATUS_NOT_REQUIRED = 3;
+   */
+  NOT_REQUIRED = 3,
+
+  /**
+   * @generated from enum value: SCORE_STATUS_SUBMITTED_EDITABLE = 4;
+   */
+  SUBMITTED_EDITABLE = 4,
+
+  /**
+   * @generated from enum value: SCORE_STATUS_SUBMITTED_NON_EDITABLE = 5;
+   */
+  SUBMITTED_NON_EDITABLE = 5,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ScoreStatus)
+proto3.util.setEnumType(ScoreStatus, "api.v1.ScoreStatus", [
+  { no: 0, name: "SCORE_STATUS_UNSPECIFIED" },
+  { no: 1, name: "SCORE_STATUS_REQUIRED" },
+  { no: 2, name: "SCORE_STATUS_OPTIONAL" },
+  { no: 3, name: "SCORE_STATUS_NOT_REQUIRED" },
+  { no: 4, name: "SCORE_STATUS_SUBMITTED_EDITABLE" },
+  { no: 5, name: "SCORE_STATUS_SUBMITTED_NON_EDITABLE" },
+]);
 
 /**
  * @generated from message api.v1.ClientVersionRequest
@@ -1200,6 +1244,196 @@ export class GetContentItemResponse extends Message<GetContentItemResponse> {
 
   static equals(a: GetContentItemResponse | PlainMessage<GetContentItemResponse> | undefined, b: GetContentItemResponse | PlainMessage<GetContentItemResponse> | undefined): boolean {
     return proto3.util.equals(GetContentItemResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.GetSubmitScoreFormRequest
+ */
+export class GetSubmitScoreFormRequest extends Message<GetSubmitScoreFormRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  /**
+   * @generated from field: uint32 venue_key = 2;
+   */
+  venueKey = 0;
+
+  /**
+   * @generated from field: string player_id = 3;
+   */
+  playerId = "";
+
+  constructor(data?: PartialMessage<GetSubmitScoreFormRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.GetSubmitScoreFormRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "venue_key", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSubmitScoreFormRequest {
+    return new GetSubmitScoreFormRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSubmitScoreFormRequest {
+    return new GetSubmitScoreFormRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSubmitScoreFormRequest {
+    return new GetSubmitScoreFormRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSubmitScoreFormRequest | PlainMessage<GetSubmitScoreFormRequest> | undefined, b: GetSubmitScoreFormRequest | PlainMessage<GetSubmitScoreFormRequest> | undefined): boolean {
+    return proto3.util.equals(GetSubmitScoreFormRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.GetSubmitScoreFormResponse
+ */
+export class GetSubmitScoreFormResponse extends Message<GetSubmitScoreFormResponse> {
+  /**
+   * @generated from field: api.v1.ScoreStatus status = 1;
+   */
+  status = ScoreStatus.UNSPECIFIED;
+
+  /**
+   * @generated from field: api.v1.Form form = 2;
+   */
+  form?: Form;
+
+  constructor(data?: PartialMessage<GetSubmitScoreFormResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.GetSubmitScoreFormResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "status", kind: "enum", T: proto3.getEnumType(ScoreStatus) },
+    { no: 2, name: "form", kind: "message", T: Form },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSubmitScoreFormResponse {
+    return new GetSubmitScoreFormResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSubmitScoreFormResponse {
+    return new GetSubmitScoreFormResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSubmitScoreFormResponse {
+    return new GetSubmitScoreFormResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSubmitScoreFormResponse | PlainMessage<GetSubmitScoreFormResponse> | undefined, b: GetSubmitScoreFormResponse | PlainMessage<GetSubmitScoreFormResponse> | undefined): boolean {
+    return proto3.util.equals(GetSubmitScoreFormResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SubmitScoreRequest
+ */
+export class SubmitScoreRequest extends Message<SubmitScoreRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  /**
+   * @generated from field: uint32 venue_key = 2;
+   */
+  venueKey = 0;
+
+  /**
+   * @generated from field: string player_id = 3;
+   */
+  playerId = "";
+
+  /**
+   * @generated from field: optional string idempotency_key = 4;
+   */
+  idempotencyKey?: string;
+
+  /**
+   * @generated from field: api.v1.FormSubmission data = 5;
+   */
+  data?: FormSubmission;
+
+  constructor(data?: PartialMessage<SubmitScoreRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SubmitScoreRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "venue_key", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "idempotency_key", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 5, name: "data", kind: "message", T: FormSubmission },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitScoreRequest {
+    return new SubmitScoreRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitScoreRequest {
+    return new SubmitScoreRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitScoreRequest {
+    return new SubmitScoreRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubmitScoreRequest | PlainMessage<SubmitScoreRequest> | undefined, b: SubmitScoreRequest | PlainMessage<SubmitScoreRequest> | undefined): boolean {
+    return proto3.util.equals(SubmitScoreRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.SubmitScoreResponse
+ */
+export class SubmitScoreResponse extends Message<SubmitScoreResponse> {
+  /**
+   * @generated from field: api.v1.ScoreStatus status = 1;
+   */
+  status = ScoreStatus.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<SubmitScoreResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.SubmitScoreResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "status", kind: "enum", T: proto3.getEnumType(ScoreStatus) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitScoreResponse {
+    return new SubmitScoreResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitScoreResponse {
+    return new SubmitScoreResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitScoreResponse {
+    return new SubmitScoreResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubmitScoreResponse | PlainMessage<SubmitScoreResponse> | undefined, b: SubmitScoreResponse | PlainMessage<SubmitScoreResponse> | undefined): boolean {
+    return proto3.util.equals(SubmitScoreResponse, a, b);
   }
 }
 

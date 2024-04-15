@@ -70,6 +70,12 @@ const (
 	// PubGolfServiceGetContentItemProcedure is the fully-qualified name of the PubGolfService's
 	// GetContentItem RPC.
 	PubGolfServiceGetContentItemProcedure = "/api.v1.PubGolfService/GetContentItem"
+	// PubGolfServiceGetSubmitScoreFormProcedure is the fully-qualified name of the PubGolfService's
+	// GetSubmitScoreForm RPC.
+	PubGolfServiceGetSubmitScoreFormProcedure = "/api.v1.PubGolfService/GetSubmitScoreForm"
+	// PubGolfServiceSubmitScoreProcedure is the fully-qualified name of the PubGolfService's
+	// SubmitScore RPC.
+	PubGolfServiceSubmitScoreProcedure = "/api.v1.PubGolfService/SubmitScore"
 	// PubGolfServiceGetScoresForCategoryProcedure is the fully-qualified name of the PubGolfService's
 	// GetScoresForCategory RPC.
 	PubGolfServiceGetScoresForCategoryProcedure = "/api.v1.PubGolfService/GetScoresForCategory"
@@ -111,6 +117,10 @@ type PubGolfServiceClient interface {
 	ListContentItems(context.Context, *connect_go.Request[v1.ListContentItemsRequest]) (*connect_go.Response[v1.ListContentItemsResponse], error)
 	// GetContentItem
 	GetContentItem(context.Context, *connect_go.Request[v1.GetContentItemRequest]) (*connect_go.Response[v1.GetContentItemResponse], error)
+	// GetSubmitScoreForm returns the form definition for submitting or revising a player's score at a specific event venue.
+	GetSubmitScoreForm(context.Context, *connect_go.Request[v1.GetSubmitScoreFormRequest]) (*connect_go.Response[v1.GetSubmitScoreFormResponse], error)
+	// GetSubmitScoreForm submits a player's proposed score at a specific event venue.
+	SubmitScore(context.Context, *connect_go.Request[v1.SubmitScoreRequest]) (*connect_go.Response[v1.SubmitScoreResponse], error)
 	// GetScoresForCategory
 	GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error)
 	// GetScoresForPlayer
@@ -189,6 +199,16 @@ func NewPubGolfServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 			baseURL+PubGolfServiceGetContentItemProcedure,
 			opts...,
 		),
+		getSubmitScoreForm: connect_go.NewClient[v1.GetSubmitScoreFormRequest, v1.GetSubmitScoreFormResponse](
+			httpClient,
+			baseURL+PubGolfServiceGetSubmitScoreFormProcedure,
+			opts...,
+		),
+		submitScore: connect_go.NewClient[v1.SubmitScoreRequest, v1.SubmitScoreResponse](
+			httpClient,
+			baseURL+PubGolfServiceSubmitScoreProcedure,
+			opts...,
+		),
 		getScoresForCategory: connect_go.NewClient[v1.GetScoresForCategoryRequest, v1.GetScoresForCategoryResponse](
 			httpClient,
 			baseURL+PubGolfServiceGetScoresForCategoryProcedure,
@@ -221,6 +241,8 @@ type pubGolfServiceClient struct {
 	getVenue             *connect_go.Client[v1.GetVenueRequest, v1.GetVenueResponse]
 	listContentItems     *connect_go.Client[v1.ListContentItemsRequest, v1.ListContentItemsResponse]
 	getContentItem       *connect_go.Client[v1.GetContentItemRequest, v1.GetContentItemResponse]
+	getSubmitScoreForm   *connect_go.Client[v1.GetSubmitScoreFormRequest, v1.GetSubmitScoreFormResponse]
+	submitScore          *connect_go.Client[v1.SubmitScoreRequest, v1.SubmitScoreResponse]
 	getScoresForCategory *connect_go.Client[v1.GetScoresForCategoryRequest, v1.GetScoresForCategoryResponse]
 	getScoresForPlayer   *connect_go.Client[v1.GetScoresForPlayerRequest, v1.GetScoresForPlayerResponse]
 	getScoresForVenue    *connect_go.Client[v1.GetScoresForVenueRequest, v1.GetScoresForVenueResponse]
@@ -288,6 +310,16 @@ func (c *pubGolfServiceClient) GetContentItem(ctx context.Context, req *connect_
 	return c.getContentItem.CallUnary(ctx, req)
 }
 
+// GetSubmitScoreForm calls api.v1.PubGolfService.GetSubmitScoreForm.
+func (c *pubGolfServiceClient) GetSubmitScoreForm(ctx context.Context, req *connect_go.Request[v1.GetSubmitScoreFormRequest]) (*connect_go.Response[v1.GetSubmitScoreFormResponse], error) {
+	return c.getSubmitScoreForm.CallUnary(ctx, req)
+}
+
+// SubmitScore calls api.v1.PubGolfService.SubmitScore.
+func (c *pubGolfServiceClient) SubmitScore(ctx context.Context, req *connect_go.Request[v1.SubmitScoreRequest]) (*connect_go.Response[v1.SubmitScoreResponse], error) {
+	return c.submitScore.CallUnary(ctx, req)
+}
+
 // GetScoresForCategory calls api.v1.PubGolfService.GetScoresForCategory.
 func (c *pubGolfServiceClient) GetScoresForCategory(ctx context.Context, req *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error) {
 	return c.getScoresForCategory.CallUnary(ctx, req)
@@ -333,6 +365,10 @@ type PubGolfServiceHandler interface {
 	ListContentItems(context.Context, *connect_go.Request[v1.ListContentItemsRequest]) (*connect_go.Response[v1.ListContentItemsResponse], error)
 	// GetContentItem
 	GetContentItem(context.Context, *connect_go.Request[v1.GetContentItemRequest]) (*connect_go.Response[v1.GetContentItemResponse], error)
+	// GetSubmitScoreForm returns the form definition for submitting or revising a player's score at a specific event venue.
+	GetSubmitScoreForm(context.Context, *connect_go.Request[v1.GetSubmitScoreFormRequest]) (*connect_go.Response[v1.GetSubmitScoreFormResponse], error)
+	// GetSubmitScoreForm submits a player's proposed score at a specific event venue.
+	SubmitScore(context.Context, *connect_go.Request[v1.SubmitScoreRequest]) (*connect_go.Response[v1.SubmitScoreResponse], error)
 	// GetScoresForCategory
 	GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error)
 	// GetScoresForPlayer
@@ -407,6 +443,16 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect_go.Hand
 		svc.GetContentItem,
 		opts...,
 	)
+	pubGolfServiceGetSubmitScoreFormHandler := connect_go.NewUnaryHandler(
+		PubGolfServiceGetSubmitScoreFormProcedure,
+		svc.GetSubmitScoreForm,
+		opts...,
+	)
+	pubGolfServiceSubmitScoreHandler := connect_go.NewUnaryHandler(
+		PubGolfServiceSubmitScoreProcedure,
+		svc.SubmitScore,
+		opts...,
+	)
 	pubGolfServiceGetScoresForCategoryHandler := connect_go.NewUnaryHandler(
 		PubGolfServiceGetScoresForCategoryProcedure,
 		svc.GetScoresForCategory,
@@ -448,6 +494,10 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect_go.Hand
 			pubGolfServiceListContentItemsHandler.ServeHTTP(w, r)
 		case PubGolfServiceGetContentItemProcedure:
 			pubGolfServiceGetContentItemHandler.ServeHTTP(w, r)
+		case PubGolfServiceGetSubmitScoreFormProcedure:
+			pubGolfServiceGetSubmitScoreFormHandler.ServeHTTP(w, r)
+		case PubGolfServiceSubmitScoreProcedure:
+			pubGolfServiceSubmitScoreHandler.ServeHTTP(w, r)
 		case PubGolfServiceGetScoresForCategoryProcedure:
 			pubGolfServiceGetScoresForCategoryHandler.ServeHTTP(w, r)
 		case PubGolfServiceGetScoresForPlayerProcedure:
@@ -509,6 +559,14 @@ func (UnimplementedPubGolfServiceHandler) ListContentItems(context.Context, *con
 
 func (UnimplementedPubGolfServiceHandler) GetContentItem(context.Context, *connect_go.Request[v1.GetContentItemRequest]) (*connect_go.Response[v1.GetContentItemResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetContentItem is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) GetSubmitScoreForm(context.Context, *connect_go.Request[v1.GetSubmitScoreFormRequest]) (*connect_go.Response[v1.GetSubmitScoreFormResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetSubmitScoreForm is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) SubmitScore(context.Context, *connect_go.Request[v1.SubmitScoreRequest]) (*connect_go.Response[v1.SubmitScoreResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("api.v1.PubGolfService.SubmitScore is not implemented"))
 }
 
 func (UnimplementedPubGolfServiceHandler) GetScoresForCategory(context.Context, *connect_go.Request[v1.GetScoresForCategoryRequest]) (*connect_go.Response[v1.GetScoresForCategoryResponse], error) {

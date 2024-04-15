@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse, UpdatePlayerDataRequest, UpdatePlayerDataResponse, UpdateRegistrationRequest, UpdateRegistrationResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetSubmitScoreFormRequest, GetSubmitScoreFormResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse, SubmitScoreRequest, SubmitScoreResponse, UpdatePlayerDataRequest, UpdatePlayerDataResponse, UpdateRegistrationRequest, UpdateRegistrationResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -149,6 +149,28 @@ export const PubGolfService = {
       name: "GetContentItem",
       I: GetContentItemRequest,
       O: GetContentItemResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetSubmitScoreForm returns the form definition for submitting or revising a player's score at a specific event venue.
+     *
+     * @generated from rpc api.v1.PubGolfService.GetSubmitScoreForm
+     */
+    getSubmitScoreForm: {
+      name: "GetSubmitScoreForm",
+      I: GetSubmitScoreFormRequest,
+      O: GetSubmitScoreFormResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetSubmitScoreForm submits a player's proposed score at a specific event venue.
+     *
+     * @generated from rpc api.v1.PubGolfService.SubmitScore
+     */
+    submitScore: {
+      name: "SubmitScore",
+      I: SubmitScoreRequest,
+      O: SubmitScoreResponse,
       kind: MethodKind.Unary,
     },
     /**
