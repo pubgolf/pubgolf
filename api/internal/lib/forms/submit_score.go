@@ -14,6 +14,11 @@ const (
 	SubmitScoreInputIDStandardAdj = "#standard-adj"
 )
 
+const (
+	SubmitScoreSipsMin = 1
+	SubmitScoreSipsMax = 10
+)
+
 // TODO: move to models package.
 type AdjustmentTemplate struct {
 	ID            models.AdjustmentTemplateID
@@ -46,8 +51,8 @@ func GenerateSubmitScoreForm(score uint32, adj []AdjustmentTemplate) *apiv1.Form
 				Required: true,
 				Variant: &apiv1.FormInput_Numeric{
 					Numeric: &apiv1.NumericInput{
-						MinValue:     i(1),
-						MaxValue:     i(10),
+						MinValue:     i(SubmitScoreSipsMin),
+						MaxValue:     i(SubmitScoreSipsMax),
 						DefaultValue: defaultScore,
 					},
 				},
@@ -124,11 +129,9 @@ func makeAdjustmentGroup(label string, adj []*apiv1.SelectManyInputOption) *apiv
 }
 
 // ParseSubmitScoreForm takes in a score form submission and returns the score along with a list of activated adjustment template IDs.
-func ParseSubmitScoreForm(vs []*apiv1.FormValue) (uint32, []string, error) {
-	var score uint32
-
-	// TODO: Change this to actual model IDs/ULIDs once adjustment templates live in the DB.
-	var adjIDs []string
+func ParseSubmitScoreForm(vs []*apiv1.FormValue) (uint32, []models.AdjustmentTemplateID, error) {
+	var score *uint32
+	var adjIDs []models.AdjustmentTemplateID
 
 	for _, v := range vs {
 		switch v.GetId() {
@@ -138,10 +141,16 @@ func ParseSubmitScoreForm(vs []*apiv1.FormValue) (uint32, []string, error) {
 				return 0, nil, fmt.Errorf("parse form element %q: %w", v.GetId(), err)
 			}
 
-			score, err = models.UInt32FromInt64(num)
+			if num < SubmitScoreSipsMin || num > SubmitScoreSipsMax {
+				return 0, nil, fmt.Errorf("form element %q not in range [%d,%d]: %w", v.GetId(), SubmitScoreSipsMin, SubmitScoreSipsMax, ErrInputOutOfAllowedRange)
+			}
+
+			uNum, err := models.UInt32FromInt64(num)
 			if err != nil {
 				return 0, nil, fmt.Errorf("parse form element %q: %w", v.GetId(), err)
 			}
+
+			score = &uNum
 		case SubmitScoreInputIDVenueAdj,
 			SubmitScoreInputIDStandardAdj:
 			as, err := ParseFormValueSelectMany(v)
@@ -149,11 +158,23 @@ func ParseSubmitScoreForm(vs []*apiv1.FormValue) (uint32, []string, error) {
 				return 0, nil, fmt.Errorf("parse form element %q: %w", v.GetId(), err)
 			}
 
-			adjIDs = append(adjIDs, as...)
+			for _, a := range as {
+				id, err := models.AdjustmentTemplateIDFromString(a)
+				if err != nil {
+					return 0, nil, fmt.Errorf("parse form element %q: %w", v.GetId(), err)
+				}
+
+				adjIDs = append(adjIDs, id)
+			}
+
 		default:
-			return 0, nil, fmt.Errorf("unknown form element ID %q: %w", v.GetId(), ErrUnexpectedFormInput)
+			return 0, nil, fmt.Errorf("unknown form element ID %q: %w", v.GetId(), ErrUnexpectedInput)
 		}
 	}
 
-	return score, adjIDs, nil
+	if score == nil {
+		return 0, nil, fmt.Errorf("form element %q: %w", SubmitScoreInputIDSips, ErrMissingRequiredInput)
+	}
+
+	return *score, adjIDs, nil
 }

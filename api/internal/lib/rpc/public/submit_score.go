@@ -59,8 +59,6 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		})
 	}
 
-	// TODO: Block empty scores.
-
 	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
