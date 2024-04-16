@@ -45,10 +45,18 @@ func main() {
 	cfg, err := config.Init()
 	guard(err, "parse env config")
 
-	// Initialize telemetry.
-	cleanupTelemetry, err := telemetry.Init(cfg)
-	guard(err, "init otel")
-	defer cleanupTelemetry()
+	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
+	noTelemetry := flag.Bool("disable-telemetry", false, "do not initialize OTel or send telemetry to Honeycomb")
+	flag.Parse()
+
+	if *noTelemetry {
+		log.Println("Running without telemetry enabled...")
+	} else {
+		// Initialize telemetry.
+		cleanupTelemetry, err := telemetry.Init(cfg)
+		guard(err, "init otel")
+		defer cleanupTelemetry()
+	}
 
 	ctx, bootSpan := otel.Tracer("").Start(context.Background(), "ServerBoot", trace.WithSpanKind(trace.SpanKindInternal))
 
@@ -56,9 +64,6 @@ func main() {
 	dbConn := makeDB(ctx, cfg)
 
 	// Run migrations and exit if migrator instance.
-	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
-	flag.Parse()
-
 	if *migrationFlag {
 		bootSpan.SetAttributes(attribute.String("service.type", "migrator"))
 		log.Println("Migrator instance: starting database migrations...")
