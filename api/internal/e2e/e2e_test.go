@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,7 +19,11 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
 
-var sharedTestDB *sql.DB
+var (
+	sharedTestDB        *sql.DB
+	dopplerFallbackFlag = flag.Bool("doppler-local", false, "use fallback file for doppler to avoid a network call")
+	noTelemetry         = flag.Bool("disable-telemetry", false, "do not initialize OTel or send telemetry to Honeycomb")
+)
 
 type LogWriter struct {
 	logger *log.Logger
@@ -66,14 +71,32 @@ func TestMain(m *testing.M) {
 }
 
 func runAPIMigrator(dbURL string) {
-	migrator := exec.Command(
-		"doppler", "run",
+	args := []string{
+		"run",
 		"--project", "pubgolf-api-server",
 		"--config", "e2e",
 		"--preserve-env",
+	}
+
+	if *dopplerFallbackFlag {
+		args = append(args, []string{
+			"--no-check-version",
+			"--fallback-only",
+		}...)
+	}
+
+	args = append(args, []string{
 		"--",
 		"go", "run", "../../cmd/pubgolf-api-server", "--run-migrations",
-	)
+	}...)
+
+	if *noTelemetry {
+		args = append(args, []string{
+			"--disable-telemetry",
+		}...)
+	}
+
+	migrator := exec.Command("doppler", args...)
 
 	migrator.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
 
@@ -86,14 +109,32 @@ func runAPIMigrator(dbURL string) {
 }
 
 func runAPIServer(dbURL string) func() {
-	server := exec.Command(
-		"doppler", "run",
+	args := []string{
+		"run",
 		"--project", "pubgolf-api-server",
 		"--config", "e2e",
 		"--preserve-env",
+	}
+
+	if *dopplerFallbackFlag {
+		args = append(args, []string{
+			"--no-check-version",
+			"--fallback-only",
+		}...)
+	}
+
+	args = append(args, []string{
 		"--",
 		"go", "run", "../../cmd/pubgolf-api-server",
-	)
+	}...)
+
+	if *noTelemetry {
+		args = append(args, []string{
+			"--disable-telemetry",
+		}...)
+	}
+
+	server := exec.Command("doppler", args...)
 
 	server.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
 	server.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}

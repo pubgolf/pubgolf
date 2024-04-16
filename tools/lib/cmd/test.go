@@ -158,6 +158,8 @@ func runE2ETest(stopOnExit, localOnly bool) func() {
 	if localOnly {
 		args = append(args, []string{
 			"-shared-postgres=true",
+			"-doppler-local=true",
+			"-disable-telemetry=true",
 		}...)
 	}
 
