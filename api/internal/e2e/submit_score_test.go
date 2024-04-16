@@ -79,6 +79,8 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	currentVenueKey := schedule.Msg.GetSchedule().GetCurrentVenueKey()
 	require.NotEmpty(t, currentVenueKey, "Has current venue key")
 
+	// Get score submission form.
+
 	form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
@@ -87,6 +89,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_REQUIRED, form.Msg.GetStatus(), "Score submission required")
 
+	require.Equal(t, "Submit Your Score", form.Msg.GetForm().GetLabel())
 	require.Len(t, form.Msg.GetForm().GetGroups(), 3)
 
 	scoreGroup := form.Msg.GetForm().GetGroups()[0]
@@ -107,6 +110,8 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	eventBonus := stdAdjGroup.GetInputs()[0].GetSelectMany().GetOptions()[0]
 	require.Equal(t, "Event Bonus (-1)", eventBonus.GetLabel())
+
+	// Submit initial score.
 
 	expectedNumSips := int64(3)
 
@@ -137,6 +142,8 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	}, playerToken.String()))
 	require.NoError(t, err)
 
+	// Score is reflected back in scoreboard and defaults for the edit score form.
+
 	scores, err := c.GetScoresForPlayer(context.Background(), requestWithAuth(&apiv1.GetScoresForPlayerRequest{
 		EventKey: testEventKey,
 		PlayerId: playerID.String(),
@@ -144,7 +151,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 2)
 	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
-	require.Equal(t, "Event Bonus", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.Equal(t, "😇 Event Bonus", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
 
 	form, err = c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
@@ -154,6 +161,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE, form.Msg.GetStatus(), "Score submission has been processed")
 
+	require.Equal(t, "Edit Your Score", form.Msg.GetForm().GetLabel())
 	require.Len(t, form.Msg.GetForm().GetGroups(), 3)
 
 	scoreGroup = form.Msg.GetForm().GetGroups()[0]
@@ -163,8 +171,33 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.True(t, stdAdjGroup.GetInputs()[0].GetSelectMany().GetOptions()[0].GetDefaultValue())
 	require.False(t, stdAdjGroup.GetInputs()[0].GetSelectMany().GetOptions()[1].GetDefaultValue())
 
-	// TODO: Test editing by adding an activated adjustment.
-} //nolint:wsl // Trailing whitespace due to TODO comment.
+	// Re-submit with Event Bonus now unselected, and confirm the scoreboard reflects the change.
+
+	_, err = c.SubmitScore(context.Background(), requestWithAuth(&apiv1.SubmitScoreRequest{
+		EventKey: testEventKey,
+		VenueKey: currentVenueKey,
+		PlayerId: playerID.String(),
+		Data: &apiv1.FormSubmission{
+			Values: []*apiv1.FormValue{
+				{
+					Id: scoreGroup.GetInputs()[0].GetId(),
+					Value: &apiv1.FormValue_Numeric{
+						Numeric: expectedNumSips,
+					},
+				},
+			},
+		},
+	}, playerToken.String()))
+	require.NoError(t, err)
+
+	scores, err = c.GetScoresForPlayer(context.Background(), requestWithAuth(&apiv1.GetScoresForPlayerRequest{
+		EventKey: testEventKey,
+		PlayerId: playerID.String(),
+	}, playerToken.String()))
+	require.NoError(t, err)
+	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 1)
+	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
+}
 
 func Test_SubmitScore_FiveHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-five-hole"
