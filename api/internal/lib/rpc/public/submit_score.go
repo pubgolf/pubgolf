@@ -69,7 +69,7 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 	}
 
 	return connect.NewResponse(&apiv1.SubmitScoreResponse{
-		Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_NON_EDITABLE,
+		Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE,
 	}), nil
 }
 
