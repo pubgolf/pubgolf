@@ -25,10 +25,14 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, err
 	}
 
+	// TODO: Handle idempotency key.
+
 	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("lookup stage ID: %w", err))
 	}
+
+	// TODO: Block scores for non-current stages.
 
 	score, activeAdjIDs, err := forms.ParseSubmitScoreForm(req.Msg.GetData().GetValues())
 	if err != nil {
@@ -44,9 +48,9 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		})
 	}
 
-	// TODO: Handle update case and idempotency key.
+	// TODO: Block empty scores.
 
-	err = s.dao.CreateScoreForStage(ctx, playerID, stageID, score, adjP)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)

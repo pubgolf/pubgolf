@@ -40,8 +40,9 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]mo
 				StageID:  s.StageID,
 				PlayerID: s.PlayerID,
 				Score: models.Score{
-					ID:    models.ScoreIDFromULID(s.ScoreID.ULID),
-					Value: s.Value,
+					ID:         models.ScoreIDFromULID(s.ScoreID.ULID),
+					Value:      s.Value,
+					IsVerified: s.IsVerified,
 				},
 				Adjustments: adj,
 			})

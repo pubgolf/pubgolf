@@ -16,7 +16,8 @@ const adjustmentsByPlayerStage = `-- name: AdjustmentsByPlayerStage :many
 SELECT
   id,
   label,
-  value
+  value,
+  adjustment_template_id
 FROM
   adjustments
 WHERE
@@ -31,9 +32,10 @@ type AdjustmentsByPlayerStageParams struct {
 }
 
 type AdjustmentsByPlayerStageRow struct {
-	ID    models.AdjustmentID
-	Label string
-	Value int32
+	ID                   models.AdjustmentID
+	Label                string
+	Value                int32
+	AdjustmentTemplateID models.AdjustmentTemplateID
 }
 
 func (q *Queries) AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error) {
@@ -45,7 +47,12 @@ func (q *Queries) AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsB
 	var items []AdjustmentsByPlayerStageRow
 	for rows.Next() {
 		var i AdjustmentsByPlayerStageRow
-		if err := rows.Scan(&i.ID, &i.Label, &i.Value); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Label,
+			&i.Value,
+			&i.AdjustmentTemplateID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -78,22 +85,6 @@ func (q *Queries) CreateAdjustment(ctx context.Context, arg CreateAdjustmentPara
 		arg.Label,
 		arg.Value,
 	)
-	return err
-}
-
-const createScore = `-- name: CreateScore :exec
-INSERT INTO scores(stage_id, player_id, value, updated_at)
-  VALUES ($1, $2, $3, now())
-`
-
-type CreateScoreParams struct {
-	StageID  models.StageID
-	PlayerID models.PlayerID
-	Value    uint32
-}
-
-func (q *Queries) CreateScore(ctx context.Context, arg CreateScoreParams) error {
-	_, err := q.exec(ctx, q.createScoreStmt, createScore, arg.StageID, arg.PlayerID, arg.Value)
 	return err
 }
 
@@ -204,7 +195,8 @@ SELECT
   s.stage_id,
   s.player_id,
   s.id AS score_id,
-  s.value
+  s.value,
+  s.is_verified
 FROM
   scores s
   JOIN stages st ON s.stage_id = st.id
@@ -218,10 +210,11 @@ ORDER BY
 `
 
 type EventScoresRow struct {
-	StageID  models.StageID
-	PlayerID models.PlayerID
-	ScoreID  models.ScoreID
-	Value    uint32
+	StageID    models.StageID
+	PlayerID   models.PlayerID
+	ScoreID    models.ScoreID
+	Value      uint32
+	IsVerified bool
 }
 
 func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error) {
@@ -238,6 +231,7 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]Ev
 			&i.PlayerID,
 			&i.ScoreID,
 			&i.Value,
+			&i.IsVerified,
 		); err != nil {
 			return nil, err
 		}
@@ -310,7 +304,8 @@ const playerScores = `-- name: PlayerScores :many
 SELECT
   v.id,
   v.name,
-  COALESCE(s.value, 0)
+  COALESCE(s.value, 0),
+  COALESCE(s.is_verified, TRUE)
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -321,23 +316,27 @@ WHERE
   AND st.event_id = $2
   AND v.deleted_at IS NULL
   AND s.deleted_at IS NULL
+  AND (s.is_verified = TRUE
+    OR s.is_verified != $3)
 ORDER BY
   st.rank ASC
 `
 
 type PlayerScoresParams struct {
-	PlayerID models.PlayerID
-	EventID  models.EventID
+	PlayerID          models.PlayerID
+	EventID           models.EventID
+	IncludeUnverified bool
 }
 
 type PlayerScoresRow struct {
-	ID    models.VenueID
-	Name  string
-	Value uint32
+	ID         models.VenueID
+	Name       string
+	Value      uint32
+	IsVerified bool
 }
 
 func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error) {
-	rows, err := q.query(ctx, q.playerScoresStmt, playerScores, arg.PlayerID, arg.EventID)
+	rows, err := q.query(ctx, q.playerScoresStmt, playerScores, arg.PlayerID, arg.EventID, arg.IncludeUnverified)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +344,12 @@ func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]P
 	var items []PlayerScoresRow
 	for rows.Next() {
 		var i PlayerScoresRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.Value); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Value,
+			&i.IsVerified,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -362,7 +366,8 @@ func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]P
 const scoreByPlayerStage = `-- name: ScoreByPlayerStage :one
 SELECT
   id,
-  value
+  value,
+  is_verified
 FROM
   scores
 WHERE
@@ -377,55 +382,39 @@ type ScoreByPlayerStageParams struct {
 }
 
 type ScoreByPlayerStageRow struct {
-	ID    models.ScoreID
-	Value uint32
+	ID         models.ScoreID
+	Value      uint32
+	IsVerified bool
 }
 
 func (q *Queries) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error) {
 	row := q.queryRow(ctx, q.scoreByPlayerStageStmt, scoreByPlayerStage, arg.StageID, arg.PlayerID)
 	var i ScoreByPlayerStageRow
-	err := row.Scan(&i.ID, &i.Value)
+	err := row.Scan(&i.ID, &i.Value, &i.IsVerified)
 	return i, err
 }
 
-const updateAdjustment = `-- name: UpdateAdjustment :exec
-UPDATE
-  adjustments
-SET
-  label = $2,
-  value = $3,
-  updated_at = now()
-WHERE
-  id = $1
+const upsertScore = `-- name: UpsertScore :exec
+INSERT INTO scores(stage_id, player_id, value, is_verified)
+  VALUES ($1, $2, $3, $4)
+ON CONFLICT (stage_id, player_id)
+  DO UPDATE SET
+    value = EXCLUDED.value, is_verified = EXCLUDED.is_verified, updated_at = now(), deleted_at = NULL
 `
 
-type UpdateAdjustmentParams struct {
-	ID    models.AdjustmentID
-	Label string
-	Value int32
+type UpsertScoreParams struct {
+	StageID    models.StageID
+	PlayerID   models.PlayerID
+	Value      uint32
+	IsVerified bool
 }
 
-func (q *Queries) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error {
-	_, err := q.exec(ctx, q.updateAdjustmentStmt, updateAdjustment, arg.ID, arg.Label, arg.Value)
-	return err
-}
-
-const updateScore = `-- name: UpdateScore :exec
-UPDATE
-  scores
-SET
-  value = $2,
-  updated_at = now()
-WHERE
-  id = $1
-`
-
-type UpdateScoreParams struct {
-	ID    models.ScoreID
-	Value uint32
-}
-
-func (q *Queries) UpdateScore(ctx context.Context, arg UpdateScoreParams) error {
-	_, err := q.exec(ctx, q.updateScoreStmt, updateScore, arg.ID, arg.Value)
+func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error {
+	_, err := q.exec(ctx, q.upsertScoreStmt, upsertScore,
+		arg.StageID,
+		arg.PlayerID,
+		arg.Value,
+		arg.IsVerified,
+	)
 	return err
 }

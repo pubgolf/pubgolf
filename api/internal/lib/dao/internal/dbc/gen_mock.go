@@ -16,6 +16,66 @@ type MockQuerier struct {
 	mock.Mock
 }
 
+// AdjustmentTemplatesByEventID provides a mock function with given fields: ctx, eventID
+func (_m *MockQuerier) AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]AdjustmentTemplatesByEventIDRow, error) {
+	ret := _m.Called(ctx, eventID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdjustmentTemplatesByEventID")
+	}
+
+	var r0 []AdjustmentTemplatesByEventIDRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]AdjustmentTemplatesByEventIDRow, error)); ok {
+		return rf(ctx, eventID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []AdjustmentTemplatesByEventIDRow); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]AdjustmentTemplatesByEventIDRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AdjustmentTemplatesByStageID provides a mock function with given fields: ctx, stageID
+func (_m *MockQuerier) AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error) {
+	ret := _m.Called(ctx, stageID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdjustmentTemplatesByStageID")
+	}
+
+	var r0 []AdjustmentTemplatesByStageIDRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.StageID) ([]AdjustmentTemplatesByStageIDRow, error)); ok {
+		return rf(ctx, stageID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.StageID) []AdjustmentTemplatesByStageIDRow); ok {
+		r0 = rf(ctx, stageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]AdjustmentTemplatesByStageIDRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.StageID) error); ok {
+		r1 = rf(ctx, stageID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // AdjustmentsByPlayerStage provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error) {
 	ret := _m.Called(ctx, arg)
@@ -90,24 +150,6 @@ func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams)
 	}
 
 	return r0, r1
-}
-
-// CreateScore provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) CreateScore(ctx context.Context, arg CreateScoreParams) error {
-	ret := _m.Called(ctx, arg)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateScore")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, CreateScoreParams) error); ok {
-		r0 = rf(ctx, arg)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
 }
 
 // DeactivateAuthTokens provides a mock function with given fields: ctx, phoneNumber
@@ -864,24 +906,6 @@ func (_m *MockQuerier) StageIDByVenueKey(ctx context.Context, arg StageIDByVenue
 	return r0, r1
 }
 
-// UpdateAdjustment provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error {
-	ret := _m.Called(ctx, arg)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateAdjustment")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, UpdateAdjustmentParams) error); ok {
-		r0 = rf(ctx, arg)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // UpdatePlayer provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error {
 	ret := _m.Called(ctx, arg)
@@ -900,24 +924,6 @@ func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams)
 	return r0
 }
 
-// UpdateScore provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) UpdateScore(ctx context.Context, arg UpdateScoreParams) error {
-	ret := _m.Called(ctx, arg)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateScore")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, UpdateScoreParams) error); ok {
-		r0 = rf(ctx, arg)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // UpsertRegistration provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error {
 	ret := _m.Called(ctx, arg)
@@ -928,6 +934,24 @@ func (_m *MockQuerier) UpsertRegistration(ctx context.Context, arg UpsertRegistr
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, UpsertRegistrationParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpsertScore provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpsertScore(ctx context.Context, arg UpsertScoreParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpsertScore")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpsertScoreParams) error); ok {
 		r0 = rf(ctx, arg)
 	} else {
 		r0 = ret.Error(0)

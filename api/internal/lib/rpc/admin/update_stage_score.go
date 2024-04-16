@@ -23,39 +23,17 @@ func (s *Server) UpdateStageScore(ctx context.Context, req *connect.Request[apiv
 	}
 
 	var newAdj []models.AdjustmentParams
-	var editAdj []models.Adjustment
 
 	for _, adj := range req.Msg.GetScore().GetAdjustments() {
-		if adj.GetId() == "" {
-			newAdj = append(newAdj, models.AdjustmentParams{
-				Label: adj.GetData().GetLabel(),
-				Value: adj.GetData().GetValue(),
-			})
-		} else {
-			id, err := models.AdjustmentIDFromString(adj.GetId())
-			if err != nil {
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid id '%s' could not be parsed as ULID or nil: %w", adj.GetId(), err))
-			}
-
-			editAdj = append(editAdj, models.Adjustment{
-				ID:    id,
-				Label: adj.GetData().GetLabel(),
-				Value: adj.GetData().GetValue(),
-			})
-		}
+		newAdj = append(newAdj, models.AdjustmentParams{
+			Label: adj.GetData().GetLabel(),
+			Value: adj.GetData().GetValue(),
+		})
 	}
 
-	scoreID, err := models.ScoreIDFromString(req.Msg.GetScore().GetScore().GetId())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoreID as ULID: %w", err))
-	}
+	newScore := req.Msg.GetScore().GetScore().GetData().GetValue()
 
-	scoreParam := models.Score{
-		ID:    scoreID,
-		Value: req.Msg.GetScore().GetScore().GetData().GetValue(),
-	}
-
-	err = s.dao.UpdateScore(ctx, playerID, stageID, scoreParam, editAdj, newAdj)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, newScore, newAdj, true)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("retrieve new score: %w", err))
 	}

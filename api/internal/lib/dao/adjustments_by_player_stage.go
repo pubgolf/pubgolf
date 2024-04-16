@@ -29,9 +29,10 @@ func (q *Queries) AdjustmentsByPlayerStage(ctx context.Context, playerID models.
 	var adj []models.Adjustment
 	for _, a := range dbAdj {
 		adj = append(adj, models.Adjustment{
-			ID:    a.ID,
-			Label: a.Label,
-			Value: a.Value,
+			ID:         a.ID,
+			Label:      a.Label,
+			Value:      a.Value,
+			TemplateID: a.AdjustmentTemplateID,
 		})
 	}
 

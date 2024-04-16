@@ -24,6 +24,24 @@ func AdjustmentIDFromString(s string) (AdjustmentID, error) {
 	return AdjustmentID{DatabaseULID{u}}, nil
 }
 
+// AdjustmentTemplateID uniquely identifies a bonus or penalty.
+type AdjustmentTemplateID struct{ DatabaseULID }
+
+// AdjustmentTemplateIDFromULID parses an AdjustmentTemplateID from a ULID.
+func AdjustmentTemplateIDFromULID(u ulid.ULID) AdjustmentTemplateID {
+	return AdjustmentTemplateID{DatabaseULID{u}}
+}
+
+// AdjustmentTemplateIDFromString parses an AdjustmentTemplateID from a string.
+func AdjustmentTemplateIDFromString(s string) (AdjustmentTemplateID, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return AdjustmentTemplateID{}, fmt.Errorf("parse AdjustmentTemplateID from string: %w", err)
+	}
+
+	return AdjustmentTemplateID{DatabaseULID{u}}, nil
+}
+
 // AuthToken uniquely identifies a bonus or penalty.
 type AuthToken struct{ DatabaseULID }
 

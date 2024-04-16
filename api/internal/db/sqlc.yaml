@@ -15,9 +15,18 @@ sql:
           - db_type: uuid
             nullable: true
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.DatabaseULID
+          # adjustment_templates
+          - column: adjustment_templates.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AdjustmentTemplateID
+          - column: adjustment_templates.event_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
+          - column: adjustment_templates.stage_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
           # adjustments
           - column: adjustments.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AdjustmentID
+          - column: adjustments.adjustment_template_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.AdjustmentTemplateID
           - column: adjustments.player_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.PlayerID
           - column: adjustments.stage_id

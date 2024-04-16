@@ -52,7 +52,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", playerID.String(), req.Msg.GetEventKey(), errNotRegistered))
 	}
 
-	scores, err := s.dao.PlayerScores(ctx, eventID, playerID)
+	scores, err := s.dao.PlayerScores(ctx, eventID, playerID, callerPID == playerID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get score info: %w", err))
 	}
@@ -104,11 +104,16 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 			}
 		}
 
+		label := s.VenueName
+		if !s.IsVerified {
+			label += " (Unverified)"
+		}
+
 		rankCopy := uint32(i + 1)
 		venueID := s.VenueID.String()
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 			EntityId:           &venueID,
-			Label:              s.VenueName,
+			Label:              label,
 			Score:              int32(s.Score),
 			DisplayScoreSigned: false,
 			Rank:               &rankCopy,

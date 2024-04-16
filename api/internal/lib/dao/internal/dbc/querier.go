@@ -12,10 +12,11 @@ import (
 )
 
 type Querier interface {
+	AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]AdjustmentTemplatesByEventIDRow, error)
+	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error)
 	AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error)
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error)
-	CreateScore(ctx context.Context, arg CreateScoreParams) error
 	DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
 	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error
@@ -44,10 +45,9 @@ type Querier interface {
 	SetEventVenueKeys(ctx context.Context, eventID models.EventID) error
 	SetNextEventVenueKey(ctx context.Context, id models.EventID) error
 	StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error)
-	UpdateAdjustment(ctx context.Context, arg UpdateAdjustmentParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error
-	UpdateScore(ctx context.Context, arg UpdateScoreParams) error
 	UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error
+	UpsertScore(ctx context.Context, arg UpsertScoreParams) error
 	VenueByKey(ctx context.Context, arg VenueByKeyParams) (VenueByKeyRow, error)
 	VerifyPhoneNumber(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 }

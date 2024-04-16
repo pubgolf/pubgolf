@@ -16,9 +16,9 @@ const (
 
 // TODO: move to models package.
 type AdjustmentTemplate struct {
-	ID            string
+	ID            models.AdjustmentTemplateID
 	Label         string
-	Value         int
+	Value         int32
 	VenueSpecific bool
 	Active        bool
 }
@@ -81,7 +81,7 @@ func groupAdjustmentTemplates(adj []AdjustmentTemplate) ([]*apiv1.SelectManyInpu
 		active := at.Active
 
 		option := &apiv1.SelectManyInputOption{
-			Id:           at.ID,
+			Id:           at.ID.ULID.String(),
 			Label:        fmt.Sprintf("%s (%+d)", at.Label, at.Value),
 			DefaultValue: &active,
 		}

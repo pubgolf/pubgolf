@@ -10,15 +10,24 @@ type StageScore struct {
 
 // Score models the base score for a stage.
 type Score struct {
-	ID    ScoreID
-	Value uint32
+	ID         ScoreID
+	Value      uint32
+	IsVerified bool
+}
+
+// AdjustmentTemplate is a "standard" penalty or bonus.
+type AdjustmentTemplate struct {
+	ID    AdjustmentTemplateID
+	Label string
+	Value int32
 }
 
 // Adjustment models a bonus or penalty applied to a stage.
 type Adjustment struct {
-	ID    AdjustmentID
-	Label string
-	Value int32
+	ID         AdjustmentID
+	Label      string
+	Value      int32
+	TemplateID AdjustmentTemplateID
 }
 
 // AdjustmentParams contains writable information about a bonus or penalty.

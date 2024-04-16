@@ -11,14 +11,16 @@ import (
 
 // QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.
 type QueryProvider interface {
+	// AdjustmentTemplatesByEventID returns a list of adjustment templates applicable to all stages for an event.
+	AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]models.AdjustmentTemplate, error)
+	// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to all stages for an event.
+	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error)
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
 	// CreatePlayer creates a new player.
 	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
 	// CreatePlayerAndRegistration creates a new player and adds them to the given event.
 	CreatePlayerAndRegistration(ctx context.Context, name string, phoneNum models.PhoneNum, eventID models.EventID, cat models.ScoringCategory) (models.Player, error)
-	// CreateScoreForStage creates score and adjustment records for a given stage.
-	CreateScoreForStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams) error
 	// DeleteScore creates score and adjustment records for a given stage.
 	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
@@ -48,7 +50,7 @@ type QueryProvider interface {
 	// PlayerRegisteredForEvent returns whether or not the player has a valid registration for the given event.
 	PlayerRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (bool, error)
 	// PlayerScores returns a list of event stages and a player's scoring info for each.
-	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)
+	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID, includeUnverified bool) ([]PlayerVenueScore, error)
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// ScoringCriteria returns a list of players competing in the given category and the data necessary to rank them.
@@ -57,10 +59,10 @@ type QueryProvider interface {
 	StageIDByVenueKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.StageID, error)
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
-	// UpdateScore creates score and adjustment records for a given stage.
-	UpdateScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score models.Score, modifyAdj []models.Adjustment, createAdj []models.AdjustmentParams) error
 	// UpsertRegistration creates a new player and adds them to the given event.
 	UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error
+	// UpsertScore creates score and adjustment records for a given stage.
+	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams, isVerified bool) error
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
 	// VerifyPhoneNumber sets the player's phone number as verified, returning a boolean to indicate whether the phone number was previously unverified (i.e. false means the DB row was not updated).

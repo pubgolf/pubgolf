@@ -35,6 +35,7 @@ FROM
     AND a.player_id = s.player_id
 WHERE
   s.deleted_at IS NULL
+  AND s.is_verified IS TRUE
   AND p.deleted_at IS NULL
   AND ep.deleted_at IS NULL
   AND ep.event_id = @event_id
@@ -79,6 +80,7 @@ FROM
     AND a.player_id = s.player_id
 WHERE
   s.deleted_at IS NULL
+  AND s.is_verified IS TRUE
   AND p.deleted_at IS NULL
   AND ep.deleted_at IS NULL
   AND ep.event_id = @event_id

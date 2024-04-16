@@ -21,7 +21,8 @@ func (q *Queries) ScoreByPlayerStage(ctx context.Context, playerID models.Player
 	}
 
 	return models.Score{
-		ID:    score.ID,
-		Value: score.Value,
+		ID:         score.ID,
+		Value:      score.Value,
+		IsVerified: score.IsVerified,
 	}, nil
 }

@@ -12,11 +12,24 @@ import (
 )
 
 type Adjustment struct {
-	ID        models.AdjustmentID
+	ID                   models.AdjustmentID
+	StageID              models.StageID
+	PlayerID             models.PlayerID
+	Value                int32
+	Label                string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+	DeletedAt            sql.NullTime
+	AdjustmentTemplateID models.AdjustmentTemplateID
+}
+
+type AdjustmentTemplate struct {
+	ID        models.AdjustmentTemplateID
+	EventID   models.EventID
 	StageID   models.StageID
-	PlayerID  models.PlayerID
 	Value     int32
 	Label     string
+	Rank      int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime
@@ -72,13 +85,14 @@ type Rule struct {
 }
 
 type Score struct {
-	ID        models.ScoreID
-	StageID   models.StageID
-	PlayerID  models.PlayerID
-	Value     uint32
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime
+	ID         models.ScoreID
+	StageID    models.StageID
+	PlayerID   models.PlayerID
+	Value      uint32
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  sql.NullTime
+	IsVerified bool
 }
 
 type Stage struct {

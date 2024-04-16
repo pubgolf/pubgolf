@@ -34,7 +34,7 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 		})
 	}
 
-	err = s.dao.CreateScoreForStage(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true)
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)

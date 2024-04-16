@@ -24,6 +24,12 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.adjustmentTemplatesByEventIDStmt, err = db.PrepareContext(ctx, adjustmentTemplatesByEventID); err != nil {
+		return nil, fmt.Errorf("error preparing query AdjustmentTemplatesByEventID: %w", err)
+	}
+	if q.adjustmentTemplatesByStageIDStmt, err = db.PrepareContext(ctx, adjustmentTemplatesByStageID); err != nil {
+		return nil, fmt.Errorf("error preparing query AdjustmentTemplatesByStageID: %w", err)
+	}
 	if q.adjustmentsByPlayerStageStmt, err = db.PrepareContext(ctx, adjustmentsByPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query AdjustmentsByPlayerStage: %w", err)
 	}
@@ -32,9 +38,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.createPlayerStmt, err = db.PrepareContext(ctx, createPlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreatePlayer: %w", err)
-	}
-	if q.createScoreStmt, err = db.PrepareContext(ctx, createScore); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateScore: %w", err)
 	}
 	if q.deactivateAuthTokensStmt, err = db.PrepareContext(ctx, deactivateAuthTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeactivateAuthTokens: %w", err)
@@ -120,17 +123,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.stageIDByVenueKeyStmt, err = db.PrepareContext(ctx, stageIDByVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query StageIDByVenueKey: %w", err)
 	}
-	if q.updateAdjustmentStmt, err = db.PrepareContext(ctx, updateAdjustment); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateAdjustment: %w", err)
-	}
 	if q.updatePlayerStmt, err = db.PrepareContext(ctx, updatePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdatePlayer: %w", err)
 	}
-	if q.updateScoreStmt, err = db.PrepareContext(ctx, updateScore); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateScore: %w", err)
-	}
 	if q.upsertRegistrationStmt, err = db.PrepareContext(ctx, upsertRegistration); err != nil {
 		return nil, fmt.Errorf("error preparing query UpsertRegistration: %w", err)
+	}
+	if q.upsertScoreStmt, err = db.PrepareContext(ctx, upsertScore); err != nil {
+		return nil, fmt.Errorf("error preparing query UpsertScore: %w", err)
 	}
 	if q.venueByKeyStmt, err = db.PrepareContext(ctx, venueByKey); err != nil {
 		return nil, fmt.Errorf("error preparing query VenueByKey: %w", err)
@@ -143,6 +143,16 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.adjustmentTemplatesByEventIDStmt != nil {
+		if cerr := q.adjustmentTemplatesByEventIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing adjustmentTemplatesByEventIDStmt: %w", cerr)
+		}
+	}
+	if q.adjustmentTemplatesByStageIDStmt != nil {
+		if cerr := q.adjustmentTemplatesByStageIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing adjustmentTemplatesByStageIDStmt: %w", cerr)
+		}
+	}
 	if q.adjustmentsByPlayerStageStmt != nil {
 		if cerr := q.adjustmentsByPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing adjustmentsByPlayerStageStmt: %w", cerr)
@@ -156,11 +166,6 @@ func (q *Queries) Close() error {
 	if q.createPlayerStmt != nil {
 		if cerr := q.createPlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createPlayerStmt: %w", cerr)
-		}
-	}
-	if q.createScoreStmt != nil {
-		if cerr := q.createScoreStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createScoreStmt: %w", cerr)
 		}
 	}
 	if q.deactivateAuthTokensStmt != nil {
@@ -303,24 +308,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing stageIDByVenueKeyStmt: %w", cerr)
 		}
 	}
-	if q.updateAdjustmentStmt != nil {
-		if cerr := q.updateAdjustmentStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateAdjustmentStmt: %w", cerr)
-		}
-	}
 	if q.updatePlayerStmt != nil {
 		if cerr := q.updatePlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updatePlayerStmt: %w", cerr)
 		}
 	}
-	if q.updateScoreStmt != nil {
-		if cerr := q.updateScoreStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateScoreStmt: %w", cerr)
-		}
-	}
 	if q.upsertRegistrationStmt != nil {
 		if cerr := q.upsertRegistrationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing upsertRegistrationStmt: %w", cerr)
+		}
+	}
+	if q.upsertScoreStmt != nil {
+		if cerr := q.upsertScoreStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing upsertScoreStmt: %w", cerr)
 		}
 	}
 	if q.venueByKeyStmt != nil {
@@ -372,10 +372,11 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                  DBTX
 	tx                                  *sql.Tx
+	adjustmentTemplatesByEventIDStmt    *sql.Stmt
+	adjustmentTemplatesByStageIDStmt    *sql.Stmt
 	adjustmentsByPlayerStageStmt        *sql.Stmt
 	createAdjustmentStmt                *sql.Stmt
 	createPlayerStmt                    *sql.Stmt
-	createScoreStmt                     *sql.Stmt
 	deactivateAuthTokensStmt            *sql.Stmt
 	deleteAdjustmentStmt                *sql.Stmt
 	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
@@ -404,10 +405,9 @@ type Queries struct {
 	setEventVenueKeysStmt               *sql.Stmt
 	setNextEventVenueKeyStmt            *sql.Stmt
 	stageIDByVenueKeyStmt               *sql.Stmt
-	updateAdjustmentStmt                *sql.Stmt
 	updatePlayerStmt                    *sql.Stmt
-	updateScoreStmt                     *sql.Stmt
 	upsertRegistrationStmt              *sql.Stmt
+	upsertScoreStmt                     *sql.Stmt
 	venueByKeyStmt                      *sql.Stmt
 	verifyPhoneNumberStmt               *sql.Stmt
 }
@@ -416,10 +416,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                  tx,
 		tx:                                  tx,
+		adjustmentTemplatesByEventIDStmt:    q.adjustmentTemplatesByEventIDStmt,
+		adjustmentTemplatesByStageIDStmt:    q.adjustmentTemplatesByStageIDStmt,
 		adjustmentsByPlayerStageStmt:        q.adjustmentsByPlayerStageStmt,
 		createAdjustmentStmt:                q.createAdjustmentStmt,
 		createPlayerStmt:                    q.createPlayerStmt,
-		createScoreStmt:                     q.createScoreStmt,
 		deactivateAuthTokensStmt:            q.deactivateAuthTokensStmt,
 		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
 		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
@@ -448,10 +449,9 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		setEventVenueKeysStmt:               q.setEventVenueKeysStmt,
 		setNextEventVenueKeyStmt:            q.setNextEventVenueKeyStmt,
 		stageIDByVenueKeyStmt:               q.stageIDByVenueKeyStmt,
-		updateAdjustmentStmt:                q.updateAdjustmentStmt,
 		updatePlayerStmt:                    q.updatePlayerStmt,
-		updateScoreStmt:                     q.updateScoreStmt,
 		upsertRegistrationStmt:              q.upsertRegistrationStmt,
+		upsertScoreStmt:                     q.upsertScoreStmt,
 		venueByKeyStmt:                      q.venueByKeyStmt,
 		verifyPhoneNumberStmt:               q.verifyPhoneNumberStmt,
 	}
