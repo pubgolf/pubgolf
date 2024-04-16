@@ -263,10 +263,10 @@ FROM
   LEFT JOIN adjustments a ON a.stage_id = st.id
     AND a.player_id = $2
 WHERE
-  st.deleted_at IS NOT NULL
+  st.deleted_at IS NULL
   AND st.event_id = $1
-  AND v.deleted_at IS NOT NULL
-  AND a.deleted_at IS NOT NULL
+  AND v.deleted_at IS NULL
+  AND a.deleted_at IS NULL
 ORDER BY
   st.rank ASC,
   a.created_at ASC
@@ -317,10 +317,10 @@ FROM
   LEFT JOIN scores s ON s.stage_id = st.id
     AND s.player_id = $1
 WHERE
-  st.deleted_at IS NOT NULL
+  st.deleted_at IS NULL
   AND st.event_id = $2
-  AND v.deleted_at IS NOT NULL
-  AND s.deleted_at IS NOT NULL
+  AND v.deleted_at IS NULL
+  AND s.deleted_at IS NULL
 ORDER BY
   st.rank ASC
 `
