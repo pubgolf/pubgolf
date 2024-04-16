@@ -19,6 +19,7 @@ func init() {
 
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
 	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output")
+	testCmd.PersistentFlags().Bool("local", false, "Run tests in a mode that disables external network dependencies")
 }
 
 var testCmd = &cobra.Command{
@@ -34,17 +35,39 @@ var testCmd = &cobra.Command{
 		verboseFlag, err := cmd.Flags().GetBool("verbose")
 		guard(err, "check '--verbose' flag")
 
-		testArgs := []string{
+		localFlag, err := cmd.Flags().GetBool("local")
+		guard(err, "check '--local' flag")
+
+		args := []string{
+			"run",
+			"--project", config.ServerBinName,
+			"--config", "test",
+		}
+
+		if localFlag {
+			args = append(args, []string{
+				"--no-check-version",
+				"--fallback-only",
+			}...)
+		}
+
+		args = append(args, []string{
+			"--",
+			"go",
 			"test",
 			filepath.FromSlash("./api/..."),
+		}...)
+
+		if localFlag {
+			args = append(args, "-shared-postgres=true")
 		}
 
 		if verboseFlag {
-			testArgs = append(testArgs, "-v")
+			args = append(args, "-v")
 		}
 
 		if coverageFlag {
-			testArgs = append(testArgs,
+			args = append(args,
 				"-coverprofile", coverageFile,
 			)
 
@@ -52,7 +75,7 @@ var testCmd = &cobra.Command{
 			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir: %w")
 		}
 
-		tester := exec.Command("go", testArgs...)
+		tester := exec.Command("doppler", args...)
 
 		tester.Stdout = os.Stdout
 		tester.Stderr = os.Stderr
@@ -88,15 +111,18 @@ var testE2ECmd = &cobra.Command{
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
+		localFlag, err := cmd.Flags().GetBool("local")
+		guard(err, "check '--local' flag")
+
 		// Start initial process.
-		stopFn := runE2ETest(!watchFlag)
+		stopFn := runE2ETest(!watchFlag, localFlag)
 
 		// Launch watcher, if applicable.
 		if watchFlag {
 			go func() {
 				watch("api", "e2e test", func(_ watcher.Event) {
 					stopFn()
-					stopFn = runE2ETest(false)
+					stopFn = runE2ETest(false, localFlag)
 				})
 			}()
 		}
@@ -106,8 +132,36 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(stopOnExit bool) func() {
-	tester := exec.Command("go", "test", filepath.FromSlash("./api/internal/e2e"), "-v", "-e2e=true") //nolint:gosec // Input is not dynamically provided by end-user.
+func runE2ETest(stopOnExit, localOnly bool) func() {
+	args := []string{
+		"run",
+		"--project", config.ServerBinName,
+		"--config", "test",
+	}
+
+	if localOnly {
+		args = append(args, []string{
+			"--no-check-version",
+			"--fallback-only",
+		}...)
+	}
+
+	args = append(args, []string{
+		"--",
+		"go",
+		"test",
+		filepath.FromSlash("./api/internal/e2e"),
+		"-v",
+		"-e2e=true",
+	}...)
+
+	if localOnly {
+		args = append(args, []string{
+			"-shared-postgres=true",
+		}...)
+	}
+
+	tester := exec.Command("doppler", args...)
 
 	tester.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 

@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 }
 
 func executeTests(m *testing.M) int {
-	_sharedDB, _sharedDBCleanup = dbtest.NewConn("dbc-test", false)
+	_sharedDB, _sharedDBCleanup = dbtest.NewConn("dao")
 	defer _sharedDBCleanup()
 
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())

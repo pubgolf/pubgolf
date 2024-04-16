@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 
 	color.NoColor = false
 
-	dbURL, dbCleanupFn := dbtest.NewURL("pubgolf-e2e", false)
+	dbURL, dbCleanupFn := dbtest.NewURL("pubgolf-e2e")
 
 	var err error
 	sharedTestDB, err = sql.Open("pgx", dbURL)
