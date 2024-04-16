@@ -16,6 +16,7 @@ type Querier interface {
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error)
 	AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error)
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
+	CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error)
 	DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error

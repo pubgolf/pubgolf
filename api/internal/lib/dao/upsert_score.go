@@ -8,8 +8,15 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+// AdjustmentParams indicate an adjustment to upsert alongside a score.
+type AdjustmentParams struct {
+	Label      string
+	Value      int32
+	TemplateID *models.AdjustmentTemplateID
+}
+
 // UpsertScore creates score and adjustment records for a given stage.
-func (q *Queries) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams, isVerified bool) error {
+func (q *Queries) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error {
 	defer daoSpan(&ctx)()
 
 	return q.useTx(ctx, func(ctx context.Context, q *Queries) error {
@@ -32,12 +39,23 @@ func (q *Queries) UpsertScore(ctx context.Context, playerID models.PlayerID, sta
 		}
 
 		for i, adj := range adjustments {
-			err = q.dbc.CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
-				StageID:  stageID,
-				PlayerID: playerID,
-				Label:    adj.Label,
-				Value:    adj.Value,
-			})
+			if adj.TemplateID != nil {
+				err = q.dbc.CreateAdjustmentWithTemplate(ctx, dbc.CreateAdjustmentWithTemplateParams{
+					StageID:              stageID,
+					PlayerID:             playerID,
+					Label:                adj.Label,
+					Value:                adj.Value,
+					AdjustmentTemplateID: *adj.TemplateID,
+				})
+			} else {
+				err = q.dbc.CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
+					StageID:  stageID,
+					PlayerID: playerID,
+					Label:    adj.Label,
+					Value:    adj.Value,
+				})
+			}
+
 			if err != nil {
 				return fmt.Errorf("insert adjustment number %d: %w", i+1, err)
 			}

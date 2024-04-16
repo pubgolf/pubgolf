@@ -9,6 +9,10 @@ ON CONFLICT (stage_id, player_id)
 INSERT INTO adjustments(stage_id, player_id, label, value)
   VALUES ($1, $2, $3, $4);
 
+-- name: CreateAdjustmentWithTemplate :exec
+INSERT INTO adjustments(stage_id, player_id, label, value, adjustment_template_id)
+  VALUES ($1, $2, $3, $4, $5);
+
 -- name: ScoreByPlayerStage :one
 SELECT
   id,

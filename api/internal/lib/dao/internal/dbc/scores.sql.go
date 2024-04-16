@@ -88,6 +88,30 @@ func (q *Queries) CreateAdjustment(ctx context.Context, arg CreateAdjustmentPara
 	return err
 }
 
+const createAdjustmentWithTemplate = `-- name: CreateAdjustmentWithTemplate :exec
+INSERT INTO adjustments(stage_id, player_id, label, value, adjustment_template_id)
+  VALUES ($1, $2, $3, $4, $5)
+`
+
+type CreateAdjustmentWithTemplateParams struct {
+	StageID              models.StageID
+	PlayerID             models.PlayerID
+	Label                string
+	Value                int32
+	AdjustmentTemplateID models.AdjustmentTemplateID
+}
+
+func (q *Queries) CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error {
+	_, err := q.exec(ctx, q.createAdjustmentWithTemplateStmt, createAdjustmentWithTemplate,
+		arg.StageID,
+		arg.PlayerID,
+		arg.Label,
+		arg.Value,
+		arg.AdjustmentTemplateID,
+	)
+	return err
+}
+
 const deleteAdjustment = `-- name: DeleteAdjustment :exec
 DELETE FROM adjustments
 WHERE id = $1

@@ -62,7 +62,7 @@ type QueryProvider interface {
 	// UpsertRegistration creates a new player and adds them to the given event.
 	UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error
 	// UpsertScore creates score and adjustment records for a given stage.
-	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams, isVerified bool) error
+	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
 	// VerifyPhoneNumber sets the player's phone number as verified, returning a boolean to indicate whether the phone number was previously unverified (i.e. false means the DB row was not updated).

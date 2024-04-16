@@ -124,6 +124,24 @@ func (_m *MockQuerier) CreateAdjustment(ctx context.Context, arg CreateAdjustmen
 	return r0
 }
 
+// CreateAdjustmentWithTemplate provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAdjustmentWithTemplate")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, CreateAdjustmentWithTemplateParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreatePlayer provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error) {
 	ret := _m.Called(ctx, arg)

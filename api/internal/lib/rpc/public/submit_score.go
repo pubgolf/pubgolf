@@ -32,6 +32,11 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("lookup stage ID: %w", err))
 	}
 
+	tpls, err := s.getAdjustmentTemplates(ctx, eventID, stageID)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch adjustment templates: %w", err))
+	}
+
 	// TODO: Block scores for non-current stages.
 
 	score, activeAdjIDs, err := forms.ParseSubmitScoreForm(req.Msg.GetData().GetValues())
@@ -39,12 +44,18 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse score form: %w", err))
 	}
 
-	var adjP []models.AdjustmentParams
+	var adjP []dao.AdjustmentParams
+
 	for _, id := range activeAdjIDs {
-		// TODO: Resolve against adjustment templates to determine actual labels and values.
-		adjP = append(adjP, models.AdjustmentParams{
-			Label: id,
-			Value: 0,
+		tpl, ok := tpls[id]
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown adjustment ID %q: %w", id.String(), forms.ErrInvalidOptionID))
+		}
+
+		adjP = append(adjP, dao.AdjustmentParams{
+			Label:      tpl.Label,
+			Value:      tpl.Value,
+			TemplateID: &tpl.ID,
 		})
 	}
 
@@ -62,4 +73,28 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 	return connect.NewResponse(&apiv1.SubmitScoreResponse{
 		Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_NON_EDITABLE,
 	}), nil
+}
+
+func (s *Server) getAdjustmentTemplates(ctx context.Context, eventID models.EventID, stageID models.StageID) (map[models.AdjustmentTemplateID]models.AdjustmentTemplate, error) {
+	allAdjs := make(map[models.AdjustmentTemplateID]models.AdjustmentTemplate)
+
+	venAdjs, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
+	if err != nil {
+		return nil, fmt.Errorf("fetch venue adjustment templates: %w", err)
+	}
+
+	for _, a := range venAdjs {
+		allAdjs[a.ID] = a
+	}
+
+	stdAdjs, err := s.dao.AdjustmentTemplatesByEventID(ctx, eventID)
+	if err != nil {
+		return nil, fmt.Errorf("fetch event adjustment templates: %w", err)
+	}
+
+	for _, a := range stdAdjs {
+		allAdjs[a.ID] = a
+	}
+
+	return allAdjs, nil
 }

@@ -724,7 +724,7 @@ func (_m *MockQueryProvider) UpsertRegistration(ctx context.Context, playerID mo
 }
 
 // UpsertScore provides a mock function with given fields: ctx, playerID, stageID, score, adjustments, isVerified
-func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []models.AdjustmentParams, isVerified bool) error {
+func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error {
 	ret := _m.Called(ctx, playerID, stageID, score, adjustments, isVerified)
 
 	if len(ret) == 0 {
@@ -732,7 +732,7 @@ func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.Pl
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []models.AdjustmentParams, bool) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []AdjustmentParams, bool) error); ok {
 		r0 = rf(ctx, playerID, stageID, score, adjustments, isVerified)
 	} else {
 		r0 = ret.Error(0)

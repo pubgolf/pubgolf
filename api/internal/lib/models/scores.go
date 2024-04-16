@@ -29,9 +29,3 @@ type Adjustment struct {
 	Value      int32
 	TemplateID AdjustmentTemplateID
 }
-
-// AdjustmentParams contains writable information about a bonus or penalty.
-type AdjustmentParams struct {
-	Label string
-	Value int32
-}

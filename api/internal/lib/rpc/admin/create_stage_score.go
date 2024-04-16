@@ -26,9 +26,9 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse stageID as ULID: %w", err))
 	}
 
-	var adjP []models.AdjustmentParams
+	var adjP []dao.AdjustmentParams
 	for _, adj := range reqData.GetAdjustments() {
-		adjP = append(adjP, models.AdjustmentParams{
+		adjP = append(adjP, dao.AdjustmentParams{
 			Label: adj.GetLabel(),
 			Value: adj.GetValue(),
 		})

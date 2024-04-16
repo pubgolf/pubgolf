@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
@@ -22,10 +23,10 @@ func (s *Server) UpdateStageScore(ctx context.Context, req *connect.Request[apiv
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse stageID as ULID: %w", err))
 	}
 
-	var newAdj []models.AdjustmentParams
+	var newAdj []dao.AdjustmentParams
 
 	for _, adj := range req.Msg.GetScore().GetAdjustments() {
-		newAdj = append(newAdj, models.AdjustmentParams{
+		newAdj = append(newAdj, dao.AdjustmentParams{
 			Label: adj.GetData().GetLabel(),
 			Value: adj.GetData().GetValue(),
 		})
