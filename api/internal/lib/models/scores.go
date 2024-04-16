@@ -17,9 +17,11 @@ type Score struct {
 
 // AdjustmentTemplate is a "standard" penalty or bonus.
 type AdjustmentTemplate struct {
-	ID    AdjustmentTemplateID
-	Label string
-	Value int32
+	ID            AdjustmentTemplateID
+	Label         string
+	Value         int32
+	VenueSpecific bool
+	Active        bool
 }
 
 // Adjustment models a bonus or penalty applied to a stage.

@@ -74,7 +74,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		}
 	}
 
-	adjs := make([]forms.AdjustmentTemplate, 0, len(venAdjs)+len(stdAdjs))
+	adjs := make([]models.AdjustmentTemplate, 0, len(venAdjs)+len(stdAdjs))
 
 	for _, a := range venAdjs {
 		active := false
@@ -82,7 +82,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 			active = true
 		}
 
-		adjs = append(adjs, forms.AdjustmentTemplate{
+		adjs = append(adjs, models.AdjustmentTemplate{
 			ID:            a.ID,
 			Label:         a.Label,
 			Value:         a.Value,
@@ -97,7 +97,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 			active = true
 		}
 
-		adjs = append(adjs, forms.AdjustmentTemplate{
+		adjs = append(adjs, models.AdjustmentTemplate{
 			ID:            a.ID,
 			Label:         a.Label,
 			Value:         a.Value,

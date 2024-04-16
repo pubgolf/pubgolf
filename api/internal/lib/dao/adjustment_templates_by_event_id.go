@@ -25,9 +25,10 @@ func (q *Queries) AdjustmentTemplatesByEventID(ctx context.Context, eventID mode
 	var ats []models.AdjustmentTemplate
 	for _, at := range adATs {
 		ats = append(ats, models.AdjustmentTemplate{
-			ID:    at.ID,
-			Label: at.Label,
-			Value: at.Value,
+			ID:            at.ID,
+			Label:         at.Label,
+			Value:         at.Value,
+			VenueSpecific: false,
 		})
 	}
 

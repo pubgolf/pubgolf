@@ -19,17 +19,8 @@ const (
 	SubmitScoreSipsMax = 10
 )
 
-// TODO: move to models package.
-type AdjustmentTemplate struct {
-	ID            models.AdjustmentTemplateID
-	Label         string
-	Value         int32
-	VenueSpecific bool
-	Active        bool
-}
-
 // GenerateSubmitScoreForm creates a player-facing score submission form. Pass in a non-zero score to indicate this is a re-submission/edit form.
-func GenerateSubmitScoreForm(score uint32, adj []AdjustmentTemplate) *apiv1.Form {
+func GenerateSubmitScoreForm(score uint32, adj []models.AdjustmentTemplate) *apiv1.Form {
 	var defaultScore *int64
 	formTitle := "Submit Your Score"
 	formAction := "Submit"
@@ -78,7 +69,7 @@ func GenerateSubmitScoreForm(score uint32, adj []AdjustmentTemplate) *apiv1.Form
 }
 
 // groupAdjustmentTemplates segments adjustment templates into lists of venue-specific and standard adjustments without changing the order.
-func groupAdjustmentTemplates(adj []AdjustmentTemplate) ([]*apiv1.SelectManyInputOption, []*apiv1.SelectManyInputOption) {
+func groupAdjustmentTemplates(adj []models.AdjustmentTemplate) ([]*apiv1.SelectManyInputOption, []*apiv1.SelectManyInputOption) {
 	venueAdj := make([]*apiv1.SelectManyInputOption, 0, len(adj))
 	standardAdj := make([]*apiv1.SelectManyInputOption, 0, len(adj))
 
