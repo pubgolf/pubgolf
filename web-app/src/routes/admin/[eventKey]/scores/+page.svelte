@@ -5,8 +5,8 @@
 	import RefreshHeader from '$lib/components/dashboards/RefreshHeader.svelte';
 	import NewScoreForm from '$lib/components/modals/ScoreForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
+	import { formatPlayerName as playerNameWithLeague } from '$lib/helpers/formatters';
 	import { combineIds, separateIds } from '$lib/helpers/scores';
-	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
 	import type { Stage, StageScore } from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
@@ -63,10 +63,11 @@
 
 	function getPlayerName(id: string) {
 		const player = players.find((x) => x.id === id);
-		const cat = player?.data?.scoringCategory
-			? scoringCategoryToDisplayName[player.data?.scoringCategory]
-			: 'None';
-		return `${player?.data?.name} (${cat})`;
+		if (!player) {
+			return '[Unknown Player]';
+		}
+
+		return playerNameWithLeague(player, $page.params.eventKey);
 	}
 
 	async function deleteScore(score: StageScore) {
@@ -99,6 +100,7 @@
 
 	async function showNewScoreModal() {
 		const props: Omit<ComponentProps<NewScoreForm>, 'parent'> = {
+			eventKey: $page.params.eventKey,
 			players: await players,
 			stages: await stages,
 			onSubmit: async (data) => {
@@ -129,6 +131,7 @@
 		const props: Omit<ComponentProps<NewScoreForm>, 'parent'> = {
 			title: 'Edit Score',
 			ctaText: 'Save',
+			eventKey: $page.params.eventKey,
 			players: await players,
 			stages: await stages,
 			score: separateIds(score),

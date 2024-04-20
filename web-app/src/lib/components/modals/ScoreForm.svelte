@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { formatListAnd } from '$lib/helpers/formatters';
+	import { formatListAnd, formatPlayerName } from '$lib/helpers/formatters';
 	import type { StageScoreIds, Strict } from '$lib/helpers/scores';
-	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
 	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import type { PlainMessage } from '@bufbuild/protobuf';
@@ -17,6 +16,7 @@
 	export let parent: ComponentProps<Modal>;
 	export let title = 'Enter a Score';
 	export let ctaText = 'Create Score';
+	export let eventKey: string;
 	export let players: Player[];
 	export let stages: Stage[];
 	export let score: {
@@ -248,11 +248,7 @@
 				<span>Player</span>
 				<select class="select" required disabled={editMode} bind:value={formData.playerId}>
 					{#each players as player}
-						<option value={player.id}
-							>{player.data?.name} ({player.data?.scoringCategory
-								? scoringCategoryToDisplayName[player.data?.scoringCategory]
-								: 'Not Set'})</option
-						>
+						<option value={player.id}>{formatPlayerName(player, eventKey)}</option>
 					{/each}
 				</select>
 			</label>
