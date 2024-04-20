@@ -54,11 +54,11 @@ func GenerateSubmitScoreForm(score uint32, adj []models.AdjustmentTemplate) *api
 	venueAdj, standardAdj := groupAdjustmentTemplates(adj)
 
 	if len(venueAdj) > 0 {
-		groups = append(groups, makeAdjustmentGroup("", venueAdj))
+		groups = append(groups, makeAdjustmentGroup("", SubmitScoreInputIDVenueAdj, venueAdj))
 	}
 
 	if len(standardAdj) > 0 {
-		groups = append(groups, makeAdjustmentGroup("Did you commit any party fouls?", standardAdj))
+		groups = append(groups, makeAdjustmentGroup("Did you commit any party fouls?", SubmitScoreInputIDStandardAdj, standardAdj))
 	}
 
 	return &apiv1.Form{
@@ -93,7 +93,7 @@ func groupAdjustmentTemplates(adj []models.AdjustmentTemplate) ([]*apiv1.SelectM
 }
 
 // makeAdjustmentGroup creates a set of checkboxes for the given adjustment templates.
-func makeAdjustmentGroup(label string, adj []*apiv1.SelectManyInputOption) *apiv1.FormGroup {
+func makeAdjustmentGroup(label, id string, adj []*apiv1.SelectManyInputOption) *apiv1.FormGroup {
 	if len(adj) < 1 {
 		return nil
 	}
@@ -107,7 +107,7 @@ func makeAdjustmentGroup(label string, adj []*apiv1.SelectManyInputOption) *apiv
 		Label: l,
 		Inputs: []*apiv1.FormInput{
 			{
-				Id: SubmitScoreInputIDStandardAdj,
+				Id: id,
 				Variant: &apiv1.FormInput_SelectMany{
 					SelectMany: &apiv1.SelectManyInput{
 						Variant: apiv1.SelectManyInputVariant_SELECT_MANY_INPUT_VARIANT_CHECKBOX,
