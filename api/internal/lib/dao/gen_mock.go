@@ -106,6 +106,34 @@ func (_m *MockQueryProvider) AdjustmentsByPlayerStage(ctx context.Context, playe
 	return r0, r1
 }
 
+// CreateAdjustmentTemplate provides a mock function with given fields: ctx, eventID, t
+func (_m *MockQueryProvider) CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error) {
+	ret := _m.Called(ctx, eventID, t)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAdjustmentTemplate")
+	}
+
+	var r0 models.AdjustmentTemplateID
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)); ok {
+		return rf(ctx, eventID, t)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.AdjustmentTemplateConfig) models.AdjustmentTemplateID); ok {
+		r0 = rf(ctx, eventID, t)
+	} else {
+		r0 = ret.Get(0).(models.AdjustmentTemplateID)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.AdjustmentTemplateConfig) error); ok {
+		r1 = rf(ctx, eventID, t)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreatePlayer provides a mock function with given fields: ctx, name, phoneNum
 func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error) {
 	ret := _m.Called(ctx, name, phoneNum)
@@ -150,6 +178,36 @@ func (_m *MockQueryProvider) DeleteScore(ctx context.Context, playerID models.Pl
 	}
 
 	return r0
+}
+
+// EventAdjustmentTemplates provides a mock function with given fields: ctx, eventID
+func (_m *MockQueryProvider) EventAdjustmentTemplates(ctx context.Context, eventID models.EventID) ([]models.AdjustmentTemplateConfig, error) {
+	ret := _m.Called(ctx, eventID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EventAdjustmentTemplates")
+	}
+
+	var r0 []models.AdjustmentTemplateConfig
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]models.AdjustmentTemplateConfig, error)); ok {
+		return rf(ctx, eventID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.AdjustmentTemplateConfig); ok {
+		r0 = rf(ctx, eventID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.AdjustmentTemplateConfig)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
+		r1 = rf(ctx, eventID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // EventIDByKey provides a mock function with given fields: ctx, key
@@ -647,6 +705,24 @@ func (_m *MockQueryProvider) StageIDByVenueKey(ctx context.Context, eventID mode
 	}
 
 	return r0, r1
+}
+
+// UpdateAdjustmentTemplate provides a mock function with given fields: ctx, eventID, t
+func (_m *MockQueryProvider) UpdateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) error {
+	ret := _m.Called(ctx, eventID, t)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAdjustmentTemplate")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.AdjustmentTemplateConfig) error); ok {
+		r0 = rf(ctx, eventID, t)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // UpdatePlayer provides a mock function with given fields: ctx, playerID, player

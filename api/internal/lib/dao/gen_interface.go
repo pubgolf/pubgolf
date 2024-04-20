@@ -17,10 +17,14 @@ type QueryProvider interface {
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error)
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
+	// CreateAdjustmentTemplate sets the properties for a new adjustment template. If the StageID is not set, the provided eventID will be linked to make the adjustment template apply to all stages.
+	CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)
 	// CreatePlayer creates a new player.
 	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
 	// DeleteScore creates score and adjustment records for a given stage.
 	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
+	// EventAdjustmentTemplates returns all adjustment templates for a given event, not to be confused with AdjustmentTemplatesByEventID, which only returns multi-venue templates.
+	EventAdjustmentTemplates(ctx context.Context, eventID models.EventID) ([]models.AdjustmentTemplateConfig, error)
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
 	// EventPlayers returns all players registered for a given event, in alphabetical order by name. The player's event registrations will only include the specified event.
@@ -55,6 +59,8 @@ type QueryProvider interface {
 	ScoringCriteria(ctx context.Context, eventID models.EventID, category models.ScoringCategory) ([]models.ScoringInput, error)
 	// StageIDByVenueKey looks up the stage ID given the client-facing version of the identifier (the venueKey).
 	StageIDByVenueKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.StageID, error)
+	// UpdateAdjustmentTemplate sets the properties of an adjustment template. If the StageID is not set, the provided eventID will be linked to make the adjustment template apply to all stages.
+	UpdateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) error
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
 	// UpsertRegistration creates a new player and adds them to the given event.

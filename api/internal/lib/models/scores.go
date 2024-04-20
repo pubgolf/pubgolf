@@ -15,6 +15,16 @@ type Score struct {
 	IsVerified bool
 }
 
+// AdjustmentTemplateConfig is used for managing adjustment templates.
+type AdjustmentTemplateConfig struct {
+	ID        AdjustmentTemplateID
+	Label     string
+	Value     int32
+	StageID   StageID
+	Rank      int32
+	IsVisible bool
+}
+
 // AdjustmentTemplate is a "standard" penalty or bonus.
 type AdjustmentTemplate struct {
 	ID            AdjustmentTemplateID

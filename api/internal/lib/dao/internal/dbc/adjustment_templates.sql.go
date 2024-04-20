@@ -7,6 +7,7 @@ package dbc
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -95,4 +96,135 @@ func (q *Queries) AdjustmentTemplatesByStageID(ctx context.Context, stageID mode
 		return nil, err
 	}
 	return items, nil
+}
+
+const createAdjustmentTemplate = `-- name: CreateAdjustmentTemplate :one
+INSERT INTO adjustment_templates(label, value, rank, stage_id, event_id, deleted_at)
+  VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING
+  id
+`
+
+type CreateAdjustmentTemplateParams struct {
+	Label     string
+	Value     int32
+	Rank      int32
+	StageID   models.StageID
+	EventID   models.EventID
+	DeletedAt sql.NullTime
+}
+
+func (q *Queries) CreateAdjustmentTemplate(ctx context.Context, arg CreateAdjustmentTemplateParams) (models.AdjustmentTemplateID, error) {
+	row := q.queryRow(ctx, q.createAdjustmentTemplateStmt, createAdjustmentTemplate,
+		arg.Label,
+		arg.Value,
+		arg.Rank,
+		arg.StageID,
+		arg.EventID,
+		arg.DeletedAt,
+	)
+	var id models.AdjustmentTemplateID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const eventAdjustmentTemplates = `-- name: EventAdjustmentTemplates :many
+SELECT
+  at.id,
+  at.value,
+  at.label,
+  at.rank,
+  at.stage_id,
+  CASE WHEN at.deleted_at IS NULL THEN
+    TRUE
+  ELSE
+    FALSE
+  END AS is_visible
+FROM
+  adjustment_templates at
+  LEFT JOIN stages s ON at.stage_id = s.id
+WHERE
+  -- Don't check ` + "`" + `at.deleted_at IS NULL` + "`" + ` to include soft-deleted templates.
+((at.event_id = $1)
+    OR (s.deleted_at IS NULL
+      AND s.event_id = $1))
+ORDER BY
+  s.rank ASC,
+  at.rank ASC
+`
+
+type EventAdjustmentTemplatesRow struct {
+	ID        models.AdjustmentTemplateID
+	Value     int32
+	Label     string
+	Rank      int32
+	StageID   models.StageID
+	IsVisible bool
+}
+
+func (q *Queries) EventAdjustmentTemplates(ctx context.Context, eventID models.EventID) ([]EventAdjustmentTemplatesRow, error) {
+	rows, err := q.query(ctx, q.eventAdjustmentTemplatesStmt, eventAdjustmentTemplates, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []EventAdjustmentTemplatesRow
+	for rows.Next() {
+		var i EventAdjustmentTemplatesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Value,
+			&i.Label,
+			&i.Rank,
+			&i.StageID,
+			&i.IsVisible,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateAdjustmentTemplate = `-- name: UpdateAdjustmentTemplate :exec
+UPDATE
+  adjustment_templates
+SET
+  label = $1,
+  value = $2,
+  rank = $3,
+  stage_id = $4,
+  event_id = $5,
+  deleted_at = $6
+WHERE
+  id = $7
+`
+
+type UpdateAdjustmentTemplateParams struct {
+	Label     string
+	Value     int32
+	Rank      int32
+	StageID   models.StageID
+	EventID   models.EventID
+	DeletedAt sql.NullTime
+	ID        models.AdjustmentTemplateID
+}
+
+func (q *Queries) UpdateAdjustmentTemplate(ctx context.Context, arg UpdateAdjustmentTemplateParams) error {
+	_, err := q.exec(ctx, q.updateAdjustmentTemplateStmt, updateAdjustmentTemplate,
+		arg.Label,
+		arg.Value,
+		arg.Rank,
+		arg.StageID,
+		arg.EventID,
+		arg.DeletedAt,
+		arg.ID,
+	)
+	return err
 }
