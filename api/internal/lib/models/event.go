@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-// StageConfig
+// StageConfig allows modifying the properties of a stage.
 type StageConfig struct {
 	ID              StageID
 	VenueID         VenueID
