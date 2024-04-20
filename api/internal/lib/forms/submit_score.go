@@ -54,7 +54,7 @@ func GenerateSubmitScoreForm(score uint32, adj []models.AdjustmentTemplate) *api
 	venueAdj, standardAdj := groupAdjustmentTemplates(adj)
 
 	if len(venueAdj) > 0 {
-		groups = append(groups, makeAdjustmentGroup("", SubmitScoreInputIDVenueAdj, venueAdj))
+		groups = append(groups, makeAdjustmentGroup("Venue-Specific Events", SubmitScoreInputIDVenueAdj, venueAdj))
 	}
 
 	if len(standardAdj) > 0 {
