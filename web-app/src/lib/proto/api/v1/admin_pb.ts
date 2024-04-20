@@ -10,6 +10,32 @@ import { Message, proto3 } from "@bufbuild/protobuf";
 import { EventRegistration, Player, PlayerData, Venue } from "./shared_pb.js";
 
 /**
+ * @generated from enum api.v1.StageScoreVerifiedFilter
+ */
+export enum StageScoreVerifiedFilter {
+  /**
+   * @generated from enum value: STAGE_SCORE_VERIFIED_FILTER_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: STAGE_SCORE_VERIFIED_FILTER_ALL = 1;
+   */
+  ALL = 1,
+
+  /**
+   * @generated from enum value: STAGE_SCORE_VERIFIED_FILTER_ONLY_UNVERIFIED = 2;
+   */
+  ONLY_UNVERIFIED = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(StageScoreVerifiedFilter)
+proto3.util.setEnumType(StageScoreVerifiedFilter, "api.v1.StageScoreVerifiedFilter", [
+  { no: 0, name: "STAGE_SCORE_VERIFIED_FILTER_UNSPECIFIED" },
+  { no: 1, name: "STAGE_SCORE_VERIFIED_FILTER_ALL" },
+  { no: 2, name: "STAGE_SCORE_VERIFIED_FILTER_ONLY_UNVERIFIED" },
+]);
+
+/**
  * @generated from message api.v1.AdminServiceCreatePlayerRequest
  */
 export class AdminServiceCreatePlayerRequest extends Message<AdminServiceCreatePlayerRequest> {
@@ -618,6 +644,11 @@ export class StageScore extends Message<StageScore> {
    */
   adjustments: Adjustment[] = [];
 
+  /**
+   * @generated from field: bool is_verified = 5;
+   */
+  isVerified = false;
+
   constructor(data?: PartialMessage<StageScore>) {
     super();
     proto3.util.initPartial(data, this);
@@ -630,6 +661,7 @@ export class StageScore extends Message<StageScore> {
     { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "score", kind: "message", T: Score },
     { no: 4, name: "adjustments", kind: "message", T: Adjustment, repeated: true },
+    { no: 5, name: "is_verified", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StageScore {
@@ -867,6 +899,13 @@ export class ListStageScoresRequest extends Message<ListStageScoresRequest> {
    */
   eventKey = "";
 
+  /**
+   * Default is STAGE_SCORE_VERIFIED_FILTER_ALL.
+   *
+   * @generated from field: optional api.v1.StageScoreVerifiedFilter verified_filter = 2;
+   */
+  verifiedFilter?: StageScoreVerifiedFilter;
+
   constructor(data?: PartialMessage<ListStageScoresRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -876,6 +915,7 @@ export class ListStageScoresRequest extends Message<ListStageScoresRequest> {
   static readonly typeName = "api.v1.ListStageScoresRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "verified_filter", kind: "enum", T: proto3.getEnumType(StageScoreVerifiedFilter), opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListStageScoresRequest {

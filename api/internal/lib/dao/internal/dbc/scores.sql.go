@@ -226,12 +226,19 @@ FROM
   JOIN stages st ON s.stage_id = st.id
 WHERE
   s.deleted_at IS NULL
+  AND (s.is_verified = FALSE
+    OR s.is_verified = $2)
   AND st.deleted_at IS NULL
   AND st.event_id = $1
 ORDER BY
   st.rank ASC,
   s.created_at ASC
 `
+
+type EventScoresParams struct {
+	EventID         models.EventID
+	IncludeVerified bool
+}
 
 type EventScoresRow struct {
 	StageID    models.StageID
@@ -241,8 +248,8 @@ type EventScoresRow struct {
 	IsVerified bool
 }
 
-func (q *Queries) EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error) {
-	rows, err := q.query(ctx, q.eventScoresStmt, eventScores, eventID)
+func (q *Queries) EventScores(ctx context.Context, arg EventScoresParams) ([]EventScoresRow, error) {
+	rows, err := q.query(ctx, q.eventScoresStmt, eventScores, arg.EventID, arg.IncludeVerified)
 	if err != nil {
 		return nil, err
 	}

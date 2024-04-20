@@ -28,7 +28,7 @@ type Querier interface {
 	EventPlayers(ctx context.Context, eventKey string) ([]EventPlayersRow, error)
 	EventSchedule(ctx context.Context, eventID models.EventID) ([]EventScheduleRow, error)
 	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]EventScheduleWithDetailsRow, error)
-	EventScores(ctx context.Context, eventID models.EventID) ([]EventScoresRow, error)
+	EventScores(ctx context.Context, arg EventScoresParams) ([]EventScoresRow, error)
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error)
 	GenerateAuthToken(ctx context.Context, phoneNumber models.PhoneNum) (GenerateAuthTokenRow, error)

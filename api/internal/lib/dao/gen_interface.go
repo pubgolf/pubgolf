@@ -32,7 +32,7 @@ type QueryProvider interface {
 	// EventScheduleWithDetails returns the event schedule with venue and rule details included.
 	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]models.Stage, error)
 	// EventScores returns all the scores (and their adjustments) for an event, ordered by stage and then by creation time.
-	EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error)
+	EventScores(ctx context.Context, eventID models.EventID, includeVerified bool) ([]models.StageScore, error)
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// GenerateAuthToken generates an auth token for the player with the given phone number, returning the auth token and the player's ID.

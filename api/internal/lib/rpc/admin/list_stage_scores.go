@@ -22,12 +22,17 @@ func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("lookup event key: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup event key: %w", err))
 	}
 
-	dbStageScores, err := s.dao.EventScores(ctx, eventID)
+	includeVerified := true
+	if req.Msg.GetVerifiedFilter() == apiv1.StageScoreVerifiedFilter_STAGE_SCORE_VERIFIED_FILTER_ONLY_UNVERIFIED {
+		includeVerified = false
+	}
+
+	dbStageScores, err := s.dao.EventScores(ctx, eventID, includeVerified)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get scores from DB: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get scores from DB: %w", err))
 	}
 
 	var stageScores []*apiv1.StageScore
@@ -45,8 +50,9 @@ func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1
 		}
 
 		stageScores = append(stageScores, &apiv1.StageScore{
-			StageId:  s.StageID.String(),
-			PlayerId: s.PlayerID.String(),
+			StageId:    s.StageID.String(),
+			PlayerId:   s.PlayerID.String(),
+			IsVerified: s.Score.IsVerified,
 			Score: &apiv1.Score{
 				Id: s.Score.ID.String(),
 				Data: &apiv1.ScoreData{

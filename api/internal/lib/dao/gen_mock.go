@@ -305,9 +305,9 @@ func (_m *MockQueryProvider) EventScheduleWithDetails(ctx context.Context, event
 	return r0, r1
 }
 
-// EventScores provides a mock function with given fields: ctx, eventID
-func (_m *MockQueryProvider) EventScores(ctx context.Context, eventID models.EventID) ([]models.StageScore, error) {
-	ret := _m.Called(ctx, eventID)
+// EventScores provides a mock function with given fields: ctx, eventID, includeVerified
+func (_m *MockQueryProvider) EventScores(ctx context.Context, eventID models.EventID, includeVerified bool) ([]models.StageScore, error) {
+	ret := _m.Called(ctx, eventID, includeVerified)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EventScores")
@@ -315,19 +315,19 @@ func (_m *MockQueryProvider) EventScores(ctx context.Context, eventID models.Eve
 
 	var r0 []models.StageScore
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]models.StageScore, error)); ok {
-		return rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, bool) ([]models.StageScore, error)); ok {
+		return rf(ctx, eventID, includeVerified)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.StageScore); ok {
-		r0 = rf(ctx, eventID)
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, bool) []models.StageScore); ok {
+		r0 = rf(ctx, eventID, includeVerified)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]models.StageScore)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, bool) error); ok {
+		r1 = rf(ctx, eventID, includeVerified)
 	} else {
 		r1 = ret.Error(1)
 	}

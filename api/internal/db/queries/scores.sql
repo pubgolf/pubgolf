@@ -50,6 +50,8 @@ FROM
   JOIN stages st ON s.stage_id = st.id
 WHERE
   s.deleted_at IS NULL
+  AND (s.is_verified = FALSE
+    OR s.is_verified = @include_verified)
   AND st.deleted_at IS NULL
   AND st.event_id = $1
 ORDER BY
