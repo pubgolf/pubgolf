@@ -2,61 +2,29 @@ package admin
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // ListPlayers returns a list of players registered for the given event in alphabetical order by name.
 func (s *Server) ListPlayers(ctx context.Context, req *connect.Request[apiv1.ListPlayersRequest]) (*connect.Response[apiv1.ListPlayersResponse], error) {
-	eventKey := req.Msg.GetEventKey()
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", eventKey)
-
-	_, err := s.dao.EventIDByKey(ctx, eventKey)
+	dbPlayers, err := s.dao.EventPlayers(ctx, req.Msg.GetEventKey())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("event %q not found: %w", eventKey, err))
-		}
-
-		return nil, connect.NewError(connect.CodeUnknown, err)
-	}
-
-	dbPlayers, err := s.dao.EventPlayers(ctx, eventKey)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch event players: %w", err))
 	}
 
 	players := make([]*apiv1.Player, 0, len(dbPlayers))
 
 	for _, p := range dbPlayers {
-		regs := make([]*apiv1.EventRegistration, 0, len(p.Events))
-
-		for _, e := range p.Events {
-			cat, err := e.ScoringCategory.ProtoEnum()
-			if err != nil {
-				return nil, connect.NewError(connect.CodeUnknown, err)
-			}
-
-			regs = append(regs, &apiv1.EventRegistration{
-				EventKey:        req.Msg.GetEventKey(),
-				ScoringCategory: cat,
-			})
+		pp, err := p.Proto()
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
 		}
 
-		player := apiv1.Player{
-			Id: p.ID.String(),
-			Data: &apiv1.PlayerData{
-				Name: p.Name,
-			},
-			Events: regs,
-		}
-
-		players = append(players, &player)
+		players = append(players, pp)
 	}
 
 	return connect.NewResponse(&apiv1.ListPlayersResponse{
