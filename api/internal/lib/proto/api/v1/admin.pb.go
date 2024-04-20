@@ -607,6 +607,404 @@ func (x *ListEventStagesResponse) GetStages() []*Stage {
 	return nil
 }
 
+type AdjustmentTemplateData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Adjustment *AdjustmentData `protobuf:"bytes,1,opt,name=adjustment,proto3" json:"adjustment,omitempty"`
+	Rank       int32           `protobuf:"varint,2,opt,name=rank,proto3" json:"rank,omitempty"`
+	EventKey   string          `protobuf:"bytes,3,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+	StageId    *string         `protobuf:"bytes,4,opt,name=stage_id,json=stageId,proto3,oneof" json:"stage_id,omitempty"`
+	IsVisible  bool            `protobuf:"varint,5,opt,name=is_visible,json=isVisible,proto3" json:"is_visible,omitempty"`
+}
+
+func (x *AdjustmentTemplateData) Reset() {
+	*x = AdjustmentTemplateData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AdjustmentTemplateData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdjustmentTemplateData) ProtoMessage() {}
+
+func (x *AdjustmentTemplateData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdjustmentTemplateData.ProtoReflect.Descriptor instead.
+func (*AdjustmentTemplateData) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AdjustmentTemplateData) GetAdjustment() *AdjustmentData {
+	if x != nil {
+		return x.Adjustment
+	}
+	return nil
+}
+
+func (x *AdjustmentTemplateData) GetRank() int32 {
+	if x != nil {
+		return x.Rank
+	}
+	return 0
+}
+
+func (x *AdjustmentTemplateData) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+func (x *AdjustmentTemplateData) GetStageId() string {
+	if x != nil && x.StageId != nil {
+		return *x.StageId
+	}
+	return ""
+}
+
+func (x *AdjustmentTemplateData) GetIsVisible() bool {
+	if x != nil {
+		return x.IsVisible
+	}
+	return false
+}
+
+type AdjustmentTemplate struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id   string                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Data *AdjustmentTemplateData `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+}
+
+func (x *AdjustmentTemplate) Reset() {
+	*x = AdjustmentTemplate{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AdjustmentTemplate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdjustmentTemplate) ProtoMessage() {}
+
+func (x *AdjustmentTemplate) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdjustmentTemplate.ProtoReflect.Descriptor instead.
+func (*AdjustmentTemplate) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AdjustmentTemplate) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AdjustmentTemplate) GetData() *AdjustmentTemplateData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type CreateAdjustmentTemplateRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Data *AdjustmentTemplateData `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+}
+
+func (x *CreateAdjustmentTemplateRequest) Reset() {
+	*x = CreateAdjustmentTemplateRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateAdjustmentTemplateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAdjustmentTemplateRequest) ProtoMessage() {}
+
+func (x *CreateAdjustmentTemplateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAdjustmentTemplateRequest.ProtoReflect.Descriptor instead.
+func (*CreateAdjustmentTemplateRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateAdjustmentTemplateRequest) GetData() *AdjustmentTemplateData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type CreateAdjustmentTemplateResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *CreateAdjustmentTemplateResponse) Reset() {
+	*x = CreateAdjustmentTemplateResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateAdjustmentTemplateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAdjustmentTemplateResponse) ProtoMessage() {}
+
+func (x *CreateAdjustmentTemplateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAdjustmentTemplateResponse.ProtoReflect.Descriptor instead.
+func (*CreateAdjustmentTemplateResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{13}
+}
+
+type UpdateAdjustmentTemplateRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Template *AdjustmentTemplate `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
+}
+
+func (x *UpdateAdjustmentTemplateRequest) Reset() {
+	*x = UpdateAdjustmentTemplateRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateAdjustmentTemplateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAdjustmentTemplateRequest) ProtoMessage() {}
+
+func (x *UpdateAdjustmentTemplateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAdjustmentTemplateRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAdjustmentTemplateRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *UpdateAdjustmentTemplateRequest) GetTemplate() *AdjustmentTemplate {
+	if x != nil {
+		return x.Template
+	}
+	return nil
+}
+
+type UpdateAdjustmentTemplateResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateAdjustmentTemplateResponse) Reset() {
+	*x = UpdateAdjustmentTemplateResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateAdjustmentTemplateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAdjustmentTemplateResponse) ProtoMessage() {}
+
+func (x *UpdateAdjustmentTemplateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAdjustmentTemplateResponse.ProtoReflect.Descriptor instead.
+func (*UpdateAdjustmentTemplateResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{15}
+}
+
+type ListAdjustmentTemplatesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EventKey string `protobuf:"bytes,1,opt,name=event_key,json=eventKey,proto3" json:"event_key,omitempty"`
+}
+
+func (x *ListAdjustmentTemplatesRequest) Reset() {
+	*x = ListAdjustmentTemplatesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListAdjustmentTemplatesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAdjustmentTemplatesRequest) ProtoMessage() {}
+
+func (x *ListAdjustmentTemplatesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAdjustmentTemplatesRequest.ProtoReflect.Descriptor instead.
+func (*ListAdjustmentTemplatesRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListAdjustmentTemplatesRequest) GetEventKey() string {
+	if x != nil {
+		return x.EventKey
+	}
+	return ""
+}
+
+type ListAdjustmentTemplatesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Templates []*AdjustmentTemplate `protobuf:"bytes,1,rep,name=templates,proto3" json:"templates,omitempty"`
+}
+
+func (x *ListAdjustmentTemplatesResponse) Reset() {
+	*x = ListAdjustmentTemplatesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_admin_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListAdjustmentTemplatesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAdjustmentTemplatesResponse) ProtoMessage() {}
+
+func (x *ListAdjustmentTemplatesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_admin_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAdjustmentTemplatesResponse.ProtoReflect.Descriptor instead.
+func (*ListAdjustmentTemplatesResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListAdjustmentTemplatesResponse) GetTemplates() []*AdjustmentTemplate {
+	if x != nil {
+		return x.Templates
+	}
+	return nil
+}
+
 type Score struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -619,7 +1017,7 @@ type Score struct {
 func (x *Score) Reset() {
 	*x = Score{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[10]
+		mi := &file_api_v1_admin_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -632,7 +1030,7 @@ func (x *Score) String() string {
 func (*Score) ProtoMessage() {}
 
 func (x *Score) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[10]
+	mi := &file_api_v1_admin_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +1043,7 @@ func (x *Score) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Score.ProtoReflect.Descriptor instead.
 func (*Score) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{10}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *Score) GetId() string {
@@ -673,7 +1071,7 @@ type ScoreData struct {
 func (x *ScoreData) Reset() {
 	*x = ScoreData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[11]
+		mi := &file_api_v1_admin_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -686,7 +1084,7 @@ func (x *ScoreData) String() string {
 func (*ScoreData) ProtoMessage() {}
 
 func (x *ScoreData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[11]
+	mi := &file_api_v1_admin_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -699,7 +1097,7 @@ func (x *ScoreData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScoreData.ProtoReflect.Descriptor instead.
 func (*ScoreData) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{11}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ScoreData) GetValue() uint32 {
@@ -721,7 +1119,7 @@ type Adjustment struct {
 func (x *Adjustment) Reset() {
 	*x = Adjustment{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[12]
+		mi := &file_api_v1_admin_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -734,7 +1132,7 @@ func (x *Adjustment) String() string {
 func (*Adjustment) ProtoMessage() {}
 
 func (x *Adjustment) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[12]
+	mi := &file_api_v1_admin_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +1145,7 @@ func (x *Adjustment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Adjustment.ProtoReflect.Descriptor instead.
 func (*Adjustment) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{12}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Adjustment) GetId() string {
@@ -776,7 +1174,7 @@ type AdjustmentData struct {
 func (x *AdjustmentData) Reset() {
 	*x = AdjustmentData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[13]
+		mi := &file_api_v1_admin_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -789,7 +1187,7 @@ func (x *AdjustmentData) String() string {
 func (*AdjustmentData) ProtoMessage() {}
 
 func (x *AdjustmentData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[13]
+	mi := &file_api_v1_admin_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -802,7 +1200,7 @@ func (x *AdjustmentData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdjustmentData.ProtoReflect.Descriptor instead.
 func (*AdjustmentData) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{13}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *AdjustmentData) GetValue() int32 {
@@ -834,7 +1232,7 @@ type StageScore struct {
 func (x *StageScore) Reset() {
 	*x = StageScore{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[14]
+		mi := &file_api_v1_admin_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -847,7 +1245,7 @@ func (x *StageScore) String() string {
 func (*StageScore) ProtoMessage() {}
 
 func (x *StageScore) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[14]
+	mi := &file_api_v1_admin_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -860,7 +1258,7 @@ func (x *StageScore) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StageScore.ProtoReflect.Descriptor instead.
 func (*StageScore) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{14}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *StageScore) GetStageId() string {
@@ -912,7 +1310,7 @@ type StageScoreData struct {
 func (x *StageScoreData) Reset() {
 	*x = StageScoreData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[15]
+		mi := &file_api_v1_admin_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -925,7 +1323,7 @@ func (x *StageScoreData) String() string {
 func (*StageScoreData) ProtoMessage() {}
 
 func (x *StageScoreData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[15]
+	mi := &file_api_v1_admin_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -938,7 +1336,7 @@ func (x *StageScoreData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StageScoreData.ProtoReflect.Descriptor instead.
 func (*StageScoreData) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{15}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *StageScoreData) GetStageId() string {
@@ -981,7 +1379,7 @@ type CreateStageScoreRequest struct {
 func (x *CreateStageScoreRequest) Reset() {
 	*x = CreateStageScoreRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[16]
+		mi := &file_api_v1_admin_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -994,7 +1392,7 @@ func (x *CreateStageScoreRequest) String() string {
 func (*CreateStageScoreRequest) ProtoMessage() {}
 
 func (x *CreateStageScoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[16]
+	mi := &file_api_v1_admin_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1007,7 +1405,7 @@ func (x *CreateStageScoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateStageScoreRequest.ProtoReflect.Descriptor instead.
 func (*CreateStageScoreRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{16}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CreateStageScoreRequest) GetData() *StageScoreData {
@@ -1035,7 +1433,7 @@ type CreateStageScoreResponse struct {
 func (x *CreateStageScoreResponse) Reset() {
 	*x = CreateStageScoreResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[17]
+		mi := &file_api_v1_admin_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1048,7 +1446,7 @@ func (x *CreateStageScoreResponse) String() string {
 func (*CreateStageScoreResponse) ProtoMessage() {}
 
 func (x *CreateStageScoreResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[17]
+	mi := &file_api_v1_admin_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1061,7 +1459,7 @@ func (x *CreateStageScoreResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateStageScoreResponse.ProtoReflect.Descriptor instead.
 func (*CreateStageScoreResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{17}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CreateStageScoreResponse) GetScore() *StageScore {
@@ -1082,7 +1480,7 @@ type UpdateStageScoreRequest struct {
 func (x *UpdateStageScoreRequest) Reset() {
 	*x = UpdateStageScoreRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[18]
+		mi := &file_api_v1_admin_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1095,7 +1493,7 @@ func (x *UpdateStageScoreRequest) String() string {
 func (*UpdateStageScoreRequest) ProtoMessage() {}
 
 func (x *UpdateStageScoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[18]
+	mi := &file_api_v1_admin_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1108,7 +1506,7 @@ func (x *UpdateStageScoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStageScoreRequest.ProtoReflect.Descriptor instead.
 func (*UpdateStageScoreRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{18}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UpdateStageScoreRequest) GetScore() *StageScore {
@@ -1129,7 +1527,7 @@ type UpdateStageScoreResponse struct {
 func (x *UpdateStageScoreResponse) Reset() {
 	*x = UpdateStageScoreResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[19]
+		mi := &file_api_v1_admin_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1142,7 +1540,7 @@ func (x *UpdateStageScoreResponse) String() string {
 func (*UpdateStageScoreResponse) ProtoMessage() {}
 
 func (x *UpdateStageScoreResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[19]
+	mi := &file_api_v1_admin_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1155,7 +1553,7 @@ func (x *UpdateStageScoreResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStageScoreResponse.ProtoReflect.Descriptor instead.
 func (*UpdateStageScoreResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{19}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UpdateStageScoreResponse) GetScore() *StageScore {
@@ -1178,7 +1576,7 @@ type ListStageScoresRequest struct {
 func (x *ListStageScoresRequest) Reset() {
 	*x = ListStageScoresRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[20]
+		mi := &file_api_v1_admin_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1191,7 +1589,7 @@ func (x *ListStageScoresRequest) String() string {
 func (*ListStageScoresRequest) ProtoMessage() {}
 
 func (x *ListStageScoresRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[20]
+	mi := &file_api_v1_admin_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1204,7 +1602,7 @@ func (x *ListStageScoresRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStageScoresRequest.ProtoReflect.Descriptor instead.
 func (*ListStageScoresRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{20}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListStageScoresRequest) GetEventKey() string {
@@ -1232,7 +1630,7 @@ type ListStageScoresResponse struct {
 func (x *ListStageScoresResponse) Reset() {
 	*x = ListStageScoresResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[21]
+		mi := &file_api_v1_admin_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1245,7 +1643,7 @@ func (x *ListStageScoresResponse) String() string {
 func (*ListStageScoresResponse) ProtoMessage() {}
 
 func (x *ListStageScoresResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[21]
+	mi := &file_api_v1_admin_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +1656,7 @@ func (x *ListStageScoresResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStageScoresResponse.ProtoReflect.Descriptor instead.
 func (*ListStageScoresResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{21}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ListStageScoresResponse) GetScores() []*StageScore {
@@ -1280,7 +1678,7 @@ type DeleteStageScoreRequest struct {
 func (x *DeleteStageScoreRequest) Reset() {
 	*x = DeleteStageScoreRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[22]
+		mi := &file_api_v1_admin_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1293,7 +1691,7 @@ func (x *DeleteStageScoreRequest) String() string {
 func (*DeleteStageScoreRequest) ProtoMessage() {}
 
 func (x *DeleteStageScoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[22]
+	mi := &file_api_v1_admin_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1306,7 +1704,7 @@ func (x *DeleteStageScoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteStageScoreRequest.ProtoReflect.Descriptor instead.
 func (*DeleteStageScoreRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{22}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *DeleteStageScoreRequest) GetStageId() string {
@@ -1332,7 +1730,7 @@ type DeleteStageScoreResponse struct {
 func (x *DeleteStageScoreResponse) Reset() {
 	*x = DeleteStageScoreResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_admin_proto_msgTypes[23]
+		mi := &file_api_v1_admin_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1345,7 +1743,7 @@ func (x *DeleteStageScoreResponse) String() string {
 func (*DeleteStageScoreResponse) ProtoMessage() {}
 
 func (x *DeleteStageScoreResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_admin_proto_msgTypes[23]
+	mi := &file_api_v1_admin_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1358,7 +1756,7 @@ func (x *DeleteStageScoreResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteStageScoreResponse.ProtoReflect.Descriptor instead.
 func (*DeleteStageScoreResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_admin_proto_rawDescGZIP(), []int{23}
+	return file_api_v1_admin_proto_rawDescGZIP(), []int{31}
 }
 
 var File_api_v1_admin_proto protoreflect.FileDescriptor
@@ -1425,7 +1823,51 @@ var file_api_v1_admin_proto_rawDesc = []byte{
 	0x74, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a,
 	0x06, 0x73, 0x74, 0x61, 0x67, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0d, 0x2e,
 	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x74, 0x61, 0x67, 0x65, 0x52, 0x06, 0x73, 0x74,
-	0x61, 0x67, 0x65, 0x73, 0x22, 0x3e, 0x0a, 0x05, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x12, 0x0e, 0x0a,
+	0x61, 0x67, 0x65, 0x73, 0x22, 0xcd, 0x01, 0x0a, 0x16, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d,
+	0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x12,
+	0x36, 0x0a, 0x0a, 0x61, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x64, 0x6a,
+	0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x0a, 0x61, 0x64, 0x6a,
+	0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x61, 0x6e, 0x6b, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x72, 0x61, 0x6e, 0x6b, 0x12, 0x1b, 0x0a, 0x09, 0x65,
+	0x76, 0x65, 0x6e, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x65, 0x76, 0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x1e, 0x0a, 0x08, 0x73, 0x74, 0x61, 0x67,
+	0x65, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x07, 0x73, 0x74,
+	0x61, 0x67, 0x65, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x1d, 0x0a, 0x0a, 0x69, 0x73, 0x5f, 0x76,
+	0x69, 0x73, 0x69, 0x62, 0x6c, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x09, 0x69, 0x73,
+	0x56, 0x69, 0x73, 0x69, 0x62, 0x6c, 0x65, 0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x73, 0x74, 0x61, 0x67,
+	0x65, 0x5f, 0x69, 0x64, 0x22, 0x58, 0x0a, 0x12, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65,
+	0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x32, 0x0a, 0x04, 0x64, 0x61,
+	0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70,
+	0x6c, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x55,
+	0x0a, 0x1f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65,
+	0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x32, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d,
+	0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x52,
+	0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x22, 0x0a, 0x20, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41,
+	0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x59, 0x0a, 0x1f, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d,
+	0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x36, 0x0a, 0x08,
+	0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65,
+	0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x08, 0x74, 0x65, 0x6d, 0x70,
+	0x6c, 0x61, 0x74, 0x65, 0x22, 0x22, 0x0a, 0x20, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x64,
+	0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x3d, 0x0a, 0x1e, 0x4c, 0x69, 0x73, 0x74,
+	0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61,
+	0x74, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65,
+	0x76, 0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x22, 0x5b, 0x0a, 0x1f, 0x4c, 0x69, 0x73, 0x74, 0x41,
+	0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74,
+	0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x09, 0x74, 0x65,
+	0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e,
+	0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x09, 0x74, 0x65, 0x6d, 0x70, 0x6c,
+	0x61, 0x74, 0x65, 0x73, 0x22, 0x3e, 0x0a, 0x05, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x12, 0x0e, 0x0a,
 	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x25, 0x0a,
 	0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x61, 0x70,
 	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04,
@@ -1515,7 +1957,7 @@ var file_api_v1_admin_proto_rawDesc = []byte{
 	0x46, 0x49, 0x4c, 0x54, 0x45, 0x52, 0x5f, 0x41, 0x4c, 0x4c, 0x10, 0x01, 0x12, 0x2f, 0x0a, 0x2b,
 	0x53, 0x54, 0x41, 0x47, 0x45, 0x5f, 0x53, 0x43, 0x4f, 0x52, 0x45, 0x5f, 0x56, 0x45, 0x52, 0x49,
 	0x46, 0x49, 0x45, 0x44, 0x5f, 0x46, 0x49, 0x4c, 0x54, 0x45, 0x52, 0x5f, 0x4f, 0x4e, 0x4c, 0x59,
-	0x5f, 0x55, 0x4e, 0x56, 0x45, 0x52, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x02, 0x32, 0xc1, 0x05,
+	0x5f, 0x55, 0x4e, 0x56, 0x45, 0x52, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x02, 0x32, 0x91, 0x08,
 	0x0a, 0x0c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x63,
 	0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x12, 0x27,
 	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x65, 0x72,
@@ -1538,6 +1980,27 @@ var file_api_v1_admin_proto_rawDesc = []byte{
 	0x53, 0x74, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e,
 	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74,
 	0x53, 0x74, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x6f, 0x0a, 0x18, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74,
+	0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x27, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75,
+	0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54,
+	0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x12, 0x6f, 0x0a, 0x18, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73,
+	0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x27, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a,
+	0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74,
+	0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x6c, 0x0a, 0x17, 0x4c, 0x69, 0x73, 0x74, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74,
+	0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x12, 0x26, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x41, 0x64, 0x6a, 0x75, 0x73,
+	0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x41, 0x64, 0x6a, 0x75, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x65, 0x6d,
+	0x70, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
 	0x12, 0x57, 0x0a, 0x10, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x74, 0x61, 0x67, 0x65, 0x53,
 	0x63, 0x6f, 0x72, 0x65, 0x12, 0x1f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72,
 	0x65, 0x61, 0x74, 0x65, 0x53, 0x74, 0x61, 0x67, 0x65, 0x53, 0x63, 0x6f, 0x72, 0x65, 0x52, 0x65,
@@ -1580,7 +2043,7 @@ func file_api_v1_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_api_v1_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_api_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_api_v1_admin_proto_goTypes = []interface{}{
 	(StageScoreVerifiedFilter)(0),            // 0: api.v1.StageScoreVerifiedFilter
 	(*AdminServiceCreatePlayerRequest)(nil),  // 1: api.v1.AdminServiceCreatePlayerRequest
@@ -1593,69 +2056,88 @@ var file_api_v1_admin_proto_goTypes = []interface{}{
 	(*Stage)(nil),                            // 8: api.v1.Stage
 	(*ListEventStagesRequest)(nil),           // 9: api.v1.ListEventStagesRequest
 	(*ListEventStagesResponse)(nil),          // 10: api.v1.ListEventStagesResponse
-	(*Score)(nil),                            // 11: api.v1.Score
-	(*ScoreData)(nil),                        // 12: api.v1.ScoreData
-	(*Adjustment)(nil),                       // 13: api.v1.Adjustment
-	(*AdjustmentData)(nil),                   // 14: api.v1.AdjustmentData
-	(*StageScore)(nil),                       // 15: api.v1.StageScore
-	(*StageScoreData)(nil),                   // 16: api.v1.StageScoreData
-	(*CreateStageScoreRequest)(nil),          // 17: api.v1.CreateStageScoreRequest
-	(*CreateStageScoreResponse)(nil),         // 18: api.v1.CreateStageScoreResponse
-	(*UpdateStageScoreRequest)(nil),          // 19: api.v1.UpdateStageScoreRequest
-	(*UpdateStageScoreResponse)(nil),         // 20: api.v1.UpdateStageScoreResponse
-	(*ListStageScoresRequest)(nil),           // 21: api.v1.ListStageScoresRequest
-	(*ListStageScoresResponse)(nil),          // 22: api.v1.ListStageScoresResponse
-	(*DeleteStageScoreRequest)(nil),          // 23: api.v1.DeleteStageScoreRequest
-	(*DeleteStageScoreResponse)(nil),         // 24: api.v1.DeleteStageScoreResponse
-	(*PlayerData)(nil),                       // 25: api.v1.PlayerData
-	(*EventRegistration)(nil),                // 26: api.v1.EventRegistration
-	(*Player)(nil),                           // 27: api.v1.Player
-	(*Venue)(nil),                            // 28: api.v1.Venue
+	(*AdjustmentTemplateData)(nil),           // 11: api.v1.AdjustmentTemplateData
+	(*AdjustmentTemplate)(nil),               // 12: api.v1.AdjustmentTemplate
+	(*CreateAdjustmentTemplateRequest)(nil),  // 13: api.v1.CreateAdjustmentTemplateRequest
+	(*CreateAdjustmentTemplateResponse)(nil), // 14: api.v1.CreateAdjustmentTemplateResponse
+	(*UpdateAdjustmentTemplateRequest)(nil),  // 15: api.v1.UpdateAdjustmentTemplateRequest
+	(*UpdateAdjustmentTemplateResponse)(nil), // 16: api.v1.UpdateAdjustmentTemplateResponse
+	(*ListAdjustmentTemplatesRequest)(nil),   // 17: api.v1.ListAdjustmentTemplatesRequest
+	(*ListAdjustmentTemplatesResponse)(nil),  // 18: api.v1.ListAdjustmentTemplatesResponse
+	(*Score)(nil),                            // 19: api.v1.Score
+	(*ScoreData)(nil),                        // 20: api.v1.ScoreData
+	(*Adjustment)(nil),                       // 21: api.v1.Adjustment
+	(*AdjustmentData)(nil),                   // 22: api.v1.AdjustmentData
+	(*StageScore)(nil),                       // 23: api.v1.StageScore
+	(*StageScoreData)(nil),                   // 24: api.v1.StageScoreData
+	(*CreateStageScoreRequest)(nil),          // 25: api.v1.CreateStageScoreRequest
+	(*CreateStageScoreResponse)(nil),         // 26: api.v1.CreateStageScoreResponse
+	(*UpdateStageScoreRequest)(nil),          // 27: api.v1.UpdateStageScoreRequest
+	(*UpdateStageScoreResponse)(nil),         // 28: api.v1.UpdateStageScoreResponse
+	(*ListStageScoresRequest)(nil),           // 29: api.v1.ListStageScoresRequest
+	(*ListStageScoresResponse)(nil),          // 30: api.v1.ListStageScoresResponse
+	(*DeleteStageScoreRequest)(nil),          // 31: api.v1.DeleteStageScoreRequest
+	(*DeleteStageScoreResponse)(nil),         // 32: api.v1.DeleteStageScoreResponse
+	(*PlayerData)(nil),                       // 33: api.v1.PlayerData
+	(*EventRegistration)(nil),                // 34: api.v1.EventRegistration
+	(*Player)(nil),                           // 35: api.v1.Player
+	(*Venue)(nil),                            // 36: api.v1.Venue
 }
 var file_api_v1_admin_proto_depIdxs = []int32{
-	25, // 0: api.v1.AdminServiceCreatePlayerRequest.player_data:type_name -> api.v1.PlayerData
-	26, // 1: api.v1.AdminServiceCreatePlayerRequest.registration:type_name -> api.v1.EventRegistration
-	27, // 2: api.v1.AdminServiceCreatePlayerResponse.player:type_name -> api.v1.Player
-	25, // 3: api.v1.UpdatePlayerRequest.player_data:type_name -> api.v1.PlayerData
-	26, // 4: api.v1.UpdatePlayerRequest.registration:type_name -> api.v1.EventRegistration
-	27, // 5: api.v1.UpdatePlayerResponse.player:type_name -> api.v1.Player
-	27, // 6: api.v1.ListPlayersResponse.players:type_name -> api.v1.Player
-	28, // 7: api.v1.Stage.venue:type_name -> api.v1.Venue
+	33, // 0: api.v1.AdminServiceCreatePlayerRequest.player_data:type_name -> api.v1.PlayerData
+	34, // 1: api.v1.AdminServiceCreatePlayerRequest.registration:type_name -> api.v1.EventRegistration
+	35, // 2: api.v1.AdminServiceCreatePlayerResponse.player:type_name -> api.v1.Player
+	33, // 3: api.v1.UpdatePlayerRequest.player_data:type_name -> api.v1.PlayerData
+	34, // 4: api.v1.UpdatePlayerRequest.registration:type_name -> api.v1.EventRegistration
+	35, // 5: api.v1.UpdatePlayerResponse.player:type_name -> api.v1.Player
+	35, // 6: api.v1.ListPlayersResponse.players:type_name -> api.v1.Player
+	36, // 7: api.v1.Stage.venue:type_name -> api.v1.Venue
 	7,  // 8: api.v1.Stage.rule:type_name -> api.v1.Rule
 	8,  // 9: api.v1.ListEventStagesResponse.stages:type_name -> api.v1.Stage
-	12, // 10: api.v1.Score.data:type_name -> api.v1.ScoreData
-	14, // 11: api.v1.Adjustment.data:type_name -> api.v1.AdjustmentData
-	11, // 12: api.v1.StageScore.score:type_name -> api.v1.Score
-	13, // 13: api.v1.StageScore.adjustments:type_name -> api.v1.Adjustment
-	12, // 14: api.v1.StageScoreData.score:type_name -> api.v1.ScoreData
-	14, // 15: api.v1.StageScoreData.adjustments:type_name -> api.v1.AdjustmentData
-	16, // 16: api.v1.CreateStageScoreRequest.data:type_name -> api.v1.StageScoreData
-	15, // 17: api.v1.CreateStageScoreResponse.score:type_name -> api.v1.StageScore
-	15, // 18: api.v1.UpdateStageScoreRequest.score:type_name -> api.v1.StageScore
-	15, // 19: api.v1.UpdateStageScoreResponse.score:type_name -> api.v1.StageScore
-	0,  // 20: api.v1.ListStageScoresRequest.verified_filter:type_name -> api.v1.StageScoreVerifiedFilter
-	15, // 21: api.v1.ListStageScoresResponse.scores:type_name -> api.v1.StageScore
-	1,  // 22: api.v1.AdminService.CreatePlayer:input_type -> api.v1.AdminServiceCreatePlayerRequest
-	3,  // 23: api.v1.AdminService.UpdatePlayer:input_type -> api.v1.UpdatePlayerRequest
-	5,  // 24: api.v1.AdminService.ListPlayers:input_type -> api.v1.ListPlayersRequest
-	9,  // 25: api.v1.AdminService.ListEventStages:input_type -> api.v1.ListEventStagesRequest
-	17, // 26: api.v1.AdminService.CreateStageScore:input_type -> api.v1.CreateStageScoreRequest
-	19, // 27: api.v1.AdminService.UpdateStageScore:input_type -> api.v1.UpdateStageScoreRequest
-	21, // 28: api.v1.AdminService.ListStageScores:input_type -> api.v1.ListStageScoresRequest
-	23, // 29: api.v1.AdminService.DeleteStageScore:input_type -> api.v1.DeleteStageScoreRequest
-	2,  // 30: api.v1.AdminService.CreatePlayer:output_type -> api.v1.AdminServiceCreatePlayerResponse
-	4,  // 31: api.v1.AdminService.UpdatePlayer:output_type -> api.v1.UpdatePlayerResponse
-	6,  // 32: api.v1.AdminService.ListPlayers:output_type -> api.v1.ListPlayersResponse
-	10, // 33: api.v1.AdminService.ListEventStages:output_type -> api.v1.ListEventStagesResponse
-	18, // 34: api.v1.AdminService.CreateStageScore:output_type -> api.v1.CreateStageScoreResponse
-	20, // 35: api.v1.AdminService.UpdateStageScore:output_type -> api.v1.UpdateStageScoreResponse
-	22, // 36: api.v1.AdminService.ListStageScores:output_type -> api.v1.ListStageScoresResponse
-	24, // 37: api.v1.AdminService.DeleteStageScore:output_type -> api.v1.DeleteStageScoreResponse
-	30, // [30:38] is the sub-list for method output_type
-	22, // [22:30] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	22, // 10: api.v1.AdjustmentTemplateData.adjustment:type_name -> api.v1.AdjustmentData
+	11, // 11: api.v1.AdjustmentTemplate.data:type_name -> api.v1.AdjustmentTemplateData
+	11, // 12: api.v1.CreateAdjustmentTemplateRequest.data:type_name -> api.v1.AdjustmentTemplateData
+	12, // 13: api.v1.UpdateAdjustmentTemplateRequest.template:type_name -> api.v1.AdjustmentTemplate
+	12, // 14: api.v1.ListAdjustmentTemplatesResponse.templates:type_name -> api.v1.AdjustmentTemplate
+	20, // 15: api.v1.Score.data:type_name -> api.v1.ScoreData
+	22, // 16: api.v1.Adjustment.data:type_name -> api.v1.AdjustmentData
+	19, // 17: api.v1.StageScore.score:type_name -> api.v1.Score
+	21, // 18: api.v1.StageScore.adjustments:type_name -> api.v1.Adjustment
+	20, // 19: api.v1.StageScoreData.score:type_name -> api.v1.ScoreData
+	22, // 20: api.v1.StageScoreData.adjustments:type_name -> api.v1.AdjustmentData
+	24, // 21: api.v1.CreateStageScoreRequest.data:type_name -> api.v1.StageScoreData
+	23, // 22: api.v1.CreateStageScoreResponse.score:type_name -> api.v1.StageScore
+	23, // 23: api.v1.UpdateStageScoreRequest.score:type_name -> api.v1.StageScore
+	23, // 24: api.v1.UpdateStageScoreResponse.score:type_name -> api.v1.StageScore
+	0,  // 25: api.v1.ListStageScoresRequest.verified_filter:type_name -> api.v1.StageScoreVerifiedFilter
+	23, // 26: api.v1.ListStageScoresResponse.scores:type_name -> api.v1.StageScore
+	1,  // 27: api.v1.AdminService.CreatePlayer:input_type -> api.v1.AdminServiceCreatePlayerRequest
+	3,  // 28: api.v1.AdminService.UpdatePlayer:input_type -> api.v1.UpdatePlayerRequest
+	5,  // 29: api.v1.AdminService.ListPlayers:input_type -> api.v1.ListPlayersRequest
+	9,  // 30: api.v1.AdminService.ListEventStages:input_type -> api.v1.ListEventStagesRequest
+	13, // 31: api.v1.AdminService.CreateAdjustmentTemplate:input_type -> api.v1.CreateAdjustmentTemplateRequest
+	15, // 32: api.v1.AdminService.UpdateAdjustmentTemplate:input_type -> api.v1.UpdateAdjustmentTemplateRequest
+	17, // 33: api.v1.AdminService.ListAdjustmentTemplates:input_type -> api.v1.ListAdjustmentTemplatesRequest
+	25, // 34: api.v1.AdminService.CreateStageScore:input_type -> api.v1.CreateStageScoreRequest
+	27, // 35: api.v1.AdminService.UpdateStageScore:input_type -> api.v1.UpdateStageScoreRequest
+	29, // 36: api.v1.AdminService.ListStageScores:input_type -> api.v1.ListStageScoresRequest
+	31, // 37: api.v1.AdminService.DeleteStageScore:input_type -> api.v1.DeleteStageScoreRequest
+	2,  // 38: api.v1.AdminService.CreatePlayer:output_type -> api.v1.AdminServiceCreatePlayerResponse
+	4,  // 39: api.v1.AdminService.UpdatePlayer:output_type -> api.v1.UpdatePlayerResponse
+	6,  // 40: api.v1.AdminService.ListPlayers:output_type -> api.v1.ListPlayersResponse
+	10, // 41: api.v1.AdminService.ListEventStages:output_type -> api.v1.ListEventStagesResponse
+	14, // 42: api.v1.AdminService.CreateAdjustmentTemplate:output_type -> api.v1.CreateAdjustmentTemplateResponse
+	16, // 43: api.v1.AdminService.UpdateAdjustmentTemplate:output_type -> api.v1.UpdateAdjustmentTemplateResponse
+	18, // 44: api.v1.AdminService.ListAdjustmentTemplates:output_type -> api.v1.ListAdjustmentTemplatesResponse
+	26, // 45: api.v1.AdminService.CreateStageScore:output_type -> api.v1.CreateStageScoreResponse
+	28, // 46: api.v1.AdminService.UpdateStageScore:output_type -> api.v1.UpdateStageScoreResponse
+	30, // 47: api.v1.AdminService.ListStageScores:output_type -> api.v1.ListStageScoresResponse
+	32, // 48: api.v1.AdminService.DeleteStageScore:output_type -> api.v1.DeleteStageScoreResponse
+	38, // [38:49] is the sub-list for method output_type
+	27, // [27:38] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_admin_proto_init() }
@@ -1786,7 +2268,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Score); i {
+			switch v := v.(*AdjustmentTemplateData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1798,7 +2280,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ScoreData); i {
+			switch v := v.(*AdjustmentTemplate); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1810,7 +2292,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Adjustment); i {
+			switch v := v.(*CreateAdjustmentTemplateRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1822,7 +2304,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AdjustmentData); i {
+			switch v := v.(*CreateAdjustmentTemplateResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1834,7 +2316,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StageScore); i {
+			switch v := v.(*UpdateAdjustmentTemplateRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1846,7 +2328,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StageScoreData); i {
+			switch v := v.(*UpdateAdjustmentTemplateResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1858,7 +2340,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateStageScoreRequest); i {
+			switch v := v.(*ListAdjustmentTemplatesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1870,7 +2352,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateStageScoreResponse); i {
+			switch v := v.(*ListAdjustmentTemplatesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1882,7 +2364,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateStageScoreRequest); i {
+			switch v := v.(*Score); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1894,7 +2376,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateStageScoreResponse); i {
+			switch v := v.(*ScoreData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1906,7 +2388,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListStageScoresRequest); i {
+			switch v := v.(*Adjustment); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1918,7 +2400,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListStageScoresResponse); i {
+			switch v := v.(*AdjustmentData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1930,7 +2412,7 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteStageScoreRequest); i {
+			switch v := v.(*StageScore); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1942,6 +2424,102 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 		file_api_v1_admin_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StageScoreData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateStageScoreRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateStageScoreResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateStageScoreRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateStageScoreResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListStageScoresRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListStageScoresResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteStageScoreRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_admin_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteStageScoreResponse); i {
 			case 0:
 				return &v.state
@@ -1954,15 +2532,16 @@ func file_api_v1_admin_proto_init() {
 			}
 		}
 	}
-	file_api_v1_admin_proto_msgTypes[16].OneofWrappers = []interface{}{}
-	file_api_v1_admin_proto_msgTypes[20].OneofWrappers = []interface{}{}
+	file_api_v1_admin_proto_msgTypes[10].OneofWrappers = []interface{}{}
+	file_api_v1_admin_proto_msgTypes[24].OneofWrappers = []interface{}{}
+	file_api_v1_admin_proto_msgTypes[28].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_v1_admin_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   24,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

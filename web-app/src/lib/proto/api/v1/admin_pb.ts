@@ -455,6 +455,320 @@ export class ListEventStagesResponse extends Message<ListEventStagesResponse> {
 }
 
 /**
+ * @generated from message api.v1.AdjustmentTemplateData
+ */
+export class AdjustmentTemplateData extends Message<AdjustmentTemplateData> {
+  /**
+   * @generated from field: api.v1.AdjustmentData adjustment = 1;
+   */
+  adjustment?: AdjustmentData;
+
+  /**
+   * @generated from field: int32 rank = 2;
+   */
+  rank = 0;
+
+  /**
+   * @generated from field: string event_key = 3;
+   */
+  eventKey = "";
+
+  /**
+   * @generated from field: optional string stage_id = 4;
+   */
+  stageId?: string;
+
+  /**
+   * @generated from field: bool is_visible = 5;
+   */
+  isVisible = false;
+
+  constructor(data?: PartialMessage<AdjustmentTemplateData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.AdjustmentTemplateData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "adjustment", kind: "message", T: AdjustmentData },
+    { no: 2, name: "rank", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "stage_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 5, name: "is_visible", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdjustmentTemplateData {
+    return new AdjustmentTemplateData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AdjustmentTemplateData {
+    return new AdjustmentTemplateData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AdjustmentTemplateData {
+    return new AdjustmentTemplateData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AdjustmentTemplateData | PlainMessage<AdjustmentTemplateData> | undefined, b: AdjustmentTemplateData | PlainMessage<AdjustmentTemplateData> | undefined): boolean {
+    return proto3.util.equals(AdjustmentTemplateData, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.AdjustmentTemplate
+ */
+export class AdjustmentTemplate extends Message<AdjustmentTemplate> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: api.v1.AdjustmentTemplateData data = 2;
+   */
+  data?: AdjustmentTemplateData;
+
+  constructor(data?: PartialMessage<AdjustmentTemplate>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.AdjustmentTemplate";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "data", kind: "message", T: AdjustmentTemplateData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdjustmentTemplate {
+    return new AdjustmentTemplate().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AdjustmentTemplate {
+    return new AdjustmentTemplate().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AdjustmentTemplate {
+    return new AdjustmentTemplate().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AdjustmentTemplate | PlainMessage<AdjustmentTemplate> | undefined, b: AdjustmentTemplate | PlainMessage<AdjustmentTemplate> | undefined): boolean {
+    return proto3.util.equals(AdjustmentTemplate, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.CreateAdjustmentTemplateRequest
+ */
+export class CreateAdjustmentTemplateRequest extends Message<CreateAdjustmentTemplateRequest> {
+  /**
+   * @generated from field: api.v1.AdjustmentTemplateData data = 1;
+   */
+  data?: AdjustmentTemplateData;
+
+  constructor(data?: PartialMessage<CreateAdjustmentTemplateRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.CreateAdjustmentTemplateRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "data", kind: "message", T: AdjustmentTemplateData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAdjustmentTemplateRequest {
+    return new CreateAdjustmentTemplateRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAdjustmentTemplateRequest {
+    return new CreateAdjustmentTemplateRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAdjustmentTemplateRequest {
+    return new CreateAdjustmentTemplateRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateAdjustmentTemplateRequest | PlainMessage<CreateAdjustmentTemplateRequest> | undefined, b: CreateAdjustmentTemplateRequest | PlainMessage<CreateAdjustmentTemplateRequest> | undefined): boolean {
+    return proto3.util.equals(CreateAdjustmentTemplateRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.CreateAdjustmentTemplateResponse
+ */
+export class CreateAdjustmentTemplateResponse extends Message<CreateAdjustmentTemplateResponse> {
+  constructor(data?: PartialMessage<CreateAdjustmentTemplateResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.CreateAdjustmentTemplateResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAdjustmentTemplateResponse {
+    return new CreateAdjustmentTemplateResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAdjustmentTemplateResponse {
+    return new CreateAdjustmentTemplateResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAdjustmentTemplateResponse {
+    return new CreateAdjustmentTemplateResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateAdjustmentTemplateResponse | PlainMessage<CreateAdjustmentTemplateResponse> | undefined, b: CreateAdjustmentTemplateResponse | PlainMessage<CreateAdjustmentTemplateResponse> | undefined): boolean {
+    return proto3.util.equals(CreateAdjustmentTemplateResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateAdjustmentTemplateRequest
+ */
+export class UpdateAdjustmentTemplateRequest extends Message<UpdateAdjustmentTemplateRequest> {
+  /**
+   * @generated from field: api.v1.AdjustmentTemplate template = 1;
+   */
+  template?: AdjustmentTemplate;
+
+  constructor(data?: PartialMessage<UpdateAdjustmentTemplateRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateAdjustmentTemplateRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "template", kind: "message", T: AdjustmentTemplate },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAdjustmentTemplateRequest {
+    return new UpdateAdjustmentTemplateRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAdjustmentTemplateRequest {
+    return new UpdateAdjustmentTemplateRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAdjustmentTemplateRequest {
+    return new UpdateAdjustmentTemplateRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateAdjustmentTemplateRequest | PlainMessage<UpdateAdjustmentTemplateRequest> | undefined, b: UpdateAdjustmentTemplateRequest | PlainMessage<UpdateAdjustmentTemplateRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateAdjustmentTemplateRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateAdjustmentTemplateResponse
+ */
+export class UpdateAdjustmentTemplateResponse extends Message<UpdateAdjustmentTemplateResponse> {
+  constructor(data?: PartialMessage<UpdateAdjustmentTemplateResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateAdjustmentTemplateResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAdjustmentTemplateResponse {
+    return new UpdateAdjustmentTemplateResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAdjustmentTemplateResponse {
+    return new UpdateAdjustmentTemplateResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAdjustmentTemplateResponse {
+    return new UpdateAdjustmentTemplateResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateAdjustmentTemplateResponse | PlainMessage<UpdateAdjustmentTemplateResponse> | undefined, b: UpdateAdjustmentTemplateResponse | PlainMessage<UpdateAdjustmentTemplateResponse> | undefined): boolean {
+    return proto3.util.equals(UpdateAdjustmentTemplateResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListAdjustmentTemplatesRequest
+ */
+export class ListAdjustmentTemplatesRequest extends Message<ListAdjustmentTemplatesRequest> {
+  /**
+   * @generated from field: string event_key = 1;
+   */
+  eventKey = "";
+
+  constructor(data?: PartialMessage<ListAdjustmentTemplatesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListAdjustmentTemplatesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAdjustmentTemplatesRequest {
+    return new ListAdjustmentTemplatesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAdjustmentTemplatesRequest {
+    return new ListAdjustmentTemplatesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAdjustmentTemplatesRequest {
+    return new ListAdjustmentTemplatesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListAdjustmentTemplatesRequest | PlainMessage<ListAdjustmentTemplatesRequest> | undefined, b: ListAdjustmentTemplatesRequest | PlainMessage<ListAdjustmentTemplatesRequest> | undefined): boolean {
+    return proto3.util.equals(ListAdjustmentTemplatesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListAdjustmentTemplatesResponse
+ */
+export class ListAdjustmentTemplatesResponse extends Message<ListAdjustmentTemplatesResponse> {
+  /**
+   * @generated from field: repeated api.v1.AdjustmentTemplate templates = 1;
+   */
+  templates: AdjustmentTemplate[] = [];
+
+  constructor(data?: PartialMessage<ListAdjustmentTemplatesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListAdjustmentTemplatesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "templates", kind: "message", T: AdjustmentTemplate, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAdjustmentTemplatesResponse {
+    return new ListAdjustmentTemplatesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAdjustmentTemplatesResponse {
+    return new ListAdjustmentTemplatesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAdjustmentTemplatesResponse {
+    return new ListAdjustmentTemplatesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListAdjustmentTemplatesResponse | PlainMessage<ListAdjustmentTemplatesResponse> | undefined, b: ListAdjustmentTemplatesResponse | PlainMessage<ListAdjustmentTemplatesResponse> | undefined): boolean {
+    return proto3.util.equals(ListAdjustmentTemplatesResponse, a, b);
+  }
+}
+
+/**
  * @generated from message api.v1.Score
  */
 export class Score extends Message<Score> {

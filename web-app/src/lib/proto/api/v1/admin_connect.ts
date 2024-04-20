@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateStageScoreRequest, CreateStageScoreResponse, DeleteStageScoreRequest, DeleteStageScoreResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
+import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateAdjustmentTemplateRequest, CreateAdjustmentTemplateResponse, CreateStageScoreRequest, CreateStageScoreResponse, DeleteStageScoreRequest, DeleteStageScoreResponse, ListAdjustmentTemplatesRequest, ListAdjustmentTemplatesResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdateAdjustmentTemplateRequest, UpdateAdjustmentTemplateResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -60,6 +60,39 @@ export const AdminService = {
       name: "ListEventStages",
       I: ListEventStagesRequest,
       O: ListEventStagesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * CreateAdjustmentTemplate creates an adjustment to surface in player score submission.
+     *
+     * @generated from rpc api.v1.AdminService.CreateAdjustmentTemplate
+     */
+    createAdjustmentTemplate: {
+      name: "CreateAdjustmentTemplate",
+      I: CreateAdjustmentTemplateRequest,
+      O: CreateAdjustmentTemplateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * CreateAdjustmentTemplate updates an adjustment template.
+     *
+     * @generated from rpc api.v1.AdminService.UpdateAdjustmentTemplate
+     */
+    updateAdjustmentTemplate: {
+      name: "UpdateAdjustmentTemplate",
+      I: UpdateAdjustmentTemplateRequest,
+      O: UpdateAdjustmentTemplateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ListAdjustmentTemplates returns all adjustment templates for a given event.
+     *
+     * @generated from rpc api.v1.AdminService.ListAdjustmentTemplates
+     */
+    listAdjustmentTemplates: {
+      name: "ListAdjustmentTemplates",
+      I: ListAdjustmentTemplatesRequest,
+      O: ListAdjustmentTemplatesResponse,
       kind: MethodKind.Unary,
     },
     /**
