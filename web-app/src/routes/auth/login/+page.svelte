@@ -24,7 +24,7 @@
 
 		const redirectURL = new URL($page.url.searchParams.get('redirect') || '/', $page.url);
 		if (redirectURL.origin === $page.url.origin) {
-			goto(redirectURL.pathname + '/');
+			goto(redirectURL.pathname);
 		} else {
 			goto('/');
 		}

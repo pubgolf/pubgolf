@@ -23,7 +23,7 @@
 			authInit = true;
 		} catch (error) {
 			if (error === USER_NOT_AUTHORIZED_ERROR) {
-				goto(`/auth/login?redirect=${$page.url.pathname}/`);
+				goto(`/auth/login?redirect=${$page.url.pathname}`);
 				return;
 			}
 			authError = error as DisplayError;
