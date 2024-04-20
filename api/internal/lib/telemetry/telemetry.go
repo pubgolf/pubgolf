@@ -26,6 +26,7 @@ func Init(cfg *config.App) (func(), error) {
 		otelconfig.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
 		otelconfig.WithServiceName(ServiceName),
 		otelconfig.WithServiceVersion(gitVersion()),
+		otelconfig.WithMetricsEnabled(false),
 		honeycomb.WithApiKey(cfg.HoneycombKey),
 	)
 }
