@@ -7,14 +7,15 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { Player, PlayerData, Venue } from "./shared_pb.js";
+import { EventRegistration, Player, PlayerData, Venue } from "./shared_pb.js";
 
 /**
  * @generated from message api.v1.AdminServiceCreatePlayerRequest
  */
 export class AdminServiceCreatePlayerRequest extends Message<AdminServiceCreatePlayerRequest> {
   /**
-   * @generated from field: string event_key = 1;
+   * @generated from field: string event_key = 1 [deprecated = true];
+   * @deprecated
    */
   eventKey = "";
 
@@ -28,6 +29,11 @@ export class AdminServiceCreatePlayerRequest extends Message<AdminServiceCreateP
    */
   phoneNumber = "";
 
+  /**
+   * @generated from field: api.v1.EventRegistration registration = 4;
+   */
+  registration?: EventRegistration;
+
   constructor(data?: PartialMessage<AdminServiceCreatePlayerRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -39,6 +45,7 @@ export class AdminServiceCreatePlayerRequest extends Message<AdminServiceCreateP
     { no: 1, name: "event_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "player_data", kind: "message", T: PlayerData },
     { no: 3, name: "phone_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "registration", kind: "message", T: EventRegistration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AdminServiceCreatePlayerRequest {
@@ -109,6 +116,11 @@ export class UpdatePlayerRequest extends Message<UpdatePlayerRequest> {
    */
   playerData?: PlayerData;
 
+  /**
+   * @generated from field: api.v1.EventRegistration registration = 3;
+   */
+  registration?: EventRegistration;
+
   constructor(data?: PartialMessage<UpdatePlayerRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -119,6 +131,7 @@ export class UpdatePlayerRequest extends Message<UpdatePlayerRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "player_data", kind: "message", T: PlayerData },
+    { no: 3, name: "registration", kind: "message", T: EventRegistration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdatePlayerRequest {
