@@ -7,7 +7,11 @@
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import { formatPlayerName as playerNameWithLeague } from '$lib/helpers/formatters';
 	import { combineIds, separateIds } from '$lib/helpers/scores';
-	import type { Stage, StageScore } from '$lib/proto/api/v1/admin_pb';
+	import {
+		StageScoreVerifiedFilter,
+		type Stage,
+		type StageScore
+	} from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
 	import { modalStore, toastStore } from '@skeletonlabs/skeleton';
@@ -15,9 +19,16 @@
 	import type { ComponentProps } from 'svelte';
 	import { onMount } from 'svelte';
 	import { noop } from 'svelte/internal';
+	import { writable } from 'svelte/store';
 
 	let refreshProgress: Promise<void> = new Promise(noop);
 	let lastRefresh: Date;
+
+	let filterUnverifiedOnly = writable(false);
+	$: {
+		$filterUnverifiedOnly;
+		refreshData();
+	}
 
 	let players: Player[] = [];
 	async function fetchPlayers() {
@@ -43,7 +54,10 @@
 	async function fetchScores() {
 		const rpc = await getAdminServiceClient();
 		const resp = await rpc.listStageScores({
-			eventKey: $page.params.eventKey
+			eventKey: $page.params.eventKey,
+			verifiedFilter: $filterUnverifiedOnly
+				? StageScoreVerifiedFilter.ONLY_UNVERIFIED
+				: StageScoreVerifiedFilter.ALL
 		});
 
 		scores = resp.scores.reverse();
@@ -77,6 +91,20 @@
 				stageId: score.stageId,
 				playerId: score.playerId
 			});
+		} catch (error) {
+			toastStore.trigger({
+				message: `API Error: ${error}`,
+				background: 'variant-filled-error'
+			});
+		}
+
+		refreshData();
+	}
+
+	async function verifyScore(score: StageScore) {
+		const rpc = await getAdminServiceClient();
+		try {
+			await rpc.updateStageScore({ score });
 		} catch (error) {
 			toastStore.trigger({
 				message: `API Error: ${error}`,
@@ -168,12 +196,12 @@
 <SetTitle title="Scores" />
 
 <div class="max-w-3xl mx-auto mb-4">
-	<RefreshHeader
-		title="Scores"
-		refresh={refreshData}
-		loadingStatus={refreshProgress}
-		{lastRefresh}
-	/>
+	<RefreshHeader title="Scores" refresh={refreshData} loadingStatus={refreshProgress} {lastRefresh}>
+		<label slot="filters" class="flex items-center space-x-2">
+			<input type="checkbox" class="checkbox" bind:checked={$filterUnverifiedOnly} />
+			<p>Only Show Unverified</p>
+		</label>
+	</RefreshHeader>
 
 	{#await refreshProgress}
 		<div class="card py-12 flex flex-col items-center">
@@ -208,10 +236,19 @@
 										{/each}
 									{/if}
 								</td>
-								<td class="table-cell-fit action-btns">
+								<td class="table-cell-fit action-btns text-right">
+									{#if !score.isVerified}
+										<button
+											type="button"
+											class="btn btn-sm variant-filled-primary"
+											on:click={() => verifyScore(score)}
+										>
+											<span>Verify</span>
+										</button>
+									{/if}
 									<button
 										type="button"
-										class="btn btn-sm variant-filled"
+										class="btn btn-sm variant-filled ml-4"
 										on:click={() => showEditScoreModal(score)}
 									>
 										<span>Edit</span>
@@ -229,6 +266,8 @@
 					</tbody>
 				</table>
 			</div>
+		{:else if $filterUnverifiedOnly}
+			<NoDataCard text="No Unverified Scores to Display" ctaText="Refresh" on:click={refreshData} />
 		{:else}
 			<NoDataCard
 				text="No Scores to Display"

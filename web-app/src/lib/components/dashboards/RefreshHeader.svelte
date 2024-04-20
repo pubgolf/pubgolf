@@ -19,7 +19,10 @@
 </script>
 
 <header class="flex justify-between items-start mb-4 md:mt-4">
-	<h1>{title}</h1>
+	<div>
+		<h1 class="mb-2">{title}</h1>
+		<slot name="filters" />
+	</div>
 	<div class="text-right">
 		<button type="button" class="btn variant-filled mb-0.5" on:click={refresh}>
 			<span class="badge-icon"
