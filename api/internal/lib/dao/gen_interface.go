@@ -19,8 +19,6 @@ type QueryProvider interface {
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
 	// CreatePlayer creates a new player.
 	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
-	// CreatePlayerAndRegistration creates a new player and adds them to the given event.
-	CreatePlayerAndRegistration(ctx context.Context, name string, phoneNum models.PhoneNum, eventID models.EventID, cat models.ScoringCategory) (models.Player, error)
 	// DeleteScore creates score and adjustment records for a given stage.
 	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
 	// EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
