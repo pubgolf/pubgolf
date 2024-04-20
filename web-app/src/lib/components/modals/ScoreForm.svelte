@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { formatListAnd, formatPlayerName } from '$lib/helpers/formatters';
-	import type { StageScoreIds, Strict } from '$lib/helpers/scores';
+	import type { StageScoreIds } from '$lib/helpers/scores';
+	import type { Strict } from '$lib/helpers/types';
 	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
 	import type { PlainMessage } from '@bufbuild/protobuf';

@@ -3,7 +3,7 @@
 	import ErrorBanner from '$lib/components/ErrorBanner.svelte';
 	import NoDataCard from '$lib/components/dashboards/NoDataCard.svelte';
 	import RefreshHeader from '$lib/components/dashboards/RefreshHeader.svelte';
-	import NewScoreForm from '$lib/components/modals/ScoreForm.svelte';
+	import ScoreForm from '$lib/components/modals/ScoreForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import { formatPlayerName as playerNameWithLeague } from '$lib/helpers/formatters';
 	import { combineIds, separateIds } from '$lib/helpers/scores';
@@ -127,7 +127,7 @@
 	}
 
 	async function showNewScoreModal() {
-		const props: Omit<ComponentProps<NewScoreForm>, 'parent'> = {
+		const props: Omit<ComponentProps<ScoreForm>, 'parent'> = {
 			eventKey: $page.params.eventKey,
 			players: await players,
 			stages: await stages,
@@ -148,7 +148,7 @@
 		modalStore.trigger({
 			type: 'component',
 			component: {
-				ref: NewScoreForm,
+				ref: ScoreForm,
 				props
 			},
 			response: (submittedForm: boolean) => submittedForm && refreshData()
@@ -156,7 +156,7 @@
 	}
 
 	async function showEditScoreModal(score: StageScore) {
-		const props: Omit<ComponentProps<NewScoreForm>, 'parent'> = {
+		const props: Omit<ComponentProps<ScoreForm>, 'parent'> = {
 			title: 'Edit Score',
 			ctaText: 'Save',
 			eventKey: $page.params.eventKey,
@@ -185,7 +185,7 @@
 		modalStore.trigger({
 			type: 'component',
 			component: {
-				ref: NewScoreForm,
+				ref: ScoreForm,
 				props
 			},
 			response: (submittedForm: boolean) => submittedForm && refreshData()

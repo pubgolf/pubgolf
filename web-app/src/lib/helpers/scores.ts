@@ -1,7 +1,6 @@
-import type { Message, PartialMessage, PlainMessage } from '@bufbuild/protobuf';
 import type { StageScore, StageScoreData } from '$lib/proto/api/v1/admin_pb';
-
-export type Strict<T extends Message<T>> = Required<PlainMessage<T>>;
+import type { PartialMessage } from '@bufbuild/protobuf';
+import type { Strict } from './types';
 
 export type StageScoreIds = {
 	score: {

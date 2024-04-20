@@ -20,6 +20,10 @@
 		{
 			slug: 'scores',
 			icon: '🏆'
+		},
+		{
+			slug: 'adjustments',
+			icon: '🔧'
 		}
 		// {
 		// 	slug: 'alerts',
