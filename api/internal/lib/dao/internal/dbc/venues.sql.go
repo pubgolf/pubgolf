@@ -22,6 +22,8 @@ FROM
   venues v
 WHERE
   v.deleted_at IS NULL
+ORDER BY
+  v.name ASC
 `
 
 type AllVenuesRow struct {
