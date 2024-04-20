@@ -16,7 +16,7 @@ SELECT
   s.player_id,
   p.name,
   count(DISTINCT (s.id)) AS num_scores,
-  sum(coalesce(s.value, 0)) + sum(coalesce(a.value, 0)) AS total_points,
+  s.value + sum(coalesce(a.value, 0)) AS total_points,
   sum(
     CASE WHEN a.value > 0 THEN
       a.value
@@ -48,7 +48,8 @@ WHERE
   AND a.deleted_at IS NULL
 GROUP BY
   s.player_id,
-  p.name
+  p.name,
+  s.value
 ORDER BY
   num_scores DESC,
   total_points ASC,
@@ -115,7 +116,7 @@ SELECT
   s.player_id,
   p.name,
   count(DISTINCT (s.id)) AS num_scores,
-  sum(coalesce(s.value, 0)) + sum(coalesce(a.value, 0)) AS total_points,
+  s.value + sum(coalesce(a.value, 0)) AS total_points,
   sum(
     CASE WHEN a.value > 0 THEN
       a.value
@@ -148,7 +149,8 @@ WHERE
   AND a.deleted_at IS NULL
 GROUP BY
   s.player_id,
-  p.name
+  p.name,
+  s.value
 ORDER BY
   num_scores DESC,
   total_points ASC,
