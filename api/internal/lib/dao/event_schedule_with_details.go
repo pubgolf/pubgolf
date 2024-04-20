@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
@@ -36,6 +37,8 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 				ID:          models.RuleIDFromULID(row.RuleID.ULID),
 				Description: row.Description.String,
 			},
+			Rank:     row.Rank,
+			Duration: time.Duration(row.DurationMinutes) * time.Minute,
 		})
 	}
 

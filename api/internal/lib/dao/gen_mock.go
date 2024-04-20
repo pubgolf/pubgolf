@@ -106,6 +106,36 @@ func (_m *MockQueryProvider) AdjustmentsByPlayerStage(ctx context.Context, playe
 	return r0, r1
 }
 
+// AllVenues provides a mock function with given fields: ctx
+func (_m *MockQueryProvider) AllVenues(ctx context.Context) ([]models.Venue, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AllVenues")
+	}
+
+	var r0 []models.Venue
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]models.Venue, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []models.Venue); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Venue)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateAdjustmentTemplate provides a mock function with given fields: ctx, eventID, t
 func (_m *MockQueryProvider) CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error) {
 	ret := _m.Called(ctx, eventID, t)
@@ -753,6 +783,24 @@ func (_m *MockQueryProvider) UpdatePlayer(ctx context.Context, playerID models.P
 	return r0, r1
 }
 
+// UpdateStage provides a mock function with given fields: ctx, stage
+func (_m *MockQueryProvider) UpdateStage(ctx context.Context, stage models.StageConfig) error {
+	ret := _m.Called(ctx, stage)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateStage")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.StageConfig) error); ok {
+		r0 = rf(ctx, stage)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpsertRegistration provides a mock function with given fields: ctx, playerID, eventKey, cat
 func (_m *MockQueryProvider) UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error {
 	ret := _m.Called(ctx, playerID, eventKey, cat)
@@ -790,22 +838,22 @@ func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.Pl
 }
 
 // VenueByKey provides a mock function with given fields: ctx, eventID, venueKey
-func (_m *MockQueryProvider) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error) {
+func (_m *MockQueryProvider) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.Venue, error) {
 	ret := _m.Called(ctx, eventID, venueKey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for VenueByKey")
 	}
 
-	var r0 Venue
+	var r0 models.Venue
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) (Venue, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) (models.Venue, error)); ok {
 		return rf(ctx, eventID, venueKey)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) Venue); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.VenueKey) models.Venue); ok {
 		r0 = rf(ctx, eventID, venueKey)
 	} else {
-		r0 = ret.Get(0).(Venue)
+		r0 = ret.Get(0).(models.Venue)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.VenueKey) error); ok {

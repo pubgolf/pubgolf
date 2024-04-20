@@ -15,6 +15,7 @@ type Querier interface {
 	AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]AdjustmentTemplatesByEventIDRow, error)
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error)
 	AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error)
+	AllVenues(ctx context.Context) ([]AllVenuesRow, error)
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreateAdjustmentTemplate(ctx context.Context, arg CreateAdjustmentTemplateParams) (models.AdjustmentTemplateID, error)
 	CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error
@@ -50,6 +51,8 @@ type Querier interface {
 	StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error)
 	UpdateAdjustmentTemplate(ctx context.Context, arg UpdateAdjustmentTemplateParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error
+	UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error
+	UpdateStage(ctx context.Context, arg UpdateStageParams) error
 	UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error
 	UpsertScore(ctx context.Context, arg UpsertScoreParams) error
 	VenueByKey(ctx context.Context, arg VenueByKeyParams) (VenueByKeyRow, error)

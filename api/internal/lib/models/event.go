@@ -1,10 +1,23 @@
 package models
 
+import "time"
+
+// StageConfig
+type StageConfig struct {
+	ID              StageID
+	VenueID         VenueID
+	RuleDescription string
+	Rank            int32
+	Duration        time.Duration
+}
+
 // Stage models a venue stop and rule set.
 type Stage struct {
-	ID    StageID
-	Venue Venue
-	Rule  Rule
+	ID       StageID
+	Venue    Venue
+	Rule     Rule
+	Rank     int32
+	Duration time.Duration
 }
 
 // Venue contains metadata about a physical location.

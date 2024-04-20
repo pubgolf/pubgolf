@@ -9,10 +9,14 @@
 		// 	slug: 'event-info',
 		// 	icon: '📝'
 		// },
-		// {
-		// 	slug: 'schedule',
-		// 	icon: '⏱️'
-		// },
+		{
+			slug: 'schedule',
+			icon: '⏱️'
+		},
+		{
+			slug: 'adjustments',
+			icon: '🔧'
+		},
 		{
 			slug: 'players',
 			icon: '🏌️'
@@ -20,10 +24,6 @@
 		{
 			slug: 'scores',
 			icon: '🏆'
-		},
-		{
-			slug: 'adjustments',
-			icon: '🔧'
 		}
 		// {
 		// 	slug: 'alerts',

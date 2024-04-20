@@ -12,6 +12,53 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+const allVenues = `-- name: AllVenues :many
+SELECT
+  v.id,
+  v.name,
+  v.address,
+  v.image_url
+FROM
+  venues v
+WHERE
+  v.deleted_at IS NULL
+`
+
+type AllVenuesRow struct {
+	ID       models.VenueID
+	Name     string
+	Address  string
+	ImageUrl sql.NullString
+}
+
+func (q *Queries) AllVenues(ctx context.Context) ([]AllVenuesRow, error) {
+	rows, err := q.query(ctx, q.allVenuesStmt, allVenues)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AllVenuesRow
+	for rows.Next() {
+		var i AllVenuesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Address,
+			&i.ImageUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const stageIDByVenueKey = `-- name: StageIDByVenueKey :one
 SELECT
   s.id
@@ -33,6 +80,56 @@ func (q *Queries) StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyPa
 	var id models.StageID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const updateRuleByStage = `-- name: UpdateRuleByStage :exec
+UPDATE
+  rules r
+SET
+  description = $1
+FROM
+  stages s
+WHERE
+  r.id = s.rule_id
+  AND s.id = $2
+`
+
+type UpdateRuleByStageParams struct {
+	Description string
+	StageID     models.StageID
+}
+
+func (q *Queries) UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error {
+	_, err := q.exec(ctx, q.updateRuleByStageStmt, updateRuleByStage, arg.Description, arg.StageID)
+	return err
+}
+
+const updateStage = `-- name: UpdateStage :exec
+UPDATE
+  stages s
+SET
+  venue_id = $1,
+  rank = $2,
+  duration_minutes = $3
+WHERE
+  s.id = $4
+`
+
+type UpdateStageParams struct {
+	VenueID         models.VenueID
+	Rank            int32
+	DurationMinutes uint32
+	ID              models.StageID
+}
+
+func (q *Queries) UpdateStage(ctx context.Context, arg UpdateStageParams) error {
+	_, err := q.exec(ctx, q.updateStageStmt, updateStage,
+		arg.VenueID,
+		arg.Rank,
+		arg.DurationMinutes,
+		arg.ID,
+	)
+	return err
 }
 
 const venueByKey = `-- name: VenueByKey :one

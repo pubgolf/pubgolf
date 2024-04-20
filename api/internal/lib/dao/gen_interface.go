@@ -17,6 +17,8 @@ type QueryProvider interface {
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error)
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
+	// AllVenues returns venue info for the venue key and event id.
+	AllVenues(ctx context.Context) ([]models.Venue, error)
 	// CreateAdjustmentTemplate sets the properties for a new adjustment template. If the StageID is not set, the provided eventID will be linked to make the adjustment template apply to all stages.
 	CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)
 	// CreatePlayer creates a new player.
@@ -63,12 +65,14 @@ type QueryProvider interface {
 	UpdateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) error
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
+	// UpdateStage updates the stage's properties and the description of its linked rule.
+	UpdateStage(ctx context.Context, stage models.StageConfig) error
 	// UpsertRegistration creates a new player and adds them to the given event.
 	UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error
 	// UpsertScore creates score and adjustment records for a given stage.
 	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error
 	// VenueByKey returns venue info for the venue key and event id.
-	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error)
+	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.Venue, error)
 	// VerifyPhoneNumber sets the player's phone number as verified, returning a boolean to indicate whether the phone number was previously unverified (i.e. false means the DB row was not updated).
 	VerifyPhoneNumber(ctx context.Context, num models.PhoneNum) (bool, error)
 }

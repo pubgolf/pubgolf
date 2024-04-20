@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateAdjustmentTemplateRequest, CreateAdjustmentTemplateResponse, CreateStageScoreRequest, CreateStageScoreResponse, DeleteStageScoreRequest, DeleteStageScoreResponse, ListAdjustmentTemplatesRequest, ListAdjustmentTemplatesResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, UpdateAdjustmentTemplateRequest, UpdateAdjustmentTemplateResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
+import { AdminServiceCreatePlayerRequest, AdminServiceCreatePlayerResponse, CreateAdjustmentTemplateRequest, CreateAdjustmentTemplateResponse, CreateStageScoreRequest, CreateStageScoreResponse, DeleteStageScoreRequest, DeleteStageScoreResponse, ListAdjustmentTemplatesRequest, ListAdjustmentTemplatesResponse, ListEventStagesRequest, ListEventStagesResponse, ListPlayersRequest, ListPlayersResponse, ListStageScoresRequest, ListStageScoresResponse, ListVenuesRequest, ListVenuesResponse, UpdateAdjustmentTemplateRequest, UpdateAdjustmentTemplateResponse, UpdatePlayerRequest, UpdatePlayerResponse, UpdateStageRequest, UpdateStageResponse, UpdateStageScoreRequest, UpdateStageScoreResponse } from "./admin_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -49,6 +49,28 @@ export const AdminService = {
       name: "ListPlayers",
       I: ListPlayersRequest,
       O: ListPlayersResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ListVenues returns all venues that a stage can link to.
+     *
+     * @generated from rpc api.v1.AdminService.ListVenues
+     */
+    listVenues: {
+      name: "ListVenues",
+      I: ListVenuesRequest,
+      O: ListVenuesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * UpdateStage sets the details for a stage.
+     *
+     * @generated from rpc api.v1.AdminService.UpdateStage
+     */
+    updateStage: {
+      name: "UpdateStage",
+      I: UpdateStageRequest,
+      O: UpdateStageResponse,
       kind: MethodKind.Unary,
     },
     /**

@@ -43,6 +43,8 @@ func (s *Server) ListEventStages(ctx context.Context, req *connect.Request[apiv1
 				Id:               s.Rule.ID.String(),
 				VenueDescription: s.Rule.Description,
 			},
+			Rank:        s.Rank,
+			DurationMin: int32(s.Duration.Minutes()),
 		})
 	}
 

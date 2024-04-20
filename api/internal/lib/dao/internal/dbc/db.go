@@ -33,6 +33,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.adjustmentsByPlayerStageStmt, err = db.PrepareContext(ctx, adjustmentsByPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query AdjustmentsByPlayerStage: %w", err)
 	}
+	if q.allVenuesStmt, err = db.PrepareContext(ctx, allVenues); err != nil {
+		return nil, fmt.Errorf("error preparing query AllVenues: %w", err)
+	}
 	if q.createAdjustmentStmt, err = db.PrepareContext(ctx, createAdjustment); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateAdjustment: %w", err)
 	}
@@ -138,6 +141,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updatePlayerStmt, err = db.PrepareContext(ctx, updatePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdatePlayer: %w", err)
 	}
+	if q.updateRuleByStageStmt, err = db.PrepareContext(ctx, updateRuleByStage); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateRuleByStage: %w", err)
+	}
+	if q.updateStageStmt, err = db.PrepareContext(ctx, updateStage); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateStage: %w", err)
+	}
 	if q.upsertRegistrationStmt, err = db.PrepareContext(ctx, upsertRegistration); err != nil {
 		return nil, fmt.Errorf("error preparing query UpsertRegistration: %w", err)
 	}
@@ -168,6 +177,11 @@ func (q *Queries) Close() error {
 	if q.adjustmentsByPlayerStageStmt != nil {
 		if cerr := q.adjustmentsByPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing adjustmentsByPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.allVenuesStmt != nil {
+		if cerr := q.allVenuesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing allVenuesStmt: %w", cerr)
 		}
 	}
 	if q.createAdjustmentStmt != nil {
@@ -345,6 +359,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updatePlayerStmt: %w", cerr)
 		}
 	}
+	if q.updateRuleByStageStmt != nil {
+		if cerr := q.updateRuleByStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateRuleByStageStmt: %w", cerr)
+		}
+	}
+	if q.updateStageStmt != nil {
+		if cerr := q.updateStageStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateStageStmt: %w", cerr)
+		}
+	}
 	if q.upsertRegistrationStmt != nil {
 		if cerr := q.upsertRegistrationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing upsertRegistrationStmt: %w", cerr)
@@ -407,6 +431,7 @@ type Queries struct {
 	adjustmentTemplatesByEventIDStmt    *sql.Stmt
 	adjustmentTemplatesByStageIDStmt    *sql.Stmt
 	adjustmentsByPlayerStageStmt        *sql.Stmt
+	allVenuesStmt                       *sql.Stmt
 	createAdjustmentStmt                *sql.Stmt
 	createAdjustmentTemplateStmt        *sql.Stmt
 	createAdjustmentWithTemplateStmt    *sql.Stmt
@@ -442,6 +467,8 @@ type Queries struct {
 	stageIDByVenueKeyStmt               *sql.Stmt
 	updateAdjustmentTemplateStmt        *sql.Stmt
 	updatePlayerStmt                    *sql.Stmt
+	updateRuleByStageStmt               *sql.Stmt
+	updateStageStmt                     *sql.Stmt
 	upsertRegistrationStmt              *sql.Stmt
 	upsertScoreStmt                     *sql.Stmt
 	venueByKeyStmt                      *sql.Stmt
@@ -455,6 +482,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		adjustmentTemplatesByEventIDStmt:    q.adjustmentTemplatesByEventIDStmt,
 		adjustmentTemplatesByStageIDStmt:    q.adjustmentTemplatesByStageIDStmt,
 		adjustmentsByPlayerStageStmt:        q.adjustmentsByPlayerStageStmt,
+		allVenuesStmt:                       q.allVenuesStmt,
 		createAdjustmentStmt:                q.createAdjustmentStmt,
 		createAdjustmentTemplateStmt:        q.createAdjustmentTemplateStmt,
 		createAdjustmentWithTemplateStmt:    q.createAdjustmentWithTemplateStmt,
@@ -490,6 +518,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		stageIDByVenueKeyStmt:               q.stageIDByVenueKeyStmt,
 		updateAdjustmentTemplateStmt:        q.updateAdjustmentTemplateStmt,
 		updatePlayerStmt:                    q.updatePlayerStmt,
+		updateRuleByStageStmt:               q.updateRuleByStageStmt,
+		updateStageStmt:                     q.updateStageStmt,
 		upsertRegistrationStmt:              q.upsertRegistrationStmt,
 		upsertScoreStmt:                     q.upsertScoreStmt,
 		venueByKeyStmt:                      q.venueByKeyStmt,

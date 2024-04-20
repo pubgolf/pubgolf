@@ -49,7 +49,9 @@ SELECT
   v.id AS venue_id,
   v.name,
   v.address,
-  v.image_url
+  v.image_url,
+  s.rank,
+  s.duration_minutes
 FROM
   stages s
   LEFT JOIN rules r ON s.rule_id = r.id

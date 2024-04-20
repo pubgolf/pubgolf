@@ -44,6 +44,11 @@ const (
 	// AdminServiceListPlayersProcedure is the fully-qualified name of the AdminService's ListPlayers
 	// RPC.
 	AdminServiceListPlayersProcedure = "/api.v1.AdminService/ListPlayers"
+	// AdminServiceListVenuesProcedure is the fully-qualified name of the AdminService's ListVenues RPC.
+	AdminServiceListVenuesProcedure = "/api.v1.AdminService/ListVenues"
+	// AdminServiceUpdateStageProcedure is the fully-qualified name of the AdminService's UpdateStage
+	// RPC.
+	AdminServiceUpdateStageProcedure = "/api.v1.AdminService/UpdateStage"
 	// AdminServiceListEventStagesProcedure is the fully-qualified name of the AdminService's
 	// ListEventStages RPC.
 	AdminServiceListEventStagesProcedure = "/api.v1.AdminService/ListEventStages"
@@ -76,6 +81,8 @@ var (
 	adminServiceCreatePlayerMethodDescriptor             = adminServiceServiceDescriptor.Methods().ByName("CreatePlayer")
 	adminServiceUpdatePlayerMethodDescriptor             = adminServiceServiceDescriptor.Methods().ByName("UpdatePlayer")
 	adminServiceListPlayersMethodDescriptor              = adminServiceServiceDescriptor.Methods().ByName("ListPlayers")
+	adminServiceListVenuesMethodDescriptor               = adminServiceServiceDescriptor.Methods().ByName("ListVenues")
+	adminServiceUpdateStageMethodDescriptor              = adminServiceServiceDescriptor.Methods().ByName("UpdateStage")
 	adminServiceListEventStagesMethodDescriptor          = adminServiceServiceDescriptor.Methods().ByName("ListEventStages")
 	adminServiceCreateAdjustmentTemplateMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("CreateAdjustmentTemplate")
 	adminServiceUpdateAdjustmentTemplateMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("UpdateAdjustmentTemplate")
@@ -94,6 +101,10 @@ type AdminServiceClient interface {
 	UpdatePlayer(context.Context, *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
 	ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error)
+	// ListVenues returns all venues that a stage can link to.
+	ListVenues(context.Context, *connect.Request[v1.ListVenuesRequest]) (*connect.Response[v1.ListVenuesResponse], error)
+	// UpdateStage sets the details for a stage.
+	UpdateStage(context.Context, *connect.Request[v1.UpdateStageRequest]) (*connect.Response[v1.UpdateStageResponse], error)
 	// ListEventStages returns a full schedule for an event.
 	ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error)
 	// CreateAdjustmentTemplate creates an adjustment to surface in player score submission.
@@ -138,6 +149,18 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			httpClient,
 			baseURL+AdminServiceListPlayersProcedure,
 			connect.WithSchema(adminServiceListPlayersMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listVenues: connect.NewClient[v1.ListVenuesRequest, v1.ListVenuesResponse](
+			httpClient,
+			baseURL+AdminServiceListVenuesProcedure,
+			connect.WithSchema(adminServiceListVenuesMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		updateStage: connect.NewClient[v1.UpdateStageRequest, v1.UpdateStageResponse](
+			httpClient,
+			baseURL+AdminServiceUpdateStageProcedure,
+			connect.WithSchema(adminServiceUpdateStageMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		listEventStages: connect.NewClient[v1.ListEventStagesRequest, v1.ListEventStagesResponse](
@@ -196,6 +219,8 @@ type adminServiceClient struct {
 	createPlayer             *connect.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
 	updatePlayer             *connect.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
 	listPlayers              *connect.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
+	listVenues               *connect.Client[v1.ListVenuesRequest, v1.ListVenuesResponse]
+	updateStage              *connect.Client[v1.UpdateStageRequest, v1.UpdateStageResponse]
 	listEventStages          *connect.Client[v1.ListEventStagesRequest, v1.ListEventStagesResponse]
 	createAdjustmentTemplate *connect.Client[v1.CreateAdjustmentTemplateRequest, v1.CreateAdjustmentTemplateResponse]
 	updateAdjustmentTemplate *connect.Client[v1.UpdateAdjustmentTemplateRequest, v1.UpdateAdjustmentTemplateResponse]
@@ -219,6 +244,16 @@ func (c *adminServiceClient) UpdatePlayer(ctx context.Context, req *connect.Requ
 // ListPlayers calls api.v1.AdminService.ListPlayers.
 func (c *adminServiceClient) ListPlayers(ctx context.Context, req *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error) {
 	return c.listPlayers.CallUnary(ctx, req)
+}
+
+// ListVenues calls api.v1.AdminService.ListVenues.
+func (c *adminServiceClient) ListVenues(ctx context.Context, req *connect.Request[v1.ListVenuesRequest]) (*connect.Response[v1.ListVenuesResponse], error) {
+	return c.listVenues.CallUnary(ctx, req)
+}
+
+// UpdateStage calls api.v1.AdminService.UpdateStage.
+func (c *adminServiceClient) UpdateStage(ctx context.Context, req *connect.Request[v1.UpdateStageRequest]) (*connect.Response[v1.UpdateStageResponse], error) {
+	return c.updateStage.CallUnary(ctx, req)
 }
 
 // ListEventStages calls api.v1.AdminService.ListEventStages.
@@ -269,6 +304,10 @@ type AdminServiceHandler interface {
 	UpdatePlayer(context.Context, *connect.Request[v1.UpdatePlayerRequest]) (*connect.Response[v1.UpdatePlayerResponse], error)
 	// ListPlayers returns all players for a given event.
 	ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error)
+	// ListVenues returns all venues that a stage can link to.
+	ListVenues(context.Context, *connect.Request[v1.ListVenuesRequest]) (*connect.Response[v1.ListVenuesResponse], error)
+	// UpdateStage sets the details for a stage.
+	UpdateStage(context.Context, *connect.Request[v1.UpdateStageRequest]) (*connect.Response[v1.UpdateStageResponse], error)
 	// ListEventStages returns a full schedule for an event.
 	ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error)
 	// CreateAdjustmentTemplate creates an adjustment to surface in player score submission.
@@ -309,6 +348,18 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 		AdminServiceListPlayersProcedure,
 		svc.ListPlayers,
 		connect.WithSchema(adminServiceListPlayersMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	adminServiceListVenuesHandler := connect.NewUnaryHandler(
+		AdminServiceListVenuesProcedure,
+		svc.ListVenues,
+		connect.WithSchema(adminServiceListVenuesMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	adminServiceUpdateStageHandler := connect.NewUnaryHandler(
+		AdminServiceUpdateStageProcedure,
+		svc.UpdateStage,
+		connect.WithSchema(adminServiceUpdateStageMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	adminServiceListEventStagesHandler := connect.NewUnaryHandler(
@@ -367,6 +418,10 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 			adminServiceUpdatePlayerHandler.ServeHTTP(w, r)
 		case AdminServiceListPlayersProcedure:
 			adminServiceListPlayersHandler.ServeHTTP(w, r)
+		case AdminServiceListVenuesProcedure:
+			adminServiceListVenuesHandler.ServeHTTP(w, r)
+		case AdminServiceUpdateStageProcedure:
+			adminServiceUpdateStageHandler.ServeHTTP(w, r)
 		case AdminServiceListEventStagesProcedure:
 			adminServiceListEventStagesHandler.ServeHTTP(w, r)
 		case AdminServiceCreateAdjustmentTemplateProcedure:
@@ -402,6 +457,14 @@ func (UnimplementedAdminServiceHandler) UpdatePlayer(context.Context, *connect.R
 
 func (UnimplementedAdminServiceHandler) ListPlayers(context.Context, *connect.Request[v1.ListPlayersRequest]) (*connect.Response[v1.ListPlayersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.ListPlayers is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) ListVenues(context.Context, *connect.Request[v1.ListVenuesRequest]) (*connect.Response[v1.ListVenuesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.ListVenues is not implemented"))
+}
+
+func (UnimplementedAdminServiceHandler) UpdateStage(context.Context, *connect.Request[v1.UpdateStageRequest]) (*connect.Response[v1.UpdateStageResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.UpdateStage is not implemented"))
 }
 
 func (UnimplementedAdminServiceHandler) ListEventStages(context.Context, *connect.Request[v1.ListEventStagesRequest]) (*connect.Response[v1.ListEventStagesResponse], error) {

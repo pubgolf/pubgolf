@@ -20,7 +20,6 @@
 	export let stages: Stage[];
 	export let template: AdjustmentTemplate | null;
 	export let operation: FormOperation;
-	export let title = '';
 	export let onSubmit: (data: AdjustmentTemplateData, id?: string) => Promise<DisplayError>;
 
 	let venueSpecific = writable(!!template?.data?.stageId);
@@ -78,7 +77,9 @@
 
 <div class="card p-4 w-modal shadow-xl space-y-4 relative">
 	<header class="card-header">
-		{#if title}<span class="text-2xl font-bold">{title}</span>{/if}
+		<span class="text-2xl font-bold"
+			>{operation[0].toLocaleUpperCase() + operation.slice(1)} Adjustment</span
+		>
 		<button
 			type="button"
 			class="btn btn-icon absolute top-4 right-4 {parent.buttonNeutral}"

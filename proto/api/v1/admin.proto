@@ -21,10 +21,18 @@ service AdminService {
   // ListPlayers returns all players for a given event.
   rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse) {}
 
-  // Event Info
+  // Schedule
+
+  // ListVenues returns all venues that a stage can link to.
+  rpc ListVenues(ListVenuesRequest) returns (ListVenuesResponse) {}
+
+  // UpdateStage sets the details for a stage.
+  rpc UpdateStage(UpdateStageRequest) returns (UpdateStageResponse) {}
 
   // ListEventStages returns a full schedule for an event.
   rpc ListEventStages(ListEventStagesRequest) returns (ListEventStagesResponse) {}
+
+  // Adjustments
 
   // CreateAdjustmentTemplate creates an adjustment to surface in player score submission.
   rpc CreateAdjustmentTemplate(CreateAdjustmentTemplateRequest) returns (CreateAdjustmentTemplateResponse) {}
@@ -87,10 +95,8 @@ message ListPlayersResponse {
 }
 
 // --------------------
-// Event Info
+// Schedule
 // --------------------
-
-// Shared
 
 message Rule {
   string id = 1;
@@ -101,9 +107,23 @@ message Stage {
   string id = 1;
   Venue venue = 2;
   Rule rule = 3;
+  int32 rank = 4;
+  int32 duration_min = 5;
 }
 
-// ListEventStages
+message ListVenuesRequest {}
+message ListVenuesResponse {
+  repeated Venue venues = 1;
+}
+
+message UpdateStageRequest {
+  string stage_id = 1;
+  string venue_id = 2;
+  string venue_description = 3;
+  int32 rank = 4;
+  int32 duration_min = 5;
+}
+message UpdateStageResponse {}
 
 message ListEventStagesRequest {
   string event_key = 1;
@@ -111,6 +131,10 @@ message ListEventStagesRequest {
 message ListEventStagesResponse {
   repeated Stage stages = 1;
 }
+
+// --------------------
+// Adjustments
+// --------------------
 
 message AdjustmentTemplateData {
   AdjustmentData adjustment = 1;

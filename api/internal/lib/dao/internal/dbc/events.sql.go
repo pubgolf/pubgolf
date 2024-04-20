@@ -106,7 +106,9 @@ SELECT
   v.id AS venue_id,
   v.name,
   v.address,
-  v.image_url
+  v.image_url,
+  s.rank,
+  s.duration_minutes
 FROM
   stages s
   LEFT JOIN rules r ON s.rule_id = r.id
@@ -121,13 +123,15 @@ ORDER BY
 `
 
 type EventScheduleWithDetailsRow struct {
-	ID          models.StageID
-	RuleID      models.DatabaseULID
-	Description sql.NullString
-	VenueID     models.VenueID
-	Name        sql.NullString
-	Address     sql.NullString
-	ImageUrl    sql.NullString
+	ID              models.StageID
+	RuleID          models.DatabaseULID
+	Description     sql.NullString
+	VenueID         models.VenueID
+	Name            sql.NullString
+	Address         sql.NullString
+	ImageUrl        sql.NullString
+	Rank            int32
+	DurationMinutes uint32
 }
 
 func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]EventScheduleWithDetailsRow, error) {
@@ -147,6 +151,8 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 			&i.Name,
 			&i.Address,
 			&i.ImageUrl,
+			&i.Rank,
+			&i.DurationMinutes,
 		); err != nil {
 			return nil, err
 		}

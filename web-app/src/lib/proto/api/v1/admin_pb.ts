@@ -350,6 +350,16 @@ export class Stage extends Message<Stage> {
    */
   rule?: Rule;
 
+  /**
+   * @generated from field: int32 rank = 4;
+   */
+  rank = 0;
+
+  /**
+   * @generated from field: int32 duration_min = 5;
+   */
+  durationMin = 0;
+
   constructor(data?: PartialMessage<Stage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -361,6 +371,8 @@ export class Stage extends Message<Stage> {
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "venue", kind: "message", T: Venue },
     { no: 3, name: "rule", kind: "message", T: Rule },
+    { no: 4, name: "rank", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "duration_min", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Stage {
@@ -377,6 +389,166 @@ export class Stage extends Message<Stage> {
 
   static equals(a: Stage | PlainMessage<Stage> | undefined, b: Stage | PlainMessage<Stage> | undefined): boolean {
     return proto3.util.equals(Stage, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListVenuesRequest
+ */
+export class ListVenuesRequest extends Message<ListVenuesRequest> {
+  constructor(data?: PartialMessage<ListVenuesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListVenuesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListVenuesRequest {
+    return new ListVenuesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListVenuesRequest {
+    return new ListVenuesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListVenuesRequest {
+    return new ListVenuesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListVenuesRequest | PlainMessage<ListVenuesRequest> | undefined, b: ListVenuesRequest | PlainMessage<ListVenuesRequest> | undefined): boolean {
+    return proto3.util.equals(ListVenuesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.ListVenuesResponse
+ */
+export class ListVenuesResponse extends Message<ListVenuesResponse> {
+  /**
+   * @generated from field: repeated api.v1.Venue venues = 1;
+   */
+  venues: Venue[] = [];
+
+  constructor(data?: PartialMessage<ListVenuesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListVenuesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "venues", kind: "message", T: Venue, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListVenuesResponse {
+    return new ListVenuesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListVenuesResponse {
+    return new ListVenuesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListVenuesResponse {
+    return new ListVenuesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListVenuesResponse | PlainMessage<ListVenuesResponse> | undefined, b: ListVenuesResponse | PlainMessage<ListVenuesResponse> | undefined): boolean {
+    return proto3.util.equals(ListVenuesResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateStageRequest
+ */
+export class UpdateStageRequest extends Message<UpdateStageRequest> {
+  /**
+   * @generated from field: string stage_id = 1;
+   */
+  stageId = "";
+
+  /**
+   * @generated from field: string venue_id = 2;
+   */
+  venueId = "";
+
+  /**
+   * @generated from field: string venue_description = 3;
+   */
+  venueDescription = "";
+
+  /**
+   * @generated from field: int32 rank = 4;
+   */
+  rank = 0;
+
+  /**
+   * @generated from field: int32 duration_min = 5;
+   */
+  durationMin = 0;
+
+  constructor(data?: PartialMessage<UpdateStageRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateStageRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stage_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "venue_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "venue_description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "rank", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "duration_min", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateStageRequest {
+    return new UpdateStageRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateStageRequest {
+    return new UpdateStageRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateStageRequest {
+    return new UpdateStageRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateStageRequest | PlainMessage<UpdateStageRequest> | undefined, b: UpdateStageRequest | PlainMessage<UpdateStageRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateStageRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.UpdateStageResponse
+ */
+export class UpdateStageResponse extends Message<UpdateStageResponse> {
+  constructor(data?: PartialMessage<UpdateStageResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.UpdateStageResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateStageResponse {
+    return new UpdateStageResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateStageResponse {
+    return new UpdateStageResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateStageResponse {
+    return new UpdateStageResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateStageResponse | PlainMessage<UpdateStageResponse> | undefined, b: UpdateStageResponse | PlainMessage<UpdateStageResponse> | undefined): boolean {
+    return proto3.util.equals(UpdateStageResponse, a, b);
   }
 }
 

@@ -106,6 +106,36 @@ func (_m *MockQuerier) AdjustmentsByPlayerStage(ctx context.Context, arg Adjustm
 	return r0, r1
 }
 
+// AllVenues provides a mock function with given fields: ctx
+func (_m *MockQuerier) AllVenues(ctx context.Context) ([]AllVenuesRow, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AllVenues")
+	}
+
+	var r0 []AllVenuesRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]AllVenuesRow, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []AllVenuesRow); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]AllVenuesRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateAdjustment provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error {
 	ret := _m.Called(ctx, arg)
@@ -1010,6 +1040,42 @@ func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, UpdatePlayerParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateRuleByStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateRuleByStage")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpdateRuleByStageParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateStage provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UpdateStage(ctx context.Context, arg UpdateStageParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateStage")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, UpdateStageParams) error); ok {
 		r0 = rf(ctx, arg)
 	} else {
 		r0 = ret.Error(0)

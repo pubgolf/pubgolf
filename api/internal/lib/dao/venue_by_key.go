@@ -8,16 +8,8 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-// Venue contains metadata about a venue location.
-type Venue struct {
-	ID       models.VenueID
-	Name     string
-	Address  string
-	ImageURL string
-}
-
 // VenueByKey returns venue info for the venue key and event id.
-func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (Venue, error) {
+func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.Venue, error) {
 	defer daoSpan(&ctx)()
 
 	v, err := q.dbc.VenueByKey(ctx, dbc.VenueByKeyParams{
@@ -25,7 +17,7 @@ func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueK
 		VenueKey: venueKey,
 	})
 	if err != nil {
-		return Venue{}, fmt.Errorf("fetch venue: %w", err)
+		return models.Venue{}, fmt.Errorf("fetch venue: %w", err)
 	}
 
 	imageURL := fallbackVenueImage
@@ -33,7 +25,7 @@ func (q *Queries) VenueByKey(ctx context.Context, eventID models.EventID, venueK
 		imageURL = v.ImageUrl.String
 	}
 
-	return Venue{
+	return models.Venue{
 		ID:       v.ID,
 		Name:     v.Name,
 		Address:  v.Address,
