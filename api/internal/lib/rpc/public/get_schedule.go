@@ -107,6 +107,11 @@ func descriptionAtIndex(venues []dao.VenueStop, idx int) *string {
 	if idx >= 0 && idx < len(venues) {
 		v := venues[idx].Description
 
+		// We've started storing empty rules to make managing schedules via the Admin UI easier, so filter those out to avoid having to special-case empty descriptions on the client.
+		if v == "" {
+			return nil
+		}
+
 		return &v
 	}
 
