@@ -1,8 +1,8 @@
+import { getAPIToken, USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
 import { AdminService } from '$lib/proto/api/v1/admin_connect';
 import { PubGolfService } from '$lib/proto/api/v1/pubgolf_connect';
-import { createConnectTransport } from '@bufbuild/connect-web';
 import { createPromiseClient, type Interceptor, type PromiseClient } from '@bufbuild/connect';
-import { getAPIToken, USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
+import { createConnectTransport } from '@bufbuild/connect-web';
 
 export const PubGolfServiceClient = createPromiseClient(
 	PubGolfService,
@@ -46,7 +46,7 @@ export async function getAdminServiceClient(): Promise<AdminServiceClient> {
 function addAuthHeader(authToken: string): Interceptor {
 	return (next) => async (req) => {
 		if (authToken) {
-			req.header.set('X-PubGolf-Auth', authToken);
+			req.header.set('X-PubGolf-AuthToken', authToken);
 		}
 		return await next(req);
 	};
