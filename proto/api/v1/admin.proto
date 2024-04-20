@@ -114,7 +114,7 @@ message ListEventStagesResponse {
 
 message AdjustmentTemplateData {
   AdjustmentData adjustment = 1;
-  int32 rank = 2; 
+  int32 rank = 2;
   string event_key = 3;
   optional string stage_id = 4;
   bool is_visible = 5;
