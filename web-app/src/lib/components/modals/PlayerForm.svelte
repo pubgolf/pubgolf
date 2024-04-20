@@ -3,34 +3,70 @@
 </script>
 
 <script lang="ts">
-	import { Modal, modalStore } from '@skeletonlabs/skeleton';
-	import type { PlayerData } from '$lib/proto/api/v1/shared_pb';
 	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
+	import { PlayerData, ScoringCategory, type Player } from '$lib/proto/api/v1/shared_pb';
+	import { Modal, modalStore } from '@skeletonlabs/skeleton';
+	import { XIcon } from 'lucide-svelte';
+	import type { ComponentProps } from 'svelte';
 	import type { DisplayError } from '../ErrorBanner.svelte';
 	import ErrorBanner from '../ErrorBanner.svelte';
-	import type { ComponentProps } from 'svelte';
-	import { XIcon } from 'lucide-svelte';
 
 	export let parent: ComponentProps<Modal>;
-	export let playerData: PlayerData;
+	export let eventKey: string;
+	export let player: Player;
 	export let operation: FormOperation;
 	export let title = '';
-	export let onSubmit: (op: FormOperation, playerData: PlayerData) => Promise<DisplayError>;
+	export let onSubmit: (
+		op: FormOperation,
+		playerData: PlayerData,
+		scoringCategory: ScoringCategory,
+		phoneNumber?: string
+	) => Promise<DisplayError>;
+
+	let playerName = player.data?.name || '';
+	let phoneNumber = '';
+	let scoringCategory =
+		player.events.find((x) => x.eventKey == eventKey)?.scoringCategory ||
+		ScoringCategory.UNSPECIFIED;
 
 	let ctaText = operation === 'create' ? 'Register Player' : 'Update Player';
+	let requirePhoneNumber = operation === 'create';
+	let normalizedPhoneNumber = '';
+	$: normalizedPhoneNumber = cleanPhoneNumber(phoneNumber);
 
 	let error: DisplayError = null;
 	function clearError() {
 		error = null;
 	}
 
+	function cleanPhoneNumber(num: string): string {
+		num = num.replaceAll(/[^\d]/g, '');
+		if (num.length < 11 && !num.startsWith('1')) {
+			num = '1' + num;
+		}
+
+		return '+' + num;
+	}
+
 	async function onFormSubmit() {
-		if (playerData.name === '') {
+		if (playerName === '') {
 			error = { type: 'Form Validation Error', message: 'Player name must not be blank.' };
 			return;
 		}
 
-		const resp = await onSubmit(operation, playerData);
+		if (requirePhoneNumber && normalizedPhoneNumber.length !== 12) {
+			error = { type: 'Form Validation Error', message: 'Phone number must be 10 digits.' };
+			return;
+		}
+
+		const resp = await onSubmit(
+			operation,
+			new PlayerData({
+				name: playerName
+			}),
+			scoringCategory,
+			requirePhoneNumber ? normalizedPhoneNumber : undefined
+		);
 		if (resp) {
 			error = resp;
 			return;
@@ -63,12 +99,18 @@
 				type="text"
 				required
 				placeholder="Enter name..."
-				bind:value={playerData.name}
+				bind:value={playerName}
 			/>
 		</label>
+		{#if requirePhoneNumber}
+			<label class="label">
+				<span>Phone Number</span>
+				<input class="input" type="tel" required bind:value={phoneNumber} />
+			</label>
+		{/if}
 		<label class="label">
 			<span>League</span>
-			<select class="select" bind:value={playerData.scoringCategory}>
+			<select class="select" bind:value={scoringCategory}>
 				{#each Object.entries(scoringCategoryToDisplayName) as league}
 					<option value={+league[0]}>{league[1]}</option>
 				{/each}

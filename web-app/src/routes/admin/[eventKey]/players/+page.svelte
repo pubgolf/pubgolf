@@ -7,7 +7,7 @@
 	import PlayerForm, { type FormOperation } from '$lib/components/modals/PlayerForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
-	import { PlayerData, type Player } from '$lib/proto/api/v1/shared_pb';
+	import { Player, type PlayerData, type ScoringCategory } from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon, UserPlusIcon } from 'lucide-svelte';
@@ -34,30 +34,44 @@
 	}
 	onMount(refreshData);
 
-	function showModal(title: string, playerData: PlayerData, playerId?: string) {
+	function showModal(title: string, player: Player) {
 		let operation: FormOperation = 'create';
-		if (playerId) {
+		if (player.id) {
 			operation = 'edit';
 		}
 
 		const props: Omit<ComponentProps<PlayerForm>, 'parent'> = {
 			operation,
 			title,
-			playerData,
-			onSubmit: async (op: FormOperation, playerData: PlayerData): Promise<DisplayError> => {
+			eventKey: $page.params.eventKey,
+			player,
+			onSubmit: async (
+				op: FormOperation,
+				playerData: PlayerData,
+				scoringCategory: ScoringCategory,
+				phoneNumber?: string
+			): Promise<DisplayError> => {
 				const rpc = await getAdminServiceClient();
 				try {
-					if (operation === 'create') {
+					if (op === 'create') {
 						await rpc.createPlayer({
-							eventKey: $page.params.eventKey,
-							playerData
+							playerData,
+							phoneNumber,
+							registration: {
+								eventKey: $page.params.eventKey,
+								scoringCategory: scoringCategory
+							}
 						});
 					}
 
-					if (operation === 'edit') {
+					if (op === 'edit') {
 						await rpc.updatePlayer({
-							playerId,
-							playerData
+							playerId: player.id,
+							playerData,
+							registration: {
+								eventKey: $page.params.eventKey,
+								scoringCategory: scoringCategory
+							}
 						});
 					}
 				} catch (error) {
@@ -80,7 +94,7 @@
 	}
 
 	function showNewPlayerModal() {
-		showModal('Register New Player', new PlayerData());
+		showModal('Register New Player', new Player());
 	}
 
 	function getPlayerCategory(player: Player) {
@@ -124,8 +138,7 @@
 									<button
 										type="button"
 										class="btn btn-sm variant-filled"
-										on:click={() =>
-											showModal('Update Player', player.data || new PlayerData(), player.id)}
+										on:click={() => showModal('Update Player', player || new Player())}
 									>
 										<span>Edit</span>
 									</button>
