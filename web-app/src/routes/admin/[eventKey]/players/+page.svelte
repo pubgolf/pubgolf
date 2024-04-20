@@ -82,6 +82,11 @@
 	function showNewPlayerModal() {
 		showModal('Register New Player', new PlayerData());
 	}
+
+	function getPlayerCategory(player: Player) {
+		const cat = player.events.find((x) => x.eventKey == $page.params.eventKey)?.scoringCategory;
+		return cat ? scoringCategoryToDisplayName[cat] : '(None)';
+	}
 </script>
 
 <SetTitle title="Players" />
@@ -114,11 +119,7 @@
 						{#each players as player (player.id)}
 							<tr>
 								<td>{player.data?.name}</td>
-								<td
-									>{player.data?.scoringCategory
-										? scoringCategoryToDisplayName[player.data?.scoringCategory]
-										: '(None)'}</td
-								>
+								<td>{getPlayerCategory(player)}</td>
 								<td class="table-cell-fit">
 									<button
 										type="button"
