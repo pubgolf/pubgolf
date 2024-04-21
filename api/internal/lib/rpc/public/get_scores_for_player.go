@@ -31,25 +31,9 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
 
-	player, err := s.dao.PlayerByID(ctx, playerID)
+	playerCategory, err := s.guardPlayerCategory(ctx, playerID, req.Msg.GetEventKey())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("lookup player info: %w", err))
-	}
-
-	var playerCategory models.ScoringCategory
-	foundEventReg := false
-
-	for _, reg := range player.Events {
-		if reg.EventKey == req.Msg.GetEventKey() {
-			playerCategory = reg.ScoringCategory
-			foundEventReg = true
-
-			break
-		}
-	}
-
-	if !foundEventReg {
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", playerID.String(), req.Msg.GetEventKey(), errNotRegistered))
+		return nil, err
 	}
 
 	scores, err := s.dao.PlayerScores(ctx, eventID, playerID, callerPID == playerID)

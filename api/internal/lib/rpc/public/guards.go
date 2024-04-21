@@ -63,3 +63,19 @@ func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.Pl
 
 	return eventID, nil
 }
+
+// guardPlayerCategory ensures the given player is registered for the given event and returns their scoring category.
+func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.PlayerID, eventKey string) (models.ScoringCategory, error) {
+	player, err := s.dao.PlayerByID(ctx, playerID)
+	if err != nil {
+		return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup player info: %w", err))
+	}
+
+	for _, reg := range player.Events {
+		if reg.EventKey == eventKey {
+			return reg.ScoringCategory, nil
+		}
+	}
+
+	return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", player.ID.String(), eventKey, errNotRegistered))
+}
