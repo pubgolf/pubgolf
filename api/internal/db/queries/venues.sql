@@ -42,7 +42,8 @@ UPDATE
 SET
   venue_id = @venue_id,
   rank = @rank,
-  duration_minutes = @duration_minutes
+  duration_minutes = @duration_minutes,
+  venue_key = NULL
 WHERE
   s.id = @id;
 

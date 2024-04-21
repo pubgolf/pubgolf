@@ -112,7 +112,8 @@ UPDATE
 SET
   venue_id = $1,
   rank = $2,
-  duration_minutes = $3
+  duration_minutes = $3,
+  venue_key = NULL
 WHERE
   s.id = $4
 `
