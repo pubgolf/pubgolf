@@ -57,15 +57,8 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 	}
 
 	currentVenueIdx := currentStopIndex(venues, time.Since(startTime))
-	if currentVenueIdx < 0 {
-		return connect.NewResponse(&apiv1.GetScoresForPlayerResponse{
-			ScoreBoard: &apiv1.ScoreBoard{
-				Scores: nil,
-			},
-		}), nil
-	}
-
 	stopIdx := len(venues) - 1
+
 	if currentVenueIdx < len(venues) {
 		stopIdx = currentVenueIdx
 	}
@@ -79,11 +72,18 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		}
 
 		status := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
+
+		// Mark as non-scoring if category doesn't take into account for overall leaderboard.
 		if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
 			status = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
-		} else if s.Score == 0 {
-			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
-			if i < currentVenueIdx {
+		} else {
+			// Future or current + un-submitted is pending.
+			if i > currentVenueIdx || (i == currentVenueIdx && s.Score == 0) {
+				status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
+			}
+
+			// Previous, required venues are incomplete if un-submitted.
+			if i < currentVenueIdx && s.Score == 0 {
 				status = apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
 			}
 		}
