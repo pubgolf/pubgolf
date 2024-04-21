@@ -335,16 +335,19 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 			// Insert random scores, without adjustments.
 
 			expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-			expectedNumScores := numVenues
+			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
+			expectedScoredPlayers := numPlayers
 
 			for _, p := range fix.PlayerIDs {
+				expectedNumScores[p] = numVenues
+
 				for _, s := range fix.StageIDs {
 					var skip bool
 					err := faker.FakeData(&skip)
 					require.NoError(t, err, "generate random bool")
 
 					if skip {
-						expectedNumScores--
+						expectedNumScores[p]--
 
 						continue
 					}
@@ -360,6 +363,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 					})
 					require.NoError(t, err, "insert generated score")
 				}
+
+				if expectedNumScores[p] < 1 {
+					expectedScoredPlayers--
+				}
 			}
 
 			// Run query and assert results.
@@ -370,11 +377,12 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			require.Len(t, actualScores, numPlayers)
+			require.Len(t, actualScores, expectedScoredPlayers)
 
 			for _, s := range actualScores {
-				assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
-				assert.EqualValues(t, expectedNumScores, s.NumScores, "one score per venue")
+				pID := models.PlayerID{DatabaseULID: s.PlayerID}
+				assert.EqualValues(t, expectedTotalScores[pID], s.TotalPoints, "total points")
+				assert.EqualValues(t, expectedNumScores[pID], s.NumScores, "one score per venue where a score was submitted")
 				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 				assert.Zero(t, s.PointsFromPenalties, "no penalties")
 			}
@@ -614,7 +622,7 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 
 			numVenues := 9
 			numEligibleVenues := 5
-			numPlayers := 1
+			numPlayers := 2
 			scoringCategory := models.ScoringCategoryPubGolfNineHole
 
 			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
@@ -626,9 +634,12 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 			// Insert random scores, without adjustments.
 
 			expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-			expectedNumScores := numEligibleVenues
+			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
+			expectedScoredPlayers := numPlayers
 
 			for _, p := range fix.PlayerIDs {
+				expectedNumScores[p] = numEligibleVenues
+
 				for stageIdx, s := range fix.StageIDs {
 					if stageIdx%2 == 1 {
 						continue
@@ -639,7 +650,7 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 					require.NoError(t, err, "generate random bool")
 
 					if skip {
-						expectedNumScores--
+						expectedNumScores[p]--
 
 						continue
 					}
@@ -655,6 +666,10 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 					})
 					require.NoError(t, err, "insert generated score")
 				}
+
+				if expectedNumScores[p] < 1 {
+					expectedScoredPlayers--
+				}
 			}
 
 			// Run query and assert results.
@@ -665,11 +680,12 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			require.Len(t, actualScores, numPlayers)
+			require.Len(t, actualScores, expectedScoredPlayers)
 
 			for _, s := range actualScores {
-				assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
-				assert.EqualValues(t, expectedNumScores, s.NumScores, "one score per venue")
+				pID := models.PlayerID{DatabaseULID: s.PlayerID}
+				assert.EqualValues(t, expectedTotalScores[pID], s.TotalPoints, "total points")
+				assert.EqualValues(t, expectedNumScores[pID], s.NumScores, "one score per venue where a score was submitted")
 				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 				assert.Zero(t, s.PointsFromPenalties, "no penalties")
 			}
