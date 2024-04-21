@@ -229,7 +229,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	var playerID models.PlayerID
 	require.NoError(t, row.Scan(&playerID), "scan returned player ID")
 
-	_, err := sharedTestDB.Exec("INSERT INTO event_players (event_id, player_id, scoring_category) VALUES ($1, $2, 'SCORING_CATEGORY_PUB_GOLF_NINE_HOLE')", eventID, playerID)
+	_, err := sharedTestDB.Exec("INSERT INTO event_players (event_id, player_id, scoring_category) VALUES ($1, $2, 'SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE')", eventID, playerID)
 	require.NoError(t, err, "insert registration")
 
 	row = sharedTestDB.QueryRow("INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
@@ -249,14 +249,17 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	currentVenueKey := schedule.Msg.GetSchedule().GetCurrentVenueKey()
 	require.NotEmpty(t, currentVenueKey, "Has current venue key")
 
-	// TODO: Enable this test case when 5-hole players are filtered out on even holes.
-	// form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
-	// 	EventKey: testEventKey,
-	// 	VenueKey: currentVenueKey,
-	// 	PlayerId: playerID.String(),
-	// }, playerToken.String()))
-	// require.NoError(t, err)
-	// require.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_NOT_REQUIRED, form.Msg.GetStatus(), "Score submission not required on even numbered hole")
+	// Get score submission form, which is optional for 5-hole players.
+
+	form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+		EventKey: testEventKey,
+		VenueKey: currentVenueKey,
+		PlayerId: playerID.String(),
+	}, playerToken.String()))
+	require.NoError(t, err)
+	require.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_OPTIONAL.String(), form.Msg.GetStatus().String(), "Score submission not required on even numbered hole")
+
+	// Advance by one hole.
 
 	_, err = sharedTestDB.Exec("UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
 	require.NoError(t, err, "seed DB: change event start time")
@@ -270,7 +273,9 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	currentVenueKey = schedule.Msg.GetSchedule().GetCurrentVenueKey()
 	require.NotEmpty(t, currentVenueKey, "Has current venue key")
 
-	form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+	// Get score submission form on the next hole, which is required for 5-hole players.
+
+	form, err = c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 
 	"connectrpc.com/connect"
 
@@ -25,12 +26,37 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
-	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
+	playerCategory, err := s.guardPlayerCategory(ctx, playerID, req.Msg.GetEventKey())
+	if err != nil {
+		return nil, err
+	}
+
+	venueKey := models.VenueKeyFromUInt32(req.Msg.GetVenueKey())
+	status := apiv1.ScoreStatus_SCORE_STATUS_REQUIRED
+
+	log.Printf("Category: %s\n", playerCategory.String())
+
+	if playerCategory == models.ScoringCategoryPubGolfFiveHole {
+		venues, err := s.dao.EventSchedule(ctx, eventID)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
+		}
+
+		for i, v := range venues {
+			if v.VenueKey == venueKey {
+				if i%2 == 1 {
+					status = apiv1.ScoreStatus_SCORE_STATUS_OPTIONAL
+				}
+
+				break
+			}
+		}
+	}
+
+	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, venueKey)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("lookup stage ID: %w", err))
 	}
-
-	// TODO: Block requests for non-current stages.
 
 	venAdjs, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
 	if err != nil {
@@ -42,8 +68,6 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch event adjustment templates: %w", err))
 	}
 
-	// TODO: Update status based on scoring category
-	status := apiv1.ScoreStatus_SCORE_STATUS_REQUIRED
 	score := uint32(0)
 	hasScore := true
 
