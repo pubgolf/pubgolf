@@ -11,6 +11,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
+	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 type ctxKeyPlayerID struct{}
@@ -77,6 +78,8 @@ func NewAuthInterceptor(q dao.QueryProvider) connect.UnaryInterceptorFunc {
 			if err != nil {
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid auth token format: %w", err))
 			}
+
+			telemetry.AddRecursiveAttribute(&ctx, "client.ctx_header.auth_token", token.RedactedString())
 
 			playerID, err := q.PlayerIDByAuthToken(ctx, token)
 			if err != nil {
