@@ -165,7 +165,6 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			defer cleanup()
 
 			// Insert fixture data.
-			// Insert fixture data.
 			eventID := setupEvent(ctx, t, tx)
 
 			var venueIDs []models.VenueID
