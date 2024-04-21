@@ -24,7 +24,7 @@ func AdjustmentIDFromString(s string) (AdjustmentID, error) {
 	return AdjustmentID{DatabaseULID{u}}, nil
 }
 
-// AdjustmentTemplateID uniquely identifies a bonus or penalty.
+// AdjustmentTemplateID uniquely identifies a "standard" bonus or penalty.
 type AdjustmentTemplateID struct{ DatabaseULID }
 
 // AdjustmentTemplateIDFromULID parses an AdjustmentTemplateID from a ULID.
@@ -42,7 +42,7 @@ func AdjustmentTemplateIDFromString(s string) (AdjustmentTemplateID, error) {
 	return AdjustmentTemplateID{DatabaseULID{u}}, nil
 }
 
-// AuthToken uniquely identifies a bonus or penalty.
+// AuthToken represents bearer authorization for a player.
 type AuthToken struct{ DatabaseULID }
 
 // AuthTokenFromULID parses an AuthToken from a ULID.
