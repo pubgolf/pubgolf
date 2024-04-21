@@ -24,7 +24,7 @@ func (q *Queries) ScoringCriteria(ctx context.Context, eventID models.EventID, c
 		var scores []models.ScoringInput
 		for _, d := range data {
 			scores = append(scores, models.ScoringInput{
-				PlayerID:            d.PlayerID,
+				PlayerID:            models.PlayerID{DatabaseULID: d.PlayerID},
 				Name:                d.Name,
 				NumScores:           d.NumScores,
 				TotalPoints:         d.TotalPoints,
@@ -47,7 +47,7 @@ func (q *Queries) ScoringCriteria(ctx context.Context, eventID models.EventID, c
 	var scores []models.ScoringInput
 	for _, d := range data {
 		scores = append(scores, models.ScoringInput{
-			PlayerID:            d.PlayerID,
+			PlayerID:            models.PlayerID{DatabaseULID: d.PlayerID},
 			Name:                d.Name,
 			NumScores:           d.NumScores,
 			TotalPoints:         d.TotalPoints,
