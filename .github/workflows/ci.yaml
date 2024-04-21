@@ -133,7 +133,7 @@ jobs:
         working-directory: ./web-app
         run: |
           npm run ci:lint
-          npm run ci:check
+          npm run check
       - name: Build Web App
         working-directory: ./web-app
         run: npm run build
