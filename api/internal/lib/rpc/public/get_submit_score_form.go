@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 
 	"connectrpc.com/connect"
 
@@ -33,8 +32,6 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 
 	venueKey := models.VenueKeyFromUInt32(req.Msg.GetVenueKey())
 	status := apiv1.ScoreStatus_SCORE_STATUS_REQUIRED
-
-	log.Printf("Category: %s\n", playerCategory.String())
 
 	if playerCategory == models.ScoringCategoryPubGolfFiveHole {
 		venues, err := s.dao.EventSchedule(ctx, eventID)

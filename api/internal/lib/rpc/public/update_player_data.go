@@ -3,7 +3,6 @@ package public
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"connectrpc.com/connect"
 
@@ -24,8 +23,6 @@ func (s *Server) UpdatePlayerData(ctx context.Context, req *connect.Request[apiv
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update registration: %w", err))
 	}
-
-	log.Printf("dao.UpdatePlayer returned(%+v)\n", player)
 
 	p, err := player.Proto()
 	if err != nil {
