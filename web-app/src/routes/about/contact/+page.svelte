@@ -7,7 +7,7 @@
 <h1>Contact Us</h1>
 <p>Have any questions? You can reach out to us at pubgolf+legal@thedeerchild.com</p>
 
-<style class="postcss">
+<style lang="postcss">
 	h1 {
 		@apply mt-8 mb-4;
 	}

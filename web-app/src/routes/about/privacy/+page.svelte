@@ -854,7 +854,7 @@
 	>.
 </p>
 
-<style class="postcss">
+<style lang="postcss">
 	h1,
 	h2,
 	h3,
