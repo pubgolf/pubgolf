@@ -57,20 +57,11 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 	}
 
 	currentVenueIdx := currentStopIndex(venues, time.Since(startTime))
-	stopIdx := len(venues) - 1
-
-	if currentVenueIdx < len(venues) {
-		stopIdx = currentVenueIdx
-	}
 
 	adjIdx := 0
 	var entries []*apiv1.ScoreBoard_ScoreBoardEntry
 
 	for i, s := range scores {
-		if i > stopIdx {
-			break
-		}
-
 		status := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 
 		// Mark as non-scoring if category doesn't take into account for overall leaderboard.
