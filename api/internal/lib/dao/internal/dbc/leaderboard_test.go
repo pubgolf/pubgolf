@@ -68,7 +68,7 @@ type setupScoreboardConfig struct {
 
 type setupScoreboardFixtures struct {
 	EventID   models.EventID
-	VenueIDs  []models.VenueID
+	Venues    []models.Venue
 	StageIDs  []models.StageID
 	PlayerIDs []models.PlayerID
 }
@@ -81,11 +81,11 @@ func setupScoreboard(ctx context.Context, t *testing.T, tx *sql.Tx, cfg setupSco
 	fix.EventID = setupEvent(ctx, t, tx)
 
 	for range cfg.NumVenues {
-		fix.VenueIDs = append(fix.VenueIDs, setupVenue(ctx, t, tx))
+		fix.Venues = append(fix.Venues, setupVenue(ctx, t, tx))
 	}
 
-	for i, vID := range fix.VenueIDs {
-		fix.StageIDs = append(fix.StageIDs, setupStage(ctx, t, tx, fix.EventID, vID, int32(i+1)))
+	for i, v := range fix.Venues {
+		fix.StageIDs = append(fix.StageIDs, setupStage(ctx, t, tx, fix.EventID, v.ID, int32(i+1)))
 	}
 
 	for range cfg.NumPlayers {

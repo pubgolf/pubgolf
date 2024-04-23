@@ -32,8 +32,11 @@ func setupEvent(ctx context.Context, t *testing.T, tx *sql.Tx) models.EventID {
 	return e
 }
 
-func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.VenueID {
+func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.Venue {
 	t.Helper()
+
+	name := faker.Word()
+	address := faker.Sentence()
 
 	row := tx.QueryRowContext(ctx, `
 		INSERT INTO venues 
@@ -42,13 +45,18 @@ func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.VenueID {
 			($1, $2)
 		RETURNING 
 			id;
-	`, faker.Word(), faker.Sentence())
+	`, name, address)
 	require.NoError(t, row.Err(), "create fixture data of venue")
 
 	var v models.VenueID
 	require.NoError(t, row.Scan(&v), "scan returned venue ID")
 
-	return v
+	return models.Venue{
+		ID:       v,
+		Name:     name,
+		Address:  address,
+		ImageURL: "",
+	}
 }
 
 func TestEventIDByKey(t *testing.T) {
@@ -137,18 +145,18 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			// Insert fixture data.
 			eventID := setupEvent(ctx, t, tx)
 
-			var venueIDs []models.VenueID
+			var venues []models.Venue
 			for range numVenues {
-				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
+				venues = append(venues, setupVenue(ctx, t, tx))
 			}
 
-			for i, vID := range venueIDs {
+			for i, v := range venues {
 				_, err := tx.ExecContext(ctx, `
 				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
-			`, eventID, vID, i)
+			`, eventID, v.ID, i)
 				require.NoError(t, err)
 			}
 
@@ -167,19 +175,19 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			// Insert fixture data.
 			eventID := setupEvent(ctx, t, tx)
 
-			var venueIDs []models.VenueID
+			var venues []models.Venue
 			for range numVenues {
-				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
+				venues = append(venues, setupVenue(ctx, t, tx))
 			}
 
-			for i, vID := range venueIDs {
+			for i, v := range venues {
 				if i == 0 {
 					_, err := tx.ExecContext(ctx, `
 					INSERT INTO stages 
 						(event_id, venue_id, duration_minutes, rank, venue_key) 
 					VALUES 
 						($1, $2, 30, $3, NULL);
-				`, eventID, vID, i)
+				`, eventID, v.ID, i)
 					require.NoError(t, err)
 
 					continue
@@ -190,7 +198,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
-			`, eventID, vID, i)
+			`, eventID, v.ID, i)
 				require.NoError(t, err)
 			}
 
@@ -207,19 +215,19 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			// Insert fixture data.
 			eventID := setupEvent(ctx, t, tx)
 
-			var venueIDs []models.VenueID
+			var venues []models.Venue
 			for range numVenues {
-				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
+				venues = append(venues, setupVenue(ctx, t, tx))
 			}
 
-			for i, vID := range venueIDs {
-				if i == len(venueIDs)-1 {
+			for i, v := range venues {
+				if i == len(venues)-1 {
 					_, err := tx.ExecContext(ctx, `
 					INSERT INTO stages 
 						(event_id, venue_id, duration_minutes, rank, venue_key) 
 					VALUES 
 						($1, $2, 30, $3, NULL);
-				`, eventID, vID, i)
+				`, eventID, v.ID, i)
 					require.NoError(t, err)
 
 					continue
@@ -230,7 +238,7 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, $3);
-			`, eventID, vID, i)
+			`, eventID, v.ID, i)
 
 				require.NoError(t, err)
 			}
@@ -248,18 +256,18 @@ func TestEventVenueKeysAreValid(t *testing.T) {
 			// Insert fixture data.
 			eventID := setupEvent(ctx, t, tx)
 
-			var venueIDs []models.VenueID
+			var venues []models.Venue
 			for range numVenues {
-				venueIDs = append(venueIDs, setupVenue(ctx, t, tx))
+				venues = append(venues, setupVenue(ctx, t, tx))
 			}
 
-			for i, vID := range venueIDs {
+			for i, v := range venues {
 				_, err := tx.ExecContext(ctx, `
 				INSERT INTO stages 
 					(event_id, venue_id, duration_minutes, rank, venue_key) 
 				VALUES 
 					($1, $2, 30, $3, NULL);
-			`, eventID, vID, i)
+			`, eventID, v.ID, i)
 				require.NoError(t, err)
 			}
 
