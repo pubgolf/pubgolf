@@ -84,7 +84,7 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 			EntityId:           p(s.VenueID.String()),
-			Label:              applyUnverifiedLabel(s.VenueName, s.IsVerified),
+			Label:              applyUnverifiedLabel(s.VenueName, status),
 			Score:              int32(s.Score),
 			DisplayScoreSigned: false,
 			Rank:               p(uint32(venueIdx + 1)),
@@ -93,7 +93,7 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 
 		for adjIdx < len(adjs) && adjs[adjIdx].VenueID == s.VenueID {
 			a := adjs[adjIdx]
-			adjLabel := applyUnverifiedLabel(applyAdjustmentLabel(a.AdjustmentLabel, a.AdjustmentAmount), s.IsVerified)
+			adjLabel := applyAdjustmentLabel(a.AdjustmentLabel, a.AdjustmentAmount)
 
 			entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 				EntityId:           p(s.VenueID.String()),
@@ -131,8 +131,8 @@ func scoreStatus(val uint32, venueRequired, scoreVerified, isCurrentVenue bool) 
 	return apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
 }
 
-func applyUnverifiedLabel(l string, isVer bool) string {
-	if !isVer {
+func applyUnverifiedLabel(l string, status apiv1.ScoreBoard_ScoreStatus) string {
+	if status == apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION {
 		return l + " (Unverified)"
 	}
 
