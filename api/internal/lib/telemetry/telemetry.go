@@ -49,6 +49,10 @@ func gitVersion() string {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, setting := range info.Settings {
 			if setting.Key == "vcs.revision" {
+				if len(setting.Value) >= 7 {
+					return "sha-" + setting.Value[:7]
+				}
+
 				return setting.Value
 			}
 		}
