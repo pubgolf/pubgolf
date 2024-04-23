@@ -1012,6 +1012,66 @@ func (_m *MockQuerier) StageIDByVenueKey(ctx context.Context, arg StageIDByVenue
 	return r0, r1
 }
 
+// UnverifiedScoreCountAllVenues provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UnverifiedScoreCountAllVenues(ctx context.Context, arg UnverifiedScoreCountAllVenuesParams) ([]UnverifiedScoreCountAllVenuesRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UnverifiedScoreCountAllVenues")
+	}
+
+	var r0 []UnverifiedScoreCountAllVenuesRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, UnverifiedScoreCountAllVenuesParams) ([]UnverifiedScoreCountAllVenuesRow, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, UnverifiedScoreCountAllVenuesParams) []UnverifiedScoreCountAllVenuesRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]UnverifiedScoreCountAllVenuesRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, UnverifiedScoreCountAllVenuesParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UnverifiedScoreCountEveryOtherVenue provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) UnverifiedScoreCountEveryOtherVenue(ctx context.Context, arg UnverifiedScoreCountEveryOtherVenueParams) ([]UnverifiedScoreCountEveryOtherVenueRow, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UnverifiedScoreCountEveryOtherVenue")
+	}
+
+	var r0 []UnverifiedScoreCountEveryOtherVenueRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, UnverifiedScoreCountEveryOtherVenueParams) ([]UnverifiedScoreCountEveryOtherVenueRow, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, UnverifiedScoreCountEveryOtherVenueParams) []UnverifiedScoreCountEveryOtherVenueRow); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]UnverifiedScoreCountEveryOtherVenueRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, UnverifiedScoreCountEveryOtherVenueParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateAdjustmentTemplate provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) UpdateAdjustmentTemplate(ctx context.Context, arg UpdateAdjustmentTemplateParams) error {
 	ret := _m.Called(ctx, arg)

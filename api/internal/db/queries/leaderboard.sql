@@ -181,3 +181,65 @@ ORDER BY
   points_from_penalties ASC,
   points_from_bonuses DESC;
 
+-- name: UnverifiedScoreCountEveryOtherVenue :many
+WITH st AS (
+  -- Replaces the stages table in the later section with only the odd numbered stages.
+  SELECT
+    st.*,
+    mod(row_number() OVER (ORDER BY st.rank ASC), 2) = 1 AS is_odd
+  FROM
+    stages st
+  WHERE
+    st.deleted_at IS NULL
+    AND st.event_id = @event_id
+)
+SELECT
+  p.id AS player_id,
+  SUM(
+    CASE WHEN s.is_verified IS FALSE THEN
+      1
+    ELSE
+      0
+    END) AS count
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+  JOIN st ON st.event_id = ep.event_id
+  LEFT JOIN scores s ON s.player_id = p.id
+    AND s.stage_id = st.id
+WHERE
+  p.deleted_at IS NULL
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id
+  AND ep.scoring_category = @scoring_category
+  AND s.deleted_at IS NULL
+  AND st.deleted_at IS NULL
+  AND st.is_odd
+GROUP BY
+  p.id;
+
+-- name: UnverifiedScoreCountAllVenues :many
+SELECT
+  p.id AS player_id,
+  SUM(
+    CASE WHEN s.is_verified IS FALSE THEN
+      1
+    ELSE
+      0
+    END) AS count
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+  JOIN stages st ON st.event_id = ep.event_id
+  LEFT JOIN scores s ON s.player_id = p.id
+    AND s.stage_id = st.id
+WHERE
+  p.deleted_at IS NULL
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id
+  AND ep.scoring_category = @scoring_category
+  AND s.deleted_at IS NULL
+  AND st.deleted_at IS NULL
+GROUP BY
+  p.id;
+

@@ -135,6 +135,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.stageIDByVenueKeyStmt, err = db.PrepareContext(ctx, stageIDByVenueKey); err != nil {
 		return nil, fmt.Errorf("error preparing query StageIDByVenueKey: %w", err)
 	}
+	if q.unverifiedScoreCountAllVenuesStmt, err = db.PrepareContext(ctx, unverifiedScoreCountAllVenues); err != nil {
+		return nil, fmt.Errorf("error preparing query UnverifiedScoreCountAllVenues: %w", err)
+	}
+	if q.unverifiedScoreCountEveryOtherVenueStmt, err = db.PrepareContext(ctx, unverifiedScoreCountEveryOtherVenue); err != nil {
+		return nil, fmt.Errorf("error preparing query UnverifiedScoreCountEveryOtherVenue: %w", err)
+	}
 	if q.updateAdjustmentTemplateStmt, err = db.PrepareContext(ctx, updateAdjustmentTemplate); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateAdjustmentTemplate: %w", err)
 	}
@@ -349,6 +355,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing stageIDByVenueKeyStmt: %w", cerr)
 		}
 	}
+	if q.unverifiedScoreCountAllVenuesStmt != nil {
+		if cerr := q.unverifiedScoreCountAllVenuesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing unverifiedScoreCountAllVenuesStmt: %w", cerr)
+		}
+	}
+	if q.unverifiedScoreCountEveryOtherVenueStmt != nil {
+		if cerr := q.unverifiedScoreCountEveryOtherVenueStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing unverifiedScoreCountEveryOtherVenueStmt: %w", cerr)
+		}
+	}
 	if q.updateAdjustmentTemplateStmt != nil {
 		if cerr := q.updateAdjustmentTemplateStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateAdjustmentTemplateStmt: %w", cerr)
@@ -426,103 +442,107 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                                  DBTX
-	tx                                  *sql.Tx
-	adjustmentTemplatesByEventIDStmt    *sql.Stmt
-	adjustmentTemplatesByStageIDStmt    *sql.Stmt
-	adjustmentsByPlayerStageStmt        *sql.Stmt
-	allVenuesStmt                       *sql.Stmt
-	createAdjustmentStmt                *sql.Stmt
-	createAdjustmentTemplateStmt        *sql.Stmt
-	createAdjustmentWithTemplateStmt    *sql.Stmt
-	createPlayerStmt                    *sql.Stmt
-	deactivateAuthTokensStmt            *sql.Stmt
-	deleteAdjustmentStmt                *sql.Stmt
-	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
-	deleteScoreForPlayerStageStmt       *sql.Stmt
-	eventAdjustmentTemplatesStmt        *sql.Stmt
-	eventAdjustmentsStmt                *sql.Stmt
-	eventCacheVersionByHashStmt         *sql.Stmt
-	eventIDByKeyStmt                    *sql.Stmt
-	eventPlayersStmt                    *sql.Stmt
-	eventScheduleStmt                   *sql.Stmt
-	eventScheduleWithDetailsStmt        *sql.Stmt
-	eventScoresStmt                     *sql.Stmt
-	eventStartTimeStmt                  *sql.Stmt
-	eventVenueKeysAreValidStmt          *sql.Stmt
-	generateAuthTokenStmt               *sql.Stmt
-	phoneNumberIsVerifiedStmt           *sql.Stmt
-	playerAdjustmentsStmt               *sql.Stmt
-	playerByIDStmt                      *sql.Stmt
-	playerIDByAuthTokenStmt             *sql.Stmt
-	playerRegisteredForEventStmt        *sql.Stmt
-	playerRegistrationsByIDStmt         *sql.Stmt
-	playerScoresStmt                    *sql.Stmt
-	scoreByPlayerStageStmt              *sql.Stmt
-	scoringCriteriaAllVenuesStmt        *sql.Stmt
-	scoringCriteriaEveryOtherVenueStmt  *sql.Stmt
-	setEventCacheKeysStmt               *sql.Stmt
-	setEventVenueKeysStmt               *sql.Stmt
-	setNextEventVenueKeyStmt            *sql.Stmt
-	stageIDByVenueKeyStmt               *sql.Stmt
-	updateAdjustmentTemplateStmt        *sql.Stmt
-	updatePlayerStmt                    *sql.Stmt
-	updateRuleByStageStmt               *sql.Stmt
-	updateStageStmt                     *sql.Stmt
-	upsertRegistrationStmt              *sql.Stmt
-	upsertScoreStmt                     *sql.Stmt
-	venueByKeyStmt                      *sql.Stmt
-	verifyPhoneNumberStmt               *sql.Stmt
+	db                                      DBTX
+	tx                                      *sql.Tx
+	adjustmentTemplatesByEventIDStmt        *sql.Stmt
+	adjustmentTemplatesByStageIDStmt        *sql.Stmt
+	adjustmentsByPlayerStageStmt            *sql.Stmt
+	allVenuesStmt                           *sql.Stmt
+	createAdjustmentStmt                    *sql.Stmt
+	createAdjustmentTemplateStmt            *sql.Stmt
+	createAdjustmentWithTemplateStmt        *sql.Stmt
+	createPlayerStmt                        *sql.Stmt
+	deactivateAuthTokensStmt                *sql.Stmt
+	deleteAdjustmentStmt                    *sql.Stmt
+	deleteAdjustmentsForPlayerStageStmt     *sql.Stmt
+	deleteScoreForPlayerStageStmt           *sql.Stmt
+	eventAdjustmentTemplatesStmt            *sql.Stmt
+	eventAdjustmentsStmt                    *sql.Stmt
+	eventCacheVersionByHashStmt             *sql.Stmt
+	eventIDByKeyStmt                        *sql.Stmt
+	eventPlayersStmt                        *sql.Stmt
+	eventScheduleStmt                       *sql.Stmt
+	eventScheduleWithDetailsStmt            *sql.Stmt
+	eventScoresStmt                         *sql.Stmt
+	eventStartTimeStmt                      *sql.Stmt
+	eventVenueKeysAreValidStmt              *sql.Stmt
+	generateAuthTokenStmt                   *sql.Stmt
+	phoneNumberIsVerifiedStmt               *sql.Stmt
+	playerAdjustmentsStmt                   *sql.Stmt
+	playerByIDStmt                          *sql.Stmt
+	playerIDByAuthTokenStmt                 *sql.Stmt
+	playerRegisteredForEventStmt            *sql.Stmt
+	playerRegistrationsByIDStmt             *sql.Stmt
+	playerScoresStmt                        *sql.Stmt
+	scoreByPlayerStageStmt                  *sql.Stmt
+	scoringCriteriaAllVenuesStmt            *sql.Stmt
+	scoringCriteriaEveryOtherVenueStmt      *sql.Stmt
+	setEventCacheKeysStmt                   *sql.Stmt
+	setEventVenueKeysStmt                   *sql.Stmt
+	setNextEventVenueKeyStmt                *sql.Stmt
+	stageIDByVenueKeyStmt                   *sql.Stmt
+	unverifiedScoreCountAllVenuesStmt       *sql.Stmt
+	unverifiedScoreCountEveryOtherVenueStmt *sql.Stmt
+	updateAdjustmentTemplateStmt            *sql.Stmt
+	updatePlayerStmt                        *sql.Stmt
+	updateRuleByStageStmt                   *sql.Stmt
+	updateStageStmt                         *sql.Stmt
+	upsertRegistrationStmt                  *sql.Stmt
+	upsertScoreStmt                         *sql.Stmt
+	venueByKeyStmt                          *sql.Stmt
+	verifyPhoneNumberStmt                   *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                                  tx,
-		tx:                                  tx,
-		adjustmentTemplatesByEventIDStmt:    q.adjustmentTemplatesByEventIDStmt,
-		adjustmentTemplatesByStageIDStmt:    q.adjustmentTemplatesByStageIDStmt,
-		adjustmentsByPlayerStageStmt:        q.adjustmentsByPlayerStageStmt,
-		allVenuesStmt:                       q.allVenuesStmt,
-		createAdjustmentStmt:                q.createAdjustmentStmt,
-		createAdjustmentTemplateStmt:        q.createAdjustmentTemplateStmt,
-		createAdjustmentWithTemplateStmt:    q.createAdjustmentWithTemplateStmt,
-		createPlayerStmt:                    q.createPlayerStmt,
-		deactivateAuthTokensStmt:            q.deactivateAuthTokensStmt,
-		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
-		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
-		deleteScoreForPlayerStageStmt:       q.deleteScoreForPlayerStageStmt,
-		eventAdjustmentTemplatesStmt:        q.eventAdjustmentTemplatesStmt,
-		eventAdjustmentsStmt:                q.eventAdjustmentsStmt,
-		eventCacheVersionByHashStmt:         q.eventCacheVersionByHashStmt,
-		eventIDByKeyStmt:                    q.eventIDByKeyStmt,
-		eventPlayersStmt:                    q.eventPlayersStmt,
-		eventScheduleStmt:                   q.eventScheduleStmt,
-		eventScheduleWithDetailsStmt:        q.eventScheduleWithDetailsStmt,
-		eventScoresStmt:                     q.eventScoresStmt,
-		eventStartTimeStmt:                  q.eventStartTimeStmt,
-		eventVenueKeysAreValidStmt:          q.eventVenueKeysAreValidStmt,
-		generateAuthTokenStmt:               q.generateAuthTokenStmt,
-		phoneNumberIsVerifiedStmt:           q.phoneNumberIsVerifiedStmt,
-		playerAdjustmentsStmt:               q.playerAdjustmentsStmt,
-		playerByIDStmt:                      q.playerByIDStmt,
-		playerIDByAuthTokenStmt:             q.playerIDByAuthTokenStmt,
-		playerRegisteredForEventStmt:        q.playerRegisteredForEventStmt,
-		playerRegistrationsByIDStmt:         q.playerRegistrationsByIDStmt,
-		playerScoresStmt:                    q.playerScoresStmt,
-		scoreByPlayerStageStmt:              q.scoreByPlayerStageStmt,
-		scoringCriteriaAllVenuesStmt:        q.scoringCriteriaAllVenuesStmt,
-		scoringCriteriaEveryOtherVenueStmt:  q.scoringCriteriaEveryOtherVenueStmt,
-		setEventCacheKeysStmt:               q.setEventCacheKeysStmt,
-		setEventVenueKeysStmt:               q.setEventVenueKeysStmt,
-		setNextEventVenueKeyStmt:            q.setNextEventVenueKeyStmt,
-		stageIDByVenueKeyStmt:               q.stageIDByVenueKeyStmt,
-		updateAdjustmentTemplateStmt:        q.updateAdjustmentTemplateStmt,
-		updatePlayerStmt:                    q.updatePlayerStmt,
-		updateRuleByStageStmt:               q.updateRuleByStageStmt,
-		updateStageStmt:                     q.updateStageStmt,
-		upsertRegistrationStmt:              q.upsertRegistrationStmt,
-		upsertScoreStmt:                     q.upsertScoreStmt,
-		venueByKeyStmt:                      q.venueByKeyStmt,
-		verifyPhoneNumberStmt:               q.verifyPhoneNumberStmt,
+		db:                                      tx,
+		tx:                                      tx,
+		adjustmentTemplatesByEventIDStmt:        q.adjustmentTemplatesByEventIDStmt,
+		adjustmentTemplatesByStageIDStmt:        q.adjustmentTemplatesByStageIDStmt,
+		adjustmentsByPlayerStageStmt:            q.adjustmentsByPlayerStageStmt,
+		allVenuesStmt:                           q.allVenuesStmt,
+		createAdjustmentStmt:                    q.createAdjustmentStmt,
+		createAdjustmentTemplateStmt:            q.createAdjustmentTemplateStmt,
+		createAdjustmentWithTemplateStmt:        q.createAdjustmentWithTemplateStmt,
+		createPlayerStmt:                        q.createPlayerStmt,
+		deactivateAuthTokensStmt:                q.deactivateAuthTokensStmt,
+		deleteAdjustmentStmt:                    q.deleteAdjustmentStmt,
+		deleteAdjustmentsForPlayerStageStmt:     q.deleteAdjustmentsForPlayerStageStmt,
+		deleteScoreForPlayerStageStmt:           q.deleteScoreForPlayerStageStmt,
+		eventAdjustmentTemplatesStmt:            q.eventAdjustmentTemplatesStmt,
+		eventAdjustmentsStmt:                    q.eventAdjustmentsStmt,
+		eventCacheVersionByHashStmt:             q.eventCacheVersionByHashStmt,
+		eventIDByKeyStmt:                        q.eventIDByKeyStmt,
+		eventPlayersStmt:                        q.eventPlayersStmt,
+		eventScheduleStmt:                       q.eventScheduleStmt,
+		eventScheduleWithDetailsStmt:            q.eventScheduleWithDetailsStmt,
+		eventScoresStmt:                         q.eventScoresStmt,
+		eventStartTimeStmt:                      q.eventStartTimeStmt,
+		eventVenueKeysAreValidStmt:              q.eventVenueKeysAreValidStmt,
+		generateAuthTokenStmt:                   q.generateAuthTokenStmt,
+		phoneNumberIsVerifiedStmt:               q.phoneNumberIsVerifiedStmt,
+		playerAdjustmentsStmt:                   q.playerAdjustmentsStmt,
+		playerByIDStmt:                          q.playerByIDStmt,
+		playerIDByAuthTokenStmt:                 q.playerIDByAuthTokenStmt,
+		playerRegisteredForEventStmt:            q.playerRegisteredForEventStmt,
+		playerRegistrationsByIDStmt:             q.playerRegistrationsByIDStmt,
+		playerScoresStmt:                        q.playerScoresStmt,
+		scoreByPlayerStageStmt:                  q.scoreByPlayerStageStmt,
+		scoringCriteriaAllVenuesStmt:            q.scoringCriteriaAllVenuesStmt,
+		scoringCriteriaEveryOtherVenueStmt:      q.scoringCriteriaEveryOtherVenueStmt,
+		setEventCacheKeysStmt:                   q.setEventCacheKeysStmt,
+		setEventVenueKeysStmt:                   q.setEventVenueKeysStmt,
+		setNextEventVenueKeyStmt:                q.setNextEventVenueKeyStmt,
+		stageIDByVenueKeyStmt:                   q.stageIDByVenueKeyStmt,
+		unverifiedScoreCountAllVenuesStmt:       q.unverifiedScoreCountAllVenuesStmt,
+		unverifiedScoreCountEveryOtherVenueStmt: q.unverifiedScoreCountEveryOtherVenueStmt,
+		updateAdjustmentTemplateStmt:            q.updateAdjustmentTemplateStmt,
+		updatePlayerStmt:                        q.updatePlayerStmt,
+		updateRuleByStageStmt:                   q.updateRuleByStageStmt,
+		updateStageStmt:                         q.updateStageStmt,
+		upsertRegistrationStmt:                  q.upsertRegistrationStmt,
+		upsertScoreStmt:                         q.upsertScoreStmt,
+		venueByKeyStmt:                          q.venueByKeyStmt,
+		verifyPhoneNumberStmt:                   q.verifyPhoneNumberStmt,
 	}
 }
