@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -56,80 +57,97 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get event schedule: %w", err))
 	}
 
-	currentVenueIdx := currentStopIndex(venues, time.Since(startTime))
+	return connect.NewResponse(&apiv1.GetScoresForPlayerResponse{
+		ScoreBoard: &apiv1.ScoreBoard{
+			Scores: buildPlayerScoreBoard(
+				scores, adjustments, playerCategory, currentStopIndex(venues, time.Since(startTime)),
+			),
+		},
+	}), nil
+}
 
+func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenueAdjustment, cat models.ScoringCategory, stopIndex int) []*apiv1.ScoreBoard_ScoreBoardEntry {
+	entries := make([]*apiv1.ScoreBoard_ScoreBoardEntry, 0, len(scores)+len(adjs))
 	adjIdx := 0
-	var entries []*apiv1.ScoreBoard_ScoreBoardEntry
 
-	for i, s := range scores {
-		status := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
-
-		// Mark as non-scoring if category doesn't take into account for overall leaderboard.
-		if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
-			status = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
-		} else {
-			// Future or current + un-submitted is pending.
-			if i > currentVenueIdx || (i == currentVenueIdx && s.Score == 0) {
-				status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
-			}
-
-			// Previous, required venues are incomplete if un-submitted.
-			if i < currentVenueIdx && s.Score == 0 {
-				status = apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
-			}
+	for venueIdx, s := range scores {
+		if venueIdx > stopIndex {
+			break
 		}
 
-		label := s.VenueName
-		if !s.IsVerified {
-			label += " (Unverified)"
+		venueRequired := true
+		if cat == models.ScoringCategoryPubGolfFiveHole {
+			venueRequired = venueIdx%2 == 1
 		}
 
-		rankCopy := uint32(i + 1)
-		venueID := s.VenueID.String()
+		status := scoreStatus(s.Score, venueRequired, s.IsVerified, stopIndex == venueIdx)
+
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
-			EntityId:           &venueID,
-			Label:              label,
+			EntityId:           p(s.VenueID.String()),
+			Label:              applyUnverifiedLabel(s.VenueName, s.IsVerified),
 			Score:              int32(s.Score),
 			DisplayScoreSigned: false,
-			Rank:               &rankCopy,
+			Rank:               p(uint32(venueIdx + 1)),
 			Status:             status,
 		})
 
-		for adjIdx < len(adjustments) && adjustments[adjIdx].VenueID == s.VenueID {
-			a := adjustments[adjIdx]
-
-			adjStatus := apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
-			if playerCategory == models.ScoringCategoryPubGolfFiveHole && i%2 == 1 {
-				adjStatus = apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
-			}
+		for adjIdx < len(adjs) && adjs[adjIdx].VenueID == s.VenueID {
+			a := adjs[adjIdx]
+			adjLabel := applyUnverifiedLabel(applyAdjustmentLabel(a.AdjustmentLabel, a.AdjustmentAmount), s.IsVerified)
 
 			entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
-				EntityId:           nil,
-				Label:              decorateAdjustmentLabel(a.AdjustmentLabel, a.AdjustmentAmount),
+				EntityId:           p(s.VenueID.String()),
+				Label:              adjLabel,
 				Score:              a.AdjustmentAmount,
 				DisplayScoreSigned: true,
 				Rank:               nil,
-				Status:             adjStatus,
+				Status:             status,
 			})
 
 			adjIdx++
 		}
 	}
 
-	return connect.NewResponse(&apiv1.GetScoresForPlayerResponse{
-		ScoreBoard: &apiv1.ScoreBoard{
-			Scores: entries,
-		},
-	}), nil
+	return entries
 }
 
-func decorateAdjustmentLabel(l string, v int32) string {
+func scoreStatus(val uint32, venueRequired, scoreVerified, isCurrentVenue bool) apiv1.ScoreBoard_ScoreStatus {
+	if !venueRequired {
+		return apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
+	}
+
+	if val > 0 {
+		if scoreVerified {
+			return apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
+		}
+
+		// TODO: Replace with `apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION` when introduced.
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING
+	}
+
+	if isCurrentVenue {
+		// TODO: Replace with `apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION` when introduced.
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING
+	}
+
+	return apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
+}
+
+func applyUnverifiedLabel(l string, isVer bool) string {
+	if !isVer {
+		return l + " (Unverified)"
+	}
+
+	return l
+}
+
+func applyAdjustmentLabel(l string, v int32) string {
 	if v < 0 {
-		return "😇 " + l
+		return "\t😇 " + l
 	}
 
 	if v > 0 {
-		return "😈 " + l
+		return "\t😈 " + l
 	}
 
 	return l
