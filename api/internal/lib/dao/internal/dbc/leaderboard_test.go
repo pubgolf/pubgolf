@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"math/rand"
+	"slices"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -416,7 +417,6 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 				expectedPointsFromPenalties := make(map[models.PlayerID]int32, numPlayers)
 
 				for _, p := range fix.PlayerIDs {
-				StageLoop:
 					for stageIdx, s := range fix.StageIDs {
 						score := rand.Int31n(10)
 						expectedTotalScores[p] += score
@@ -431,10 +431,8 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 						// Insert random adjustments.
 
-						for _, skipIdx := range tc.skipIndex {
-							if stageIdx == skipIdx {
-								continue StageLoop
-							}
+						if slices.Contains(tc.skipIndex, stageIdx) {
+							continue
 						}
 
 						for range tc.numBonuses {
@@ -720,7 +718,6 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 				expectedPointsFromPenalties := make(map[models.PlayerID]int32, numPlayers)
 
 				for _, p := range fix.PlayerIDs {
-				StageLoop:
 					for stageIdx, s := range fix.StageIDs {
 						if stageIdx%2 == 1 {
 							continue
@@ -739,10 +736,8 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 
 						// Insert random adjustments.
 
-						for _, skipIdx := range tc.skipIndex {
-							if stageIdx == skipIdx {
-								continue StageLoop
-							}
+						if slices.Contains(tc.skipIndex, stageIdx) {
+							continue
 						}
 
 						for range tc.numBonuses {
