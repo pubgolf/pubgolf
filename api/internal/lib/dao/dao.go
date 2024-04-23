@@ -17,6 +17,8 @@ var (
 	ErrAlreadyCreated = errors.New("entity already exists")
 	// ErrTransactedQuerier indicates that the underlying DBC.Querier could not be used to create a transaction-compatible version of itself.
 	ErrTransactedQuerier = errors.New("cannot construct transacted querier")
+	// ErrInvariantViolation indicates an unexpected modeling condition within the database.
+	ErrInvariantViolation = errors.New("data model invariant violated")
 )
 
 const fallbackVenueImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
