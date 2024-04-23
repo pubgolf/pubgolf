@@ -54,7 +54,7 @@ type QueryProvider interface {
 	// PlayerRegisteredForEvent returns whether or not the player has a valid registration for the given event.
 	PlayerRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (bool, error)
 	// PlayerScores returns a list of event stages and a player's scoring info for each.
-	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID, includeUnverified bool) ([]PlayerVenueScore, error)
+	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// ScoringCriteria returns a list of players competing in the given category and the data necessary to rank them.

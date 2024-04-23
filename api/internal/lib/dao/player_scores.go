@@ -17,13 +17,12 @@ type PlayerVenueScore struct {
 }
 
 // PlayerScores returns a list of event stages and a player's scoring info for each.
-func (q *Queries) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID, includeUnverified bool) ([]PlayerVenueScore, error) {
+func (q *Queries) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error) {
 	defer daoSpan(&ctx)()
 
 	dbScores, err := q.dbc.PlayerScores(ctx, dbc.PlayerScoresParams{
-		EventID:           eventID,
-		PlayerID:          playerID,
-		IncludeUnverified: includeUnverified,
+		EventID:  eventID,
+		PlayerID: playerID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("fetch scores: %w", err)

@@ -336,7 +336,7 @@ SELECT
   v.id,
   v.name,
   COALESCE(s.value, 0),
-  COALESCE(s.is_verified, TRUE)
+  COALESCE(s.is_verified, FALSE)
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -347,16 +347,13 @@ WHERE
   AND st.event_id = $2
   AND v.deleted_at IS NULL
   AND s.deleted_at IS NULL
-  AND (s.is_verified = TRUE
-    OR s.is_verified != $3)
 ORDER BY
   st.rank ASC
 `
 
 type PlayerScoresParams struct {
-	PlayerID          models.PlayerID
-	EventID           models.EventID
-	IncludeUnverified bool
+	PlayerID models.PlayerID
+	EventID  models.EventID
 }
 
 type PlayerScoresRow struct {
@@ -367,7 +364,7 @@ type PlayerScoresRow struct {
 }
 
 func (q *Queries) PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error) {
-	rows, err := q.query(ctx, q.playerScoresStmt, playerScores, arg.PlayerID, arg.EventID, arg.IncludeUnverified)
+	rows, err := q.query(ctx, q.playerScoresStmt, playerScores, arg.PlayerID, arg.EventID)
 	if err != nil {
 		return nil, err
 	}

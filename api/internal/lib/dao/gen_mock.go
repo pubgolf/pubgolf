@@ -621,9 +621,9 @@ func (_m *MockQueryProvider) PlayerRegisteredForEvent(ctx context.Context, playe
 	return r0, r1
 }
 
-// PlayerScores provides a mock function with given fields: ctx, eventID, playerID, includeUnverified
-func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID, includeUnverified bool) ([]PlayerVenueScore, error) {
-	ret := _m.Called(ctx, eventID, playerID, includeUnverified)
+// PlayerScores provides a mock function with given fields: ctx, eventID, playerID
+func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error) {
+	ret := _m.Called(ctx, eventID, playerID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PlayerScores")
@@ -631,19 +631,19 @@ func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.Ev
 
 	var r0 []PlayerVenueScore
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID, bool) ([]PlayerVenueScore, error)); ok {
-		return rf(ctx, eventID, playerID, includeUnverified)
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID) ([]PlayerVenueScore, error)); ok {
+		return rf(ctx, eventID, playerID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID, bool) []PlayerVenueScore); ok {
-		r0 = rf(ctx, eventID, playerID, includeUnverified)
+	if rf, ok := ret.Get(0).(func(context.Context, models.EventID, models.PlayerID) []PlayerVenueScore); ok {
+		r0 = rf(ctx, eventID, playerID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]PlayerVenueScore)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerID, bool) error); ok {
-		r1 = rf(ctx, eventID, playerID, includeUnverified)
+	if rf, ok := ret.Get(1).(func(context.Context, models.EventID, models.PlayerID) error); ok {
+		r1 = rf(ctx, eventID, playerID)
 	} else {
 		r1 = ret.Error(1)
 	}

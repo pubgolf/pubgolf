@@ -36,7 +36,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
-	scores, err := s.dao.PlayerScores(ctx, eventID, playerID, callerPID == playerID)
+	scores, err := s.dao.PlayerScores(ctx, eventID, playerID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get score info: %w", err))
 	}

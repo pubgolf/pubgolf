@@ -85,7 +85,7 @@ SELECT
   v.id,
   v.name,
   COALESCE(s.value, 0),
-  COALESCE(s.is_verified, TRUE)
+  COALESCE(s.is_verified, FALSE)
 FROM
   stages st
   JOIN venues v ON st.venue_id = v.id
@@ -96,8 +96,6 @@ WHERE
   AND st.event_id = @event_id
   AND v.deleted_at IS NULL
   AND s.deleted_at IS NULL
-  AND (s.is_verified = TRUE
-    OR s.is_verified != @include_unverified)
 ORDER BY
   st.rank ASC;
 
