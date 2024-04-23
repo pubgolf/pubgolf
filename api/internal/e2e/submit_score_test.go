@@ -149,9 +149,12 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 		PlayerId: playerID.String(),
 	}, playerToken.String()))
 	require.NoError(t, err)
-	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 2)
-	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
-	require.Equal(t, "😇 Event Bonus", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 3)
+	require.Equal(t, "Venue 1", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
+	require.Zero(t, scores.Msg.GetScoreBoard().GetScores()[0].GetScore(), "no score for first venue")
+	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.EqualValues(t, expectedNumSips, scores.Msg.GetScoreBoard().GetScores()[1].GetScore(), "score reflected for submitted venue")
+	require.Equal(t, "\t😇 Event Bonus", scores.Msg.GetScoreBoard().GetScores()[2].GetLabel())
 
 	form, err = c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
@@ -195,8 +198,11 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 		PlayerId: playerID.String(),
 	}, playerToken.String()))
 	require.NoError(t, err)
-	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 1)
-	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
+	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 2)
+	require.Equal(t, "Venue 1", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
+	require.Zero(t, scores.Msg.GetScoreBoard().GetScores()[0].GetScore(), "no score for first venue")
+	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.EqualValues(t, expectedNumSips, scores.Msg.GetScoreBoard().GetScores()[1].GetScore(), "score reflected for submitted venue")
 }
 
 func Test_SubmitScore_FiveHole(t *testing.T) {
