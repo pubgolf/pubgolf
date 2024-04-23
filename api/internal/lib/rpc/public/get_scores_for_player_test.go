@@ -160,7 +160,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 			}
 		})
 
-		t.Run("all venues are pending with unverified score", func(t *testing.T) {
+		t.Run("all venues are pending verification with unverified score", func(t *testing.T) {
 			t.Parallel()
 
 			stopIndexes := []int{1, 3, 8, 9}
@@ -178,7 +178,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 					}
 
 					for i := range stopIndex - 1 {
-						assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_PENDING.String(), scoreboard[i].GetStatus().String())
+						assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION.String(), scoreboard[i].GetStatus().String())
 					}
 				})
 			}
@@ -302,7 +302,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 					scoreboard := buildPlayerScoreBoard(scores, nil, models.ScoringCategoryPubGolfNineHole, stopIndex)
 
 					require.Len(t, scoreboard, stopIndex+1)
-					assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_PENDING.String(), scoreboard[len(scoreboard)-1].GetStatus().String())
+					assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION.String(), scoreboard[len(scoreboard)-1].GetStatus().String())
 				})
 			}
 		})

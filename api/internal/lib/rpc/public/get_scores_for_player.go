@@ -121,13 +121,11 @@ func scoreStatus(val uint32, venueRequired, scoreVerified, isCurrentVenue bool) 
 			return apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 		}
 
-		// TODO: Replace with `apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION` when introduced.
-		return apiv1.ScoreBoard_SCORE_STATUS_PENDING
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION
 	}
 
 	if isCurrentVenue {
-		// TODO: Replace with `apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION` when introduced.
-		return apiv1.ScoreBoard_SCORE_STATUS_PENDING
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION
 	}
 
 	return apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE

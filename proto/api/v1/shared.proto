@@ -52,13 +52,17 @@ message ScoreBoard {
   enum ScoreStatus {
     SCORE_STATUS_UNSPECIFIED = 0;
     // SCORE_STATUS_PENDING indicates the player has not yet submitted/finalized their score for this round.
-    SCORE_STATUS_PENDING = 1;
+    SCORE_STATUS_PENDING = 1 [deprecated = true];
     // SCORE_STATUS_FINALIZED indicates that a player's score is "locked in" as of a given milestone.
     SCORE_STATUS_FINALIZED = 2;
     // SCORE_STATUS_INCOMPLETE indicates that a player's score is in an invalid or non-comparable state (e.g. they have dropped out of the event).
     SCORE_STATUS_INCOMPLETE = 3;
     // SCORE_STATUS_NON_SCORING indicates that a player's score will not be counted towards the overall leaderboard.
     SCORE_STATUS_NON_SCORING = 4;
+    // SCORE_STATUS_PENDING_SUBMISSION indicates the player has not yet submitted their score for this round.
+    SCORE_STATUS_PENDING_SUBMISSION = 5;
+    // SCORE_STATUS_PENDING_VERIFICATION indicates the player has submitted a score for this round but it hasn't yet been approved by an organizer.
+    SCORE_STATUS_PENDING_VERIFICATION = 6;
   }
 
   message ScoreBoardEntry {
