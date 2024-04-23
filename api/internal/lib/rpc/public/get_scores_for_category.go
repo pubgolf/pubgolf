@@ -76,7 +76,7 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		status := apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
 
 		if int(c.NumScores) == numScoredStages-1 {
-			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING
+			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING //nolint:staticcheck // TODO: Slated for refactor
 		}
 
 		if int(c.NumScores) >= numScoredStages {
