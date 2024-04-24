@@ -909,7 +909,6 @@ func TestUnverifiedScoreCountEveryOtherVenue(t *testing.T) {
 			// Insert random scores, without adjustments.
 
 			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
-			expectedScoredPlayers := numPlayers
 
 			for _, p := range fix.PlayerIDs {
 				expectedNumScores[p] = numVenues
@@ -943,10 +942,6 @@ func TestUnverifiedScoreCountEveryOtherVenue(t *testing.T) {
 					})
 					require.NoError(t, err, "insert generated score")
 				}
-
-				if expectedNumScores[p] < 1 {
-					expectedScoredPlayers--
-				}
 			}
 
 			// Run query and assert results.
@@ -956,7 +951,7 @@ func TestUnverifiedScoreCountEveryOtherVenue(t *testing.T) {
 				ScoringCategory: scoringCategory,
 			})
 			require.NoError(t, err)
-			require.Len(t, unverifiedRows, expectedScoredPlayers)
+			require.Len(t, unverifiedRows, numPlayers)
 
 			for _, s := range unverifiedRows {
 				assert.EqualValues(t, expectedNumScores[s.PlayerID], s.Count)
