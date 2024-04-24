@@ -76,6 +76,8 @@ github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY
 github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+lD48awMYo=
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
+github.com/hashicorp/golang-lru/v2 v2.0.7 h1:a+bsQ5rvGLjzHuww6tVxozPZFVghXaHOwFs4luLUK2k=
+github.com/hashicorp/golang-lru/v2 v2.0.7/go.mod h1:QeFd9opnmA6QUJc5vARoKUSoFhyfM2/ZepoAG6RGpeM=
 github.com/honeycombio/honeycomb-opentelemetry-go v0.10.0 h1:VEfkR+WP35D2H7PbeUqZtfmbUuKjnv39CdQLgR7TfTY=
 github.com/honeycombio/honeycomb-opentelemetry-go v0.10.0/go.mod h1:3AcXbJMBChalA+cgGqGn/tKF/Ce5pW5bZtnci60GqJo=
 github.com/honeycombio/otel-config-go v1.15.0 h1:wUiYG2gGaQEmyZeMMLCb14bx1DR/rxOylkZ05YWN1Jg=
