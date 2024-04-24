@@ -80,7 +80,7 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 			venueRequired = venueIdx%2 == 1
 		}
 
-		status := scoreStatus(s.Score, venueRequired, s.IsVerified, stopIndex == venueIdx)
+		status := playerScoreStatus(s.Score, venueRequired, s.IsVerified, stopIndex == venueIdx)
 
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 			EntityId:           p(s.VenueID.String()),
@@ -111,7 +111,7 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 	return entries
 }
 
-func scoreStatus(val uint32, venueRequired, scoreVerified, isCurrentVenue bool) apiv1.ScoreBoard_ScoreStatus {
+func playerScoreStatus(val uint32, venueRequired, scoreVerified, isCurrentVenue bool) apiv1.ScoreBoard_ScoreStatus {
 	if !venueRequired {
 		return apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING
 	}
