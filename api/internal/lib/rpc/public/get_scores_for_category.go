@@ -33,70 +33,86 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unrecognized enum value: %w", err))
 	}
 
-	sc, err := s.dao.ScoringCriteria(ctx, eventID, category)
+	scores, err := s.dao.ScoringCriteria(ctx, eventID, category)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get scoring criteria: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get scoring criteria: %w", err))
 	}
 
 	startTime, err := s.dao.EventStartTime(ctx, eventID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event start time: %w", err))
 	}
 
 	venues, err := s.dao.EventSchedule(ctx, eventID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
 	}
 
-	currentVenueIdx := currentStopIndex(venues, time.Since(startTime))
-
-	numScoredStages := 0
-	if currentVenueIdx > -1 {
-		numScoredStages = currentVenueIdx
-		if currentVenueIdx < len(venues) {
-			numScoredStages++
-		}
-
-		if category == models.ScoringCategoryPubGolfFiveHole {
-			numScoredStages = (numScoredStages / 2) + 1
-		}
-	}
-
-	var rank uint32 = 1
-	var scores []*apiv1.ScoreBoard_ScoreBoardEntry
-
-	for i, c := range sc {
-		var rankCopy *uint32
-
-		if i > 0 && c.TotalPoints > sc[i-1].TotalPoints {
-			// Increase the rank when we've stopped tying, but when we do we jump up to the 1-index of the leaderboard.
-			rank = uint32(i) + 1
-		}
-
-		status := apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
-
-		if int(c.NumScores) == numScoredStages-1 {
-			status = apiv1.ScoreBoard_SCORE_STATUS_PENDING //nolint:staticcheck // TODO: Slated for refactor
-		}
-
-		if int(c.NumScores) >= numScoredStages {
-			status = apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
-			rankCopy = &rank
-		}
-
-		scores = append(scores, &apiv1.ScoreBoard_ScoreBoardEntry{
-			EntityId:           p(c.PlayerID.String()),
-			Label:              c.Name,
-			Score:              int32(c.TotalPoints),
-			DisplayScoreSigned: false,
-			Rank:               rankCopy,
-			Status:             status,
-		})
-	}
+	venueIdx := currentStopIndex(venues, time.Since(startTime))
+	required := scoredStages(venueIdx, len(venues), category == models.ScoringCategoryPubGolfFiveHole)
 
 	return connect.NewResponse(&apiv1.GetScoresForCategoryResponse{
 		ScoreBoard: &apiv1.ScoreBoard{
-			Scores: scores,
+			Scores: buildCategoryScoreBoard(scores, required),
 		},
 	}), nil
+}
+
+func buildCategoryScoreBoard(scores []models.ScoringInput, required int) []*apiv1.ScoreBoard_ScoreBoardEntry {
+	sb := make([]*apiv1.ScoreBoard_ScoreBoardEntry, 0, len(scores))
+
+	rank := uint32(1)
+	for i, s := range scores {
+		rank := rank
+
+		// Increase the rank when we've stopped tying, but when we do we jump up to the 1-index of the leaderboard.
+		if i > 0 && s.TotalPoints > scores[i-1].TotalPoints {
+			rank = uint32(i) + 1
+		}
+
+		sb = append(sb, &apiv1.ScoreBoard_ScoreBoardEntry{
+			EntityId:           p(s.PlayerID.String()),
+			Label:              s.Name,
+			Score:              int32(s.TotalPoints),
+			DisplayScoreSigned: false,
+			Rank:               &rank,
+			Status:             categoryScoreStatus(s, required),
+		})
+	}
+
+	return sb
+}
+
+func categoryScoreStatus(s models.ScoringInput, required int) apiv1.ScoreBoard_ScoreStatus {
+	req := int64(required)
+
+	if s.NumScores >= req {
+		return apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
+	}
+
+	if s.NumScores+s.NumUnverifiedScores >= req {
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION
+	}
+
+	if s.NumScores+s.NumUnverifiedScores == req-1 {
+		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION
+	}
+
+	return apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE
+}
+
+func scoredStages(venueIdx, numVenues int, everyOther bool) int {
+	if venueIdx < 0 {
+		return 0
+	}
+
+	if venueIdx == numVenues {
+		return numVenues
+	}
+
+	if everyOther {
+		return (venueIdx / 2) + 1
+	}
+
+	return venueIdx + 1
 }
