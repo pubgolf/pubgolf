@@ -18,9 +18,6 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    # TODO: enable...finding a lot of duplication in rpc GetSchedule tests
-    - dupl
-
     # No plans to enable (mostly complexity measures or extremely dogmatic).
     - cyclop
     - depguard
