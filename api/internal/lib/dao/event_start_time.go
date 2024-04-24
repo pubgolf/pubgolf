@@ -9,7 +9,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-var eventStartTimeCache = expirable.NewLRU[models.EventID, time.Time](defaultEventCacheSize, func(key models.EventID, value time.Time) {}, 1*time.Minute)
+var eventStartTimeCache = expirable.NewLRU[models.EventID, time.Time](defaultEventCacheSize, func(_ models.EventID, _ time.Time) {}, 1*time.Minute)
 
 // EventStartTime returns the start time for the given event ID.
 func (q *Queries) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {
