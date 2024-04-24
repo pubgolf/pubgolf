@@ -2,6 +2,7 @@ package public
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -185,6 +186,11 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 		})
 
 		t.Run("with five-hole category", func(t *testing.T) {
+			t.Parallel()
+
+			requiredIndexes := []int{0, 2, 4, 6, 8}
+			nonRequiredIndexes := []int{1, 3, 5, 7}
+
 			t.Run("all required venues are finalized with score", func(t *testing.T) {
 				t.Parallel()
 
@@ -203,7 +209,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 						}
 
 						for i := range stopIndex - 1 {
-							if i%2 == 1 {
+							if slices.Contains(requiredIndexes, i) {
 								assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_FINALIZED.String(), scoreboard[i].GetStatus().String())
 							}
 						}
@@ -229,7 +235,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 						}
 
 						for i := range stopIndex - 1 {
-							if i%2 != 1 {
+							if slices.Contains(nonRequiredIndexes, i) {
 								assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING.String(), scoreboard[i].GetStatus().String())
 							}
 						}
@@ -255,7 +261,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 						}
 
 						for i := range stopIndex - 1 {
-							if i%2 != 1 {
+							if slices.Contains(nonRequiredIndexes, i) {
 								assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING.String(), scoreboard[i].GetStatus().String())
 							}
 						}
@@ -281,7 +287,7 @@ func TestBuildPlayerScoreBoard(t *testing.T) {
 						}
 
 						for i := range stopIndex - 1 {
-							if i%2 != 1 {
+							if slices.Contains(nonRequiredIndexes, i) {
 								assert.Equal(t, apiv1.ScoreBoard_SCORE_STATUS_NON_SCORING.String(), scoreboard[i].GetStatus().String())
 							}
 						}

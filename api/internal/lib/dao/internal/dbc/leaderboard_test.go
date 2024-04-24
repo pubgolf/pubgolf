@@ -492,7 +492,7 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 	t.Run("No adjustments", func(t *testing.T) {
 		t.Parallel()
 
-		t.Run("Sums up scores for all venues", func(t *testing.T) {
+		t.Run("Sums up scores for all required venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -550,7 +550,7 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 			}
 		})
 
-		t.Run("Sums up scores for first N venues", func(t *testing.T) {
+		t.Run("Sums up scores for first N required venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -612,7 +612,7 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 			}
 		})
 
-		t.Run("Sums up scores for random N venues", func(t *testing.T) {
+		t.Run("Sums up scores for random N required venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)

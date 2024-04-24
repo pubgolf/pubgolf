@@ -41,6 +41,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 
 		for i, v := range venues {
 			if v.VenueKey == venueKey {
+				// Check for *odd* index to mean optional because it's the zero-based index, not the one-based venue count.
 				if i%2 == 1 {
 					status = apiv1.ScoreStatus_SCORE_STATUS_OPTIONAL
 				}

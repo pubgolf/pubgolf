@@ -77,7 +77,8 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 
 		venueRequired := true
 		if cat == models.ScoringCategoryPubGolfFiveHole {
-			venueRequired = venueIdx%2 == 1
+			// Check for *even* index to mean required because it's the zero-based index, not the one-based venue count.
+			venueRequired = venueIdx%2 == 0
 		}
 
 		status := playerScoreStatus(s.Score, venueRequired, s.IsVerified, stopIndex == venueIdx)
