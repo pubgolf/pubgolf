@@ -5,11 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"connectrpc.com/connect"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
+	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
@@ -54,7 +56,7 @@ func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.Pl
 	eventID, err := s.dao.EventIDByKey(ctx, eventKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.EventID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("unknown event key: %w", err))
+			return models.EventID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("unknown event key: %w", errIDNotFound))
 		}
 
 		return models.EventID{}, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event ID from database: %w", err))
@@ -89,4 +91,35 @@ func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.Player
 	}
 
 	return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", player.ID.String(), eventKey, errNotRegistered))
+}
+
+// guardValidCategory ensures the given scoring category is valid.
+func (s *Server) guardValidCategory(ctx context.Context, category apiv1.ScoringCategory) (models.ScoringCategory, error) {
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", category.String())
+
+	cat := models.ScoringCategoryUnspecified
+
+	err := cat.FromProtoEnum(category)
+	if err != nil {
+		return cat, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unrecognized enum value: %w", err))
+	}
+
+	return cat, nil
+}
+
+// guardStageID ensures the given venue key is valid and returns the matching stage ID.
+func (s *Server) guardStageID(ctx context.Context, eventID models.EventID, vk models.VenueKey) (models.StageID, error) {
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.event_id", eventID.String())
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.venue_key", strconv.FormatUint(uint64(vk.UInt32()), 10))
+
+	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, vk)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.StageID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("venue key %q: %w", vk, errIDNotFound))
+		}
+
+		return models.StageID{}, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup stage ID: %w", err))
+	}
+
+	return stageID, nil
 }

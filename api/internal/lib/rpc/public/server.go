@@ -17,6 +17,8 @@ var (
 	errNotRegistered = errors.New("must be registered for event")
 	// errNoInferredPlayerID indicates an invariant failure, in which a token-guarded route did not have a valid player ID inferred from the auth token.
 	errNoInferredPlayerID = errors.New("could not infer player ID from auth token")
+	// errIDNotFound indicates the entity could not be located.
+	errIDNotFound = errors.New("id not found")
 )
 
 // Server implements the gRPC handlers for the PubGolf API.

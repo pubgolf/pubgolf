@@ -23,14 +23,12 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		return nil, err
 	}
 
-	var category models.ScoringCategory
-
-	err = category.FromProtoEnum(*req.Msg.GetCategory().Enum())
+	cat, err := s.guardValidCategory(ctx, req.Msg.GetCategory())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unrecognized enum value: %w", err))
+		return nil, err
 	}
 
-	scores, err := s.dao.ScoringCriteria(ctx, eventID, category)
+	scores, err := s.dao.ScoringCriteria(ctx, eventID, cat)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get scoring criteria: %w", err))
 	}
@@ -46,7 +44,7 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 	}
 
 	venueIdx := currentStopIndex(venues, time.Since(startTime))
-	required := scoredStages(venueIdx, len(venues), category == models.ScoringCategoryPubGolfFiveHole)
+	required := scoredStages(venueIdx, len(venues), cat == models.ScoringCategoryPubGolfFiveHole)
 
 	return connect.NewResponse(&apiv1.GetScoresForCategoryResponse{
 		ScoreBoard: &apiv1.ScoreBoard{

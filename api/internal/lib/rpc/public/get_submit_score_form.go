@@ -31,6 +31,12 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 	}
 
 	venueKey := models.VenueKeyFromUInt32(req.Msg.GetVenueKey())
+
+	stageID, err := s.guardStageID(ctx, eventID, venueKey)
+	if err != nil {
+		return nil, err
+	}
+
 	status := apiv1.ScoreStatus_SCORE_STATUS_REQUIRED
 
 	if playerCategory == models.ScoringCategoryPubGolfFiveHole {
@@ -49,11 +55,6 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 				break
 			}
 		}
-	}
-
-	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, venueKey)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("lookup stage ID: %w", err))
 	}
 
 	venAdjs, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)

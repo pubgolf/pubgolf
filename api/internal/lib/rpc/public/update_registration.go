@@ -6,7 +6,6 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
@@ -17,11 +16,9 @@ func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
-	var cat models.ScoringCategory
-
-	err = cat.FromProtoEnum(req.Msg.GetRegistration().GetScoringCategory())
+	cat, err := s.guardValidCategory(ctx, req.Msg.GetRegistration().GetScoringCategory())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse scoring category: %w", err))
+		return nil, err
 	}
 
 	err = s.dao.UpsertRegistration(ctx, playerID, req.Msg.GetRegistration().GetEventKey(), cat)

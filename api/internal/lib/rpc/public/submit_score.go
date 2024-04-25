@@ -27,9 +27,9 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 
 	// TODO: Handle idempotency key.
 
-	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
+	stageID, err := s.guardStageID(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("lookup stage ID: %w", err))
+		return nil, err
 	}
 
 	tpls, err := s.getAdjustmentTemplates(ctx, eventID, stageID)
