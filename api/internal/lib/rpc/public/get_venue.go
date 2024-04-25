@@ -9,13 +9,10 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // GetVenue returns display information for the provided venue keys.
 func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVenueRequest]) (*connect.Response[apiv1.GetVenueResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
-
 	playerID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
 		return nil, err

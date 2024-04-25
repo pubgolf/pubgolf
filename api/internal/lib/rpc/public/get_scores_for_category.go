@@ -9,13 +9,10 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // GetScoresForCategory returns a scoreboard for the overall competition.
 func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[apiv1.GetScoresForCategoryRequest]) (*connect.Response[apiv1.GetScoresForCategoryResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
-
 	playerID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
 		return nil, err

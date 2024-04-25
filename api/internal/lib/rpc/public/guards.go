@@ -10,6 +10,7 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
+	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // guardInferredPlayerID returns the player's ID as inferred from the auth token.
@@ -18,6 +19,8 @@ func (s *Server) guardInferredPlayerID(ctx context.Context) (models.PlayerID, er
 	if !ok {
 		return models.PlayerID{}, connect.NewError(connect.CodeInvalidArgument, errNoInferredPlayerID)
 	}
+
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.inferred_player_id", playerID.String())
 
 	return playerID, nil
 }
@@ -34,6 +37,8 @@ func (s *Server) guardPlayerIDMatchesSelf(ctx context.Context, playerID string) 
 		return models.PlayerID{}, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
 
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", pID.String())
+
 	if pID != infPlayerID {
 		return models.PlayerID{}, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("player_id doesn't match auth token: %w", errUnownedEntity))
 	}
@@ -43,6 +48,9 @@ func (s *Server) guardPlayerIDMatchesSelf(ctx context.Context, playerID string) 
 
 // guardRegisteredForEvent ensures the given player is registered for the given event.
 func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventKey string) (models.EventID, error) {
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", playerID.String())
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.event_key", eventKey)
+
 	eventID, err := s.dao.EventIDByKey(ctx, eventKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -66,6 +74,9 @@ func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.Pl
 
 // guardPlayerCategory ensures the given player is registered for the given event and returns their scoring category.
 func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.PlayerID, eventKey string) (models.ScoringCategory, error) {
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", playerID.String())
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.event_key", eventKey)
+
 	player, err := s.dao.PlayerByID(ctx, playerID)
 	if err != nil {
 		return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup player info: %w", err))

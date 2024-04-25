@@ -9,13 +9,10 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // ListStageScores records the score and any adjustments (i.e. bonuses or penalties) for a (player, stage) pair.
 func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1.ListStageScoresRequest]) (*connect.Response[apiv1.ListStageScoresResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
-
 	eventID, err := s.dao.EventIDByKey(ctx, req.Msg.GetEventKey())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

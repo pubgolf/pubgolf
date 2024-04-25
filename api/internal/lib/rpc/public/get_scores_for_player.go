@@ -10,13 +10,10 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 // GetScoresForPlayer returns a player's personal scorecard.
 func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[apiv1.GetScoresForPlayerRequest]) (*connect.Response[apiv1.GetScoresForPlayerResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
-
 	callerPID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
 		return nil, err

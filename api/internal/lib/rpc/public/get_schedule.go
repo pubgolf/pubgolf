@@ -11,15 +11,12 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
 )
 
 const nextVenueVisibilityDuration = time.Duration(10) * time.Minute
 
 // GetSchedule returns the list of past venues, the current venue, and next venue plus transition time (if currently visible to clients).
 func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.GetScheduleRequest]) (*connect.Response[apiv1.GetScheduleResponse], error) {
-	telemetry.AddRecursiveAttribute(&ctx, "event.key", req.Msg.GetEventKey())
-
 	playerID, err := s.guardInferredPlayerID(ctx)
 	if err != nil {
 		return nil, err
