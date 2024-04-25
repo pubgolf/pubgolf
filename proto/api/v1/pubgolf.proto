@@ -34,7 +34,7 @@ service PubGolfService {
   // GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
   rpc GetMyPlayer(GetMyPlayerRequest) returns (GetMyPlayerResponse) {}
 
-   // DeleteMyAccount purges all data related to the authenticated player.
+  // DeleteMyAccount purges all data related to the authenticated player.
   rpc DeleteMyAccount(DeleteMyAccountRequest) returns (DeleteMyAccountResponse) {}
 
   // Player
