@@ -29,7 +29,7 @@ type mockDBCCall struct {
 
 func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 	if c.ShouldCall {
-		m.On(name, c.Args...).Return(c.Return...)
+		m.On(name, c.Args...).Return(c.Return...).Once()
 	}
 }
 

@@ -15,20 +15,6 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-func mockEventVenueKeysAreValid(m *dbc.MockQuerier, eventID models.EventID, isValid bool) {
-	mockDBCCall{
-		ShouldCall: true,
-		Args: []interface{}{
-			mock.Anything,
-			eventID,
-		},
-		Return: []interface{}{
-			isValid,
-			nil,
-		},
-	}.Bind(m, "EventVenueKeysAreValid")
-}
-
 func mockSetEventVenueKeys(m *dbc.MockQuerier, eventID models.EventID, shouldCall bool) {
 	mockDBCCall{
 		ShouldCall: shouldCall,
@@ -72,37 +58,86 @@ func mockEventSchedule(m *dbc.MockQuerier, eventID models.EventID, schedule []db
 func TestEventSchedule(t *testing.T) {
 	t.Parallel()
 
-	t.Run("Venue key setters aren't called when EventVenueKeysAreValid returns true", func(t *testing.T) {
+	nullVenueKey := models.VenueKeyFromUInt32(0)
+
+	t.Run("venue key setters aren't called when no venues are returned", func(t *testing.T) {
 		t.Parallel()
 
 		m := new(dbc.MockQuerier)
 		d := Queries{dbc: m}
 		eventID := models.EventIDFromULID(ulid.Make())
 
-		mockEventVenueKeysAreValid(m, eventID, true /* = isValid */)
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
-		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 
 		_, err := d.EventSchedule(context.Background(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
 
-	t.Run("Venue key setters are called when EventVenueKeysAreValid returns false", func(t *testing.T) {
+	t.Run("venue key setters aren't called when not missing venue keys", func(t *testing.T) {
+		t.Parallel()
+
+		m := new(dbc.MockQuerier)
+		d := Queries{dbc: m}
+		eventID := models.EventIDFromULID(ulid.Make())
+
+		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
+		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
+			{VenueKey: models.VenueKeyFromUInt32(1)},
+		})
+
+		_, err := d.EventSchedule(context.Background(), eventID)
+		require.NoError(t, err)
+		m.AssertExpectations(t)
+	})
+
+	t.Run("venue key setters are called when missing a venue key", func(t *testing.T) {
 		t.Parallel()
 
 		m := dbc.NewMockQuerier(t)
 		d := Queries{dbc: m}
 		eventID := models.EventIDFromULID(ulid.Make())
 
-		mockEventVenueKeysAreValid(m, eventID, false /* = isValid */)
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
+			{VenueKey: nullVenueKey},
+		})
+
 		mockSetEventVenueKeys(m, eventID, true /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, true /* = shouldCall */)
-		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
+
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
+			{VenueKey: models.VenueKeyFromUInt32(1)},
+		})
 
 		_, err := d.EventSchedule(context.Background(), eventID)
 		require.NoError(t, err)
+		m.AssertExpectations(t)
+	})
+
+	t.Run("returns an error when venue key setters still result in missing venue key", func(t *testing.T) {
+		t.Parallel()
+
+		m := dbc.NewMockQuerier(t)
+		d := Queries{dbc: m}
+		eventID := models.EventIDFromULID(ulid.Make())
+
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
+			{VenueKey: nullVenueKey},
+		})
+
+		mockSetEventVenueKeys(m, eventID, true /* = shouldCall */)
+		mockSetNextEventVenueKey(m, eventID, true /* = shouldCall */)
+
+		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
+			{VenueKey: nullVenueKey},
+		})
+
+		_, err := d.EventSchedule(context.Background(), eventID)
+		require.Error(t, err)
+		require.ErrorIs(t, err, ErrInvariantViolation)
 		m.AssertExpectations(t)
 	})
 
@@ -131,7 +166,6 @@ func TestEventSchedule(t *testing.T) {
 			})
 		}
 
-		mockEventVenueKeysAreValid(m, eventID, true /* = isValid */)
 		mockEventSchedule(m, eventID, scheduleRows)
 
 		venues, err := d.EventSchedule(context.Background(), eventID)
