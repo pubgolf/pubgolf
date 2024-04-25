@@ -184,24 +184,6 @@ func (q *Queries) EventStartTime(ctx context.Context, id models.EventID) (time.T
 	return starts_at, err
 }
 
-const eventVenueKeysAreValid = `-- name: EventVenueKeysAreValid :one
-SELECT
-  COUNT(*) < 1
-FROM
-  stages s
-WHERE
-  s.event_id = $1
-  AND s.deleted_at IS NULL
-  AND s.venue_key IS NULL
-`
-
-func (q *Queries) EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error) {
-	row := q.queryRow(ctx, q.eventVenueKeysAreValidStmt, eventVenueKeysAreValid, eventID)
-	var column_1 bool
-	err := row.Scan(&column_1)
-	return column_1, err
-}
-
 const setEventCacheKeys = `-- name: SetEventCacheKeys :one
 WITH starting_cache_version AS (
   SELECT

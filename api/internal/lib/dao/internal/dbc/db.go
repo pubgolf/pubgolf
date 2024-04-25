@@ -90,9 +90,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.eventStartTimeStmt, err = db.PrepareContext(ctx, eventStartTime); err != nil {
 		return nil, fmt.Errorf("error preparing query EventStartTime: %w", err)
 	}
-	if q.eventVenueKeysAreValidStmt, err = db.PrepareContext(ctx, eventVenueKeysAreValid); err != nil {
-		return nil, fmt.Errorf("error preparing query EventVenueKeysAreValid: %w", err)
-	}
 	if q.generateAuthTokenStmt, err = db.PrepareContext(ctx, generateAuthToken); err != nil {
 		return nil, fmt.Errorf("error preparing query GenerateAuthToken: %w", err)
 	}
@@ -283,11 +280,6 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing eventStartTimeStmt: %w", cerr)
 		}
 	}
-	if q.eventVenueKeysAreValidStmt != nil {
-		if cerr := q.eventVenueKeysAreValidStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing eventVenueKeysAreValidStmt: %w", cerr)
-		}
-	}
 	if q.generateAuthTokenStmt != nil {
 		if cerr := q.generateAuthTokenStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing generateAuthTokenStmt: %w", cerr)
@@ -474,7 +466,6 @@ type Queries struct {
 	eventScheduleWithDetailsStmt            *sql.Stmt
 	eventScoresStmt                         *sql.Stmt
 	eventStartTimeStmt                      *sql.Stmt
-	eventVenueKeysAreValidStmt              *sql.Stmt
 	generateAuthTokenStmt                   *sql.Stmt
 	phoneNumberIsVerifiedStmt               *sql.Stmt
 	playerAdjustmentsStmt                   *sql.Stmt
@@ -528,7 +519,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		eventScheduleWithDetailsStmt:            q.eventScheduleWithDetailsStmt,
 		eventScoresStmt:                         q.eventScoresStmt,
 		eventStartTimeStmt:                      q.eventStartTimeStmt,
-		eventVenueKeysAreValidStmt:              q.eventVenueKeysAreValidStmt,
 		generateAuthTokenStmt:                   q.generateAuthTokenStmt,
 		phoneNumberIsVerifiedStmt:               q.phoneNumberIsVerifiedStmt,
 		playerAdjustmentsStmt:                   q.playerAdjustmentsStmt,

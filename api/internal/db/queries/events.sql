@@ -16,16 +16,6 @@ WHERE
   id = $1
   AND deleted_at IS NULL;
 
--- name: EventVenueKeysAreValid :one
-SELECT
-  COUNT(*) < 1
-FROM
-  stages s
-WHERE
-  s.event_id = $1
-  AND s.deleted_at IS NULL
-  AND s.venue_key IS NULL;
-
 -- name: EventSchedule :many
 SELECT
   s.venue_key,
