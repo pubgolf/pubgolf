@@ -5,7 +5,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetSubmitScoreFormRequest, GetSubmitScoreFormResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse, SubmitScoreRequest, SubmitScoreResponse, UpdatePlayerDataRequest, UpdatePlayerDataResponse, UpdateRegistrationRequest, UpdateRegistrationResponse } from "./pubgolf_pb.js";
+import { ClientVersionRequest, ClientVersionResponse, CompletePlayerLoginRequest, CompletePlayerLoginResponse, DeleteMyAccountRequest, DeleteMyAccountResponse, GetContentItemRequest, GetContentItemResponse, GetMyPlayerRequest, GetMyPlayerResponse, GetPlayerRequest, GetPlayerResponse, GetScheduleRequest, GetScheduleResponse, GetScoresForCategoryRequest, GetScoresForCategoryResponse, GetScoresForPlayerRequest, GetScoresForPlayerResponse, GetScoresForVenueRequest, GetScoresForVenueResponse, GetSubmitScoreFormRequest, GetSubmitScoreFormResponse, GetVenueRequest, GetVenueResponse, ListContentItemsRequest, ListContentItemsResponse, PubGolfServiceCreatePlayerRequest, PubGolfServiceCreatePlayerResponse, StartPlayerLoginRequest, StartPlayerLoginResponse, SubmitScoreRequest, SubmitScoreResponse, UpdatePlayerDataRequest, UpdatePlayerDataResponse, UpdateRegistrationRequest, UpdateRegistrationResponse } from "./pubgolf_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -72,6 +72,17 @@ export const PubGolfService = {
       name: "GetMyPlayer",
       I: GetMyPlayerRequest,
       O: GetMyPlayerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * DeleteMyAccount purges all data related to the authenticated player.
+     *
+     * @generated from rpc api.v1.PubGolfService.DeleteMyAccount
+     */
+    deleteMyAccount: {
+      name: "DeleteMyAccount",
+      I: DeleteMyAccountRequest,
+      O: DeleteMyAccountResponse,
       kind: MethodKind.Unary,
     },
     /**

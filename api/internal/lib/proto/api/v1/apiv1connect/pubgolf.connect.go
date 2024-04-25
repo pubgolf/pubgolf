@@ -50,6 +50,9 @@ const (
 	// PubGolfServiceGetMyPlayerProcedure is the fully-qualified name of the PubGolfService's
 	// GetMyPlayer RPC.
 	PubGolfServiceGetMyPlayerProcedure = "/api.v1.PubGolfService/GetMyPlayer"
+	// PubGolfServiceDeleteMyAccountProcedure is the fully-qualified name of the PubGolfService's
+	// DeleteMyAccount RPC.
+	PubGolfServiceDeleteMyAccountProcedure = "/api.v1.PubGolfService/DeleteMyAccount"
 	// PubGolfServiceGetPlayerProcedure is the fully-qualified name of the PubGolfService's GetPlayer
 	// RPC.
 	PubGolfServiceGetPlayerProcedure = "/api.v1.PubGolfService/GetPlayer"
@@ -95,6 +98,7 @@ var (
 	pubGolfServiceStartPlayerLoginMethodDescriptor     = pubGolfServiceServiceDescriptor.Methods().ByName("StartPlayerLogin")
 	pubGolfServiceCompletePlayerLoginMethodDescriptor  = pubGolfServiceServiceDescriptor.Methods().ByName("CompletePlayerLogin")
 	pubGolfServiceGetMyPlayerMethodDescriptor          = pubGolfServiceServiceDescriptor.Methods().ByName("GetMyPlayer")
+	pubGolfServiceDeleteMyAccountMethodDescriptor      = pubGolfServiceServiceDescriptor.Methods().ByName("DeleteMyAccount")
 	pubGolfServiceGetPlayerMethodDescriptor            = pubGolfServiceServiceDescriptor.Methods().ByName("GetPlayer")
 	pubGolfServiceUpdateRegistrationMethodDescriptor   = pubGolfServiceServiceDescriptor.Methods().ByName("UpdateRegistration")
 	pubGolfServiceUpdatePlayerDataMethodDescriptor     = pubGolfServiceServiceDescriptor.Methods().ByName("UpdatePlayerData")
@@ -125,6 +129,8 @@ type PubGolfServiceClient interface {
 	CompletePlayerLogin(context.Context, *connect.Request[v1.CompletePlayerLoginRequest]) (*connect.Response[v1.CompletePlayerLoginResponse], error)
 	// GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
 	GetMyPlayer(context.Context, *connect.Request[v1.GetMyPlayerRequest]) (*connect.Response[v1.GetMyPlayerResponse], error)
+	// DeleteMyAccount purges all data related to the authenticated player.
+	DeleteMyAccount(context.Context, *connect.Request[v1.DeleteMyAccountRequest]) (*connect.Response[v1.DeleteMyAccountResponse], error)
 	// GetPlayer returns the player object including profile data and event registrations, given a player_id.
 	GetPlayer(context.Context, *connect.Request[v1.GetPlayerRequest]) (*connect.Response[v1.GetPlayerResponse], error)
 	// UpdateRegistration upserts an event registration for the given player.
@@ -189,6 +195,12 @@ func NewPubGolfServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+PubGolfServiceGetMyPlayerProcedure,
 			connect.WithSchema(pubGolfServiceGetMyPlayerMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteMyAccount: connect.NewClient[v1.DeleteMyAccountRequest, v1.DeleteMyAccountResponse](
+			httpClient,
+			baseURL+PubGolfServiceDeleteMyAccountProcedure,
+			connect.WithSchema(pubGolfServiceDeleteMyAccountMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getPlayer: connect.NewClient[v1.GetPlayerRequest, v1.GetPlayerResponse](
@@ -273,6 +285,7 @@ type pubGolfServiceClient struct {
 	startPlayerLogin     *connect.Client[v1.StartPlayerLoginRequest, v1.StartPlayerLoginResponse]
 	completePlayerLogin  *connect.Client[v1.CompletePlayerLoginRequest, v1.CompletePlayerLoginResponse]
 	getMyPlayer          *connect.Client[v1.GetMyPlayerRequest, v1.GetMyPlayerResponse]
+	deleteMyAccount      *connect.Client[v1.DeleteMyAccountRequest, v1.DeleteMyAccountResponse]
 	getPlayer            *connect.Client[v1.GetPlayerRequest, v1.GetPlayerResponse]
 	updateRegistration   *connect.Client[v1.UpdateRegistrationRequest, v1.UpdateRegistrationResponse]
 	updatePlayerData     *connect.Client[v1.UpdatePlayerDataRequest, v1.UpdatePlayerDataResponse]
@@ -312,6 +325,11 @@ func (c *pubGolfServiceClient) CompletePlayerLogin(ctx context.Context, req *con
 // GetMyPlayer calls api.v1.PubGolfService.GetMyPlayer.
 func (c *pubGolfServiceClient) GetMyPlayer(ctx context.Context, req *connect.Request[v1.GetMyPlayerRequest]) (*connect.Response[v1.GetMyPlayerResponse], error) {
 	return c.getMyPlayer.CallUnary(ctx, req)
+}
+
+// DeleteMyAccount calls api.v1.PubGolfService.DeleteMyAccount.
+func (c *pubGolfServiceClient) DeleteMyAccount(ctx context.Context, req *connect.Request[v1.DeleteMyAccountRequest]) (*connect.Response[v1.DeleteMyAccountResponse], error) {
+	return c.deleteMyAccount.CallUnary(ctx, req)
 }
 
 // GetPlayer calls api.v1.PubGolfService.GetPlayer.
@@ -390,6 +408,8 @@ type PubGolfServiceHandler interface {
 	CompletePlayerLogin(context.Context, *connect.Request[v1.CompletePlayerLoginRequest]) (*connect.Response[v1.CompletePlayerLoginResponse], error)
 	// GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
 	GetMyPlayer(context.Context, *connect.Request[v1.GetMyPlayerRequest]) (*connect.Response[v1.GetMyPlayerResponse], error)
+	// DeleteMyAccount purges all data related to the authenticated player.
+	DeleteMyAccount(context.Context, *connect.Request[v1.DeleteMyAccountRequest]) (*connect.Response[v1.DeleteMyAccountResponse], error)
 	// GetPlayer returns the player object including profile data and event registrations, given a player_id.
 	GetPlayer(context.Context, *connect.Request[v1.GetPlayerRequest]) (*connect.Response[v1.GetPlayerResponse], error)
 	// UpdateRegistration upserts an event registration for the given player.
@@ -450,6 +470,12 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect.Handler
 		PubGolfServiceGetMyPlayerProcedure,
 		svc.GetMyPlayer,
 		connect.WithSchema(pubGolfServiceGetMyPlayerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	pubGolfServiceDeleteMyAccountHandler := connect.NewUnaryHandler(
+		PubGolfServiceDeleteMyAccountProcedure,
+		svc.DeleteMyAccount,
+		connect.WithSchema(pubGolfServiceDeleteMyAccountMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	pubGolfServiceGetPlayerHandler := connect.NewUnaryHandler(
@@ -536,6 +562,8 @@ func NewPubGolfServiceHandler(svc PubGolfServiceHandler, opts ...connect.Handler
 			pubGolfServiceCompletePlayerLoginHandler.ServeHTTP(w, r)
 		case PubGolfServiceGetMyPlayerProcedure:
 			pubGolfServiceGetMyPlayerHandler.ServeHTTP(w, r)
+		case PubGolfServiceDeleteMyAccountProcedure:
+			pubGolfServiceDeleteMyAccountHandler.ServeHTTP(w, r)
 		case PubGolfServiceGetPlayerProcedure:
 			pubGolfServiceGetPlayerHandler.ServeHTTP(w, r)
 		case PubGolfServiceUpdateRegistrationProcedure:
@@ -587,6 +615,10 @@ func (UnimplementedPubGolfServiceHandler) CompletePlayerLogin(context.Context, *
 
 func (UnimplementedPubGolfServiceHandler) GetMyPlayer(context.Context, *connect.Request[v1.GetMyPlayerRequest]) (*connect.Response[v1.GetMyPlayerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.PubGolfService.GetMyPlayer is not implemented"))
+}
+
+func (UnimplementedPubGolfServiceHandler) DeleteMyAccount(context.Context, *connect.Request[v1.DeleteMyAccountRequest]) (*connect.Response[v1.DeleteMyAccountResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.PubGolfService.DeleteMyAccount is not implemented"))
 }
 
 func (UnimplementedPubGolfServiceHandler) GetPlayer(context.Context, *connect.Request[v1.GetPlayerRequest]) (*connect.Response[v1.GetPlayerResponse], error) {

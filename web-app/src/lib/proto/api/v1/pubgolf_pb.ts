@@ -468,6 +468,68 @@ export class GetMyPlayerResponse extends Message<GetMyPlayerResponse> {
 }
 
 /**
+ * @generated from message api.v1.DeleteMyAccountRequest
+ */
+export class DeleteMyAccountRequest extends Message<DeleteMyAccountRequest> {
+  constructor(data?: PartialMessage<DeleteMyAccountRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.DeleteMyAccountRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteMyAccountRequest {
+    return new DeleteMyAccountRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteMyAccountRequest {
+    return new DeleteMyAccountRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteMyAccountRequest {
+    return new DeleteMyAccountRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteMyAccountRequest | PlainMessage<DeleteMyAccountRequest> | undefined, b: DeleteMyAccountRequest | PlainMessage<DeleteMyAccountRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteMyAccountRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.v1.DeleteMyAccountResponse
+ */
+export class DeleteMyAccountResponse extends Message<DeleteMyAccountResponse> {
+  constructor(data?: PartialMessage<DeleteMyAccountResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.DeleteMyAccountResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteMyAccountResponse {
+    return new DeleteMyAccountResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteMyAccountResponse {
+    return new DeleteMyAccountResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteMyAccountResponse {
+    return new DeleteMyAccountResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteMyAccountResponse | PlainMessage<DeleteMyAccountResponse> | undefined, b: DeleteMyAccountResponse | PlainMessage<DeleteMyAccountResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteMyAccountResponse, a, b);
+  }
+}
+
+/**
  * @generated from message api.v1.GetPlayerRequest
  */
 export class GetPlayerRequest extends Message<GetPlayerRequest> {

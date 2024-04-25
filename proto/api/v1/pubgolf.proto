@@ -29,10 +29,15 @@ service PubGolfService {
   // CompletePlayerLogin (unauthenticated) accepts an auth code and logs in the player, returning the data necessary to bootstrap a player's session in the app.
   rpc CompletePlayerLogin(CompletePlayerLoginRequest) returns (CompletePlayerLoginResponse) {}
 
-  // Player
+  // Account
 
   // GetMyPlayer is an authenticated request that returns the same data as `CompletePlayerLogin()` if the player's auth token is still valid.
   rpc GetMyPlayer(GetMyPlayerRequest) returns (GetMyPlayerResponse) {}
+
+   // DeleteMyAccount purges all data related to the authenticated player.
+  rpc DeleteMyAccount(DeleteMyAccountRequest) returns (DeleteMyAccountResponse) {}
+
+  // Player
 
   // GetPlayer returns the player object including profile data and event registrations, given a player_id.
   rpc GetPlayer(GetPlayerRequest) returns (GetPlayerResponse) {}
@@ -131,13 +136,20 @@ message CompletePlayerLoginResponse {
 }
 
 // --------------------
-// Player Info
+// Account
 // --------------------
 
 message GetMyPlayerRequest {}
 message GetMyPlayerResponse {
   Player player = 1;
 }
+
+message DeleteMyAccountRequest {}
+message DeleteMyAccountResponse {}
+
+// --------------------
+// Player Info
+// --------------------
 
 message GetPlayerRequest {
   string player_id = 1;
