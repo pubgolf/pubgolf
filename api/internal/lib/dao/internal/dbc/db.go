@@ -57,6 +57,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteAdjustmentsForPlayerStageStmt, err = db.PrepareContext(ctx, deleteAdjustmentsForPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteAdjustmentsForPlayerStage: %w", err)
 	}
+	if q.deletePlayerStmt, err = db.PrepareContext(ctx, deletePlayer); err != nil {
+		return nil, fmt.Errorf("error preparing query DeletePlayer: %w", err)
+	}
 	if q.deleteScoreForPlayerStageStmt, err = db.PrepareContext(ctx, deleteScoreForPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteScoreForPlayerStage: %w", err)
 	}
@@ -223,6 +226,11 @@ func (q *Queries) Close() error {
 	if q.deleteAdjustmentsForPlayerStageStmt != nil {
 		if cerr := q.deleteAdjustmentsForPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteAdjustmentsForPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.deletePlayerStmt != nil {
+		if cerr := q.deletePlayerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deletePlayerStmt: %w", cerr)
 		}
 	}
 	if q.deleteScoreForPlayerStageStmt != nil {
@@ -455,6 +463,7 @@ type Queries struct {
 	deactivateAuthTokensStmt                *sql.Stmt
 	deleteAdjustmentStmt                    *sql.Stmt
 	deleteAdjustmentsForPlayerStageStmt     *sql.Stmt
+	deletePlayerStmt                        *sql.Stmt
 	deleteScoreForPlayerStageStmt           *sql.Stmt
 	eventAdjustmentTemplatesStmt            *sql.Stmt
 	eventAdjustmentsStmt                    *sql.Stmt
@@ -508,6 +517,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deactivateAuthTokensStmt:                q.deactivateAuthTokensStmt,
 		deleteAdjustmentStmt:                    q.deleteAdjustmentStmt,
 		deleteAdjustmentsForPlayerStageStmt:     q.deleteAdjustmentsForPlayerStageStmt,
+		deletePlayerStmt:                        q.deletePlayerStmt,
 		deleteScoreForPlayerStageStmt:           q.deleteScoreForPlayerStageStmt,
 		eventAdjustmentTemplatesStmt:            q.eventAdjustmentTemplatesStmt,
 		eventAdjustmentsStmt:                    q.eventAdjustmentsStmt,

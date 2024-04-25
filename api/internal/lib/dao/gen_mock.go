@@ -192,6 +192,24 @@ func (_m *MockQueryProvider) CreatePlayer(ctx context.Context, name string, phon
 	return r0, r1
 }
 
+// DeletePlayer provides a mock function with given fields: ctx, playerID
+func (_m *MockQueryProvider) DeletePlayer(ctx context.Context, playerID models.PlayerID) error {
+	ret := _m.Called(ctx, playerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePlayer")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) error); ok {
+		r0 = rf(ctx, playerID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteScore provides a mock function with given fields: ctx, playerID, stageID
 func (_m *MockQueryProvider) DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error {
 	ret := _m.Called(ctx, playerID, stageID)

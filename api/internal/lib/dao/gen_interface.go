@@ -23,6 +23,8 @@ type QueryProvider interface {
 	CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)
 	// CreatePlayer creates a new player.
 	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
+	// DeletePlayer hard deletes all data related to the given player ID.
+	DeletePlayer(ctx context.Context, playerID models.PlayerID) error
 	// DeleteScore creates score and adjustment records for a given stage.
 	DeleteScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID) error
 	// EventAdjustmentTemplates returns all adjustment templates for a given event, not to be confused with AdjustmentTemplatesByEventID, which only returns multi-venue templates.

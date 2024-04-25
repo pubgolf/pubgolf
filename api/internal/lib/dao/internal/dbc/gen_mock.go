@@ -292,6 +292,24 @@ func (_m *MockQuerier) DeleteAdjustmentsForPlayerStage(ctx context.Context, arg 
 	return r0
 }
 
+// DeletePlayer provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) DeletePlayer(ctx context.Context, id models.PlayerID) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePlayer")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteScoreForPlayerStage provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error {
 	ret := _m.Called(ctx, arg)

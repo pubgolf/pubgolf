@@ -30,6 +30,16 @@ func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (mod
 	return id, err
 }
 
+const deletePlayer = `-- name: DeletePlayer :exec
+DELETE FROM players
+WHERE id = $1
+`
+
+func (q *Queries) DeletePlayer(ctx context.Context, id models.PlayerID) error {
+	_, err := q.exec(ctx, q.deletePlayerStmt, deletePlayer, id)
+	return err
+}
+
 const eventPlayers = `-- name: EventPlayers :many
 SELECT
   p.id,

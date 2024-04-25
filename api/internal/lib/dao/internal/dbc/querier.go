@@ -23,6 +23,7 @@ type Querier interface {
 	DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
 	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error
+	DeletePlayer(ctx context.Context, id models.PlayerID) error
 	DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error
 	EventAdjustmentTemplates(ctx context.Context, eventID models.EventID) ([]EventAdjustmentTemplatesRow, error)
 	EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error)

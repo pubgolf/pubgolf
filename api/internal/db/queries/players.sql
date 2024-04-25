@@ -95,3 +95,7 @@ WHERE
 ORDER BY
   name ASC;
 
+-- name: DeletePlayer :exec
+DELETE FROM players
+WHERE id = $1;
+
