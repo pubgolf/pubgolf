@@ -1,11 +1,12 @@
+//nolint:gosec // Non-cryptographic application of random numbers.
 package dao
 
 import (
 	"context"
+	"math/rand"
 	"testing"
 	"time"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -151,18 +152,10 @@ func TestEventSchedule(t *testing.T) {
 		numVenues := 5
 
 		var scheduleRows []dbc.EventScheduleRow
-		var sr struct {
-			Key      uint32
-			Duration uint32
-		}
-
 		for range numVenues {
-			err := faker.FakeData(&sr)
-			require.NoError(t, err, "generate random data")
-
 			scheduleRows = append(scheduleRows, dbc.EventScheduleRow{
-				VenueKey:        models.VenueKeyFromUInt32(sr.Key),
-				DurationMinutes: sr.Duration,
+				VenueKey:        models.VenueKeyFromUInt32(uint32(rand.Int31n(9999) + 1)),
+				DurationMinutes: uint32(rand.Int31n(90) + 1),
 			})
 		}
 
