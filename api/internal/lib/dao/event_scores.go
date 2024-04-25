@@ -8,6 +8,11 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
+type playerStage struct {
+	playerID models.PlayerID
+	stageID  models.StageID
+}
+
 // EventScores returns all the scores (and their adjustments) for an event, ordered by stage and then by creation time.
 func (q *Queries) EventScores(ctx context.Context, eventID models.EventID, includeVerified bool) ([]models.StageScore, error) {
 	defer daoSpan(&ctx)()
@@ -27,17 +32,25 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID, inclu
 			return fmt.Errorf("get event adjustments: %w", err)
 		}
 
-		var adj []models.Adjustment
+		adjs := make(map[playerStage][]models.Adjustment, len(sRows))
 
-		aIdx := 0
+		for _, a := range aRows {
+			key := playerStage{
+				playerID: a.PlayerID,
+				stageID:  a.StageID,
+			}
+
+			adjs[key] = append(adjs[key], models.Adjustment{
+				ID:    models.AdjustmentIDFromULID(a.AdjustmentID.ULID),
+				Label: a.Label,
+				Value: a.Value,
+			})
+		}
+
 		for _, s := range sRows {
-			for aIdx < len(aRows) && aRows[aIdx].StageID == s.StageID && aRows[aIdx].PlayerID == s.PlayerID {
-				adj = append(adj, models.Adjustment{
-					ID:    models.AdjustmentIDFromULID(aRows[aIdx].AdjustmentID.ULID),
-					Label: aRows[aIdx].Label,
-					Value: aRows[aIdx].Value,
-				})
-				aIdx++
+			var adj []models.Adjustment
+			if a, ok := adjs[playerStage{playerID: s.PlayerID, stageID: s.StageID}]; ok {
+				adj = a
 			}
 
 			stageScores = append(stageScores, models.StageScore{
@@ -50,8 +63,6 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID, inclu
 				},
 				Adjustments: adj,
 			})
-
-			adj = nil
 		}
 
 		return nil
