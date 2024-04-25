@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
@@ -16,6 +17,9 @@ var (
 	defaultVenueCacheSize = 16
 	// defaultPlayerCacheSize is the default item size for caches that hold player-scoped data.
 	defaultPlayerCacheSize = 128
+
+	// errDoNotCacheResult is returned from a cache query function to prevent caching the result.
+	errDoNotCacheResult = errors.New("uncachable result")
 )
 
 // wrapWithCache handles access and instrumentation of the provided cache, falling back to access via the provided query function.
@@ -29,12 +33,18 @@ func wrapWithCache[K comparable, V any](ctx context.Context, cache *expirable.LR
 		return val, nil
 	}
 
+	span.SetAttributes(attribute.Bool("dao.cache.hit", false))
+
 	val, err := query(ctx, params)
 	if err != nil {
+		if errors.Is(err, errDoNotCacheResult) {
+			span.SetAttributes(attribute.Bool("dao.cache.placed", false))
+
+			return val, nil
+		}
+
 		return val, fmt.Errorf("fetch from database on cache miss: %w", err)
 	}
-
-	span.SetAttributes(attribute.Bool("dao.cache.hit", false))
 
 	evicted := cache.Add(params, val)
 	span.SetAttributes(attribute.Bool("dao.cache.placed", true), attribute.Bool("dao.cache.evicted", evicted))

@@ -24,7 +24,7 @@ func (q *Queries) PlayerRegisteredForEvent(ctx context.Context, playerID models.
 			isReg, err := q.dbc.PlayerRegisteredForEvent(ctx, params)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return false, nil
+					return false, errDoNotCacheResult
 				}
 
 				return false, fmt.Errorf("find event registration: %w", err)
