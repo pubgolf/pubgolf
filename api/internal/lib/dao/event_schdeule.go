@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
@@ -19,12 +20,13 @@ type VenueStop struct {
 func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error) {
 	defer daoSpan(&ctx)()
 
-	validKeys, err := q.dbc.EventVenueKeysAreValid(ctx, eventID)
+	schedule, err := q.dbc.EventSchedule(ctx, eventID)
 	if err != nil {
-		return nil, fmt.Errorf("check venue keys are valid: %w", err)
+		return nil, fmt.Errorf("query event schedule: %w", err)
 	}
 
-	if !validKeys {
+	venueStops, ok := buildVenueStops(schedule)
+	if !ok {
 		if err := q.dbc.SetEventVenueKeys(ctx, eventID); err != nil {
 			return nil, fmt.Errorf("set venue keys: %w", err)
 		}
@@ -32,16 +34,29 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 		if err := q.dbc.SetNextEventVenueKey(ctx, eventID); err != nil {
 			return nil, fmt.Errorf("reset venue key iterator: %w", err)
 		}
+
+		schedule, err = q.dbc.EventSchedule(ctx, eventID)
+		if err != nil {
+			return nil, fmt.Errorf("query event schedule: %w", err)
+		}
+
+		venueStops, ok = buildVenueStops(schedule)
+		if !ok {
+			return nil, fmt.Errorf("unable to establish valid venue keys: %w", ErrInvariantViolation)
+		}
 	}
 
-	schedule, err := q.dbc.EventSchedule(ctx, eventID)
-	if err != nil {
-		return nil, fmt.Errorf("query event schedule: %w", err)
-	}
+	return venueStops, nil
+}
 
-	var venueStops []VenueStop
+func buildVenueStops(schedule []dbc.EventScheduleRow) ([]VenueStop, bool) {
+	venueStops := make([]VenueStop, 0, len(schedule))
 
 	for _, v := range schedule {
+		if v.VenueKey.UInt32() == 0 {
+			return nil, false
+		}
+
 		desc := ""
 		if v.Description.Valid {
 			desc = v.Description.String
@@ -54,5 +69,5 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 		})
 	}
 
-	return venueStops, nil
+	return venueStops, true
 }
