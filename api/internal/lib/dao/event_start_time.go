@@ -4,12 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/hashicorp/golang-lru/v2/expirable"
-
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-var eventStartTimeCache = expirable.NewLRU[models.EventID, time.Time](defaultEventCacheSize, func(_ models.EventID, _ time.Time) {}, 1*time.Minute)
+var eventStartTimeCache = makeCache[models.EventID, time.Time](cacheSizeEvent, cacheExpirationVolatile)
 
 // EventStartTime returns the start time for the given event ID.
 func (q *Queries) EventStartTime(ctx context.Context, id models.EventID) (time.Time, error) {

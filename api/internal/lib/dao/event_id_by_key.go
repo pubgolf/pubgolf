@@ -2,14 +2,11 @@ package dao
 
 import (
 	"context"
-	"time"
-
-	"github.com/hashicorp/golang-lru/v2/expirable"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-var eventIDByKeyCache = expirable.NewLRU[string, models.EventID](defaultEventCacheSize, func(_ string, _ models.EventID) {}, 24*time.Hour)
+var eventIDByKeyCache = makeCache[string, models.EventID](cacheSizeEvent, cacheExpirationDurable)
 
 // EventIDByKey takes a human readable event key (slug) and returns the event's canonical identifier.
 func (q *Queries) EventIDByKey(ctx context.Context, key string) (models.EventID, error) {
