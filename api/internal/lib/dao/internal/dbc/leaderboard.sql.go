@@ -15,68 +15,68 @@ const scoringCriteriaAllVenues = `-- name: ScoringCriteriaAllVenues :many
 WITH separated AS ((
     -- Get score contributions.
     SELECT
-      s.player_id,
+      p.id AS player_id,
       p.name,
-      count(DISTINCT (s.id)) AS num_scores,
-      sum(s.value) AS total_points,
+      coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
+      coalesce(sum(s.value), 0)::bigint AS total_points,
       0 AS points_from_penalties,
       0 AS points_from_bonuses
     FROM
-      scores s
-      JOIN players p ON s.player_id = p.id
-      JOIN event_players ep ON p.id = ep.player_id
-      JOIN stages st ON s.stage_id = st.id
-    WHERE
-      s.deleted_at IS NULL
+      players p
+    LEFT JOIN event_players ep ON p.id = ep.player_id
+    LEFT JOIN scores s ON s.player_id = p.id
       AND s.is_verified IS TRUE
-      AND p.deleted_at IS NULL
-      AND ep.deleted_at IS NULL
-      AND ep.event_id = $1
-      AND ep.scoring_category = $2
-      AND st.deleted_at IS NULL
-      AND st.event_id = $1
-    GROUP BY
-      s.player_id,
-      p.name)
-  UNION (
-    -- Get adjustment contributions.
-    SELECT
-      s.player_id,
-      p.name,
-      count(DISTINCT (s.id)) AS num_scores,
-      sum(a.value) AS total_points,
-      sum(
-        CASE WHEN a.value > 0 THEN
-          a.value
-        ELSE
-          0
-        END) AS points_from_penalties,
-      sum(
-        CASE WHEN a.value < 0 THEN
-          a.value
-        ELSE
-          0
-        END) AS points_from_bonuses
-    FROM
-      scores s
-      JOIN players p ON s.player_id = p.id
-      JOIN event_players ep ON p.id = ep.player_id
-      JOIN stages st ON s.stage_id = st.id
-      LEFT JOIN adjustments a ON a.stage_id = s.stage_id
-        AND a.player_id = s.player_id
-    WHERE
-      s.deleted_at IS NULL
+    LEFT JOIN stages st ON s.stage_id = st.id
+      AND st.event_id = ep.event_id
+  WHERE
+    p.deleted_at IS NULL
+    AND ep.deleted_at IS NULL
+    AND ep.event_id = $1
+    AND ep.scoring_category = $2
+    AND s.deleted_at IS NULL
+    AND st.deleted_at IS NULL
+  GROUP BY
+    p.id,
+    p.name)
+UNION (
+  -- Get adjustment contributions.
+  SELECT
+    p.id AS player_id,
+    p.name,
+    coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
+    coalesce(sum(a.value), 0)::bigint AS total_points,
+    sum(
+      CASE WHEN a.value > 0 THEN
+        a.value
+      ELSE
+        0
+      END) AS points_from_penalties,
+    sum(
+      CASE WHEN a.value < 0 THEN
+        a.value
+      ELSE
+        0
+      END) AS points_from_bonuses
+  FROM
+    players p
+    LEFT JOIN event_players ep ON p.id = ep.player_id
+    LEFT JOIN scores s ON s.player_id = p.id
       AND s.is_verified IS TRUE
-      AND p.deleted_at IS NULL
-      AND ep.deleted_at IS NULL
-      AND ep.event_id = $1
-      AND ep.scoring_category = $2
-      AND st.deleted_at IS NULL
-      AND st.event_id = $1
-      AND a.deleted_at IS NULL
-    GROUP BY
-      s.player_id,
-      p.name))
+    LEFT JOIN stages st ON s.stage_id = st.id
+      AND st.event_id = ep.event_id
+    LEFT JOIN adjustments a ON a.stage_id = s.stage_id
+      AND a.player_id = s.player_id
+  WHERE
+    p.deleted_at IS NULL
+    AND ep.deleted_at IS NULL
+    AND ep.event_id = $1
+    AND ep.scoring_category = $2
+    AND s.deleted_at IS NULL
+    AND st.deleted_at IS NULL
+    AND a.deleted_at IS NULL
+  GROUP BY
+    p.id,
+    p.name))
 SELECT
   player_id,
   name,
@@ -156,70 +156,70 @@ WITH st AS (
 separated AS ((
     -- Get score contributions.
     SELECT
-      s.player_id,
+      p.id AS player_id,
       p.name,
-      count(DISTINCT (s.id)) AS num_scores,
-      sum(s.value) AS total_points,
+      coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
+      coalesce(sum(s.value), 0)::bigint AS total_points,
       0 AS points_from_penalties,
       0 AS points_from_bonuses
     FROM
-      scores s
-      JOIN players p ON s.player_id = p.id
-      JOIN event_players ep ON p.id = ep.player_id
-      JOIN st ON s.stage_id = st.id
-    WHERE
-      s.deleted_at IS NULL
+      players p
+    LEFT JOIN event_players ep ON p.id = ep.player_id
+    LEFT JOIN scores s ON s.player_id = p.id
       AND s.is_verified IS TRUE
-      AND p.deleted_at IS NULL
-      AND ep.deleted_at IS NULL
-      AND ep.event_id = $1
-      AND ep.scoring_category = $2
-      AND st.deleted_at IS NULL
-      AND st.event_id = $1
-      AND st.is_odd
-    GROUP BY
-      s.player_id,
-      p.name)
-  UNION (
-    -- Get adjustment contributions.
-    SELECT
-      s.player_id,
-      p.name,
-      count(DISTINCT (s.id)) AS num_scores,
-      sum(a.value) AS total_points,
-      sum(
-        CASE WHEN a.value > 0 THEN
-          a.value
-        ELSE
-          0
-        END) AS points_from_penalties,
-      sum(
-        CASE WHEN a.value < 0 THEN
-          a.value
-        ELSE
-          0
-        END) AS points_from_bonuses
-    FROM
-      scores s
-      JOIN players p ON s.player_id = p.id
-      JOIN event_players ep ON p.id = ep.player_id
-      JOIN st ON s.stage_id = st.id
-      LEFT JOIN adjustments a ON a.stage_id = s.stage_id
-        AND a.player_id = s.player_id
-    WHERE
-      s.deleted_at IS NULL
+    LEFT JOIN st ON s.stage_id = st.id
+      AND st.event_id = ep.event_id
+  WHERE
+    p.deleted_at IS NULL
+    AND ep.deleted_at IS NULL
+    AND ep.event_id = $1
+    AND ep.scoring_category = $2
+    AND s.deleted_at IS NULL
+    AND st.deleted_at IS NULL
+    AND st.is_odd
+  GROUP BY
+    p.id,
+    p.name)
+UNION (
+  -- Get adjustment contributions.
+  SELECT
+    p.id AS player_id,
+    p.name,
+    coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
+    coalesce(sum(a.value), 0)::bigint AS total_points,
+    sum(
+      CASE WHEN a.value > 0 THEN
+        a.value
+      ELSE
+        0
+      END) AS points_from_penalties,
+    sum(
+      CASE WHEN a.value < 0 THEN
+        a.value
+      ELSE
+        0
+      END) AS points_from_bonuses
+  FROM
+    players p
+    LEFT JOIN event_players ep ON p.id = ep.player_id
+    LEFT JOIN scores s ON s.player_id = p.id
       AND s.is_verified IS TRUE
-      AND p.deleted_at IS NULL
-      AND ep.deleted_at IS NULL
-      AND ep.event_id = $1
-      AND ep.scoring_category = $2
-      AND st.deleted_at IS NULL
-      AND st.event_id = $1
-      AND st.is_odd
-      AND a.deleted_at IS NULL
-    GROUP BY
-      s.player_id,
-      p.name))
+    LEFT JOIN st ON s.stage_id = st.id
+      AND st.event_id = ep.event_id
+    LEFT JOIN adjustments a ON a.stage_id = s.stage_id
+      AND a.player_id = s.player_id
+  WHERE
+    p.deleted_at IS NULL
+    AND ep.deleted_at IS NULL
+    AND ep.event_id = $1
+    AND ep.scoring_category = $2
+    AND s.deleted_at IS NULL
+    AND st.deleted_at IS NULL
+    AND st.is_odd
+    AND a.deleted_at IS NULL
+  GROUP BY
+    p.id,
+    p.name))
 SELECT
   player_id,
   name,
