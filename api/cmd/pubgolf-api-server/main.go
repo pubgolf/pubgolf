@@ -109,7 +109,7 @@ func guard(err error, msg string) {
 
 // makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
 func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
-	conConfig, err := pgxpool.New(context.Background(), cfg.AppDatabaseURL)
+	conConfig, err := pgxpool.New(ctx, cfg.AppDatabaseURL)
 	guard(err, "parse database config")
 
 	db := telemetry.WrapDB(stdlib.GetPoolConnector(conConfig))
