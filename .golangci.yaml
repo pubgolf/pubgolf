@@ -22,6 +22,7 @@ linters:
     - cyclop
     - depguard
     - dogsled
+    - dupl
     - execinquery
     - exhaustruct
     - funlen
