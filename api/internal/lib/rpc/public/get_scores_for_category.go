@@ -3,6 +3,7 @@ package public
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -28,27 +29,37 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 		return nil, err
 	}
 
-	scores, err := s.dao.ScoringCriteria(ctx, eventID, cat)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get scoring criteria: %w", err))
+	var wg sync.WaitGroup
+
+	sc := s.dao.ScoringCriteriaAsync(eventID, cat)
+	sc.Run(ctx, &wg)
+
+	est := s.dao.EventStartTimeAsync(eventID)
+	est.Run(ctx, &wg)
+
+	es := s.dao.EventScheduleAsync(eventID)
+	es.Run(ctx, &wg)
+
+	wg.Wait()
+
+	if sc.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get score info: %w", err))
 	}
 
-	startTime, err := s.dao.EventStartTime(ctx, eventID)
-	if err != nil {
+	if est.Err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event start time: %w", err))
 	}
 
-	venues, err := s.dao.EventSchedule(ctx, eventID)
-	if err != nil {
+	if es.Err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
 	}
 
-	venueIdx := currentStopIndex(venues, time.Since(startTime))
-	required := scoredStages(venueIdx, len(venues), cat == models.ScoringCategoryPubGolfFiveHole)
+	venueIdx := currentStopIndex(es.Schedule, time.Since(est.StartTime))
+	required := scoredStages(venueIdx, len(es.Schedule), cat == models.ScoringCategoryPubGolfFiveHole)
 
 	return connect.NewResponse(&apiv1.GetScoresForCategoryResponse{
 		ScoreBoard: &apiv1.ScoreBoard{
-			Scores: buildCategoryScoreBoard(scores, required),
+			Scores: buildCategoryScoreBoard(sc.Scores, required),
 		},
 	}), nil
 }

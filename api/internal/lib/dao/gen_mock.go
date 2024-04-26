@@ -316,9 +316,9 @@ func (_m *MockQueryProvider) EventPlayers(ctx context.Context, eventKey string) 
 	return r0, r1
 }
 
-// EventSchedule provides a mock function with given fields: ctx, eventID
-func (_m *MockQueryProvider) EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error) {
-	ret := _m.Called(ctx, eventID)
+// EventSchedule provides a mock function with given fields: ctx, id
+func (_m *MockQueryProvider) EventSchedule(ctx context.Context, id models.EventID) ([]VenueStop, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for EventSchedule")
@@ -327,10 +327,10 @@ func (_m *MockQueryProvider) EventSchedule(ctx context.Context, eventID models.E
 	var r0 []VenueStop
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]VenueStop, error)); ok {
-		return rf(ctx, eventID)
+		return rf(ctx, id)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []VenueStop); ok {
-		r0 = rf(ctx, eventID)
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]VenueStop)
@@ -338,12 +338,32 @@ func (_m *MockQueryProvider) EventSchedule(ctx context.Context, eventID models.E
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
+}
+
+// EventScheduleAsync provides a mock function with given fields: id
+func (_m *MockQueryProvider) EventScheduleAsync(id models.EventID) *EventScheduleAsyncResult {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EventScheduleAsync")
+	}
+
+	var r0 *EventScheduleAsyncResult
+	if rf, ok := ret.Get(0).(func(models.EventID) *EventScheduleAsyncResult); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*EventScheduleAsyncResult)
+		}
+	}
+
+	return r0
 }
 
 // EventScheduleCacheVersion provides a mock function with given fields: ctx, eventID, hash
@@ -469,6 +489,26 @@ func (_m *MockQueryProvider) EventStartTime(ctx context.Context, id models.Event
 	return r0, r1
 }
 
+// EventStartTimeAsync provides a mock function with given fields: id
+func (_m *MockQueryProvider) EventStartTimeAsync(id models.EventID) *EventStartTimeAsyncResult {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EventStartTimeAsync")
+	}
+
+	var r0 *EventStartTimeAsyncResult
+	if rf, ok := ret.Get(0).(func(models.EventID) *EventStartTimeAsyncResult); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*EventStartTimeAsyncResult)
+		}
+	}
+
+	return r0
+}
+
 // GenerateAuthToken provides a mock function with given fields: ctx, num
 func (_m *MockQueryProvider) GenerateAuthToken(ctx context.Context, num models.PhoneNum) (GenerateAuthTokenResult, error) {
 	ret := _m.Called(ctx, num)
@@ -553,6 +593,26 @@ func (_m *MockQueryProvider) PlayerAdjustments(ctx context.Context, eventID mode
 	}
 
 	return r0, r1
+}
+
+// PlayerAdjustmentsAsync provides a mock function with given fields: eventID, playerID
+func (_m *MockQueryProvider) PlayerAdjustmentsAsync(eventID models.EventID, playerID models.PlayerID) *PlayerAdjustmentsAsyncResult {
+	ret := _m.Called(eventID, playerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerAdjustmentsAsync")
+	}
+
+	var r0 *PlayerAdjustmentsAsyncResult
+	if rf, ok := ret.Get(0).(func(models.EventID, models.PlayerID) *PlayerAdjustmentsAsyncResult); ok {
+		r0 = rf(eventID, playerID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*PlayerAdjustmentsAsyncResult)
+		}
+	}
+
+	return r0
 }
 
 // PlayerByID provides a mock function with given fields: ctx, playerID
@@ -669,6 +729,26 @@ func (_m *MockQueryProvider) PlayerScores(ctx context.Context, eventID models.Ev
 	return r0, r1
 }
 
+// PlayerScoresAsync provides a mock function with given fields: eventID, playerID
+func (_m *MockQueryProvider) PlayerScoresAsync(eventID models.EventID, playerID models.PlayerID) *PlayerScoresAsyncResult {
+	ret := _m.Called(eventID, playerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerScoresAsync")
+	}
+
+	var r0 *PlayerScoresAsyncResult
+	if rf, ok := ret.Get(0).(func(models.EventID, models.PlayerID) *PlayerScoresAsyncResult); ok {
+		r0 = rf(eventID, playerID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*PlayerScoresAsyncResult)
+		}
+	}
+
+	return r0
+}
+
 // ScoreByPlayerStage provides a mock function with given fields: ctx, playerID, stageID
 func (_m *MockQueryProvider) ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error) {
 	ret := _m.Called(ctx, playerID, stageID)
@@ -725,6 +805,26 @@ func (_m *MockQueryProvider) ScoringCriteria(ctx context.Context, eventID models
 	}
 
 	return r0, r1
+}
+
+// ScoringCriteriaAsync provides a mock function with given fields: eventID, category
+func (_m *MockQueryProvider) ScoringCriteriaAsync(eventID models.EventID, category models.ScoringCategory) *ScoringCriteriaAsyncResult {
+	ret := _m.Called(eventID, category)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ScoringCriteriaAsync")
+	}
+
+	var r0 *ScoringCriteriaAsyncResult
+	if rf, ok := ret.Get(0).(func(models.EventID, models.ScoringCategory) *ScoringCriteriaAsyncResult); ok {
+		r0 = rf(eventID, category)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ScoringCriteriaAsyncResult)
+		}
+	}
+
+	return r0
 }
 
 // StageIDByVenueKey provides a mock function with given fields: ctx, eventID, venueKey

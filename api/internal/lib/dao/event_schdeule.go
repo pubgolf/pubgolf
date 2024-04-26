@@ -16,26 +16,43 @@ type VenueStop struct {
 	Description string
 }
 
+// EventScheduleAsyncResult holds the result of a EventSchedule call.
+type EventScheduleAsyncResult struct {
+	asyncResult
+	Schedule []VenueStop
+	Err      error
+}
+
+// EventScheduleAsync constructs a EventScheduleAsyncResult struct, which can be fulfilled by calling the Run method.
+func (q *Queries) EventScheduleAsync(id models.EventID) *EventScheduleAsyncResult {
+	var res EventScheduleAsyncResult
+	res.asyncResult.query = func(ctx context.Context) {
+		res.Schedule, res.Err = q.EventSchedule(ctx, id)
+	}
+
+	return &res
+}
+
 // EventSchedule returns a slice of venue keys and durations for the given event ID.
-func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error) {
+func (q *Queries) EventSchedule(ctx context.Context, id models.EventID) ([]VenueStop, error) {
 	defer daoSpan(&ctx)()
 
-	schedule, err := q.dbc.EventSchedule(ctx, eventID)
+	schedule, err := q.dbc.EventSchedule(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("query event schedule: %w", err)
 	}
 
 	venueStops, ok := buildVenueStops(schedule)
 	if !ok {
-		if err := q.dbc.SetEventVenueKeys(ctx, eventID); err != nil {
+		if err := q.dbc.SetEventVenueKeys(ctx, id); err != nil {
 			return nil, fmt.Errorf("set venue keys: %w", err)
 		}
 
-		if err := q.dbc.SetNextEventVenueKey(ctx, eventID); err != nil {
+		if err := q.dbc.SetNextEventVenueKey(ctx, id); err != nil {
 			return nil, fmt.Errorf("reset venue key iterator: %w", err)
 		}
 
-		schedule, err = q.dbc.EventSchedule(ctx, eventID)
+		schedule, err = q.dbc.EventSchedule(ctx, id)
 		if err != nil {
 			return nil, fmt.Errorf("query event schedule: %w", err)
 		}

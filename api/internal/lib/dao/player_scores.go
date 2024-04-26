@@ -16,6 +16,23 @@ type PlayerVenueScore struct {
 	IsVerified bool
 }
 
+// PlayerScoresAsyncResult holds the result of a PlayerScores call.
+type PlayerScoresAsyncResult struct {
+	asyncResult
+	Scores []PlayerVenueScore
+	Err    error
+}
+
+// PlayerScoresAsync constructs a PlayerScoresAsyncResult struct, which can be fulfilled by calling the Run method.
+func (q *Queries) PlayerScoresAsync(eventID models.EventID, playerID models.PlayerID) *PlayerScoresAsyncResult {
+	var res PlayerScoresAsyncResult
+	res.asyncResult.query = func(ctx context.Context) {
+		res.Scores, res.Err = q.PlayerScores(ctx, eventID, playerID)
+	}
+
+	return &res
+}
+
 // PlayerScores returns a list of event stages and a player's scoring info for each.
 func (q *Queries) PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error) {
 	defer daoSpan(&ctx)()

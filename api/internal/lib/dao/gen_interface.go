@@ -33,20 +33,26 @@ type QueryProvider interface {
 	EventIDByKey(ctx context.Context, key string) (models.EventID, error)
 	// EventPlayers returns all players registered for a given event, in alphabetical order by name. The player's event registrations will only include the specified event.
 	EventPlayers(ctx context.Context, eventKey string) ([]models.Player, error)
+	// EventScheduleAsync constructs a EventScheduleAsyncResult struct, which can be fulfilled by calling the Run method.
+	EventScheduleAsync(id models.EventID) *EventScheduleAsyncResult
 	// EventSchedule returns a slice of venue keys and durations for the given event ID.
-	EventSchedule(ctx context.Context, eventID models.EventID) ([]VenueStop, error)
+	EventSchedule(ctx context.Context, id models.EventID) ([]VenueStop, error)
 	// EventScheduleCacheVersion returns the integer version number of the latest schedule version, as well as whether or not the provided hash triggered a cache break.
 	EventScheduleCacheVersion(ctx context.Context, eventID models.EventID, hash []byte) (v uint32, hashMatched bool, err error)
 	// EventScheduleWithDetails returns the event schedule with venue and rule details included.
 	EventScheduleWithDetails(ctx context.Context, eventID models.EventID) ([]models.Stage, error)
 	// EventScores returns all the scores (and their adjustments) for an event, ordered by stage and then by creation time.
 	EventScores(ctx context.Context, eventID models.EventID, includeVerified bool) ([]models.StageScore, error)
+	// EventStartTimeAsync constructs a EventStartTimeAsyncResult struct, which can be fulfilled by calling the Run method.
+	EventStartTimeAsync(id models.EventID) *EventStartTimeAsyncResult
 	// EventStartTime returns the start time for the given event ID.
 	EventStartTime(ctx context.Context, id models.EventID) (time.Time, error)
 	// GenerateAuthToken generates an auth token for the player with the given phone number, returning the auth token and the player's ID.
 	GenerateAuthToken(ctx context.Context, num models.PhoneNum) (GenerateAuthTokenResult, error)
 	// PhoneNumberIsVerified returns true if the phone number has been verified via an auth code.
 	PhoneNumberIsVerified(ctx context.Context, num models.PhoneNum) (bool, error)
+	// PlayerAdjustmentsAsync constructs a PlayerAdjustmentsAsyncResult struct, which can be fulfilled by calling the Run method.
+	PlayerAdjustmentsAsync(eventID models.EventID, playerID models.PlayerID) *PlayerAdjustmentsAsyncResult
 	// PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.
 	PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error)
 	// PlayerByID returns a player's profile data and event registrations.
@@ -55,10 +61,14 @@ type QueryProvider interface {
 	PlayerIDByAuthToken(ctx context.Context, token models.AuthToken) (models.PlayerID, error)
 	// PlayerRegisteredForEvent returns whether or not the player has a valid registration for the given event.
 	PlayerRegisteredForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (bool, error)
+	// PlayerScoresAsync constructs a PlayerScoresAsyncResult struct, which can be fulfilled by calling the Run method.
+	PlayerScoresAsync(eventID models.EventID, playerID models.PlayerID) *PlayerScoresAsyncResult
 	// PlayerScores returns a list of event stages and a player's scoring info for each.
 	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
+	// ScoringCriteriaAsync constructs a ScoringCriteriaAsyncResult struct, which can be fulfilled by calling the Run method.
+	ScoringCriteriaAsync(eventID models.EventID, category models.ScoringCategory) *ScoringCriteriaAsyncResult
 	// ScoringCriteria returns a list of players competing in the given category and the data necessary to rank them.
 	ScoringCriteria(ctx context.Context, eventID models.EventID, category models.ScoringCategory) ([]models.ScoringInput, error)
 	// StageIDByVenueKey looks up the stage ID given the client-facing version of the identifier (the venueKey).

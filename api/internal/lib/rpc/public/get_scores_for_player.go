@@ -3,6 +3,8 @@ package public
 import (
 	"context"
 	"fmt"
+	"log"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -34,30 +36,43 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
-	scores, err := s.dao.PlayerScores(ctx, eventID, playerID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get score info: %w", err))
+	var wg sync.WaitGroup
+
+	ps := s.dao.PlayerScoresAsync(eventID, playerID)
+	ps.Run(ctx, &wg)
+
+	pa := s.dao.PlayerAdjustmentsAsync(eventID, playerID)
+	pa.Run(ctx, &wg)
+
+	est := s.dao.EventStartTimeAsync(eventID)
+	est.Run(ctx, &wg)
+
+	es := s.dao.EventScheduleAsync(eventID)
+	es.Run(ctx, &wg)
+
+	wg.Wait()
+	log.Printf("EventStartTimeAsyncResult = %+v\n", est)
+
+	if ps.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get score info: %w", err))
 	}
 
-	adjustments, err := s.dao.PlayerAdjustments(ctx, eventID, playerID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get adjustments info: %w", err))
+	if pa.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get adjustments info: %w", err))
 	}
 
-	startTime, err := s.dao.EventStartTime(ctx, eventID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get event start time: %w", err))
+	if est.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event start time: %w", err))
 	}
 
-	venues, err := s.dao.EventSchedule(ctx, eventID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get event schedule: %w", err))
+	if es.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.GetScoresForPlayerResponse{
 		ScoreBoard: &apiv1.ScoreBoard{
 			Scores: buildPlayerScoreBoard(
-				scores, adjustments, playerCategory, currentStopIndex(venues, time.Since(startTime)),
+				ps.Scores, pa.Adjs, playerCategory, currentStopIndex(es.Schedule, time.Since(est.StartTime)),
 			),
 		},
 	}), nil

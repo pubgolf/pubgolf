@@ -15,6 +15,23 @@ type PlayerVenueAdjustment struct {
 	AdjustmentAmount int32
 }
 
+// PlayerAdjustmentsAsyncResult holds the result of a PlayerAdjustments call.
+type PlayerAdjustmentsAsyncResult struct {
+	asyncResult
+	Adjs []PlayerVenueAdjustment
+	Err  error
+}
+
+// PlayerAdjustmentsAsync constructs a PlayerAdjustmentsAsyncResult struct, which can be fulfilled by calling the Run method.
+func (q *Queries) PlayerAdjustmentsAsync(eventID models.EventID, playerID models.PlayerID) *PlayerAdjustmentsAsyncResult {
+	var res PlayerAdjustmentsAsyncResult
+	res.asyncResult.query = func(ctx context.Context) {
+		res.Adjs, res.Err = q.PlayerAdjustments(ctx, eventID, playerID)
+	}
+
+	return &res
+}
+
 // PlayerAdjustments returns a list of event stages where a player has an adjustment(s) and their labels/values.
 func (q *Queries) PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error) {
 	defer daoSpan(&ctx)()
