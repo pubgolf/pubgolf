@@ -46,6 +46,26 @@ func (_m *MockQueryProvider) AdjustmentTemplatesByStageID(ctx context.Context, s
 	return r0, r1
 }
 
+// AdjustmentTemplatesByStageIDAsync provides a mock function with given fields: stageID
+func (_m *MockQueryProvider) AdjustmentTemplatesByStageIDAsync(stageID models.StageID) *AdjustmentTemplatesByStageIDAsyncResult {
+	ret := _m.Called(stageID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdjustmentTemplatesByStageIDAsync")
+	}
+
+	var r0 *AdjustmentTemplatesByStageIDAsyncResult
+	if rf, ok := ret.Get(0).(func(models.StageID) *AdjustmentTemplatesByStageIDAsyncResult); ok {
+		r0 = rf(stageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*AdjustmentTemplatesByStageIDAsyncResult)
+		}
+	}
+
+	return r0
+}
+
 // AdjustmentsByPlayerStage provides a mock function with given fields: ctx, playerID, stageID
 func (_m *MockQueryProvider) AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error) {
 	ret := _m.Called(ctx, playerID, stageID)
@@ -773,6 +793,26 @@ func (_m *MockQueryProvider) ScoreByPlayerStage(ctx context.Context, playerID mo
 	}
 
 	return r0, r1
+}
+
+// ScoreByPlayerStageAsync provides a mock function with given fields: playerID, stageID
+func (_m *MockQueryProvider) ScoreByPlayerStageAsync(playerID models.PlayerID, stageID models.StageID) *ScoreByPlayerStageAsyncResult {
+	ret := _m.Called(playerID, stageID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ScoreByPlayerStageAsync")
+	}
+
+	var r0 *ScoreByPlayerStageAsyncResult
+	if rf, ok := ret.Get(0).(func(models.PlayerID, models.StageID) *ScoreByPlayerStageAsyncResult); ok {
+		r0 = rf(playerID, stageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ScoreByPlayerStageAsyncResult)
+		}
+	}
+
+	return r0
 }
 
 // ScoringCriteria provides a mock function with given fields: ctx, eventID, category

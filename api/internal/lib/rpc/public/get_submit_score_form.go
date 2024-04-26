@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sync"
 
 	"connectrpc.com/connect"
 
@@ -37,15 +38,43 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
+	var wg sync.WaitGroup
+
+	at := s.dao.AdjustmentTemplatesByStageIDAsync(stageID)
+	at.Run(ctx, &wg)
+
+	sps := s.dao.ScoreByPlayerStageAsync(playerID, stageID)
+	sps.Run(ctx, &wg)
+
+	es := s.dao.EventScheduleAsync(eventID)
+	if playerCategory == models.ScoringCategoryPubGolfFiveHole {
+		es.Run(ctx, &wg)
+	}
+
+	wg.Wait()
+
+	if at.Err != nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch venue adjustment templates: %w", at.Err))
+	}
+
+	hasScore := true
+
+	if sps.Err != nil {
+		if errors.Is(sps.Err, sql.ErrNoRows) {
+			hasScore = false
+		} else {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get existing score: %w", sps.Err))
+		}
+	}
+
 	status := apiv1.ScoreStatus_SCORE_STATUS_REQUIRED
 
 	if playerCategory == models.ScoringCategoryPubGolfFiveHole {
-		venues, err := s.dao.EventSchedule(ctx, eventID)
-		if err != nil {
-			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
+		if es.Err != nil {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", es.Err))
 		}
 
-		for i, v := range venues {
+		for i, v := range es.Schedule {
 			if v.VenueKey == venueKey {
 				// Check for *odd* index to mean optional because it's the zero-based index, not the one-based venue count.
 				if i%2 == 1 {
@@ -57,28 +86,12 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		}
 	}
 
-	templates, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch venue adjustment templates: %w", err))
-	}
-
 	score := uint32(0)
-	hasScore := true
-
-	dbScore, err := s.dao.ScoreByPlayerStage(ctx, playerID, stageID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			hasScore = false
-		} else {
-			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get existing score: %w", err))
-		}
-	}
-
 	activeAdjs := make(map[models.AdjustmentTemplateID]struct{})
 
 	if hasScore {
 		status = apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE
-		score = dbScore.Value
+		score = sps.Score.Value
 
 		dbAdjs, err := s.dao.AdjustmentsByPlayerStage(ctx, playerID, stageID)
 		if err != nil {
@@ -92,9 +105,9 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		}
 	}
 
-	adjs := make([]models.AdjustmentTemplate, 0, len(templates))
+	adjs := make([]models.AdjustmentTemplate, 0, len(at.Templates))
 
-	for _, a := range templates {
+	for _, a := range at.Templates {
 		active := false
 		if _, ok := activeAdjs[a.ID]; ok {
 			active = true

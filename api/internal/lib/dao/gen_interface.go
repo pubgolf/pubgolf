@@ -11,6 +11,8 @@ import (
 
 // QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.
 type QueryProvider interface {
+	// AdjustmentTemplatesByStageIDAsync constructs a AdjustmentTemplatesByStageIDAsyncResult struct, which can be fulfilled by calling the Run method.
+	AdjustmentTemplatesByStageIDAsync(stageID models.StageID) *AdjustmentTemplatesByStageIDAsyncResult
 	// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to a given stage for an event, including event-wide adjustment templates.
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error)
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
@@ -65,6 +67,8 @@ type QueryProvider interface {
 	PlayerScoresAsync(eventID models.EventID, playerID models.PlayerID) *PlayerScoresAsyncResult
 	// PlayerScores returns a list of event stages and a player's scoring info for each.
 	PlayerScores(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueScore, error)
+	// ScoreByPlayerStageAsync constructs a ScoreByPlayerStageAsyncResult struct, which can be fulfilled by calling the Run method.
+	ScoreByPlayerStageAsync(playerID models.PlayerID, stageID models.StageID) *ScoreByPlayerStageAsyncResult
 	// ScoreByPlayerStage returns the base score for a given player/stage combination.
 	ScoreByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) (models.Score, error)
 	// ScoringCriteriaAsync constructs a ScoringCriteriaAsyncResult struct, which can be fulfilled by calling the Run method.
