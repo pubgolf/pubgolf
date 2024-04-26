@@ -18,7 +18,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/go-chi/chi/v5"
 	chim "github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httprate"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel"
@@ -134,14 +133,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
 		r.Use(chim.NoCache)
-
-		if cfg.EnvName != config.DeployEnvE2ETest {
-			r.Use(
-				httprate.Limit(10, 1*time.Second, httprate.WithKeyFuncs(func(r *http.Request) (string, error) {
-					return r.Header.Get("X-PubGolf-User-ID"), nil
-				})),
-			)
-		}
+		r.Use(middleware.RateLimiter(cfg)...)
 
 		rpcMux := http.NewServeMux()
 		stdInterceptors, err := middleware.ConnectInterceptors()

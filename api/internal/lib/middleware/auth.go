@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"connectrpc.com/connect"
 
@@ -44,6 +46,13 @@ func initRouteSet(service string, names []string) map[string]struct{} {
 // nonAuthRoute returns true if the route should be skipped for token auth checks.
 func nonAuthRoute(req connect.AnyRequest) bool {
 	_, match := nonAuthRPCs[req.Spec().Procedure]
+
+	return match
+}
+
+// nonAuthPath returns true if the URL path should be skipped for token-based auth checks.
+func nonAuthPath(r *http.Request) bool {
+	_, match := nonAuthRPCs[strings.TrimPrefix(r.URL.Path, "/rpc")]
 
 	return match
 }
