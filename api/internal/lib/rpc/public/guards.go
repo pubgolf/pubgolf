@@ -95,7 +95,7 @@ func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.Player
 
 // guardValidCategory ensures the given scoring category is valid.
 func (s *Server) guardValidCategory(ctx context.Context, category apiv1.ScoringCategory) (models.ScoringCategory, error) {
-	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", category.String())
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.category_id", category.String())
 
 	cat := models.ScoringCategoryUnspecified
 
