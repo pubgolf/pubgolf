@@ -203,6 +203,40 @@ var adjustmentInserterTestCases = []struct {
 func TestScoringCriteriaAllVenues(t *testing.T) {
 	t.Parallel()
 
+	t.Run("includes players with no scores", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, tx, cleanup := initDB(t)
+		defer cleanup()
+
+		numVenues := 9
+		numPlayers := 2
+		scoringCategory := models.ScoringCategoryPubGolfNineHole
+
+		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+			NumVenues:       numVenues,
+			NumPlayers:      numPlayers,
+			ScoringCategory: scoringCategory,
+		})
+
+		// Do not insert any actual scores.
+
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+			EventID:         fix.EventID,
+			ScoringCategory: scoringCategory,
+		})
+		require.NoError(t, err)
+
+		require.Len(t, actualScores, numPlayers)
+
+		for _, s := range actualScores {
+			assert.Zero(t, s.TotalPoints, "total points")
+			assert.Zero(t, s.NumScores, "one score per venue")
+			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+		}
+	})
+
 	t.Run("No adjustments", func(t *testing.T) {
 		t.Parallel()
 
@@ -488,6 +522,40 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 	t.Parallel()
+
+	t.Run("includes players with no scores", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, tx, cleanup := initDB(t)
+		defer cleanup()
+
+		numVenues := 9
+		numPlayers := 2
+		scoringCategory := models.ScoringCategoryPubGolfNineHole
+
+		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+			NumVenues:       numVenues,
+			NumPlayers:      numPlayers,
+			ScoringCategory: scoringCategory,
+		})
+
+		// Do not insert any actual scores.
+
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
+			EventID:         fix.EventID,
+			ScoringCategory: scoringCategory,
+		})
+		require.NoError(t, err)
+
+		require.Len(t, actualScores, numPlayers)
+
+		for _, s := range actualScores {
+			assert.Zero(t, s.TotalPoints, "total points")
+			assert.Zero(t, s.NumScores, "one score per venue")
+			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+		}
+	})
 
 	t.Run("No adjustments", func(t *testing.T) {
 		t.Parallel()

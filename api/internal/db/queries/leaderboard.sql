@@ -26,6 +26,7 @@ separated AS ((
       AND s.is_verified IS TRUE
     LEFT JOIN st ON s.stage_id = st.id
       AND st.event_id = ep.event_id
+      AND st.is_odd
   WHERE
     p.deleted_at IS NULL
     AND ep.deleted_at IS NULL
@@ -33,7 +34,6 @@ separated AS ((
     AND ep.scoring_category = @scoring_category
     AND s.deleted_at IS NULL
     AND st.deleted_at IS NULL
-    AND st.is_odd
   GROUP BY
     p.id,
     p.name)
@@ -63,6 +63,7 @@ UNION (
       AND s.is_verified IS TRUE
     LEFT JOIN st ON s.stage_id = st.id
       AND st.event_id = ep.event_id
+      AND st.is_odd
     LEFT JOIN adjustments a ON a.stage_id = s.stage_id
       AND a.player_id = s.player_id
   WHERE
@@ -72,7 +73,6 @@ UNION (
     AND ep.scoring_category = @scoring_category
     AND s.deleted_at IS NULL
     AND st.deleted_at IS NULL
-    AND st.is_odd
     AND a.deleted_at IS NULL
   GROUP BY
     p.id,
