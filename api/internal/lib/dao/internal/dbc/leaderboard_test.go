@@ -231,7 +231,62 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 		for _, s := range actualScores {
 			assert.Zero(t, s.TotalPoints, "total points")
-			assert.Zero(t, s.NumScores, "one score per venue")
+			assert.Zero(t, s.NumScores, "no scores")
+			assert.Zero(t, s.NumScoresVerified, "no verified scores")
+			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+		}
+	})
+
+	t.Run("includes players with only unverified scores", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, tx, cleanup := initDB(t)
+		defer cleanup()
+
+		numVenues := 9
+		numPlayers := 2
+		scoringCategory := models.ScoringCategoryPubGolfNineHole
+
+		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+			NumVenues:       numVenues,
+			NumPlayers:      numPlayers,
+			ScoringCategory: scoringCategory,
+		})
+
+		// Insert random scores, without adjustments.
+
+		expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
+
+		for _, p := range fix.PlayerIDs {
+			for _, s := range fix.StageIDs {
+				score := rand.Int31n(10)
+				expectedTotalScores[p] += score
+
+				err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
+					PlayerID:   p,
+					StageID:    s,
+					Value:      uint32(score),
+					IsVerified: false,
+				})
+				require.NoError(t, err, "insert generated score")
+			}
+		}
+
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+			EventID:         fix.EventID,
+			ScoringCategory: scoringCategory,
+		})
+		require.NoError(t, err)
+
+		require.Len(t, actualScores, numPlayers)
+
+		// Run query and assert results.
+
+		for _, s := range actualScores {
+			assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
+			assert.EqualValues(t, numVenues, s.NumScores, "one score per venue")
+			assert.Zero(t, s.NumScoresVerified, "no verified scores")
 			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 			assert.Zero(t, s.PointsFromPenalties, "no penalties")
 		}
@@ -551,7 +606,67 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 
 		for _, s := range actualScores {
 			assert.Zero(t, s.TotalPoints, "total points")
-			assert.Zero(t, s.NumScores, "one score per venue")
+			assert.Zero(t, s.NumScores, "no scores")
+			assert.Zero(t, s.NumScoresVerified, "no verified scores")
+			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+		}
+	})
+
+	t.Run("includes players with only unverified scores", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, tx, cleanup := initDB(t)
+		defer cleanup()
+
+		numVenues := 9
+		numEligibleVenues := 5
+		numPlayers := 2
+		scoringCategory := models.ScoringCategoryPubGolfNineHole
+
+		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+			NumVenues:       numVenues,
+			NumPlayers:      numPlayers,
+			ScoringCategory: scoringCategory,
+		})
+
+		// Insert random scores, without adjustments.
+
+		expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
+
+		for _, p := range fix.PlayerIDs {
+			for stageIdx, s := range fix.StageIDs {
+				if stageIdx%2 == 1 {
+					continue
+				}
+
+				score := rand.Int31n(10)
+				expectedTotalScores[p] += score
+
+				err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
+					PlayerID:   p,
+					StageID:    s,
+					Value:      uint32(score),
+					IsVerified: false,
+				})
+				require.NoError(t, err, "insert generated score")
+			}
+		}
+
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
+			EventID:         fix.EventID,
+			ScoringCategory: scoringCategory,
+		})
+		require.NoError(t, err)
+
+		require.Len(t, actualScores, numPlayers)
+
+		// Run query and assert results.
+
+		for _, s := range actualScores {
+			assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
+			assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
+			assert.Zero(t, s.NumScoresVerified, "no verified scores")
 			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 			assert.Zero(t, s.PointsFromPenalties, "no penalties")
 		}
@@ -856,174 +971,5 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 				}
 			})
 		}
-	})
-}
-
-func TestUnverifiedScoreCountEveryOtherVenue(t *testing.T) {
-	t.Parallel()
-
-	t.Run("returns count of unverified scores for odd-numbered venues", func(t *testing.T) {
-		t.Parallel()
-
-		t.Run("with all scores verified", func(t *testing.T) {
-			t.Parallel()
-
-			ctx, tx, cleanup := initDB(t)
-			defer cleanup()
-
-			numVenues := 9
-			numPlayers := 2
-			scoringCategory := models.ScoringCategoryPubGolfFiveHole
-
-			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-				NumVenues:       numVenues,
-				NumPlayers:      numPlayers,
-				ScoringCategory: scoringCategory,
-			})
-
-			// Insert random scores, without adjustments.
-
-			for _, p := range fix.PlayerIDs {
-				for _, s := range fix.StageIDs {
-					score := rand.Int31n(10)
-
-					err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-						PlayerID:   p,
-						StageID:    s,
-						Value:      uint32(score),
-						IsVerified: true,
-					})
-					require.NoError(t, err, "insert generated score")
-				}
-			}
-
-			// Run query and assert results.
-
-			unverifiedRows, err := _sharedDBC.WithTx(tx).UnverifiedScoreCountEveryOtherVenue(ctx, dbc.UnverifiedScoreCountEveryOtherVenueParams{
-				EventID:         fix.EventID,
-				ScoringCategory: scoringCategory,
-			})
-			require.NoError(t, err)
-			require.Len(t, unverifiedRows, numPlayers)
-
-			for _, s := range unverifiedRows {
-				assert.Zero(t, s.Count)
-			}
-		})
-
-		t.Run("with all scores unverified", func(t *testing.T) {
-			t.Parallel()
-
-			ctx, tx, cleanup := initDB(t)
-			defer cleanup()
-
-			numVenues := 9
-			numPlayers := 2
-			numEligibleVenues := 5
-			scoringCategory := models.ScoringCategoryPubGolfFiveHole
-
-			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-				NumVenues:       numVenues,
-				NumPlayers:      numPlayers,
-				ScoringCategory: scoringCategory,
-			})
-
-			// Insert random scores, without adjustments.
-
-			for _, p := range fix.PlayerIDs {
-				for _, s := range fix.StageIDs {
-					score := rand.Int31n(10)
-
-					err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-						PlayerID:   p,
-						StageID:    s,
-						Value:      uint32(score),
-						IsVerified: false,
-					})
-					require.NoError(t, err, "insert generated score")
-				}
-			}
-
-			// Run query and assert results.
-
-			unverifiedRows, err := _sharedDBC.WithTx(tx).UnverifiedScoreCountEveryOtherVenue(ctx, dbc.UnverifiedScoreCountEveryOtherVenueParams{
-				EventID:         fix.EventID,
-				ScoringCategory: scoringCategory,
-			})
-			require.NoError(t, err)
-			require.Len(t, unverifiedRows, numPlayers)
-
-			for _, s := range unverifiedRows {
-				assert.EqualValues(t, numEligibleVenues, s.Count)
-			}
-		})
-
-		t.Run("with random number of scores", func(t *testing.T) {
-			t.Parallel()
-
-			ctx, tx, cleanup := initDB(t)
-			defer cleanup()
-
-			numVenues := 9
-			numPlayers := 5
-			scoringCategory := models.ScoringCategoryPubGolfFiveHole
-
-			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-				NumVenues:       numVenues,
-				NumPlayers:      numPlayers,
-				ScoringCategory: scoringCategory,
-			})
-
-			// Insert random scores, without adjustments.
-
-			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
-
-			for _, p := range fix.PlayerIDs {
-				expectedNumScores[p] = numVenues
-
-				for si, s := range fix.StageIDs {
-					var skip bool
-					err := faker.FakeData(&skip)
-					require.NoError(t, err, "generate random bool")
-
-					if skip {
-						expectedNumScores[p]--
-
-						continue
-					}
-
-					var verify bool
-					err = faker.FakeData(&verify)
-					require.NoError(t, err, "generate random bool")
-
-					if verify || si%2 == 1 {
-						expectedNumScores[p]--
-					}
-
-					score := rand.Int31n(10)
-
-					err = _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-						PlayerID:   p,
-						StageID:    s,
-						Value:      uint32(score),
-						IsVerified: verify,
-					})
-					require.NoError(t, err, "insert generated score")
-				}
-			}
-
-			// Run query and assert results.
-
-			unverifiedRows, err := _sharedDBC.WithTx(tx).UnverifiedScoreCountEveryOtherVenue(ctx, dbc.UnverifiedScoreCountEveryOtherVenueParams{
-				EventID:         fix.EventID,
-				ScoringCategory: scoringCategory,
-			})
-			require.NoError(t, err)
-			require.Len(t, unverifiedRows, numPlayers)
-
-			for _, s := range unverifiedRows {
-				assert.EqualValues(t, expectedNumScores[s.PlayerID], s.Count)
-			}
-		})
 	})
 }

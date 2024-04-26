@@ -92,15 +92,15 @@ func buildCategoryScoreBoard(scores []models.ScoringInput, required int) []*apiv
 func categoryScoreStatus(s models.ScoringInput, required int) apiv1.ScoreBoard_ScoreStatus {
 	req := int64(required)
 
-	if s.NumScores >= req {
+	if s.VerifiedScores >= req {
 		return apiv1.ScoreBoard_SCORE_STATUS_FINALIZED
 	}
 
-	if s.NumScores+s.NumUnverifiedScores >= req {
+	if s.VerifiedScores+s.UnverifiedScores >= req {
 		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION
 	}
 
-	if s.NumScores+s.NumUnverifiedScores == req-1 {
+	if s.VerifiedScores+s.UnverifiedScores == req-1 {
 		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION
 	}
 

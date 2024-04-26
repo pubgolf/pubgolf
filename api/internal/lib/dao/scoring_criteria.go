@@ -31,93 +31,53 @@ func (q *Queries) ScoringCriteria(ctx context.Context, eventID models.EventID, c
 
 	var scores []models.ScoringInput
 
-	err := q.useTx(ctx, func(ctx context.Context, q *Queries) error {
-		if category == models.ScoringCategoryPubGolfFiveHole {
-			unvCount, err := q.dbc.UnverifiedScoreCountEveryOtherVenue(ctx, dbc.UnverifiedScoreCountEveryOtherVenueParams{
-				EventID:         eventID,
-				ScoringCategory: category,
-			})
-			if err != nil {
-				return fmt.Errorf("fetch unverified count every other: %w", err)
-			}
-
-			unv := make(map[models.PlayerID]int64, len(unvCount))
-			for _, c := range unvCount {
-				unv[c.PlayerID] = c.Count
-			}
-
-			data, err := q.dbc.ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
-				EventID:         eventID,
-				ScoringCategory: category,
-			})
-			if err != nil {
-				return fmt.Errorf("fetch scoring data every other: %w", err)
-			}
-
-			for _, d := range data {
-				playerID := models.PlayerID{DatabaseULID: d.PlayerID}
-
-				numUnv, ok := unv[playerID]
-				if !ok {
-					return fmt.Errorf("find unverified score count for player %q: %w", playerID, ErrInvariantViolation)
-				}
-
-				scores = append(scores, models.ScoringInput{
-					PlayerID:            playerID,
-					Name:                d.Name,
-					NumScores:           d.NumScores,
-					NumUnverifiedScores: numUnv,
-					TotalPoints:         d.TotalPoints,
-					PointsFromPenalties: d.PointsFromPenalties,
-					PointsFromBonuses:   d.PointsFromBonuses,
-				})
-			}
-
-			return nil
-		}
-
-		unvCount, err := q.dbc.UnverifiedScoreCountAllVenues(ctx, dbc.UnverifiedScoreCountAllVenuesParams{
+	if category == models.ScoringCategoryPubGolfFiveHole {
+		data, err := q.dbc.ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
 			EventID:         eventID,
 			ScoringCategory: category,
 		})
 		if err != nil {
-			return fmt.Errorf("fetch unverified count every other: %w", err)
-		}
-
-		unv := make(map[models.PlayerID]int64, len(unvCount))
-		for _, c := range unvCount {
-			unv[c.PlayerID] = c.Count
-		}
-
-		data, err := q.dbc.ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
-			EventID:         eventID,
-			ScoringCategory: category,
-		})
-		if err != nil {
-			return fmt.Errorf("fetch scoring data: %w", err)
+			return nil, fmt.Errorf("fetch scoring data every other: %w", err)
 		}
 
 		for _, d := range data {
 			playerID := models.PlayerID{DatabaseULID: d.PlayerID}
 
-			numUnv, ok := unv[playerID]
-			if !ok {
-				return fmt.Errorf("find unverified score count for player %q: %w", playerID, ErrInvariantViolation)
-			}
-
 			scores = append(scores, models.ScoringInput{
 				PlayerID:            playerID,
 				Name:                d.Name,
-				NumScores:           d.NumScores,
-				NumUnverifiedScores: numUnv,
+				VerifiedScores:      d.NumScoresVerified,
+				UnverifiedScores:    d.NumScores - d.NumScoresVerified,
 				TotalPoints:         d.TotalPoints,
 				PointsFromPenalties: d.PointsFromPenalties,
 				PointsFromBonuses:   d.PointsFromBonuses,
 			})
 		}
 
-		return nil
-	})
+		return scores, nil
+	}
 
-	return scores, err
+	data, err := q.dbc.ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+		EventID:         eventID,
+		ScoringCategory: category,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fetch scoring data: %w", err)
+	}
+
+	for _, d := range data {
+		playerID := models.PlayerID{DatabaseULID: d.PlayerID}
+
+		scores = append(scores, models.ScoringInput{
+			PlayerID:            playerID,
+			Name:                d.Name,
+			VerifiedScores:      d.NumScoresVerified,
+			UnverifiedScores:    d.NumScores - d.NumScoresVerified,
+			TotalPoints:         d.TotalPoints,
+			PointsFromPenalties: d.PointsFromPenalties,
+			PointsFromBonuses:   d.PointsFromBonuses,
+		})
+	}
+
+	return scores, nil
 }

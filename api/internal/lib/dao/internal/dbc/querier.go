@@ -48,8 +48,6 @@ type Querier interface {
 	SetEventVenueKeys(ctx context.Context, eventID models.EventID) error
 	SetNextEventVenueKey(ctx context.Context, id models.EventID) error
 	StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error)
-	UnverifiedScoreCountAllVenues(ctx context.Context, arg UnverifiedScoreCountAllVenuesParams) ([]UnverifiedScoreCountAllVenuesRow, error)
-	UnverifiedScoreCountEveryOtherVenue(ctx context.Context, arg UnverifiedScoreCountEveryOtherVenueParams) ([]UnverifiedScoreCountEveryOtherVenueRow, error)
 	UpdateAdjustmentTemplate(ctx context.Context, arg UpdateAdjustmentTemplateParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error
 	UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error
