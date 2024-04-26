@@ -18,7 +18,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/go-chi/chi/v5"
 	chim "github.com/go-chi/chi/v5/middleware"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -109,10 +109,10 @@ func guard(err error, msg string) {
 
 // makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
 func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
-	conConfig, err := pgx.ParseConfig(cfg.AppDatabaseURL)
+	conConfig, err := pgxpool.New(context.Background(), cfg.AppDatabaseURL)
 	guard(err, "parse database config")
 
-	db := telemetry.WrapDB(stdlib.GetConnector(*conConfig))
+	db := telemetry.WrapDB(stdlib.GetPoolConnector(conConfig))
 
 	if cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest {
 		err = db.PingContext(ctx)
