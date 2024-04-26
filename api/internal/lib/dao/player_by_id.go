@@ -3,7 +3,9 @@ package dao
 import (
 	"context"
 	"fmt"
+	"sync"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
@@ -11,14 +13,28 @@ import (
 func (q *Queries) PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error) {
 	defer daoSpan(&ctx)()
 
-	p, err := q.dbc.PlayerByID(ctx, playerID)
-	if err != nil {
-		return models.Player{}, fmt.Errorf("fetch player: %w", err)
+	var wg sync.WaitGroup
+	var pRow dbc.PlayerByIDRow
+	var pErr error
+	var regRows []dbc.PlayerRegistrationsByIDRow
+	var regErr error
+
+	runAsync(ctx, &wg, func(ctx context.Context) {
+		pRow, pErr = q.dbc.PlayerByID(ctx, playerID)
+	})
+
+	runAsync(ctx, &wg, func(ctx context.Context) {
+		regRows, regErr = q.dbc.PlayerRegistrationsByID(ctx, playerID)
+	})
+
+	wg.Wait()
+
+	if pErr != nil {
+		return models.Player{}, fmt.Errorf("fetch player: %w", pErr)
 	}
 
-	regRows, err := q.dbc.PlayerRegistrationsByID(ctx, playerID)
-	if err != nil {
-		return models.Player{}, fmt.Errorf("fetch player registrations: %w", err)
+	if regErr != nil {
+		return models.Player{}, fmt.Errorf("fetch player registrations: %w", regErr)
 	}
 
 	regs := make([]models.EventRegistration, len(regRows))
@@ -30,8 +46,8 @@ func (q *Queries) PlayerByID(ctx context.Context, playerID models.PlayerID) (mod
 	}
 
 	return models.Player{
-		ID:     p.ID,
-		Name:   p.Name,
+		ID:     pRow.ID,
+		Name:   pRow.Name,
 		Events: regs,
 	}, nil
 }
