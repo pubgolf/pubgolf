@@ -48,6 +48,18 @@ WHERE
   AND ep.deleted_at IS NULL
   AND ep.event_id = @event_id;
 
+-- name: PlayerCategoryForEvent :one
+SELECT
+  ep.scoring_category
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+WHERE
+  p.deleted_at IS NULL
+  AND p.id = @player_id
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = @event_id;
+
 -- name: PlayerRegistrationsByID :many
 SELECT
   e.key AS event_key,

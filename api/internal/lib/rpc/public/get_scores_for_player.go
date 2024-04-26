@@ -31,7 +31,7 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse playerID as ULID: %w", err))
 	}
 
-	playerCategory, err := s.guardPlayerCategory(ctx, playerID, req.Msg.GetEventKey())
+	playerCategory, err := s.guardPlayerCategory(ctx, playerID, eventID)
 	if err != nil {
 		return nil, err
 	}

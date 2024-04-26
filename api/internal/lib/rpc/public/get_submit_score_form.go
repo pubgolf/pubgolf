@@ -25,7 +25,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		return nil, err
 	}
 
-	playerCategory, err := s.guardPlayerCategory(ctx, playerID, req.Msg.GetEventKey())
+	playerCategory, err := s.guardPlayerCategory(ctx, playerID, eventID)
 	if err != nil {
 		return nil, err
 	}

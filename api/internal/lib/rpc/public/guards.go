@@ -75,22 +75,19 @@ func (s *Server) guardRegisteredForEvent(ctx context.Context, playerID models.Pl
 }
 
 // guardPlayerCategory ensures the given player is registered for the given event and returns their scoring category.
-func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.PlayerID, eventKey string) (models.ScoringCategory, error) {
+func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (models.ScoringCategory, error) {
 	telemetry.AddRecursiveAttribute(&ctx, "req.param.player_id", playerID.String())
-	telemetry.AddRecursiveAttribute(&ctx, "req.param.event_key", eventKey)
+	telemetry.AddRecursiveAttribute(&ctx, "req.param.event_id", eventID.String())
 
-	player, err := s.dao.PlayerByID(ctx, playerID)
+	cat, err := s.dao.PlayerCategoryForEvent(ctx, playerID, eventID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeNotFound, fmt.Errorf("player %q not registered for event %q: %w", playerID.String(), eventID.String(), errNotRegistered))
+		}
 		return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup player info: %w", err))
 	}
 
-	for _, reg := range player.Events {
-		if reg.EventKey == eventKey {
-			return reg.ScoringCategory, nil
-		}
-	}
-
-	return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeNotFound, fmt.Errorf("user %q not registered for event %q: %w", player.ID.String(), eventKey, errNotRegistered))
+	return cat, nil
 }
 
 // guardValidCategory ensures the given scoring category is valid.

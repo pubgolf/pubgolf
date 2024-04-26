@@ -676,6 +676,34 @@ func (_m *MockQuerier) PlayerByID(ctx context.Context, id models.PlayerID) (Play
 	return r0, r1
 }
 
+// PlayerCategoryForEvent provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) PlayerCategoryForEvent(ctx context.Context, arg PlayerCategoryForEventParams) (models.ScoringCategory, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerCategoryForEvent")
+	}
+
+	var r0 models.ScoringCategory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, PlayerCategoryForEventParams) (models.ScoringCategory, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, PlayerCategoryForEventParams) models.ScoringCategory); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(models.ScoringCategory)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, PlayerCategoryForEventParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // PlayerIDByAuthToken provides a mock function with given fields: ctx, authToken
 func (_m *MockQuerier) PlayerIDByAuthToken(ctx context.Context, authToken models.AuthToken) (models.PlayerID, error) {
 	ret := _m.Called(ctx, authToken)

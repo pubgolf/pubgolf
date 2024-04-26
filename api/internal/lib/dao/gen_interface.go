@@ -55,6 +55,8 @@ type QueryProvider interface {
 	PlayerAdjustments(ctx context.Context, eventID models.EventID, playerID models.PlayerID) ([]PlayerVenueAdjustment, error)
 	// PlayerByID returns a player's profile data and event registrations.
 	PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error)
+	// PlayerCategoryForEvent returns the player's registered scoring category.
+	PlayerCategoryForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (models.ScoringCategory, error)
 	// PlayerIDByAuthToken takes an auth token and returns the corresponding player ID (only if the token is active).
 	PlayerIDByAuthToken(ctx context.Context, token models.AuthToken) (models.PlayerID, error)
 	// PlayerRegisteredForEvent returns whether or not the player has a valid registration for the given event.

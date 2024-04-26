@@ -127,6 +127,31 @@ func (q *Queries) PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByI
 	return i, err
 }
 
+const playerCategoryForEvent = `-- name: PlayerCategoryForEvent :one
+SELECT
+  ep.scoring_category
+FROM
+  players p
+  JOIN event_players ep ON p.id = ep.player_id
+WHERE
+  p.deleted_at IS NULL
+  AND p.id = $1
+  AND ep.deleted_at IS NULL
+  AND ep.event_id = $2
+`
+
+type PlayerCategoryForEventParams struct {
+	PlayerID models.PlayerID
+	EventID  models.EventID
+}
+
+func (q *Queries) PlayerCategoryForEvent(ctx context.Context, arg PlayerCategoryForEventParams) (models.ScoringCategory, error) {
+	row := q.queryRow(ctx, q.playerCategoryForEventStmt, playerCategoryForEvent, arg.PlayerID, arg.EventID)
+	var scoring_category models.ScoringCategory
+	err := row.Scan(&scoring_category)
+	return scoring_category, err
+}
+
 const playerRegisteredForEvent = `-- name: PlayerRegisteredForEvent :one
 SELECT
   TRUE AS registration_found

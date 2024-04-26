@@ -99,6 +99,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.playerByIDStmt, err = db.PrepareContext(ctx, playerByID); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerByID: %w", err)
 	}
+	if q.playerCategoryForEventStmt, err = db.PrepareContext(ctx, playerCategoryForEvent); err != nil {
+		return nil, fmt.Errorf("error preparing query PlayerCategoryForEvent: %w", err)
+	}
 	if q.playerIDByAuthTokenStmt, err = db.PrepareContext(ctx, playerIDByAuthToken); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerIDByAuthToken: %w", err)
 	}
@@ -283,6 +286,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing playerByIDStmt: %w", cerr)
 		}
 	}
+	if q.playerCategoryForEventStmt != nil {
+		if cerr := q.playerCategoryForEventStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing playerCategoryForEventStmt: %w", cerr)
+		}
+	}
 	if q.playerIDByAuthTokenStmt != nil {
 		if cerr := q.playerIDByAuthTokenStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing playerIDByAuthTokenStmt: %w", cerr)
@@ -437,6 +445,7 @@ type Queries struct {
 	phoneNumberIsVerifiedStmt           *sql.Stmt
 	playerAdjustmentsStmt               *sql.Stmt
 	playerByIDStmt                      *sql.Stmt
+	playerCategoryForEventStmt          *sql.Stmt
 	playerIDByAuthTokenStmt             *sql.Stmt
 	playerRegisteredForEventStmt        *sql.Stmt
 	playerRegistrationsByIDStmt         *sql.Stmt
@@ -486,6 +495,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		phoneNumberIsVerifiedStmt:           q.phoneNumberIsVerifiedStmt,
 		playerAdjustmentsStmt:               q.playerAdjustmentsStmt,
 		playerByIDStmt:                      q.playerByIDStmt,
+		playerCategoryForEventStmt:          q.playerCategoryForEventStmt,
 		playerIDByAuthTokenStmt:             q.playerIDByAuthTokenStmt,
 		playerRegisteredForEventStmt:        q.playerRegisteredForEventStmt,
 		playerRegistrationsByIDStmt:         q.playerRegistrationsByIDStmt,
