@@ -84,6 +84,7 @@ func (s *Server) guardPlayerCategory(ctx context.Context, playerID models.Player
 		if errors.Is(err, sql.ErrNoRows) {
 			return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeNotFound, fmt.Errorf("player %q not registered for event %q: %w", playerID.String(), eventID.String(), errNotRegistered))
 		}
+
 		return models.ScoringCategoryUnspecified, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup player info: %w", err))
 	}
 
