@@ -16,36 +16,6 @@ type MockQuerier struct {
 	mock.Mock
 }
 
-// AdjustmentTemplatesByEventID provides a mock function with given fields: ctx, eventID
-func (_m *MockQuerier) AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]AdjustmentTemplatesByEventIDRow, error) {
-	ret := _m.Called(ctx, eventID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for AdjustmentTemplatesByEventID")
-	}
-
-	var r0 []AdjustmentTemplatesByEventIDRow
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]AdjustmentTemplatesByEventIDRow, error)); ok {
-		return rf(ctx, eventID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []AdjustmentTemplatesByEventIDRow); ok {
-		r0 = rf(ctx, eventID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]AdjustmentTemplatesByEventIDRow)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // AdjustmentTemplatesByStageID provides a mock function with given fields: ctx, stageID
 func (_m *MockQuerier) AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error) {
 	ret := _m.Called(ctx, stageID)
@@ -585,34 +555,6 @@ func (_m *MockQuerier) EventStartTime(ctx context.Context, id models.EventID) (t
 
 	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
 		r1 = rf(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// EventVenueKeysAreValid provides a mock function with given fields: ctx, eventID
-func (_m *MockQuerier) EventVenueKeysAreValid(ctx context.Context, eventID models.EventID) (bool, error) {
-	ret := _m.Called(ctx, eventID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for EventVenueKeysAreValid")
-	}
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) (bool, error)); ok {
-		return rf(ctx, eventID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) bool); ok {
-		r0 = rf(ctx, eventID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
 	} else {
 		r1 = ret.Error(1)
 	}

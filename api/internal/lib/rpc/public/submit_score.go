@@ -32,7 +32,7 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, err
 	}
 
-	tpls, err := s.getAdjustmentTemplates(ctx, eventID, stageID)
+	tpls, err := s.getAdjustmentTemplates(ctx, stageID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch adjustment templates: %w", err))
 	}
@@ -73,24 +73,15 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 	}), nil
 }
 
-func (s *Server) getAdjustmentTemplates(ctx context.Context, eventID models.EventID, stageID models.StageID) (map[models.AdjustmentTemplateID]models.AdjustmentTemplate, error) {
+func (s *Server) getAdjustmentTemplates(ctx context.Context, stageID models.StageID) (map[models.AdjustmentTemplateID]models.AdjustmentTemplate, error) {
 	allAdjs := make(map[models.AdjustmentTemplateID]models.AdjustmentTemplate)
 
-	venAdjs, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
+	templates, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
 	if err != nil {
 		return nil, fmt.Errorf("fetch venue adjustment templates: %w", err)
 	}
 
-	for _, a := range venAdjs {
-		allAdjs[a.ID] = a
-	}
-
-	stdAdjs, err := s.dao.AdjustmentTemplatesByEventID(ctx, eventID)
-	if err != nil {
-		return nil, fmt.Errorf("fetch event adjustment templates: %w", err)
-	}
-
-	for _, a := range stdAdjs {
+	for _, a := range templates {
 		allAdjs[a.ID] = a
 	}
 

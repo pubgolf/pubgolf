@@ -9,7 +9,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to all stages for an event.
+// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to a given stage for an event, including event-wide adjustment templates.
 func (q *Queries) AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error) {
 	defer daoSpan(&ctx)()
 
@@ -28,7 +28,7 @@ func (q *Queries) AdjustmentTemplatesByStageID(ctx context.Context, stageID mode
 			ID:            at.ID,
 			Label:         at.Label,
 			Value:         at.Value,
-			VenueSpecific: true,
+			VenueSpecific: at.VenueSpecific,
 		})
 	}
 

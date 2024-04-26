@@ -24,9 +24,6 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.adjustmentTemplatesByEventIDStmt, err = db.PrepareContext(ctx, adjustmentTemplatesByEventID); err != nil {
-		return nil, fmt.Errorf("error preparing query AdjustmentTemplatesByEventID: %w", err)
-	}
 	if q.adjustmentTemplatesByStageIDStmt, err = db.PrepareContext(ctx, adjustmentTemplatesByStageID); err != nil {
 		return nil, fmt.Errorf("error preparing query AdjustmentTemplatesByStageID: %w", err)
 	}
@@ -170,11 +167,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
-	if q.adjustmentTemplatesByEventIDStmt != nil {
-		if cerr := q.adjustmentTemplatesByEventIDStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing adjustmentTemplatesByEventIDStmt: %w", cerr)
-		}
-	}
 	if q.adjustmentTemplatesByStageIDStmt != nil {
 		if cerr := q.adjustmentTemplatesByStageIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing adjustmentTemplatesByStageIDStmt: %w", cerr)
@@ -444,7 +436,6 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                      DBTX
 	tx                                      *sql.Tx
-	adjustmentTemplatesByEventIDStmt        *sql.Stmt
 	adjustmentTemplatesByStageIDStmt        *sql.Stmt
 	adjustmentsByPlayerStageStmt            *sql.Stmt
 	allVenuesStmt                           *sql.Stmt
@@ -497,7 +488,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                      tx,
 		tx:                                      tx,
-		adjustmentTemplatesByEventIDStmt:        q.adjustmentTemplatesByEventIDStmt,
 		adjustmentTemplatesByStageIDStmt:        q.adjustmentTemplatesByStageIDStmt,
 		adjustmentsByPlayerStageStmt:            q.adjustmentsByPlayerStageStmt,
 		allVenuesStmt:                           q.allVenuesStmt,

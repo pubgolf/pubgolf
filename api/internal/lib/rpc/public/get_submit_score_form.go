@@ -57,14 +57,9 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		}
 	}
 
-	venAdjs, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
+	templates, err := s.dao.AdjustmentTemplatesByStageID(ctx, stageID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch venue adjustment templates: %w", err))
-	}
-
-	stdAdjs, err := s.dao.AdjustmentTemplatesByEventID(ctx, eventID)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("fetch event adjustment templates: %w", err))
 	}
 
 	score := uint32(0)
@@ -97,9 +92,9 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 		}
 	}
 
-	adjs := make([]models.AdjustmentTemplate, 0, len(venAdjs)+len(stdAdjs))
+	adjs := make([]models.AdjustmentTemplate, 0, len(templates))
 
-	for _, a := range venAdjs {
+	for _, a := range templates {
 		active := false
 		if _, ok := activeAdjs[a.ID]; ok {
 			active = true
@@ -109,22 +104,7 @@ func (s *Server) GetSubmitScoreForm(ctx context.Context, req *connect.Request[ap
 			ID:            a.ID,
 			Label:         a.Label,
 			Value:         a.Value,
-			VenueSpecific: true,
-			Active:        active,
-		})
-	}
-
-	for _, a := range stdAdjs {
-		active := false
-		if _, ok := activeAdjs[a.ID]; ok {
-			active = true
-		}
-
-		adjs = append(adjs, models.AdjustmentTemplate{
-			ID:            a.ID,
-			Label:         a.Label,
-			Value:         a.Value,
-			VenueSpecific: false,
+			VenueSpecific: a.VenueSpecific,
 			Active:        active,
 		})
 	}

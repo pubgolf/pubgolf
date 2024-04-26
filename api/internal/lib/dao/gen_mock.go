@@ -16,36 +16,6 @@ type MockQueryProvider struct {
 	mock.Mock
 }
 
-// AdjustmentTemplatesByEventID provides a mock function with given fields: ctx, eventID
-func (_m *MockQueryProvider) AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]models.AdjustmentTemplate, error) {
-	ret := _m.Called(ctx, eventID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for AdjustmentTemplatesByEventID")
-	}
-
-	var r0 []models.AdjustmentTemplate
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) ([]models.AdjustmentTemplate, error)); ok {
-		return rf(ctx, eventID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.EventID) []models.AdjustmentTemplate); ok {
-		r0 = rf(ctx, eventID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]models.AdjustmentTemplate)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, models.EventID) error); ok {
-		r1 = rf(ctx, eventID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // AdjustmentTemplatesByStageID provides a mock function with given fields: ctx, stageID
 func (_m *MockQueryProvider) AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error) {
 	ret := _m.Called(ctx, stageID)

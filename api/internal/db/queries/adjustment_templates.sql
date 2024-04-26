@@ -4,30 +4,22 @@ INSERT INTO adjustment_templates(label, value, rank, stage_id, event_id, deleted
 RETURNING
   id;
 
--- name: AdjustmentTemplatesByEventID :many
-SELECT
-  at.id,
-  at.value,
-  at.label
-FROM
-  adjustment_templates at
-WHERE
-  at.deleted_at IS NULL
-  AND at.event_id = @event_id
-ORDER BY
-  at.rank;
-
 -- name: AdjustmentTemplatesByStageID :many
 SELECT
   at.id,
   at.value,
-  at.label
+  at.label,
+(at.stage_id IS NOT NULL)::bool AS venue_specific
 FROM
-  adjustment_templates at
+  stages st
+  JOIN adjustment_templates at ON at.stage_id = st.id
+    OR at.event_id = st.event_id
 WHERE
   at.deleted_at IS NULL
-  AND at.stage_id = @stage_id
+  AND st.deleted_at IS NULL
+  AND st.id = @stage_id
 ORDER BY
+  at.stage_id,
   at.rank;
 
 -- name: EventAdjustmentTemplates :many

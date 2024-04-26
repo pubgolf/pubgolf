@@ -11,9 +11,7 @@ import (
 
 // QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.
 type QueryProvider interface {
-	// AdjustmentTemplatesByEventID returns a list of adjustment templates applicable to all stages for an event.
-	AdjustmentTemplatesByEventID(ctx context.Context, eventID models.EventID) ([]models.AdjustmentTemplate, error)
-	// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to all stages for an event.
+	// AdjustmentTemplatesByStageID returns a list of adjustment templates applicable to a given stage for an event, including event-wide adjustment templates.
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]models.AdjustmentTemplate, error)
 	// AdjustmentsByPlayerStage returns the base score for a given player/stage combination.
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
