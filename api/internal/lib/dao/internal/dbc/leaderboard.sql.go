@@ -11,145 +11,7 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
-const scoringCriteriaAllVenues = `-- name: ScoringCriteriaAllVenues :many
-WITH separated AS ((
-    -- Get score contributions.
-    SELECT
-      p.id AS player_id,
-      p.name,
-      coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
-      sum(
-        CASE WHEN NOT coalesce(s.is_verified, FALSE) THEN
-          0
-        ELSE
-          1
-        END) AS num_scores_verified,
-      coalesce(sum(s.value), 0)::bigint AS total_points,
-      0 AS points_from_penalties,
-      0 AS points_from_bonuses
-    FROM
-      players p
-    LEFT JOIN event_players ep ON p.id = ep.player_id
-    LEFT JOIN scores s ON s.player_id = p.id
-    LEFT JOIN stages st ON s.stage_id = st.id
-      AND st.event_id = ep.event_id
-  WHERE
-    p.deleted_at IS NULL
-    AND ep.deleted_at IS NULL
-    AND ep.event_id = $1
-    AND ep.scoring_category = $2
-    AND s.deleted_at IS NULL
-    AND st.deleted_at IS NULL
-  GROUP BY
-    p.id,
-    p.name)
-UNION (
-  -- Get adjustment contributions.
-  SELECT
-    p.id AS player_id,
-    p.name,
-    coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
-    0 AS num_scores_verified,
-    coalesce(sum(a.value), 0)::bigint AS total_points,
-    sum(
-      CASE WHEN a.value > 0 THEN
-        a.value
-      ELSE
-        0
-      END) AS points_from_penalties,
-    sum(
-      CASE WHEN a.value < 0 THEN
-        a.value
-      ELSE
-        0
-      END) AS points_from_bonuses
-  FROM
-    players p
-    LEFT JOIN event_players ep ON p.id = ep.player_id
-    LEFT JOIN scores s ON s.player_id = p.id
-    LEFT JOIN stages st ON s.stage_id = st.id
-      AND st.event_id = ep.event_id
-    LEFT JOIN adjustments a ON a.stage_id = s.stage_id
-      AND a.player_id = s.player_id
-  WHERE
-    p.deleted_at IS NULL
-    AND ep.deleted_at IS NULL
-    AND ep.event_id = $1
-    AND ep.scoring_category = $2
-    AND s.deleted_at IS NULL
-    AND st.deleted_at IS NULL
-    AND a.deleted_at IS NULL
-  GROUP BY
-    p.id,
-    p.name))
-SELECT
-  player_id,
-  name,
-  num_scores,
-  SUM(num_scores_verified) AS num_scores_verified,
-  SUM(total_points) AS total_points,
-  SUM(points_from_penalties) AS points_from_penalties,
-  SUM(points_from_bonuses) AS points_from_bonuses
-FROM
-  separated
-GROUP BY
-  player_id,
-  name,
-  num_scores
-ORDER BY
-  num_scores DESC,
-  total_points ASC,
-  points_from_penalties ASC,
-  points_from_bonuses DESC
-`
-
-type ScoringCriteriaAllVenuesParams struct {
-	EventID         models.EventID
-	ScoringCategory models.ScoringCategory
-}
-
-type ScoringCriteriaAllVenuesRow struct {
-	PlayerID            models.DatabaseULID
-	Name                string
-	NumScores           int64
-	NumScoresVerified   int64
-	TotalPoints         int64
-	PointsFromPenalties int64
-	PointsFromBonuses   int64
-}
-
-func (q *Queries) ScoringCriteriaAllVenues(ctx context.Context, arg ScoringCriteriaAllVenuesParams) ([]ScoringCriteriaAllVenuesRow, error) {
-	rows, err := q.query(ctx, q.scoringCriteriaAllVenuesStmt, scoringCriteriaAllVenues, arg.EventID, arg.ScoringCategory)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ScoringCriteriaAllVenuesRow
-	for rows.Next() {
-		var i ScoringCriteriaAllVenuesRow
-		if err := rows.Scan(
-			&i.PlayerID,
-			&i.Name,
-			&i.NumScores,
-			&i.NumScoresVerified,
-			&i.TotalPoints,
-			&i.PointsFromPenalties,
-			&i.PointsFromBonuses,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const scoringCriteriaEveryOtherVenue = `-- name: ScoringCriteriaEveryOtherVenue :many
+const scoringCriteria = `-- name: ScoringCriteria :many
 WITH st AS (
   -- Replaces the stages table in the later section with only the odd numbered stages.
   SELECT
@@ -182,7 +44,6 @@ separated AS ((
     LEFT JOIN scores s ON s.player_id = p.id
     LEFT JOIN st ON s.stage_id = st.id
       AND st.event_id = ep.event_id
-      AND st.is_odd
   WHERE
     p.deleted_at IS NULL
     AND ep.deleted_at IS NULL
@@ -190,6 +51,8 @@ separated AS ((
     AND ep.scoring_category = $2
     AND s.deleted_at IS NULL
     AND st.deleted_at IS NULL
+    AND (st.is_odd = TRUE
+      OR st.is_odd = $3::bool)
   GROUP BY
     p.id,
     p.name)
@@ -198,7 +61,7 @@ UNION (
   SELECT
     p.id AS player_id,
     p.name,
-    coalesce(count(DISTINCT (s.id)), 0)::bigint AS num_scores,
+    0 AS num_scores,
     0 AS num_scores_verified,
     coalesce(sum(a.value), 0)::bigint AS total_points,
     sum(
@@ -219,7 +82,8 @@ UNION (
     LEFT JOIN scores s ON s.player_id = p.id
     LEFT JOIN st ON s.stage_id = st.id
       AND st.event_id = ep.event_id
-      AND st.is_odd
+      AND (st.is_odd = TRUE
+        OR st.is_odd = $3::bool)
     LEFT JOIN adjustments a ON a.stage_id = s.stage_id
       AND a.player_id = s.player_id
   WHERE
@@ -236,7 +100,7 @@ UNION (
 SELECT
   player_id,
   name,
-  num_scores,
+  SUM(num_scores) AS num_scores,
   SUM(num_scores_verified) AS num_scores_verified,
   SUM(total_points) AS total_points,
   SUM(points_from_penalties) AS points_from_penalties,
@@ -245,8 +109,7 @@ FROM
   separated
 GROUP BY
   player_id,
-  name,
-  num_scores
+  name
 ORDER BY
   num_scores DESC,
   total_points ASC,
@@ -254,12 +117,13 @@ ORDER BY
   points_from_bonuses DESC
 `
 
-type ScoringCriteriaEveryOtherVenueParams struct {
+type ScoringCriteriaParams struct {
 	EventID         models.EventID
 	ScoringCategory models.ScoringCategory
+	EveryOther      bool
 }
 
-type ScoringCriteriaEveryOtherVenueRow struct {
+type ScoringCriteriaRow struct {
 	PlayerID            models.DatabaseULID
 	Name                string
 	NumScores           int64
@@ -269,15 +133,15 @@ type ScoringCriteriaEveryOtherVenueRow struct {
 	PointsFromBonuses   int64
 }
 
-func (q *Queries) ScoringCriteriaEveryOtherVenue(ctx context.Context, arg ScoringCriteriaEveryOtherVenueParams) ([]ScoringCriteriaEveryOtherVenueRow, error) {
-	rows, err := q.query(ctx, q.scoringCriteriaEveryOtherVenueStmt, scoringCriteriaEveryOtherVenue, arg.EventID, arg.ScoringCategory)
+func (q *Queries) ScoringCriteria(ctx context.Context, arg ScoringCriteriaParams) ([]ScoringCriteriaRow, error) {
+	rows, err := q.query(ctx, q.scoringCriteriaStmt, scoringCriteria, arg.EventID, arg.ScoringCategory, arg.EveryOther)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ScoringCriteriaEveryOtherVenueRow
+	var items []ScoringCriteriaRow
 	for rows.Next() {
-		var i ScoringCriteriaEveryOtherVenueRow
+		var i ScoringCriteriaRow
 		if err := rows.Scan(
 			&i.PlayerID,
 			&i.Name,

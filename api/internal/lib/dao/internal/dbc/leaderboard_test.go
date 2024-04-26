@@ -200,7 +200,7 @@ var adjustmentInserterTestCases = []struct {
 	},
 }
 
-func TestScoringCriteriaAllVenues(t *testing.T) {
+func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 	t.Parallel()
 
 	t.Run("includes players with no scores", func(t *testing.T) {
@@ -221,9 +221,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 		// Do not insert any actual scores.
 
-		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 			EventID:         fix.EventID,
 			ScoringCategory: scoringCategory,
+			EveryOther:      false,
 		})
 		require.NoError(t, err)
 
@@ -273,9 +274,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 			}
 		}
 
-		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 			EventID:         fix.EventID,
 			ScoringCategory: scoringCategory,
+			EveryOther:      false,
 		})
 		require.NoError(t, err)
 
@@ -332,9 +334,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 			// Run query and assert results.
 
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 				EventID:         fix.EventID,
 				ScoringCategory: scoringCategory,
+				EveryOther:      false,
 			})
 			require.NoError(t, err)
 
@@ -390,9 +393,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 			// Run query and assert results.
 
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 				EventID:         fix.EventID,
 				ScoringCategory: scoringCategory,
+				EveryOther:      false,
 			})
 			require.NoError(t, err)
 
@@ -461,9 +465,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 			// Run query and assert results.
 
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 				EventID:         fix.EventID,
 				ScoringCategory: scoringCategory,
+				EveryOther:      false,
 			})
 			require.NoError(t, err)
 
@@ -556,9 +561,10 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 
 				// Run query and assert results.
 
-				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
+				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 					EventID:         fix.EventID,
 					ScoringCategory: scoringCategory,
+					EveryOther:      false,
 				})
 				require.NoError(t, err)
 
@@ -573,109 +579,47 @@ func TestScoringCriteriaAllVenues(t *testing.T) {
 			})
 		}
 	})
-}
 
-func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
-	t.Parallel()
-
-	t.Run("includes players with no scores", func(t *testing.T) {
+	t.Run("best of five", func(t *testing.T) {
 		t.Parallel()
 
-		ctx, tx, cleanup := initDB(t)
-		defer cleanup()
+		t.Run("includes players with no scores", func(t *testing.T) {
+			t.Parallel()
 
-		numVenues := 9
-		numPlayers := 2
-		scoringCategory := models.ScoringCategoryPubGolfNineHole
+			ctx, tx, cleanup := initDB(t)
+			defer cleanup()
 
-		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-			NumVenues:       numVenues,
-			NumPlayers:      numPlayers,
-			ScoringCategory: scoringCategory,
-		})
+			numVenues := 9
+			numPlayers := 2
+			scoringCategory := models.ScoringCategoryPubGolfFiveHole
 
-		// Do not insert any actual scores.
+			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+				NumVenues:       numVenues,
+				NumPlayers:      numPlayers,
+				ScoringCategory: scoringCategory,
+			})
 
-		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
-			EventID:         fix.EventID,
-			ScoringCategory: scoringCategory,
-		})
-		require.NoError(t, err)
+			// Do not insert any actual scores.
 
-		require.Len(t, actualScores, numPlayers)
+			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
+				EventID:         fix.EventID,
+				ScoringCategory: scoringCategory,
+				EveryOther:      true,
+			})
+			require.NoError(t, err)
 
-		for _, s := range actualScores {
-			assert.Zero(t, s.TotalPoints, "total points")
-			assert.Zero(t, s.NumScores, "no scores")
-			assert.Zero(t, s.NumScoresVerified, "no verified scores")
-			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
-			assert.Zero(t, s.PointsFromPenalties, "no penalties")
-		}
-	})
+			require.Len(t, actualScores, numPlayers)
 
-	t.Run("includes players with only unverified scores", func(t *testing.T) {
-		t.Parallel()
-
-		ctx, tx, cleanup := initDB(t)
-		defer cleanup()
-
-		numVenues := 9
-		numEligibleVenues := 5
-		numPlayers := 2
-		scoringCategory := models.ScoringCategoryPubGolfNineHole
-
-		fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-			NumVenues:       numVenues,
-			NumPlayers:      numPlayers,
-			ScoringCategory: scoringCategory,
-		})
-
-		// Insert random scores, without adjustments.
-
-		expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-
-		for _, p := range fix.PlayerIDs {
-			for stageIdx, s := range fix.StageIDs {
-				if stageIdx%2 == 1 {
-					continue
-				}
-
-				score := rand.Int31n(10)
-				expectedTotalScores[p] += score
-
-				err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-					PlayerID:   p,
-					StageID:    s,
-					Value:      uint32(score),
-					IsVerified: false,
-				})
-				require.NoError(t, err, "insert generated score")
+			for _, s := range actualScores {
+				assert.Zero(t, s.TotalPoints, "total points")
+				assert.Zero(t, s.NumScores, "no scores")
+				assert.Zero(t, s.NumScoresVerified, "no verified scores")
+				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+				assert.Zero(t, s.PointsFromPenalties, "no penalties")
 			}
-		}
-
-		actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
-			EventID:         fix.EventID,
-			ScoringCategory: scoringCategory,
 		})
-		require.NoError(t, err)
 
-		require.Len(t, actualScores, numPlayers)
-
-		// Run query and assert results.
-
-		for _, s := range actualScores {
-			assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
-			assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
-			assert.Zero(t, s.NumScoresVerified, "no verified scores")
-			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
-			assert.Zero(t, s.PointsFromPenalties, "no penalties")
-		}
-	})
-
-	t.Run("No adjustments", func(t *testing.T) {
-		t.Parallel()
-
-		t.Run("Sums up scores for all required venues", func(t *testing.T) {
+		t.Run("includes players with only unverified scores", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -709,175 +653,36 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 						PlayerID:   p,
 						StageID:    s,
 						Value:      uint32(score),
-						IsVerified: true,
+						IsVerified: false,
 					})
 					require.NoError(t, err, "insert generated score")
 				}
 			}
 
-			// Run query and assert results.
-
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
+			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 				EventID:         fix.EventID,
 				ScoringCategory: scoringCategory,
+				EveryOther:      true,
 			})
 			require.NoError(t, err)
 
 			require.Len(t, actualScores, numPlayers)
+
+			// Run query and assert results.
 
 			for _, s := range actualScores {
 				assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
 				assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
+				assert.Zero(t, s.NumScoresVerified, "no verified scores")
 				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 				assert.Zero(t, s.PointsFromPenalties, "no penalties")
 			}
 		})
 
-		t.Run("Sums up scores for first N required venues", func(t *testing.T) {
+		t.Run("No adjustments", func(t *testing.T) {
 			t.Parallel()
 
-			ctx, tx, cleanup := initDB(t)
-			defer cleanup()
-
-			numVenues := 9
-			numPlayers := 2
-			scoringCategory := models.ScoringCategoryPubGolfNineHole
-
-			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-				NumVenues:       numVenues,
-				NumPlayers:      numPlayers,
-				ScoringCategory: scoringCategory,
-			})
-
-			// Insert random scores, without adjustments.
-
-			expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-			expectedNumScores := 3
-
-			for _, p := range fix.PlayerIDs {
-				for stageIdx, s := range fix.StageIDs {
-					if stageIdx%2 == 1 {
-						continue
-					}
-
-					if stageIdx >= expectedNumScores*2 {
-						break
-					}
-
-					score := rand.Int31n(10)
-					expectedTotalScores[p] += score
-
-					err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-						PlayerID:   p,
-						StageID:    s,
-						Value:      uint32(score),
-						IsVerified: true,
-					})
-					require.NoError(t, err, "insert generated score")
-				}
-			}
-
-			// Run query and assert results.
-
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
-				EventID:         fix.EventID,
-				ScoringCategory: scoringCategory,
-			})
-			require.NoError(t, err)
-
-			require.Len(t, actualScores, numPlayers)
-
-			for _, s := range actualScores {
-				assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
-				assert.EqualValues(t, expectedNumScores, s.NumScores, "one score per venue")
-				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
-				assert.Zero(t, s.PointsFromPenalties, "no penalties")
-			}
-		})
-
-		t.Run("Sums up scores for random N required venues", func(t *testing.T) {
-			t.Parallel()
-
-			ctx, tx, cleanup := initDB(t)
-			defer cleanup()
-
-			numVenues := 9
-			numEligibleVenues := 5
-			numPlayers := 2
-			scoringCategory := models.ScoringCategoryPubGolfNineHole
-
-			fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
-				NumVenues:       numVenues,
-				NumPlayers:      numPlayers,
-				ScoringCategory: scoringCategory,
-			})
-
-			// Insert random scores, without adjustments.
-
-			expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
-			expectedScoredPlayers := numPlayers
-
-			for _, p := range fix.PlayerIDs {
-				expectedNumScores[p] = numEligibleVenues
-
-				for stageIdx, s := range fix.StageIDs {
-					if stageIdx%2 == 1 {
-						continue
-					}
-
-					var skip bool
-					err := faker.FakeData(&skip)
-					require.NoError(t, err, "generate random bool")
-
-					if skip {
-						expectedNumScores[p]--
-
-						continue
-					}
-
-					score := rand.Int31n(10)
-					expectedTotalScores[p] += score
-
-					err = _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
-						PlayerID:   p,
-						StageID:    s,
-						Value:      uint32(score),
-						IsVerified: true,
-					})
-					require.NoError(t, err, "insert generated score")
-				}
-
-				if expectedNumScores[p] < 1 {
-					expectedScoredPlayers--
-				}
-			}
-
-			// Run query and assert results.
-
-			actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaAllVenues(ctx, dbc.ScoringCriteriaAllVenuesParams{
-				EventID:         fix.EventID,
-				ScoringCategory: scoringCategory,
-			})
-			require.NoError(t, err)
-
-			require.Len(t, actualScores, expectedScoredPlayers)
-
-			for _, s := range actualScores {
-				pID := models.PlayerID{DatabaseULID: s.PlayerID}
-				assert.EqualValues(t, expectedTotalScores[pID], s.TotalPoints, "total points")
-				assert.EqualValues(t, expectedNumScores[pID], s.NumScores, "one score per venue where a score was submitted")
-				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
-				assert.Zero(t, s.PointsFromPenalties, "no penalties")
-			}
-		})
-	})
-
-	t.Run("With adjustments", func(t *testing.T) {
-		t.Parallel()
-
-		for _, tc := range adjustmentInserterTestCases {
-			t.Run(tc.name, func(t *testing.T) {
+			t.Run("Sums up scores for all required venues", func(t *testing.T) {
 				t.Parallel()
 
 				ctx, tx, cleanup := initDB(t)
@@ -894,11 +699,9 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 					ScoringCategory: scoringCategory,
 				})
 
-				// Insert random scores.
+				// Insert random scores, without adjustments.
 
 				expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
-				expectedPointsFromBonuses := make(map[models.PlayerID]int32, numPlayers)
-				expectedPointsFromPenalties := make(map[models.PlayerID]int32, numPlayers)
 
 				for _, p := range fix.PlayerIDs {
 					for stageIdx, s := range fix.StageIDs {
@@ -916,48 +719,15 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 							IsVerified: true,
 						})
 						require.NoError(t, err, "insert generated score")
-
-						// Insert random adjustments.
-
-						if slices.Contains(tc.skipIndex, stageIdx) {
-							continue
-						}
-
-						for range tc.numBonuses {
-							bonus := -rand.Int31n(10)
-							expectedTotalScores[p] += bonus
-							expectedPointsFromBonuses[p] += bonus
-
-							err = _sharedDBC.WithTx(tx).CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
-								PlayerID: p,
-								StageID:  s,
-								Value:    bonus,
-								Label:    faker.UUIDHyphenated(),
-							})
-							require.NoError(t, err, "insert generated bonus")
-						}
-
-						for range tc.numPenalties {
-							penalty := rand.Int31n(10)
-							expectedTotalScores[p] += penalty
-							expectedPointsFromPenalties[p] += penalty
-
-							err = _sharedDBC.WithTx(tx).CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
-								PlayerID: p,
-								StageID:  s,
-								Value:    penalty,
-								Label:    faker.UUIDHyphenated(),
-							})
-							require.NoError(t, err, "insert generated bonus")
-						}
 					}
 				}
 
 				// Run query and assert results.
 
-				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteriaEveryOtherVenue(ctx, dbc.ScoringCriteriaEveryOtherVenueParams{
+				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
 					EventID:         fix.EventID,
 					ScoringCategory: scoringCategory,
+					EveryOther:      true,
 				})
 				require.NoError(t, err)
 
@@ -966,10 +736,252 @@ func TestScoringCriteriaEveryOtherVenue(t *testing.T) {
 				for _, s := range actualScores {
 					assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
 					assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
-					assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "no bonuses")
-					assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "no penalties")
+					assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+					assert.Zero(t, s.PointsFromPenalties, "no penalties")
 				}
 			})
-		}
+
+			t.Run("Sums up scores for first N required venues", func(t *testing.T) {
+				t.Parallel()
+
+				ctx, tx, cleanup := initDB(t)
+				defer cleanup()
+
+				numVenues := 9
+				numPlayers := 2
+				scoringCategory := models.ScoringCategoryPubGolfNineHole
+
+				fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+					NumVenues:       numVenues,
+					NumPlayers:      numPlayers,
+					ScoringCategory: scoringCategory,
+				})
+
+				// Insert random scores, without adjustments.
+
+				expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
+				expectedNumScores := 3
+
+				for _, p := range fix.PlayerIDs {
+					for stageIdx, s := range fix.StageIDs {
+						if stageIdx%2 == 1 {
+							continue
+						}
+
+						if stageIdx >= expectedNumScores*2 {
+							break
+						}
+
+						score := rand.Int31n(10)
+						expectedTotalScores[p] += score
+
+						err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
+							PlayerID:   p,
+							StageID:    s,
+							Value:      uint32(score),
+							IsVerified: true,
+						})
+						require.NoError(t, err, "insert generated score")
+					}
+				}
+
+				// Run query and assert results.
+
+				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
+					EventID:         fix.EventID,
+					ScoringCategory: scoringCategory,
+					EveryOther:      true,
+				})
+				require.NoError(t, err)
+
+				require.Len(t, actualScores, numPlayers)
+
+				for _, s := range actualScores {
+					assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
+					assert.EqualValues(t, expectedNumScores, s.NumScores, "one score per venue")
+					assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+					assert.Zero(t, s.PointsFromPenalties, "no penalties")
+				}
+			})
+
+			t.Run("Sums up scores for random N required venues", func(t *testing.T) {
+				t.Parallel()
+
+				ctx, tx, cleanup := initDB(t)
+				defer cleanup()
+
+				numVenues := 9
+				numEligibleVenues := 5
+				numPlayers := 2
+				scoringCategory := models.ScoringCategoryPubGolfFiveHole
+
+				fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+					NumVenues:       numVenues,
+					NumPlayers:      numPlayers,
+					ScoringCategory: scoringCategory,
+				})
+
+				// Insert random scores, without adjustments.
+
+				expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
+				expectedNumScores := make(map[models.PlayerID]int, numPlayers)
+				expectedScoredPlayers := numPlayers
+
+				for _, p := range fix.PlayerIDs {
+					expectedNumScores[p] = numEligibleVenues
+
+					for stageIdx, s := range fix.StageIDs {
+						if stageIdx%2 == 1 {
+							continue
+						}
+
+						var skip bool
+						err := faker.FakeData(&skip)
+						require.NoError(t, err, "generate random bool")
+
+						if skip {
+							expectedNumScores[p]--
+
+							continue
+						}
+
+						score := rand.Int31n(10)
+						expectedTotalScores[p] += score
+
+						err = _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
+							PlayerID:   p,
+							StageID:    s,
+							Value:      uint32(score),
+							IsVerified: true,
+						})
+						require.NoError(t, err, "insert generated score")
+					}
+
+					if expectedNumScores[p] < 1 {
+						expectedScoredPlayers--
+					}
+				}
+
+				// Run query and assert results.
+
+				actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
+					EventID:         fix.EventID,
+					ScoringCategory: scoringCategory,
+					EveryOther:      true,
+				})
+				require.NoError(t, err)
+
+				require.Len(t, actualScores, expectedScoredPlayers)
+
+				for _, s := range actualScores {
+					pID := models.PlayerID{DatabaseULID: s.PlayerID}
+					assert.EqualValues(t, expectedTotalScores[pID], s.TotalPoints, "total points")
+					assert.EqualValues(t, expectedNumScores[pID], s.NumScores, "one score per venue where a score was submitted")
+					assert.Zero(t, s.PointsFromBonuses, "no bonuses")
+					assert.Zero(t, s.PointsFromPenalties, "no penalties")
+				}
+			})
+		})
+
+		t.Run("With adjustments", func(t *testing.T) {
+			t.Parallel()
+
+			for _, tc := range adjustmentInserterTestCases {
+				t.Run(tc.name, func(t *testing.T) {
+					t.Parallel()
+
+					ctx, tx, cleanup := initDB(t)
+					defer cleanup()
+
+					numVenues := 9
+					numEligibleVenues := 5
+					numPlayers := 2
+					scoringCategory := models.ScoringCategoryPubGolfFiveHole
+
+					fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
+						NumVenues:       numVenues,
+						NumPlayers:      numPlayers,
+						ScoringCategory: scoringCategory,
+					})
+
+					// Insert random scores.
+
+					expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
+					expectedPointsFromBonuses := make(map[models.PlayerID]int32, numPlayers)
+					expectedPointsFromPenalties := make(map[models.PlayerID]int32, numPlayers)
+
+					for _, p := range fix.PlayerIDs {
+						for stageIdx, s := range fix.StageIDs {
+							if stageIdx%2 == 1 {
+								continue
+							}
+
+							score := rand.Int31n(10)
+							expectedTotalScores[p] += score
+
+							err := _sharedDBC.WithTx(tx).UpsertScore(ctx, dbc.UpsertScoreParams{
+								PlayerID:   p,
+								StageID:    s,
+								Value:      uint32(score),
+								IsVerified: true,
+							})
+							require.NoError(t, err, "insert generated score")
+
+							// Insert random adjustments.
+
+							if slices.Contains(tc.skipIndex, stageIdx) {
+								continue
+							}
+
+							for range tc.numBonuses {
+								bonus := -rand.Int31n(10)
+								expectedTotalScores[p] += bonus
+								expectedPointsFromBonuses[p] += bonus
+
+								err = _sharedDBC.WithTx(tx).CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
+									PlayerID: p,
+									StageID:  s,
+									Value:    bonus,
+									Label:    faker.UUIDHyphenated(),
+								})
+								require.NoError(t, err, "insert generated bonus")
+							}
+
+							for range tc.numPenalties {
+								penalty := rand.Int31n(10)
+								expectedTotalScores[p] += penalty
+								expectedPointsFromPenalties[p] += penalty
+
+								err = _sharedDBC.WithTx(tx).CreateAdjustment(ctx, dbc.CreateAdjustmentParams{
+									PlayerID: p,
+									StageID:  s,
+									Value:    penalty,
+									Label:    faker.UUIDHyphenated(),
+								})
+								require.NoError(t, err, "insert generated bonus")
+							}
+						}
+					}
+
+					// Run query and assert results.
+
+					actualScores, err := _sharedDBC.WithTx(tx).ScoringCriteria(ctx, dbc.ScoringCriteriaParams{
+						EventID:         fix.EventID,
+						ScoringCategory: scoringCategory,
+						EveryOther:      true,
+					})
+					require.NoError(t, err)
+
+					require.Len(t, actualScores, numPlayers)
+
+					for _, s := range actualScores {
+						assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
+						assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
+						assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "no bonuses")
+						assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "no penalties")
+					}
+				})
+			}
+		})
 	})
 }

@@ -42,8 +42,7 @@ type Querier interface {
 	PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error)
 	PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)
-	ScoringCriteriaAllVenues(ctx context.Context, arg ScoringCriteriaAllVenuesParams) ([]ScoringCriteriaAllVenuesRow, error)
-	ScoringCriteriaEveryOtherVenue(ctx context.Context, arg ScoringCriteriaEveryOtherVenueParams) ([]ScoringCriteriaEveryOtherVenueRow, error)
+	ScoringCriteria(ctx context.Context, arg ScoringCriteriaParams) ([]ScoringCriteriaRow, error)
 	SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error)
 	SetEventVenueKeys(ctx context.Context, eventID models.EventID) error
 	SetNextEventVenueKey(ctx context.Context, id models.EventID) error
