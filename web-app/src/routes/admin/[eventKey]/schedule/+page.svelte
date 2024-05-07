@@ -86,7 +86,7 @@
 
 	{#await refreshProgress}
 		<div class="card py-12 flex flex-col items-center">
-			<p class="mb-4">Loading adjustment templates...</p>
+			<p class="mb-4">Loading schedule...</p>
 			<RefreshCwIcon class="animate-spin" />
 		</div>
 	{:then}
@@ -122,7 +122,7 @@
 				</table>
 			</div>
 		{:else}
-			<NoDataCard text="No Adjustments to Display" hideCTA={true} />
+			<NoDataCard text="No Stops to Display" hideCTA={true} />
 		{/if}
 	{:catch error}
 		<ErrorBanner
