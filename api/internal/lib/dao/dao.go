@@ -80,7 +80,9 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 	return nil
 }
 
-func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) { //nolint:ireturn // Needed to wrap type-specific logic for mocking.
+func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, //nolint:ireturn // Needed to wrap type-specific logic for mocking. Needs to be *inside* the function signature to disable ireturn but not trigger nolint
+	error,
+) {
 	if q.tx != nil {
 		return q.dbc, nil
 	}
