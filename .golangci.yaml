@@ -34,6 +34,7 @@ linters:
     - gomnd
     - lll
     - maintidx
+    - mnd
     - prealloc
     - rowserrcheck
     - tagalign
