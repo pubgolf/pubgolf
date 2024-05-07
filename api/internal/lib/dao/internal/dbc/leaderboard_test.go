@@ -102,99 +102,99 @@ var adjustmentInserterTestCases = []struct {
 	skipIndex    []int
 }{
 	{
-		name:         "With one bonus per venue",
+		name:         "with one bonus per venue",
 		numBonuses:   1,
 		numPenalties: 0,
 	},
 	{
-		name:         "With one bonus per venue, skipping first",
+		name:         "with one bonus per venue, skipping first",
 		numBonuses:   1,
 		numPenalties: 0,
 		skipIndex:    []int{0},
 	},
 	{
-		name:         "With one bonus per venue, skipping middle",
+		name:         "with one bonus per venue, skipping middle",
 		numBonuses:   1,
 		numPenalties: 0,
 		skipIndex:    []int{5},
 	},
 	{
-		name:         "With one bonus per venue, skipping last",
+		name:         "with one bonus per venue, skipping last",
 		numBonuses:   1,
 		numPenalties: 0,
 		skipIndex:    []int{8},
 	},
 	{
-		name:         "With two bonuses per venue",
+		name:         "with two bonuses per venue",
 		numBonuses:   2,
 		numPenalties: 0,
 	},
 	{
-		name:         "With two bonuses per venue, skipping first",
+		name:         "with two bonuses per venue, skipping first",
 		numBonuses:   2,
 		numPenalties: 0,
 		skipIndex:    []int{0},
 	},
 	{
-		name:         "With two bonuses per venue, skipping middle",
+		name:         "with two bonuses per venue, skipping middle",
 		numBonuses:   2,
 		numPenalties: 0,
 		skipIndex:    []int{5},
 	},
 	{
-		name:         "With two bonuses per venue, skipping last",
+		name:         "with two bonuses per venue, skipping last",
 		numBonuses:   2,
 		numPenalties: 0,
 		skipIndex:    []int{8},
 	},
 	{
-		name:         "With one penalty per venue",
+		name:         "with one penalty per venue",
 		numBonuses:   0,
 		numPenalties: 1,
 	},
 	{
-		name:         "With one penalty per venue, skipping first",
+		name:         "with one penalty per venue, skipping first",
 		numBonuses:   0,
 		numPenalties: 1,
 		skipIndex:    []int{0},
 	},
 	{
-		name:         "With one penalty per venue, skipping middle",
+		name:         "with one penalty per venue, skipping middle",
 		numBonuses:   0,
 		numPenalties: 1,
 		skipIndex:    []int{5},
 	},
 	{
-		name:         "With one penalty per venue, skipping last",
+		name:         "with one penalty per venue, skipping last",
 		numBonuses:   0,
 		numPenalties: 1,
 		skipIndex:    []int{8},
 	},
 	{
-		name:         "With two penalties per venue",
+		name:         "with two penalties per venue",
 		numBonuses:   0,
 		numPenalties: 2,
 	},
 	{
-		name:         "With two penalties per venue, skipping first",
+		name:         "with two penalties per venue, skipping first",
 		numBonuses:   0,
 		numPenalties: 2,
 		skipIndex:    []int{0},
 	},
 	{
-		name:         "With two penalties per venue, skipping middle",
+		name:         "with two penalties per venue, skipping middle",
 		numBonuses:   0,
 		numPenalties: 2,
 		skipIndex:    []int{5},
 	},
 	{
-		name:         "With two penalties per venue, skipping last",
+		name:         "with two penalties per venue, skipping last",
 		numBonuses:   0,
 		numPenalties: 2,
 		skipIndex:    []int{8},
 	},
 	{
-		name:         "With one bonus and one penalty per venue",
+		name:         "with one bonus and one penalty per venue",
 		numBonuses:   1,
 		numPenalties: 1,
 	},
@@ -294,10 +294,10 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 		}
 	})
 
-	t.Run("No adjustments", func(t *testing.T) {
+	t.Run("no adjustments", func(t *testing.T) {
 		t.Parallel()
 
-		t.Run("Sums up scores for all venues", func(t *testing.T) {
+		t.Run("sums up scores for all venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -351,7 +351,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			}
 		})
 
-		t.Run("Sums up scores for first N venues", func(t *testing.T) {
+		t.Run("sums up scores for first N venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -410,7 +410,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			}
 		})
 
-		t.Run("Sums up scores for random N venues", func(t *testing.T) {
+		t.Run("sums up scores for random N venues", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, tx, cleanup := initDB(t)
@@ -484,7 +484,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 		})
 	})
 
-	t.Run("With adjustments", func(t *testing.T) {
+	t.Run("with adjustments", func(t *testing.T) {
 		t.Parallel()
 
 		for _, tc := range adjustmentInserterTestCases {
@@ -573,8 +573,8 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 				for _, s := range actualScores {
 					assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
 					assert.EqualValues(t, numVenues, s.NumScores, "one score per venue")
-					assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "no bonuses")
-					assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "no penalties")
+					assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "includes all bonuses")
+					assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "includes all penalties")
 				}
 			})
 		}
@@ -679,10 +679,10 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			}
 		})
 
-		t.Run("No adjustments", func(t *testing.T) {
+		t.Run("no adjustments", func(t *testing.T) {
 			t.Parallel()
 
-			t.Run("Sums up scores for all required venues", func(t *testing.T) {
+			t.Run("sums up scores for all required venues", func(t *testing.T) {
 				t.Parallel()
 
 				ctx, tx, cleanup := initDB(t)
@@ -749,7 +749,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 
 				numVenues := 9
 				numPlayers := 2
-				scoringCategory := models.ScoringCategoryPubGolfNineHole
+				scoringCategory := models.ScoringCategoryPubGolfFiveHole
 
 				fix := setupScoreboard(ctx, t, tx, setupScoreboardConfig{
 					NumVenues:       numVenues,
@@ -804,7 +804,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 				}
 			})
 
-			t.Run("Sums up scores for random N required venues", func(t *testing.T) {
+			t.Run("sums up scores for random N required venues", func(t *testing.T) {
 				t.Parallel()
 
 				ctx, tx, cleanup := initDB(t)
@@ -883,7 +883,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			})
 		})
 
-		t.Run("With adjustments", func(t *testing.T) {
+		t.Run("with adjustments", func(t *testing.T) {
 			t.Parallel()
 
 			for _, tc := range adjustmentInserterTestCases {
@@ -977,8 +977,8 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 					for _, s := range actualScores {
 						assert.EqualValues(t, expectedTotalScores[models.PlayerID{DatabaseULID: s.PlayerID}], s.TotalPoints, "total points")
 						assert.EqualValues(t, numEligibleVenues, s.NumScores, "one score per venue")
-						assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "no bonuses")
-						assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "no penalties")
+						assert.EqualValues(t, expectedPointsFromBonuses[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromBonuses, "matched bonuses")
+						assert.EqualValues(t, expectedPointsFromPenalties[models.PlayerID{DatabaseULID: s.PlayerID}], s.PointsFromPenalties, "matched penalties")
 					}
 				})
 			}
