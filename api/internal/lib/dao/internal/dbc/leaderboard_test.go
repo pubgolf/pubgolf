@@ -430,7 +430,6 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 
 			expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
 			expectedNumScores := make(map[models.PlayerID]int, numPlayers)
-			expectedScoredPlayers := numPlayers
 
 			for _, p := range fix.PlayerIDs {
 				expectedNumScores[p] = numVenues
@@ -457,10 +456,6 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 					})
 					require.NoError(t, err, "insert generated score")
 				}
-
-				if expectedNumScores[p] < 1 {
-					expectedScoredPlayers--
-				}
 			}
 
 			// Run query and assert results.
@@ -472,7 +467,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			})
 			require.NoError(t, err)
 
-			require.Len(t, actualScores, expectedScoredPlayers)
+			require.Len(t, actualScores, numPlayers)
 
 			for _, s := range actualScores {
 				pID := models.PlayerID{DatabaseULID: s.PlayerID}
@@ -825,7 +820,6 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 
 				expectedTotalScores := make(map[models.PlayerID]int32, numPlayers)
 				expectedNumScores := make(map[models.PlayerID]int, numPlayers)
-				expectedScoredPlayers := numPlayers
 
 				for _, p := range fix.PlayerIDs {
 					expectedNumScores[p] = numEligibleVenues
@@ -856,10 +850,6 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 						})
 						require.NoError(t, err, "insert generated score")
 					}
-
-					if expectedNumScores[p] < 1 {
-						expectedScoredPlayers--
-					}
 				}
 
 				// Run query and assert results.
@@ -871,7 +861,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 				})
 				require.NoError(t, err)
 
-				require.Len(t, actualScores, expectedScoredPlayers)
+				require.Len(t, actualScores, numPlayers)
 
 				for _, s := range actualScores {
 					pID := models.PlayerID{DatabaseULID: s.PlayerID}

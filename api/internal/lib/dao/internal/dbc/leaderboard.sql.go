@@ -41,18 +41,18 @@ separated AS ((
     FROM
       players p
     LEFT JOIN event_players ep ON p.id = ep.player_id
+    LEFT JOIN st ON st.event_id = ep.event_id
     LEFT JOIN scores s ON s.player_id = p.id
-    LEFT JOIN st ON s.stage_id = st.id
-      AND st.event_id = ep.event_id
+      AND s.stage_id = st.id
   WHERE
     p.deleted_at IS NULL
     AND ep.deleted_at IS NULL
     AND ep.event_id = $1
     AND ep.scoring_category = $2
-    AND s.deleted_at IS NULL
     AND st.deleted_at IS NULL
     AND (st.is_odd = TRUE
       OR st.is_odd = $3::bool)
+    AND s.deleted_at IS NULL
   GROUP BY
     p.id,
     p.name)
@@ -79,11 +79,11 @@ UNION (
   FROM
     players p
     LEFT JOIN event_players ep ON p.id = ep.player_id
-    LEFT JOIN scores s ON s.player_id = p.id
-    LEFT JOIN st ON s.stage_id = st.id
-      AND st.event_id = ep.event_id
+    LEFT JOIN st ON st.event_id = ep.event_id
       AND (st.is_odd = TRUE
         OR st.is_odd = $3::bool)
+    LEFT JOIN scores s ON s.player_id = p.id
+      AND s.stage_id = st.id
     LEFT JOIN adjustments a ON a.stage_id = s.stage_id
       AND a.player_id = s.player_id
   WHERE
@@ -91,8 +91,8 @@ UNION (
     AND ep.deleted_at IS NULL
     AND ep.event_id = $1
     AND ep.scoring_category = $2
-    AND s.deleted_at IS NULL
     AND st.deleted_at IS NULL
+    AND s.deleted_at IS NULL
     AND a.deleted_at IS NULL
   GROUP BY
     p.id,
