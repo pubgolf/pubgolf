@@ -17,11 +17,11 @@ import (
 
 const (
 	// eventKeyHeader is the header name to check for client-provided context on the currently selected event.
-	eventKeyHeader = "X-PubGolf-EventKey"
+	eventKeyHeader = "X-Pubgolf-Eventkey"
 	// playerIDHeader is the header name to check for client-provided context on the requesting player.
-	playerIDHeader = "X-PubGolf-PlayerID"
+	playerIDHeader = "X-Pubgolf-Playerid"
 	// deviceIDHeader is the header name to check for client-provided context on the requesting device.
-	deviceIDHeader = "X-PubGolf-DeviceID"
+	deviceIDHeader = "X-Pubgolf-Deviceid"
 )
 
 // NewLoggingInterceptor logs (and annotates OTel spans for) all gRPC calls.

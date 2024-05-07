@@ -19,7 +19,7 @@ import (
 type ctxKeyPlayerID struct{}
 
 // tokenHeader is the header name to check for auth credentials.
-const tokenHeader = "X-PubGolf-AuthToken" //nolint:gosec
+const tokenHeader = "X-Pubgolf-Authtoken" //nolint:gosec
 
 var (
 	errMissingAuthToken = errors.New("no auth token provided")

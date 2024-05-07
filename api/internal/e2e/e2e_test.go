@@ -184,7 +184,7 @@ func guard(err error, msg string) {
 // requestWithAuth makes an RPC call with an auth header.
 func requestWithAuth[T any](msg *T, token string) *connect.Request[T] {
 	req := connect.NewRequest(msg)
-	req.Header().Set("X-PubGolf-AuthToken", token)
+	req.Header().Set("X-Pubgolf-Authtoken", token)
 
 	return req
 }

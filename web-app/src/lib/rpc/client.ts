@@ -46,7 +46,7 @@ export async function getAdminServiceClient(): Promise<AdminServiceClient> {
 function addAuthHeader(authToken: string): Interceptor {
 	return (next) => async (req) => {
 		if (authToken) {
-			req.header.set('X-PubGolf-AuthToken', authToken);
+			req.header.set('X-Pubgolf-Authtoken', authToken);
 		}
 		return await next(req);
 	};
