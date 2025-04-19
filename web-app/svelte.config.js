@@ -27,10 +27,11 @@ const config = {
 		prerender: {
 			entries: [
 				'/',
-				'/event/nyc-2024',
+				'/event/nyc-2025',
 				'/about/contact',
 				'/about/privacy',
 				'/admin',
+				// 2023
 				'/admin/nyc-2023',
 				'/admin/nyc-2023/adjustments',
 				'/admin/nyc-2023/alerts',
@@ -38,6 +39,7 @@ const config = {
 				'/admin/nyc-2023/players',
 				'/admin/nyc-2023/schedule',
 				'/admin/nyc-2023/scores',
+				// 2024
 				'/admin/nyc-2024',
 				'/admin/nyc-2024/adjustments',
 				'/admin/nyc-2024/alerts',
@@ -45,6 +47,15 @@ const config = {
 				'/admin/nyc-2024/players',
 				'/admin/nyc-2024/schedule',
 				'/admin/nyc-2024/scores',
+				// 2025
+				'/admin/nyc-2025',
+				'/admin/nyc-2025/adjustments',
+				'/admin/nyc-2025/alerts',
+				'/admin/nyc-2025/event-info',
+				'/admin/nyc-2025/players',
+				'/admin/nyc-2025/schedule',
+				'/admin/nyc-2025/scores',
+				// 
 				'/auth/login'
 			]
 		}
