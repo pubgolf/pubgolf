@@ -21,11 +21,17 @@ func (s *Server) CreatePlayer(ctx context.Context, req *connect.Request[apiv1.Ad
 
 	player, err := s.dao.CreatePlayer(ctx, req.Msg.GetPlayerData().GetName(), num)
 	if err != nil {
-		if errors.Is(err, dao.ErrAlreadyCreated) {
-			return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("player with this phone number: %w", err))
+		if !errors.Is(err, dao.ErrAlreadyCreated) {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("store player: %w", err))
 		}
 
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("store player: %w", err))
+		// Upsert players for now. Consider renaming as UpsertPlayer or returning conflict.
+		// return nil, connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("player with this phone number: %w", err))
+
+		player, err = s.dao.PlayerByPhoneNumber(ctx, num)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get already existing player from DB: %w", err))
+		}
 	}
 
 	var cat models.ScoringCategory
