@@ -7,8 +7,14 @@
 	import PlayerForm, { type FormOperation } from '$lib/components/modals/PlayerForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
 	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
-	import { Player, type PlayerData, type ScoringCategory } from '$lib/proto/api/v1/shared_pb';
+	import {
+		PlayerSchema,
+		type Player,
+		type PlayerData,
+		type ScoringCategory
+	} from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
+	import { create } from '@bufbuild/protobuf';
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon, UserPlusIcon } from 'lucide-svelte';
 	import { onMount, type ComponentProps } from 'svelte';
@@ -94,7 +100,7 @@
 	}
 
 	function showNewPlayerModal() {
-		showModal('Register New Player', new Player());
+		showModal('Register New Player', create(PlayerSchema));
 	}
 
 	function getPlayerCategory(player: Player) {
@@ -138,7 +144,7 @@
 									<button
 										type="button"
 										class="btn btn-sm variant-filled"
-										on:click={() => showModal('Update Player', player || new Player())}
+										on:click={() => showModal('Update Player', player || create(PlayerSchema))}
 									>
 										<span>Edit</span>
 									</button>

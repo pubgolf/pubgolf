@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { formatListAnd, formatPlayerName } from '$lib/helpers/formatters';
 	import type { StageScoreIds } from '$lib/helpers/scores';
-	import type { Strict } from '$lib/helpers/types';
-	import type { AdjustmentData, Stage, StageScoreData } from '$lib/proto/api/v1/admin_pb';
+	import { StageScoreDataSchema, type Stage } from '$lib/proto/api/v1/admin_pb';
 	import type { Player } from '$lib/proto/api/v1/shared_pb';
-	import type { PlainMessage } from '@bufbuild/protobuf';
+	import type { MessageInitShape } from '@bufbuild/protobuf';
 	import { modalStore, type Modal } from '@skeletonlabs/skeleton';
 	import { PlusIcon, XIcon } from 'lucide-svelte';
 	import type { ComponentProps } from 'svelte';
@@ -21,11 +20,11 @@
 	export let players: Player[];
 	export let stages: Stage[];
 	export let score: {
-		data: Strict<StageScoreData>;
+		data: MessageInitShape<typeof StageScoreDataSchema>;
 		ids: StageScoreIds;
 	} | null = null;
 	export let onSubmit: (
-		scoreData: Strict<StageScoreData>,
+		scoreData: MessageInitShape<typeof StageScoreDataSchema>,
 		ids?: StageScoreIds
 	) => Promise<DisplayError>;
 
@@ -35,26 +34,30 @@
 	$: {
 		if (!formInit && score) {
 			formData = score.data;
+			scoreValue = score.data.score?.value || 0;
 
 			let newBonuses: AdjustmentFormEntry[] = [];
 			let newPenalties: AdjustmentFormEntry[] = [];
-			score.data.adjustments.forEach((a, i) => {
-				if (a.value < 0) {
+			score.data.adjustments?.forEach((a, i) => {
+				if (!!a.value && a.value < 0) {
 					newBonuses.push({
 						idType: 'server',
 						id: score?.ids.adjustments[i].id || '',
 						adjustment: {
-							label: a.label,
+							label: a.label || '',
 							value: -1 * a.value
 						}
 					});
 				}
 
-				if (a.value > 0) {
+				if (!!a.value && a.value > 0) {
 					newPenalties.push({
 						idType: 'server',
 						id: score?.ids.adjustments[i].id || '',
-						adjustment: a
+						adjustment: {
+							label: a.label || '',
+							value: a.value
+						}
 					});
 				}
 			});
@@ -69,7 +72,10 @@
 	type AdjustmentFormEntry = {
 		idType: 'server' | 'client';
 		id: string;
-		adjustment: PlainMessage<AdjustmentData>;
+		adjustment: {
+			value: number;
+			label: string;
+		};
 	};
 
 	let penalties: AdjustmentFormEntry[] = [];
@@ -125,7 +131,7 @@
 		...bonuses.map((x) => ({ ...x.adjustment, value: -x.adjustment.value }))
 	];
 
-	let formData: Strict<StageScoreData> = {
+	let formData: MessageInitShape<typeof StageScoreDataSchema> = {
 		stageId: '',
 		playerId: '',
 		score: {
@@ -133,6 +139,10 @@
 		},
 		adjustments: []
 	};
+
+	// Break out as a separate var because formData.score being nullable doesn't let us bind to it directly.
+	let scoreValue: number;
+	$: formData.score!.value = scoreValue;
 
 	let error: DisplayError = null;
 	function clearError() {
@@ -150,7 +160,7 @@
 			blankFields.push('Venue');
 		}
 
-		formData.adjustments.forEach((x, i) => {
+		formData.adjustments?.forEach((x, i) => {
 			if (x.label === '') {
 				if (i < penalties.length) {
 					blankFields.push(`Label for penalty #${i + 1}`);
@@ -171,11 +181,11 @@
 		}
 
 		let zeroFields: string[] = [];
-		if (formData.score.value === 0) {
+		if (formData.score!.value === 0) {
 			zeroFields.push('Score');
 		}
 
-		formData.adjustments.forEach((x, i) => {
+		formData.adjustments?.forEach((x, i) => {
 			if (x.value === 0) {
 				if (i < penalties.length) {
 					zeroFields.push(`${x.label} Amount`);
@@ -269,7 +279,7 @@
 					inputmode="numeric"
 					required
 					on:focus={selectOnFocus}
-					bind:value={formData.score.value}
+					bind:value={scoreValue}
 				/>
 			</label>
 		</div>

@@ -4,7 +4,13 @@
 
 <script lang="ts">
 	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
-	import { PlayerData, ScoringCategory, type Player } from '$lib/proto/api/v1/shared_pb';
+	import {
+		PlayerDataSchema,
+		ScoringCategory,
+		type Player,
+		type PlayerData
+	} from '$lib/proto/api/v1/shared_pb';
+	import { create } from '@bufbuild/protobuf';
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import { XIcon } from 'lucide-svelte';
 	import type { ComponentProps } from 'svelte';
@@ -61,7 +67,7 @@
 
 		const resp = await onSubmit(
 			operation,
-			new PlayerData({
+			create(PlayerDataSchema, {
 				name: playerName
 			}),
 			scoringCategory,

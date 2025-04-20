@@ -1,6 +1,6 @@
 import { getAPIToken, USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
-import { AdminService } from '$lib/proto/api/v1/admin_connect';
-import { PubGolfService } from '$lib/proto/api/v1/pubgolf_connect';
+import { AdminService } from '$lib/proto/api/v1/admin_pb';
+import { PubGolfService } from '$lib/proto/api/v1/pubgolf_pb';
 import { createClient, type Client, type Interceptor } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
 

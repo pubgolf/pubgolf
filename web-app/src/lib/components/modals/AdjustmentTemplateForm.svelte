@@ -4,10 +4,12 @@
 
 <script lang="ts">
 	import {
-		AdjustmentTemplateData,
+		AdjustmentTemplateDataSchema,
 		type AdjustmentTemplate,
+		type AdjustmentTemplateData,
 		type Stage
 	} from '$lib/proto/api/v1/admin_pb';
+	import { create } from '@bufbuild/protobuf';
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import { XIcon } from 'lucide-svelte';
 	import type { ComponentProps } from 'svelte';
@@ -53,7 +55,7 @@
 		}
 
 		const resp = await onSubmit(
-			new AdjustmentTemplateData({
+			create(AdjustmentTemplateDataSchema, {
 				adjustment: {
 					value: amount,
 					label

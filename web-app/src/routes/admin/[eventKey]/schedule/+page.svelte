@@ -5,9 +5,14 @@
 	import RefreshHeader from '$lib/components/dashboards/RefreshHeader.svelte';
 	import StageForm from '$lib/components/modals/StageForm.svelte';
 	import SetTitle from '$lib/components/util/SetTitle.svelte';
-	import { UpdateStageRequest, type Stage } from '$lib/proto/api/v1/admin_pb';
+	import {
+		UpdateStageRequestSchema,
+		type Stage,
+		type UpdateStageRequest
+	} from '$lib/proto/api/v1/admin_pb';
 	import type { Venue } from '$lib/proto/api/v1/shared_pb';
 	import { getAdminServiceClient } from '$lib/rpc/client';
+	import { create } from '@bufbuild/protobuf';
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -44,7 +49,7 @@
 	async function showEditStageModal(stage: Stage) {
 		const props: Omit<ComponentProps<StageForm>, 'parent'> = {
 			venues: await venues,
-			stage: new UpdateStageRequest({
+			stage: create(UpdateStageRequestSchema, {
 				stageId: stage.id,
 				venueId: stage.venue?.id,
 				rank: stage.rank,

@@ -1,6 +1,5 @@
-import type { StageScore, StageScoreData } from '$lib/proto/api/v1/admin_pb';
-import type { PartialMessage } from '@bufbuild/protobuf';
-import type { Strict } from './types';
+import { StageScoreDataSchema, type StageScore } from '$lib/proto/api/v1/admin_pb';
+import type { MessageInitShape } from '@bufbuild/protobuf';
 
 export type StageScoreIds = {
 	score: {
@@ -12,7 +11,7 @@ export type StageScoreIds = {
 };
 
 export function separateIds(s: StageScore): {
-	data: Strict<StageScoreData>;
+	data: MessageInitShape<typeof StageScoreDataSchema>;
 	ids: StageScoreIds;
 } {
 	return {
@@ -37,9 +36,9 @@ export function combineIds({
 	data,
 	ids
 }: {
-	data: Strict<StageScoreData>;
+	data: MessageInitShape<typeof StageScoreDataSchema>;
 	ids: StageScoreIds;
-}): PartialMessage<StageScore> {
+}) {
 	return {
 		stageId: data.stageId,
 		playerId: data.playerId,
@@ -47,9 +46,9 @@ export function combineIds({
 			id: ids.score.id,
 			data: data.score
 		},
-		adjustments: Array.from(Array(data.adjustments.length).keys()).map((i) => ({
+		adjustments: Array.from(Array(data.adjustments?.length || 0).keys()).map((i) => ({
 			id: ids.adjustments[i].id,
-			data: data.adjustments[i]
+			data: data.adjustments?.[i]
 		}))
 	};
 }
