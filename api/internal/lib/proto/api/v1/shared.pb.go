@@ -1424,7 +1424,7 @@ type ScoreBoard_ScoreBoardEntry struct {
 	Score    int32                  `protobuf:"varint,3,opt,name=score,proto3" json:"score,omitempty"`
 	// display_score_signed indicates that non-zero scores should be displayed with an explicit +/-.
 	DisplayScoreSigned bool `protobuf:"varint,4,opt,name=display_score_signed,json=displayScoreSigned,proto3" json:"display_score_signed,omitempty"`
-	// rank is a display value indicating the ranking of the score. May be omitted in the case of ties, so ordering should be done based on the index of the `ScoreBoardEntry` in the repated field `Scoreboard.scores`.
+	// rank is a display value indicating the ranking of the score. May be omitted in the case of ties, so ordering should be done based on the index of the `ScoreBoardEntry` in the repeated field `Scoreboard.scores`.
 	Rank *uint32 `protobuf:"varint,5,opt,name=rank,proto3,oneof" json:"rank,omitempty"`
 	// icon_key is an SF-Symbol name (e.g. "heart.fill").
 	IconKey       *string                `protobuf:"bytes,6,opt,name=icon_key,json=iconKey,proto3,oneof" json:"icon_key,omitempty"`
