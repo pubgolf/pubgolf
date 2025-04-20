@@ -43,8 +43,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@bufbuild/connect": "^0.8.6",
-		"@bufbuild/connect-web": "^0.8.6",
+		"@connectrpc/connect": "^1.6.1",
+		"@connectrpc/connect-web": "^1.6.1",
 		"lucide-svelte": "^0.140.0"
 	}
 }

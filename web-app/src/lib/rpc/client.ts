@@ -1,17 +1,17 @@
 import { getAPIToken, USER_NOT_AUTHORIZED_ERROR } from '$lib/auth/client';
 import { AdminService } from '$lib/proto/api/v1/admin_connect';
 import { PubGolfService } from '$lib/proto/api/v1/pubgolf_connect';
-import { createPromiseClient, type Interceptor, type PromiseClient } from '@bufbuild/connect';
-import { createConnectTransport } from '@bufbuild/connect-web';
+import { createClient, type Client, type Interceptor } from '@connectrpc/connect';
+import { createConnectTransport } from '@connectrpc/connect-web';
 
-export const PubGolfServiceClient = createPromiseClient(
+export const PubGolfServiceClient = createClient(
 	PubGolfService,
 	createConnectTransport({
 		baseUrl: '/rpc/'
 	})
 );
 
-export type AdminServiceClient = PromiseClient<typeof AdminService>;
+export type AdminServiceClient = Client<typeof AdminService>;
 
 let adminToken = '';
 const adminServiceClients: { [authToken: string]: AdminServiceClient } = {};
@@ -31,7 +31,7 @@ export async function getAdminServiceClient(): Promise<AdminServiceClient> {
 	}
 
 	if (!adminServiceClients[adminToken]) {
-		adminServiceClients[adminToken] = createPromiseClient(
+		adminServiceClients[adminToken] = createClient(
 			AdminService,
 			createConnectTransport({
 				baseUrl: '/rpc/',
