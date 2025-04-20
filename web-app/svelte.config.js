@@ -55,7 +55,7 @@ const config = {
 				'/admin/nyc-2025/players',
 				'/admin/nyc-2025/schedule',
 				'/admin/nyc-2025/scores',
-				// 
+				//
 				'/auth/login'
 			]
 		}
