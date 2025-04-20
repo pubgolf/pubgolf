@@ -633,6 +633,34 @@ func (_m *MockQueryProvider) PlayerByID(ctx context.Context, playerID models.Pla
 	return r0, r1
 }
 
+// PlayerByPhoneNumber provides a mock function with given fields: ctx, num
+func (_m *MockQueryProvider) PlayerByPhoneNumber(ctx context.Context, num models.PhoneNum) (models.Player, error) {
+	ret := _m.Called(ctx, num)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PlayerByPhoneNumber")
+	}
+
+	var r0 models.Player
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) (models.Player, error)); ok {
+		return rf(ctx, num)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.PhoneNum) models.Player); ok {
+		r0 = rf(ctx, num)
+	} else {
+		r0 = ret.Get(0).(models.Player)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.PhoneNum) error); ok {
+		r1 = rf(ctx, num)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // PlayerCategoryForEvent provides a mock function with given fields: ctx, playerID, eventID
 func (_m *MockQueryProvider) PlayerCategoryForEvent(ctx context.Context, playerID models.PlayerID, eventID models.EventID) (models.ScoringCategory, error) {
 	ret := _m.Called(ctx, playerID, eventID)

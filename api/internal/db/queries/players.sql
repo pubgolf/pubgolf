@@ -36,6 +36,16 @@ WHERE
   id = $1
   AND deleted_at IS NULL;
 
+-- name: PlayerByPhoneNumber :one
+SELECT
+  id,
+  name
+FROM
+  players
+WHERE
+  phone_number = $1
+  AND deleted_at IS NULL;
+
 -- name: PlayerRegisteredForEvent :one
 SELECT
   TRUE AS registration_found

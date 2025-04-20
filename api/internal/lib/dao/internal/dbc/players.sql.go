@@ -127,6 +127,29 @@ func (q *Queries) PlayerByID(ctx context.Context, id models.PlayerID) (PlayerByI
 	return i, err
 }
 
+const playerByPhoneNumber = `-- name: PlayerByPhoneNumber :one
+SELECT
+  id,
+  name
+FROM
+  players
+WHERE
+  phone_number = $1
+  AND deleted_at IS NULL
+`
+
+type PlayerByPhoneNumberRow struct {
+	ID   models.PlayerID
+	Name string
+}
+
+func (q *Queries) PlayerByPhoneNumber(ctx context.Context, phoneNumber models.PhoneNum) (PlayerByPhoneNumberRow, error) {
+	row := q.queryRow(ctx, q.playerByPhoneNumberStmt, playerByPhoneNumber, phoneNumber)
+	var i PlayerByPhoneNumberRow
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const playerCategoryForEvent = `-- name: PlayerCategoryForEvent :one
 SELECT
   ep.scoring_category
