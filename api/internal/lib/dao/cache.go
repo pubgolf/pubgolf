@@ -41,7 +41,7 @@ type (
 func emptyEvictionCallback[K comparable, V any](_ K, _ V) {}
 
 func makeCache[K comparable, V any](size cacheSize, exp cacheExpiration) cache[K, V] {
-	return expirable.NewLRU[K, V](int(size), emptyEvictionCallback[K, V], time.Duration(exp))
+	return expirable.NewLRU(int(size), emptyEvictionCallback[K, V], time.Duration(exp))
 }
 
 // wrapWithCache handles access and instrumentation of the provided cache, falling back to access via the provided query function.
