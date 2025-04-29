@@ -32,6 +32,21 @@ var (
 // errDoNotCacheResult is returned from a cache query function to prevent caching the result.
 var errDoNotCacheResult = errors.New("uncachable result")
 
+// Purger is an interface for in-memory caches that can be purged.
+type Purger interface {
+	Purge()
+}
+
+// allCaches is a list of all in-memory caches to allow purging.
+var allCaches []Purger
+
+// PurgeAllCaches purges all in-memory caches.
+func PurgeAllCaches() {
+	for _, c := range allCaches {
+		c.Purge()
+	}
+}
+
 type (
 	cache[K comparable, V any] *expirable.LRU[K, V]
 	cacheSize                  int
@@ -40,8 +55,12 @@ type (
 
 func emptyEvictionCallback[K comparable, V any](_ K, _ V) {}
 
+// makeCache creates a new in-memory cache with the provided size and expiration, registering it to allow purging.
 func makeCache[K comparable, V any](size cacheSize, exp cacheExpiration) cache[K, V] {
-	return expirable.NewLRU(int(size), emptyEvictionCallback[K, V], time.Duration(exp))
+	c := expirable.NewLRU(int(size), emptyEvictionCallback[K, V], time.Duration(exp))
+	allCaches = append(allCaches, c)
+
+	return c
 }
 
 // wrapWithCache handles access and instrumentation of the provided cache, falling back to access via the provided query function.

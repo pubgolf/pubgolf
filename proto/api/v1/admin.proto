@@ -10,6 +10,11 @@ option go_package = "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1;ap
 
 // AdminService allows administering events with enhanced permissions.
 service AdminService {
+  // Debug
+
+  // PurgeAllCaches clears all caches in the API server. Used for testing.
+  rpc PurgeAllCaches(PurgeAllCachesRequest) returns (PurgeAllCachesResponse) {}
+
   // Players
 
   // CreatePlayer creates a new player profile for a given event.
@@ -57,6 +62,16 @@ service AdminService {
   // DeleteStageScore removes all scoring data for a player/stage pair.
   rpc DeleteStageScore(DeleteStageScoreRequest) returns (DeleteStageScoreResponse) {}
 }
+
+// --------------------
+// Debug
+// --------------------
+
+// PurgeAllCaches
+
+message PurgeAllCachesRequest {}
+
+message PurgeAllCachesResponse {}
 
 // --------------------
 // Players

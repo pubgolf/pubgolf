@@ -35,6 +35,9 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// AdminServicePurgeAllCachesProcedure is the fully-qualified name of the AdminService's
+	// PurgeAllCaches RPC.
+	AdminServicePurgeAllCachesProcedure = "/api.v1.AdminService/PurgeAllCaches"
 	// AdminServiceCreatePlayerProcedure is the fully-qualified name of the AdminService's CreatePlayer
 	// RPC.
 	AdminServiceCreatePlayerProcedure = "/api.v1.AdminService/CreatePlayer"
@@ -78,6 +81,7 @@ const (
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	adminServiceServiceDescriptor                        = v1.File_api_v1_admin_proto.Services().ByName("AdminService")
+	adminServicePurgeAllCachesMethodDescriptor           = adminServiceServiceDescriptor.Methods().ByName("PurgeAllCaches")
 	adminServiceCreatePlayerMethodDescriptor             = adminServiceServiceDescriptor.Methods().ByName("CreatePlayer")
 	adminServiceUpdatePlayerMethodDescriptor             = adminServiceServiceDescriptor.Methods().ByName("UpdatePlayer")
 	adminServiceListPlayersMethodDescriptor              = adminServiceServiceDescriptor.Methods().ByName("ListPlayers")
@@ -95,6 +99,8 @@ var (
 
 // AdminServiceClient is a client for the api.v1.AdminService service.
 type AdminServiceClient interface {
+	// PurgeAllCaches clears all caches in the API server. Used for testing.
+	PurgeAllCaches(context.Context, *connect.Request[v1.PurgeAllCachesRequest]) (*connect.Response[v1.PurgeAllCachesResponse], error)
 	// CreatePlayer creates a new player profile for a given event.
 	CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
@@ -133,6 +139,12 @@ type AdminServiceClient interface {
 func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AdminServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &adminServiceClient{
+		purgeAllCaches: connect.NewClient[v1.PurgeAllCachesRequest, v1.PurgeAllCachesResponse](
+			httpClient,
+			baseURL+AdminServicePurgeAllCachesProcedure,
+			connect.WithSchema(adminServicePurgeAllCachesMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		createPlayer: connect.NewClient[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse](
 			httpClient,
 			baseURL+AdminServiceCreatePlayerProcedure,
@@ -216,6 +228,7 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // adminServiceClient implements AdminServiceClient.
 type adminServiceClient struct {
+	purgeAllCaches           *connect.Client[v1.PurgeAllCachesRequest, v1.PurgeAllCachesResponse]
 	createPlayer             *connect.Client[v1.AdminServiceCreatePlayerRequest, v1.AdminServiceCreatePlayerResponse]
 	updatePlayer             *connect.Client[v1.UpdatePlayerRequest, v1.UpdatePlayerResponse]
 	listPlayers              *connect.Client[v1.ListPlayersRequest, v1.ListPlayersResponse]
@@ -229,6 +242,11 @@ type adminServiceClient struct {
 	updateStageScore         *connect.Client[v1.UpdateStageScoreRequest, v1.UpdateStageScoreResponse]
 	listStageScores          *connect.Client[v1.ListStageScoresRequest, v1.ListStageScoresResponse]
 	deleteStageScore         *connect.Client[v1.DeleteStageScoreRequest, v1.DeleteStageScoreResponse]
+}
+
+// PurgeAllCaches calls api.v1.AdminService.PurgeAllCaches.
+func (c *adminServiceClient) PurgeAllCaches(ctx context.Context, req *connect.Request[v1.PurgeAllCachesRequest]) (*connect.Response[v1.PurgeAllCachesResponse], error) {
+	return c.purgeAllCaches.CallUnary(ctx, req)
 }
 
 // CreatePlayer calls api.v1.AdminService.CreatePlayer.
@@ -298,6 +316,8 @@ func (c *adminServiceClient) DeleteStageScore(ctx context.Context, req *connect.
 
 // AdminServiceHandler is an implementation of the api.v1.AdminService service.
 type AdminServiceHandler interface {
+	// PurgeAllCaches clears all caches in the API server. Used for testing.
+	PurgeAllCaches(context.Context, *connect.Request[v1.PurgeAllCachesRequest]) (*connect.Response[v1.PurgeAllCachesResponse], error)
 	// CreatePlayer creates a new player profile for a given event.
 	CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error)
 	// UpdatePlayer modifies the player's profile and settings for a given event.
@@ -332,6 +352,12 @@ type AdminServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	adminServicePurgeAllCachesHandler := connect.NewUnaryHandler(
+		AdminServicePurgeAllCachesProcedure,
+		svc.PurgeAllCaches,
+		connect.WithSchema(adminServicePurgeAllCachesMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	adminServiceCreatePlayerHandler := connect.NewUnaryHandler(
 		AdminServiceCreatePlayerProcedure,
 		svc.CreatePlayer,
@@ -412,6 +438,8 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 	)
 	return "/api.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case AdminServicePurgeAllCachesProcedure:
+			adminServicePurgeAllCachesHandler.ServeHTTP(w, r)
 		case AdminServiceCreatePlayerProcedure:
 			adminServiceCreatePlayerHandler.ServeHTTP(w, r)
 		case AdminServiceUpdatePlayerProcedure:
@@ -446,6 +474,10 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 
 // UnimplementedAdminServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAdminServiceHandler struct{}
+
+func (UnimplementedAdminServiceHandler) PurgeAllCaches(context.Context, *connect.Request[v1.PurgeAllCachesRequest]) (*connect.Response[v1.PurgeAllCachesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.PurgeAllCaches is not implemented"))
+}
 
 func (UnimplementedAdminServiceHandler) CreatePlayer(context.Context, *connect.Request[v1.AdminServiceCreatePlayerRequest]) (*connect.Response[v1.AdminServiceCreatePlayerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.AdminService.CreatePlayer is not implemented"))

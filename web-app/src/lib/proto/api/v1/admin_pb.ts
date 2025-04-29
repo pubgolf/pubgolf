@@ -14,7 +14,33 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file api/v1/admin.proto.
  */
 export const file_api_v1_admin: GenFile = /*@__PURE__*/
-  fileDesc("ChJhcGkvdjEvYWRtaW4ucHJvdG8SBmFwaS52MSKoAQofQWRtaW5TZXJ2aWNlQ3JlYXRlUGxheWVyUmVxdWVzdBIVCglldmVudF9rZXkYASABKAlCAhgBEicKC3BsYXllcl9kYXRhGAIgASgLMhIuYXBpLnYxLlBsYXllckRhdGESFAoMcGhvbmVfbnVtYmVyGAMgASgJEi8KDHJlZ2lzdHJhdGlvbhgEIAEoCzIZLmFwaS52MS5FdmVudFJlZ2lzdHJhdGlvbiJCCiBBZG1pblNlcnZpY2VDcmVhdGVQbGF5ZXJSZXNwb25zZRIeCgZwbGF5ZXIYASABKAsyDi5hcGkudjEuUGxheWVyIoIBChNVcGRhdGVQbGF5ZXJSZXF1ZXN0EhEKCXBsYXllcl9pZBgBIAEoCRInCgtwbGF5ZXJfZGF0YRgCIAEoCzISLmFwaS52MS5QbGF5ZXJEYXRhEi8KDHJlZ2lzdHJhdGlvbhgDIAEoCzIZLmFwaS52MS5FdmVudFJlZ2lzdHJhdGlvbiI2ChRVcGRhdGVQbGF5ZXJSZXNwb25zZRIeCgZwbGF5ZXIYASABKAsyDi5hcGkudjEuUGxheWVyIicKEkxpc3RQbGF5ZXJzUmVxdWVzdBIRCglldmVudF9rZXkYASABKAkiNgoTTGlzdFBsYXllcnNSZXNwb25zZRIfCgdwbGF5ZXJzGAEgAygLMg4uYXBpLnYxLlBsYXllciItCgRSdWxlEgoKAmlkGAEgASgJEhkKEXZlbnVlX2Rlc2NyaXB0aW9uGAIgASgJInEKBVN0YWdlEgoKAmlkGAEgASgJEhwKBXZlbnVlGAIgASgLMg0uYXBpLnYxLlZlbnVlEhoKBHJ1bGUYAyABKAsyDC5hcGkudjEuUnVsZRIMCgRyYW5rGAQgASgFEhQKDGR1cmF0aW9uX21pbhgFIAEoBSITChFMaXN0VmVudWVzUmVxdWVzdCIzChJMaXN0VmVudWVzUmVzcG9uc2USHQoGdmVudWVzGAEgAygLMg0uYXBpLnYxLlZlbnVlIncKElVwZGF0ZVN0YWdlUmVxdWVzdBIQCghzdGFnZV9pZBgBIAEoCRIQCgh2ZW51ZV9pZBgCIAEoCRIZChF2ZW51ZV9kZXNjcmlwdGlvbhgDIAEoCRIMCgRyYW5rGAQgASgFEhQKDGR1cmF0aW9uX21pbhgFIAEoBSIVChNVcGRhdGVTdGFnZVJlc3BvbnNlIisKFkxpc3RFdmVudFN0YWdlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJIjgKF0xpc3RFdmVudFN0YWdlc1Jlc3BvbnNlEh0KBnN0YWdlcxgBIAMoCzINLmFwaS52MS5TdGFnZSKdAQoWQWRqdXN0bWVudFRlbXBsYXRlRGF0YRIqCgphZGp1c3RtZW50GAEgASgLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhEgwKBHJhbmsYAiABKAUSEQoJZXZlbnRfa2V5GAMgASgJEhUKCHN0YWdlX2lkGAQgASgJSACIAQESEgoKaXNfdmlzaWJsZRgFIAEoCEILCglfc3RhZ2VfaWQiTgoSQWRqdXN0bWVudFRlbXBsYXRlEgoKAmlkGAEgASgJEiwKBGRhdGEYAiABKAsyHi5hcGkudjEuQWRqdXN0bWVudFRlbXBsYXRlRGF0YSJPCh9DcmVhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXF1ZXN0EiwKBGRhdGEYASABKAsyHi5hcGkudjEuQWRqdXN0bWVudFRlbXBsYXRlRGF0YSIiCiBDcmVhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSJPCh9VcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXF1ZXN0EiwKCHRlbXBsYXRlGAEgASgLMhouYXBpLnYxLkFkanVzdG1lbnRUZW1wbGF0ZSIiCiBVcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSIzCh5MaXN0QWRqdXN0bWVudFRlbXBsYXRlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJIlAKH0xpc3RBZGp1c3RtZW50VGVtcGxhdGVzUmVzcG9uc2USLQoJdGVtcGxhdGVzGAEgAygLMhouYXBpLnYxLkFkanVzdG1lbnRUZW1wbGF0ZSI0CgVTY29yZRIKCgJpZBgBIAEoCRIfCgRkYXRhGAIgASgLMhEuYXBpLnYxLlNjb3JlRGF0YSIaCglTY29yZURhdGESDQoFdmFsdWUYASABKA0iPgoKQWRqdXN0bWVudBIKCgJpZBgBIAEoCRIkCgRkYXRhGAIgASgLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhIi4KDkFkanVzdG1lbnREYXRhEg0KBXZhbHVlGAEgASgFEg0KBWxhYmVsGAIgASgJIo0BCgpTdGFnZVNjb3JlEhAKCHN0YWdlX2lkGAEgASgJEhEKCXBsYXllcl9pZBgCIAEoCRIcCgVzY29yZRgDIAEoCzINLmFwaS52MS5TY29yZRInCgthZGp1c3RtZW50cxgEIAMoCzISLmFwaS52MS5BZGp1c3RtZW50EhMKC2lzX3ZlcmlmaWVkGAUgASgIIoQBCg5TdGFnZVNjb3JlRGF0YRIQCghzdGFnZV9pZBgBIAEoCRIRCglwbGF5ZXJfaWQYAiABKAkSIAoFc2NvcmUYAyABKAsyES5hcGkudjEuU2NvcmVEYXRhEisKC2FkanVzdG1lbnRzGAQgAygLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhInEKF0NyZWF0ZVN0YWdlU2NvcmVSZXF1ZXN0EiQKBGRhdGEYASABKAsyFi5hcGkudjEuU3RhZ2VTY29yZURhdGESHAoPaWRlbXBvdGVuY3lfa2V5GAIgASgJSACIAQFCEgoQX2lkZW1wb3RlbmN5X2tleSI9ChhDcmVhdGVTdGFnZVNjb3JlUmVzcG9uc2USIQoFc2NvcmUYASABKAsyEi5hcGkudjEuU3RhZ2VTY29yZSI8ChdVcGRhdGVTdGFnZVNjb3JlUmVxdWVzdBIhCgVzY29yZRgBIAEoCzISLmFwaS52MS5TdGFnZVNjb3JlIj0KGFVwZGF0ZVN0YWdlU2NvcmVSZXNwb25zZRIhCgVzY29yZRgBIAEoCzISLmFwaS52MS5TdGFnZVNjb3JlIn8KFkxpc3RTdGFnZVNjb3Jlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJEj4KD3ZlcmlmaWVkX2ZpbHRlchgCIAEoDjIgLmFwaS52MS5TdGFnZVNjb3JlVmVyaWZpZWRGaWx0ZXJIAIgBAUISChBfdmVyaWZpZWRfZmlsdGVyIj0KF0xpc3RTdGFnZVNjb3Jlc1Jlc3BvbnNlEiIKBnNjb3JlcxgBIAMoCzISLmFwaS52MS5TdGFnZVNjb3JlIj4KF0RlbGV0ZVN0YWdlU2NvcmVSZXF1ZXN0EhAKCHN0YWdlX2lkGAEgASgJEhEKCXBsYXllcl9pZBgCIAEoCSIaChhEZWxldGVTdGFnZVNjb3JlUmVzcG9uc2UqnQEKGFN0YWdlU2NvcmVWZXJpZmllZEZpbHRlchIrCidTVEFHRV9TQ09SRV9WRVJJRklFRF9GSUxURVJfVU5TUEVDSUZJRUQQABIjCh9TVEFHRV9TQ09SRV9WRVJJRklFRF9GSUxURVJfQUxMEAESLworU1RBR0VfU0NPUkVfVkVSSUZJRURfRklMVEVSX09OTFlfVU5WRVJJRklFRBACMqIJCgxBZG1pblNlcnZpY2USYwoMQ3JlYXRlUGxheWVyEicuYXBpLnYxLkFkbWluU2VydmljZUNyZWF0ZVBsYXllclJlcXVlc3QaKC5hcGkudjEuQWRtaW5TZXJ2aWNlQ3JlYXRlUGxheWVyUmVzcG9uc2UiABJLCgxVcGRhdGVQbGF5ZXISGy5hcGkudjEuVXBkYXRlUGxheWVyUmVxdWVzdBocLmFwaS52MS5VcGRhdGVQbGF5ZXJSZXNwb25zZSIAEkgKC0xpc3RQbGF5ZXJzEhouYXBpLnYxLkxpc3RQbGF5ZXJzUmVxdWVzdBobLmFwaS52MS5MaXN0UGxheWVyc1Jlc3BvbnNlIgASRQoKTGlzdFZlbnVlcxIZLmFwaS52MS5MaXN0VmVudWVzUmVxdWVzdBoaLmFwaS52MS5MaXN0VmVudWVzUmVzcG9uc2UiABJICgtVcGRhdGVTdGFnZRIaLmFwaS52MS5VcGRhdGVTdGFnZVJlcXVlc3QaGy5hcGkudjEuVXBkYXRlU3RhZ2VSZXNwb25zZSIAElQKD0xpc3RFdmVudFN0YWdlcxIeLmFwaS52MS5MaXN0RXZlbnRTdGFnZXNSZXF1ZXN0Gh8uYXBpLnYxLkxpc3RFdmVudFN0YWdlc1Jlc3BvbnNlIgASbwoYQ3JlYXRlQWRqdXN0bWVudFRlbXBsYXRlEicuYXBpLnYxLkNyZWF0ZUFkanVzdG1lbnRUZW1wbGF0ZVJlcXVlc3QaKC5hcGkudjEuQ3JlYXRlQWRqdXN0bWVudFRlbXBsYXRlUmVzcG9uc2UiABJvChhVcGRhdGVBZGp1c3RtZW50VGVtcGxhdGUSJy5hcGkudjEuVXBkYXRlQWRqdXN0bWVudFRlbXBsYXRlUmVxdWVzdBooLmFwaS52MS5VcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSIAEmwKF0xpc3RBZGp1c3RtZW50VGVtcGxhdGVzEiYuYXBpLnYxLkxpc3RBZGp1c3RtZW50VGVtcGxhdGVzUmVxdWVzdBonLmFwaS52MS5MaXN0QWRqdXN0bWVudFRlbXBsYXRlc1Jlc3BvbnNlIgASVwoQQ3JlYXRlU3RhZ2VTY29yZRIfLmFwaS52MS5DcmVhdGVTdGFnZVNjb3JlUmVxdWVzdBogLmFwaS52MS5DcmVhdGVTdGFnZVNjb3JlUmVzcG9uc2UiABJXChBVcGRhdGVTdGFnZVNjb3JlEh8uYXBpLnYxLlVwZGF0ZVN0YWdlU2NvcmVSZXF1ZXN0GiAuYXBpLnYxLlVwZGF0ZVN0YWdlU2NvcmVSZXNwb25zZSIAElQKD0xpc3RTdGFnZVNjb3JlcxIeLmFwaS52MS5MaXN0U3RhZ2VTY29yZXNSZXF1ZXN0Gh8uYXBpLnYxLkxpc3RTdGFnZVNjb3Jlc1Jlc3BvbnNlIgASVwoQRGVsZXRlU3RhZ2VTY29yZRIfLmFwaS52MS5EZWxldGVTdGFnZVNjb3JlUmVxdWVzdBogLmFwaS52MS5EZWxldGVTdGFnZVNjb3JlUmVzcG9uc2UiAEJAWj5naXRodWIuY29tL3B1YmdvbGYvcHViZ29sZi9hcGkvaW50ZXJuYWwvbGliL3Byb3RvL2FwaS92MTthcGl2MWIGcHJvdG8z", [file_api_v1_shared]);
+  fileDesc("ChJhcGkvdjEvYWRtaW4ucHJvdG8SBmFwaS52MSIXChVQdXJnZUFsbENhY2hlc1JlcXVlc3QiGAoWUHVyZ2VBbGxDYWNoZXNSZXNwb25zZSKoAQofQWRtaW5TZXJ2aWNlQ3JlYXRlUGxheWVyUmVxdWVzdBIVCglldmVudF9rZXkYASABKAlCAhgBEicKC3BsYXllcl9kYXRhGAIgASgLMhIuYXBpLnYxLlBsYXllckRhdGESFAoMcGhvbmVfbnVtYmVyGAMgASgJEi8KDHJlZ2lzdHJhdGlvbhgEIAEoCzIZLmFwaS52MS5FdmVudFJlZ2lzdHJhdGlvbiJCCiBBZG1pblNlcnZpY2VDcmVhdGVQbGF5ZXJSZXNwb25zZRIeCgZwbGF5ZXIYASABKAsyDi5hcGkudjEuUGxheWVyIoIBChNVcGRhdGVQbGF5ZXJSZXF1ZXN0EhEKCXBsYXllcl9pZBgBIAEoCRInCgtwbGF5ZXJfZGF0YRgCIAEoCzISLmFwaS52MS5QbGF5ZXJEYXRhEi8KDHJlZ2lzdHJhdGlvbhgDIAEoCzIZLmFwaS52MS5FdmVudFJlZ2lzdHJhdGlvbiI2ChRVcGRhdGVQbGF5ZXJSZXNwb25zZRIeCgZwbGF5ZXIYASABKAsyDi5hcGkudjEuUGxheWVyIicKEkxpc3RQbGF5ZXJzUmVxdWVzdBIRCglldmVudF9rZXkYASABKAkiNgoTTGlzdFBsYXllcnNSZXNwb25zZRIfCgdwbGF5ZXJzGAEgAygLMg4uYXBpLnYxLlBsYXllciItCgRSdWxlEgoKAmlkGAEgASgJEhkKEXZlbnVlX2Rlc2NyaXB0aW9uGAIgASgJInEKBVN0YWdlEgoKAmlkGAEgASgJEhwKBXZlbnVlGAIgASgLMg0uYXBpLnYxLlZlbnVlEhoKBHJ1bGUYAyABKAsyDC5hcGkudjEuUnVsZRIMCgRyYW5rGAQgASgFEhQKDGR1cmF0aW9uX21pbhgFIAEoBSITChFMaXN0VmVudWVzUmVxdWVzdCIzChJMaXN0VmVudWVzUmVzcG9uc2USHQoGdmVudWVzGAEgAygLMg0uYXBpLnYxLlZlbnVlIncKElVwZGF0ZVN0YWdlUmVxdWVzdBIQCghzdGFnZV9pZBgBIAEoCRIQCgh2ZW51ZV9pZBgCIAEoCRIZChF2ZW51ZV9kZXNjcmlwdGlvbhgDIAEoCRIMCgRyYW5rGAQgASgFEhQKDGR1cmF0aW9uX21pbhgFIAEoBSIVChNVcGRhdGVTdGFnZVJlc3BvbnNlIisKFkxpc3RFdmVudFN0YWdlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJIjgKF0xpc3RFdmVudFN0YWdlc1Jlc3BvbnNlEh0KBnN0YWdlcxgBIAMoCzINLmFwaS52MS5TdGFnZSKdAQoWQWRqdXN0bWVudFRlbXBsYXRlRGF0YRIqCgphZGp1c3RtZW50GAEgASgLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhEgwKBHJhbmsYAiABKAUSEQoJZXZlbnRfa2V5GAMgASgJEhUKCHN0YWdlX2lkGAQgASgJSACIAQESEgoKaXNfdmlzaWJsZRgFIAEoCEILCglfc3RhZ2VfaWQiTgoSQWRqdXN0bWVudFRlbXBsYXRlEgoKAmlkGAEgASgJEiwKBGRhdGEYAiABKAsyHi5hcGkudjEuQWRqdXN0bWVudFRlbXBsYXRlRGF0YSJPCh9DcmVhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXF1ZXN0EiwKBGRhdGEYASABKAsyHi5hcGkudjEuQWRqdXN0bWVudFRlbXBsYXRlRGF0YSIiCiBDcmVhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSJPCh9VcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXF1ZXN0EiwKCHRlbXBsYXRlGAEgASgLMhouYXBpLnYxLkFkanVzdG1lbnRUZW1wbGF0ZSIiCiBVcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSIzCh5MaXN0QWRqdXN0bWVudFRlbXBsYXRlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJIlAKH0xpc3RBZGp1c3RtZW50VGVtcGxhdGVzUmVzcG9uc2USLQoJdGVtcGxhdGVzGAEgAygLMhouYXBpLnYxLkFkanVzdG1lbnRUZW1wbGF0ZSI0CgVTY29yZRIKCgJpZBgBIAEoCRIfCgRkYXRhGAIgASgLMhEuYXBpLnYxLlNjb3JlRGF0YSIaCglTY29yZURhdGESDQoFdmFsdWUYASABKA0iPgoKQWRqdXN0bWVudBIKCgJpZBgBIAEoCRIkCgRkYXRhGAIgASgLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhIi4KDkFkanVzdG1lbnREYXRhEg0KBXZhbHVlGAEgASgFEg0KBWxhYmVsGAIgASgJIo0BCgpTdGFnZVNjb3JlEhAKCHN0YWdlX2lkGAEgASgJEhEKCXBsYXllcl9pZBgCIAEoCRIcCgVzY29yZRgDIAEoCzINLmFwaS52MS5TY29yZRInCgthZGp1c3RtZW50cxgEIAMoCzISLmFwaS52MS5BZGp1c3RtZW50EhMKC2lzX3ZlcmlmaWVkGAUgASgIIoQBCg5TdGFnZVNjb3JlRGF0YRIQCghzdGFnZV9pZBgBIAEoCRIRCglwbGF5ZXJfaWQYAiABKAkSIAoFc2NvcmUYAyABKAsyES5hcGkudjEuU2NvcmVEYXRhEisKC2FkanVzdG1lbnRzGAQgAygLMhYuYXBpLnYxLkFkanVzdG1lbnREYXRhInEKF0NyZWF0ZVN0YWdlU2NvcmVSZXF1ZXN0EiQKBGRhdGEYASABKAsyFi5hcGkudjEuU3RhZ2VTY29yZURhdGESHAoPaWRlbXBvdGVuY3lfa2V5GAIgASgJSACIAQFCEgoQX2lkZW1wb3RlbmN5X2tleSI9ChhDcmVhdGVTdGFnZVNjb3JlUmVzcG9uc2USIQoFc2NvcmUYASABKAsyEi5hcGkudjEuU3RhZ2VTY29yZSI8ChdVcGRhdGVTdGFnZVNjb3JlUmVxdWVzdBIhCgVzY29yZRgBIAEoCzISLmFwaS52MS5TdGFnZVNjb3JlIj0KGFVwZGF0ZVN0YWdlU2NvcmVSZXNwb25zZRIhCgVzY29yZRgBIAEoCzISLmFwaS52MS5TdGFnZVNjb3JlIn8KFkxpc3RTdGFnZVNjb3Jlc1JlcXVlc3QSEQoJZXZlbnRfa2V5GAEgASgJEj4KD3ZlcmlmaWVkX2ZpbHRlchgCIAEoDjIgLmFwaS52MS5TdGFnZVNjb3JlVmVyaWZpZWRGaWx0ZXJIAIgBAUISChBfdmVyaWZpZWRfZmlsdGVyIj0KF0xpc3RTdGFnZVNjb3Jlc1Jlc3BvbnNlEiIKBnNjb3JlcxgBIAMoCzISLmFwaS52MS5TdGFnZVNjb3JlIj4KF0RlbGV0ZVN0YWdlU2NvcmVSZXF1ZXN0EhAKCHN0YWdlX2lkGAEgASgJEhEKCXBsYXllcl9pZBgCIAEoCSIaChhEZWxldGVTdGFnZVNjb3JlUmVzcG9uc2UqnQEKGFN0YWdlU2NvcmVWZXJpZmllZEZpbHRlchIrCidTVEFHRV9TQ09SRV9WRVJJRklFRF9GSUxURVJfVU5TUEVDSUZJRUQQABIjCh9TVEFHRV9TQ09SRV9WRVJJRklFRF9GSUxURVJfQUxMEAESLworU1RBR0VfU0NPUkVfVkVSSUZJRURfRklMVEVSX09OTFlfVU5WRVJJRklFRBACMvUJCgxBZG1pblNlcnZpY2USUQoOUHVyZ2VBbGxDYWNoZXMSHS5hcGkudjEuUHVyZ2VBbGxDYWNoZXNSZXF1ZXN0Gh4uYXBpLnYxLlB1cmdlQWxsQ2FjaGVzUmVzcG9uc2UiABJjCgxDcmVhdGVQbGF5ZXISJy5hcGkudjEuQWRtaW5TZXJ2aWNlQ3JlYXRlUGxheWVyUmVxdWVzdBooLmFwaS52MS5BZG1pblNlcnZpY2VDcmVhdGVQbGF5ZXJSZXNwb25zZSIAEksKDFVwZGF0ZVBsYXllchIbLmFwaS52MS5VcGRhdGVQbGF5ZXJSZXF1ZXN0GhwuYXBpLnYxLlVwZGF0ZVBsYXllclJlc3BvbnNlIgASSAoLTGlzdFBsYXllcnMSGi5hcGkudjEuTGlzdFBsYXllcnNSZXF1ZXN0GhsuYXBpLnYxLkxpc3RQbGF5ZXJzUmVzcG9uc2UiABJFCgpMaXN0VmVudWVzEhkuYXBpLnYxLkxpc3RWZW51ZXNSZXF1ZXN0GhouYXBpLnYxLkxpc3RWZW51ZXNSZXNwb25zZSIAEkgKC1VwZGF0ZVN0YWdlEhouYXBpLnYxLlVwZGF0ZVN0YWdlUmVxdWVzdBobLmFwaS52MS5VcGRhdGVTdGFnZVJlc3BvbnNlIgASVAoPTGlzdEV2ZW50U3RhZ2VzEh4uYXBpLnYxLkxpc3RFdmVudFN0YWdlc1JlcXVlc3QaHy5hcGkudjEuTGlzdEV2ZW50U3RhZ2VzUmVzcG9uc2UiABJvChhDcmVhdGVBZGp1c3RtZW50VGVtcGxhdGUSJy5hcGkudjEuQ3JlYXRlQWRqdXN0bWVudFRlbXBsYXRlUmVxdWVzdBooLmFwaS52MS5DcmVhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXNwb25zZSIAEm8KGFVwZGF0ZUFkanVzdG1lbnRUZW1wbGF0ZRInLmFwaS52MS5VcGRhdGVBZGp1c3RtZW50VGVtcGxhdGVSZXF1ZXN0GiguYXBpLnYxLlVwZGF0ZUFkanVzdG1lbnRUZW1wbGF0ZVJlc3BvbnNlIgASbAoXTGlzdEFkanVzdG1lbnRUZW1wbGF0ZXMSJi5hcGkudjEuTGlzdEFkanVzdG1lbnRUZW1wbGF0ZXNSZXF1ZXN0GicuYXBpLnYxLkxpc3RBZGp1c3RtZW50VGVtcGxhdGVzUmVzcG9uc2UiABJXChBDcmVhdGVTdGFnZVNjb3JlEh8uYXBpLnYxLkNyZWF0ZVN0YWdlU2NvcmVSZXF1ZXN0GiAuYXBpLnYxLkNyZWF0ZVN0YWdlU2NvcmVSZXNwb25zZSIAElcKEFVwZGF0ZVN0YWdlU2NvcmUSHy5hcGkudjEuVXBkYXRlU3RhZ2VTY29yZVJlcXVlc3QaIC5hcGkudjEuVXBkYXRlU3RhZ2VTY29yZVJlc3BvbnNlIgASVAoPTGlzdFN0YWdlU2NvcmVzEh4uYXBpLnYxLkxpc3RTdGFnZVNjb3Jlc1JlcXVlc3QaHy5hcGkudjEuTGlzdFN0YWdlU2NvcmVzUmVzcG9uc2UiABJXChBEZWxldGVTdGFnZVNjb3JlEh8uYXBpLnYxLkRlbGV0ZVN0YWdlU2NvcmVSZXF1ZXN0GiAuYXBpLnYxLkRlbGV0ZVN0YWdlU2NvcmVSZXNwb25zZSIAQkBaPmdpdGh1Yi5jb20vcHViZ29sZi9wdWJnb2xmL2FwaS9pbnRlcm5hbC9saWIvcHJvdG8vYXBpL3YxO2FwaXYxYgZwcm90bzM", [file_api_v1_shared]);
+
+/**
+ * @generated from message api.v1.PurgeAllCachesRequest
+ */
+export type PurgeAllCachesRequest = Message<"api.v1.PurgeAllCachesRequest"> & {
+};
+
+/**
+ * Describes the message api.v1.PurgeAllCachesRequest.
+ * Use `create(PurgeAllCachesRequestSchema)` to create a new message.
+ */
+export const PurgeAllCachesRequestSchema: GenMessage<PurgeAllCachesRequest> = /*@__PURE__*/
+  messageDesc(file_api_v1_admin, 0);
+
+/**
+ * @generated from message api.v1.PurgeAllCachesResponse
+ */
+export type PurgeAllCachesResponse = Message<"api.v1.PurgeAllCachesResponse"> & {
+};
+
+/**
+ * Describes the message api.v1.PurgeAllCachesResponse.
+ * Use `create(PurgeAllCachesResponseSchema)` to create a new message.
+ */
+export const PurgeAllCachesResponseSchema: GenMessage<PurgeAllCachesResponse> = /*@__PURE__*/
+  messageDesc(file_api_v1_admin, 1);
 
 /**
  * @generated from message api.v1.AdminServiceCreatePlayerRequest
@@ -47,7 +73,7 @@ export type AdminServiceCreatePlayerRequest = Message<"api.v1.AdminServiceCreate
  * Use `create(AdminServiceCreatePlayerRequestSchema)` to create a new message.
  */
 export const AdminServiceCreatePlayerRequestSchema: GenMessage<AdminServiceCreatePlayerRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 0);
+  messageDesc(file_api_v1_admin, 2);
 
 /**
  * @generated from message api.v1.AdminServiceCreatePlayerResponse
@@ -64,7 +90,7 @@ export type AdminServiceCreatePlayerResponse = Message<"api.v1.AdminServiceCreat
  * Use `create(AdminServiceCreatePlayerResponseSchema)` to create a new message.
  */
 export const AdminServiceCreatePlayerResponseSchema: GenMessage<AdminServiceCreatePlayerResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 1);
+  messageDesc(file_api_v1_admin, 3);
 
 /**
  * @generated from message api.v1.UpdatePlayerRequest
@@ -91,7 +117,7 @@ export type UpdatePlayerRequest = Message<"api.v1.UpdatePlayerRequest"> & {
  * Use `create(UpdatePlayerRequestSchema)` to create a new message.
  */
 export const UpdatePlayerRequestSchema: GenMessage<UpdatePlayerRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 2);
+  messageDesc(file_api_v1_admin, 4);
 
 /**
  * @generated from message api.v1.UpdatePlayerResponse
@@ -108,7 +134,7 @@ export type UpdatePlayerResponse = Message<"api.v1.UpdatePlayerResponse"> & {
  * Use `create(UpdatePlayerResponseSchema)` to create a new message.
  */
 export const UpdatePlayerResponseSchema: GenMessage<UpdatePlayerResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 3);
+  messageDesc(file_api_v1_admin, 5);
 
 /**
  * @generated from message api.v1.ListPlayersRequest
@@ -125,7 +151,7 @@ export type ListPlayersRequest = Message<"api.v1.ListPlayersRequest"> & {
  * Use `create(ListPlayersRequestSchema)` to create a new message.
  */
 export const ListPlayersRequestSchema: GenMessage<ListPlayersRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 4);
+  messageDesc(file_api_v1_admin, 6);
 
 /**
  * @generated from message api.v1.ListPlayersResponse
@@ -142,7 +168,7 @@ export type ListPlayersResponse = Message<"api.v1.ListPlayersResponse"> & {
  * Use `create(ListPlayersResponseSchema)` to create a new message.
  */
 export const ListPlayersResponseSchema: GenMessage<ListPlayersResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 5);
+  messageDesc(file_api_v1_admin, 7);
 
 /**
  * @generated from message api.v1.Rule
@@ -164,7 +190,7 @@ export type Rule = Message<"api.v1.Rule"> & {
  * Use `create(RuleSchema)` to create a new message.
  */
 export const RuleSchema: GenMessage<Rule> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 6);
+  messageDesc(file_api_v1_admin, 8);
 
 /**
  * @generated from message api.v1.Stage
@@ -201,7 +227,7 @@ export type Stage = Message<"api.v1.Stage"> & {
  * Use `create(StageSchema)` to create a new message.
  */
 export const StageSchema: GenMessage<Stage> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 7);
+  messageDesc(file_api_v1_admin, 9);
 
 /**
  * @generated from message api.v1.ListVenuesRequest
@@ -214,7 +240,7 @@ export type ListVenuesRequest = Message<"api.v1.ListVenuesRequest"> & {
  * Use `create(ListVenuesRequestSchema)` to create a new message.
  */
 export const ListVenuesRequestSchema: GenMessage<ListVenuesRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 8);
+  messageDesc(file_api_v1_admin, 10);
 
 /**
  * @generated from message api.v1.ListVenuesResponse
@@ -231,7 +257,7 @@ export type ListVenuesResponse = Message<"api.v1.ListVenuesResponse"> & {
  * Use `create(ListVenuesResponseSchema)` to create a new message.
  */
 export const ListVenuesResponseSchema: GenMessage<ListVenuesResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 9);
+  messageDesc(file_api_v1_admin, 11);
 
 /**
  * @generated from message api.v1.UpdateStageRequest
@@ -268,7 +294,7 @@ export type UpdateStageRequest = Message<"api.v1.UpdateStageRequest"> & {
  * Use `create(UpdateStageRequestSchema)` to create a new message.
  */
 export const UpdateStageRequestSchema: GenMessage<UpdateStageRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 10);
+  messageDesc(file_api_v1_admin, 12);
 
 /**
  * @generated from message api.v1.UpdateStageResponse
@@ -281,7 +307,7 @@ export type UpdateStageResponse = Message<"api.v1.UpdateStageResponse"> & {
  * Use `create(UpdateStageResponseSchema)` to create a new message.
  */
 export const UpdateStageResponseSchema: GenMessage<UpdateStageResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 11);
+  messageDesc(file_api_v1_admin, 13);
 
 /**
  * @generated from message api.v1.ListEventStagesRequest
@@ -298,7 +324,7 @@ export type ListEventStagesRequest = Message<"api.v1.ListEventStagesRequest"> & 
  * Use `create(ListEventStagesRequestSchema)` to create a new message.
  */
 export const ListEventStagesRequestSchema: GenMessage<ListEventStagesRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 12);
+  messageDesc(file_api_v1_admin, 14);
 
 /**
  * @generated from message api.v1.ListEventStagesResponse
@@ -315,7 +341,7 @@ export type ListEventStagesResponse = Message<"api.v1.ListEventStagesResponse"> 
  * Use `create(ListEventStagesResponseSchema)` to create a new message.
  */
 export const ListEventStagesResponseSchema: GenMessage<ListEventStagesResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 13);
+  messageDesc(file_api_v1_admin, 15);
 
 /**
  * @generated from message api.v1.AdjustmentTemplateData
@@ -352,7 +378,7 @@ export type AdjustmentTemplateData = Message<"api.v1.AdjustmentTemplateData"> & 
  * Use `create(AdjustmentTemplateDataSchema)` to create a new message.
  */
 export const AdjustmentTemplateDataSchema: GenMessage<AdjustmentTemplateData> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 14);
+  messageDesc(file_api_v1_admin, 16);
 
 /**
  * @generated from message api.v1.AdjustmentTemplate
@@ -374,7 +400,7 @@ export type AdjustmentTemplate = Message<"api.v1.AdjustmentTemplate"> & {
  * Use `create(AdjustmentTemplateSchema)` to create a new message.
  */
 export const AdjustmentTemplateSchema: GenMessage<AdjustmentTemplate> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 15);
+  messageDesc(file_api_v1_admin, 17);
 
 /**
  * @generated from message api.v1.CreateAdjustmentTemplateRequest
@@ -391,7 +417,7 @@ export type CreateAdjustmentTemplateRequest = Message<"api.v1.CreateAdjustmentTe
  * Use `create(CreateAdjustmentTemplateRequestSchema)` to create a new message.
  */
 export const CreateAdjustmentTemplateRequestSchema: GenMessage<CreateAdjustmentTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 16);
+  messageDesc(file_api_v1_admin, 18);
 
 /**
  * @generated from message api.v1.CreateAdjustmentTemplateResponse
@@ -404,7 +430,7 @@ export type CreateAdjustmentTemplateResponse = Message<"api.v1.CreateAdjustmentT
  * Use `create(CreateAdjustmentTemplateResponseSchema)` to create a new message.
  */
 export const CreateAdjustmentTemplateResponseSchema: GenMessage<CreateAdjustmentTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 17);
+  messageDesc(file_api_v1_admin, 19);
 
 /**
  * @generated from message api.v1.UpdateAdjustmentTemplateRequest
@@ -421,7 +447,7 @@ export type UpdateAdjustmentTemplateRequest = Message<"api.v1.UpdateAdjustmentTe
  * Use `create(UpdateAdjustmentTemplateRequestSchema)` to create a new message.
  */
 export const UpdateAdjustmentTemplateRequestSchema: GenMessage<UpdateAdjustmentTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 18);
+  messageDesc(file_api_v1_admin, 20);
 
 /**
  * @generated from message api.v1.UpdateAdjustmentTemplateResponse
@@ -434,7 +460,7 @@ export type UpdateAdjustmentTemplateResponse = Message<"api.v1.UpdateAdjustmentT
  * Use `create(UpdateAdjustmentTemplateResponseSchema)` to create a new message.
  */
 export const UpdateAdjustmentTemplateResponseSchema: GenMessage<UpdateAdjustmentTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 19);
+  messageDesc(file_api_v1_admin, 21);
 
 /**
  * @generated from message api.v1.ListAdjustmentTemplatesRequest
@@ -451,7 +477,7 @@ export type ListAdjustmentTemplatesRequest = Message<"api.v1.ListAdjustmentTempl
  * Use `create(ListAdjustmentTemplatesRequestSchema)` to create a new message.
  */
 export const ListAdjustmentTemplatesRequestSchema: GenMessage<ListAdjustmentTemplatesRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 20);
+  messageDesc(file_api_v1_admin, 22);
 
 /**
  * @generated from message api.v1.ListAdjustmentTemplatesResponse
@@ -468,7 +494,7 @@ export type ListAdjustmentTemplatesResponse = Message<"api.v1.ListAdjustmentTemp
  * Use `create(ListAdjustmentTemplatesResponseSchema)` to create a new message.
  */
 export const ListAdjustmentTemplatesResponseSchema: GenMessage<ListAdjustmentTemplatesResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 21);
+  messageDesc(file_api_v1_admin, 23);
 
 /**
  * @generated from message api.v1.Score
@@ -490,7 +516,7 @@ export type Score = Message<"api.v1.Score"> & {
  * Use `create(ScoreSchema)` to create a new message.
  */
 export const ScoreSchema: GenMessage<Score> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 22);
+  messageDesc(file_api_v1_admin, 24);
 
 /**
  * @generated from message api.v1.ScoreData
@@ -507,7 +533,7 @@ export type ScoreData = Message<"api.v1.ScoreData"> & {
  * Use `create(ScoreDataSchema)` to create a new message.
  */
 export const ScoreDataSchema: GenMessage<ScoreData> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 23);
+  messageDesc(file_api_v1_admin, 25);
 
 /**
  * @generated from message api.v1.Adjustment
@@ -529,7 +555,7 @@ export type Adjustment = Message<"api.v1.Adjustment"> & {
  * Use `create(AdjustmentSchema)` to create a new message.
  */
 export const AdjustmentSchema: GenMessage<Adjustment> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 24);
+  messageDesc(file_api_v1_admin, 26);
 
 /**
  * @generated from message api.v1.AdjustmentData
@@ -551,7 +577,7 @@ export type AdjustmentData = Message<"api.v1.AdjustmentData"> & {
  * Use `create(AdjustmentDataSchema)` to create a new message.
  */
 export const AdjustmentDataSchema: GenMessage<AdjustmentData> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 25);
+  messageDesc(file_api_v1_admin, 27);
 
 /**
  * @generated from message api.v1.StageScore
@@ -588,7 +614,7 @@ export type StageScore = Message<"api.v1.StageScore"> & {
  * Use `create(StageScoreSchema)` to create a new message.
  */
 export const StageScoreSchema: GenMessage<StageScore> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 26);
+  messageDesc(file_api_v1_admin, 28);
 
 /**
  * @generated from message api.v1.StageScoreData
@@ -620,7 +646,7 @@ export type StageScoreData = Message<"api.v1.StageScoreData"> & {
  * Use `create(StageScoreDataSchema)` to create a new message.
  */
 export const StageScoreDataSchema: GenMessage<StageScoreData> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 27);
+  messageDesc(file_api_v1_admin, 29);
 
 /**
  * @generated from message api.v1.CreateStageScoreRequest
@@ -642,7 +668,7 @@ export type CreateStageScoreRequest = Message<"api.v1.CreateStageScoreRequest"> 
  * Use `create(CreateStageScoreRequestSchema)` to create a new message.
  */
 export const CreateStageScoreRequestSchema: GenMessage<CreateStageScoreRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 28);
+  messageDesc(file_api_v1_admin, 30);
 
 /**
  * @generated from message api.v1.CreateStageScoreResponse
@@ -659,7 +685,7 @@ export type CreateStageScoreResponse = Message<"api.v1.CreateStageScoreResponse"
  * Use `create(CreateStageScoreResponseSchema)` to create a new message.
  */
 export const CreateStageScoreResponseSchema: GenMessage<CreateStageScoreResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 29);
+  messageDesc(file_api_v1_admin, 31);
 
 /**
  * @generated from message api.v1.UpdateStageScoreRequest
@@ -676,7 +702,7 @@ export type UpdateStageScoreRequest = Message<"api.v1.UpdateStageScoreRequest"> 
  * Use `create(UpdateStageScoreRequestSchema)` to create a new message.
  */
 export const UpdateStageScoreRequestSchema: GenMessage<UpdateStageScoreRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 30);
+  messageDesc(file_api_v1_admin, 32);
 
 /**
  * @generated from message api.v1.UpdateStageScoreResponse
@@ -693,7 +719,7 @@ export type UpdateStageScoreResponse = Message<"api.v1.UpdateStageScoreResponse"
  * Use `create(UpdateStageScoreResponseSchema)` to create a new message.
  */
 export const UpdateStageScoreResponseSchema: GenMessage<UpdateStageScoreResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 31);
+  messageDesc(file_api_v1_admin, 33);
 
 /**
  * @generated from message api.v1.ListStageScoresRequest
@@ -717,7 +743,7 @@ export type ListStageScoresRequest = Message<"api.v1.ListStageScoresRequest"> & 
  * Use `create(ListStageScoresRequestSchema)` to create a new message.
  */
 export const ListStageScoresRequestSchema: GenMessage<ListStageScoresRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 32);
+  messageDesc(file_api_v1_admin, 34);
 
 /**
  * @generated from message api.v1.ListStageScoresResponse
@@ -734,7 +760,7 @@ export type ListStageScoresResponse = Message<"api.v1.ListStageScoresResponse"> 
  * Use `create(ListStageScoresResponseSchema)` to create a new message.
  */
 export const ListStageScoresResponseSchema: GenMessage<ListStageScoresResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 33);
+  messageDesc(file_api_v1_admin, 35);
 
 /**
  * @generated from message api.v1.DeleteStageScoreRequest
@@ -756,7 +782,7 @@ export type DeleteStageScoreRequest = Message<"api.v1.DeleteStageScoreRequest"> 
  * Use `create(DeleteStageScoreRequestSchema)` to create a new message.
  */
 export const DeleteStageScoreRequestSchema: GenMessage<DeleteStageScoreRequest> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 34);
+  messageDesc(file_api_v1_admin, 36);
 
 /**
  * @generated from message api.v1.DeleteStageScoreResponse
@@ -769,7 +795,7 @@ export type DeleteStageScoreResponse = Message<"api.v1.DeleteStageScoreResponse"
  * Use `create(DeleteStageScoreResponseSchema)` to create a new message.
  */
 export const DeleteStageScoreResponseSchema: GenMessage<DeleteStageScoreResponse> = /*@__PURE__*/
-  messageDesc(file_api_v1_admin, 35);
+  messageDesc(file_api_v1_admin, 37);
 
 /**
  * @generated from enum api.v1.StageScoreVerifiedFilter
@@ -800,11 +826,21 @@ export const StageScoreVerifiedFilterSchema: GenEnum<StageScoreVerifiedFilter> =
 /**
  * AdminService allows administering events with enhanced permissions.
  *
- * Players
+ * Debug
  *
  * @generated from service api.v1.AdminService
  */
 export const AdminService: GenService<{
+  /**
+   * PurgeAllCaches clears all caches in the API server. Used for testing.
+   *
+   * @generated from rpc api.v1.AdminService.PurgeAllCaches
+   */
+  purgeAllCaches: {
+    methodKind: "unary";
+    input: typeof PurgeAllCachesRequestSchema;
+    output: typeof PurgeAllCachesResponseSchema;
+  },
   /**
    * CreatePlayer creates a new player profile for a given event.
    *
