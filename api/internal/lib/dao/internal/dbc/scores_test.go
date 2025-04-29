@@ -170,7 +170,7 @@ func TestPlayerScores(t *testing.T) {
 						assert.Equal(t, fix.Venues[rowIdx].Name, s.Name, "named for venue")
 
 						if rowIdx < tc.firstN && !slices.Contains(tc.skipIndex, rowIdx) {
-							assert.EqualValues(t, expectedScores[p][scoreIdx].value, s.Value, "points match given score")
+							assert.Equal(t, expectedScores[p][scoreIdx].value, s.Value, "points match given score")
 							assert.Equal(t, expectedScores[p][scoreIdx].verified, s.IsVerified, "verified status matches given score")
 
 							scoreIdx++
