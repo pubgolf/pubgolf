@@ -1,29 +1,11 @@
-output:
-  show-stats: true
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - blank
-      - prefix(github.com/pubgolf/pubgolf)
-  wsl:
-    # allow-assign-and-anything: true
-    allow-cuddle-declarations: true
-    force-err-cuddling: true
-  exhaustive:
-    check:
-      - switch
-      - map
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
-    # No plans to enable (mostly complexity measures or extremely dogmatic).
     - cyclop
     - depguard
     - dogsled
     - dupl
-    - execinquery
     - exhaustruct
     - funlen
     - gochecknoglobals
@@ -31,7 +13,6 @@ linters:
     - gocognit
     - goconst
     - godox
-    - gomnd
     - lll
     - maintidx
     - mnd
@@ -43,15 +24,44 @@ linters:
     - unparam
     - unused
     - varnamelen
-
-    # Deprecated checks: deactivating to suppress warning.
-    - deadcode
-    - exhaustivestruct
-    - golint
-    - ifshort
-    - interfacer
-    - maligned
-    - nosnakecase
-    - scopelint
-    - structcheck
-    - varcheck
+  settings:
+    exhaustive:
+      check:
+        - switch
+        - map
+    wsl:
+      allow-cuddle-declarations: true
+      force-err-cuddling: true
+    recvcheck:
+      exclusions:
+        - "*.Value"
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - blank
+        - prefix(github.com/pubgolf/pubgolf)
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
