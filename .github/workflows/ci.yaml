@@ -55,9 +55,9 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: v2.1.5
+          version: v2.1
           args: ./tools/...
       - name: Test
         run: go test ./tools/lib/...
@@ -82,9 +82,9 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: v2.1.5
+          version: v2.1
           args: ./api/...
       - name: Test
         run: go test ./api/...
