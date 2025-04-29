@@ -9,6 +9,7 @@ import (
 
 	"github.com/honeycombio/honeycomb-opentelemetry-go"
 	"github.com/honeycombio/otel-config-go/otelconfig"
+	"go.opentelemetry.io/contrib/processors/baggagecopy"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
@@ -23,7 +24,7 @@ const ServiceName = "pubgolf-api-server"
 // Init configures OTel and Honeycomb reporting.
 func Init(cfg *config.App) (func(), error) {
 	return otelconfig.ConfigureOpenTelemetry( //nolint:wrapcheck // Trivial pass-through function.
-		otelconfig.WithSpanProcessor(honeycomb.NewBaggageSpanProcessor()),
+		otelconfig.WithSpanProcessor(baggagecopy.NewSpanProcessor(baggagecopy.AllowAllMembers)),
 		otelconfig.WithServiceName(ServiceName),
 		otelconfig.WithServiceVersion(gitVersion()),
 		otelconfig.WithMetricsEnabled(false),
@@ -32,6 +33,8 @@ func Init(cfg *config.App) (func(), error) {
 }
 
 // AddRecursiveAttribute adds an attribute to a span and all of its children.
+//
+//nolint:fatcontext // Pointer-based context modification is intentional for ergonomic instrumentation
 func AddRecursiveAttribute(ctx *context.Context, key, value string) {
 	// Set attribute on current span.
 	span := trace.SpanFromContext(*ctx)
@@ -69,6 +72,8 @@ var FnSpan = AutoSpan("func")
 // var mySpan = telemetry.AutoSpan("my")
 //
 // then you would call it by adding `defer mySpan(&ctx)()` to the start of the function definition you want to annotate, resulting in a span named `my.NameOfAnnotatedFunc`.
+//
+//nolint:fatcontext // Pointer-based context modification is intentional for ergonomic instrumentation
 func AutoSpan(prefix string) func(ctx *context.Context) func() {
 	return func(ctx *context.Context) func() {
 		name := prefix + ".Unknown"
