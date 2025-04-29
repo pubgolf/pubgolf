@@ -1,7 +1,6 @@
 package public
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -112,7 +111,7 @@ func TestGetSchedule(t *testing.T) {
 	}
 
 	playerID := models.PlayerIDFromULID(ulid.Make())
-	gameCtx := middleware.ContextWithPlayerID(context.Background(), playerID)
+	gameCtx := middleware.ContextWithPlayerID(t.Context(), playerID)
 	eventKey := "my-testing-key"
 	eventID := models.EventIDFromULID(ulid.Make())
 	preEventStartTime := time.Now().Add(time.Minute * 5)
@@ -241,8 +240,8 @@ func TestGetSchedule(t *testing.T) {
 				require.NoError(t, err)
 
 				assert.Len(t, resp.Msg.GetSchedule().GetVisitedVenueKeys(), tc.expectedVisitedVenueLen)
-				assert.EqualValues(t, tc.expectedCurrentVenueKey, resp.Msg.GetSchedule().GetCurrentVenueKey())
-				assert.EqualValues(t, tc.expectedNextVenueKey, resp.Msg.GetSchedule().GetNextVenueKey())
+				assert.Equal(t, tc.expectedCurrentVenueKey, resp.Msg.GetSchedule().GetCurrentVenueKey())
+				assert.Equal(t, tc.expectedNextVenueKey, resp.Msg.GetSchedule().GetNextVenueKey())
 				assertTimestampsMatch(t, tc.startTime.Add(tc.expectedNextVenueStartOffset), resp.Msg.GetSchedule().GetNextVenueStart().AsTime())
 				assertTimestampsMatch(t, tc.startTime.Add(tc.expectedEventEndOffset), resp.Msg.GetSchedule().GetEventEnd().AsTime())
 			})

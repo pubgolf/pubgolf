@@ -2,7 +2,6 @@
 package dao
 
 import (
-	"context"
 	"math/rand"
 	"testing"
 	"time"
@@ -72,7 +71,7 @@ func TestEventSchedule(t *testing.T) {
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
 
-		_, err := d.EventSchedule(context.Background(), eventID)
+		_, err := d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -90,7 +89,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: models.VenueKeyFromUInt32(1)},
 		})
 
-		_, err := d.EventSchedule(context.Background(), eventID)
+		_, err := d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -113,7 +112,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: models.VenueKeyFromUInt32(1)},
 		})
 
-		_, err := d.EventSchedule(context.Background(), eventID)
+		_, err := d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -136,7 +135,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: nullVenueKey},
 		})
 
-		_, err := d.EventSchedule(context.Background(), eventID)
+		_, err := d.EventSchedule(t.Context(), eventID)
 		require.Error(t, err)
 		require.ErrorIs(t, err, ErrInvariantViolation)
 		m.AssertExpectations(t)
@@ -161,7 +160,7 @@ func TestEventSchedule(t *testing.T) {
 
 		mockEventSchedule(m, eventID, scheduleRows)
 
-		venues, err := d.EventSchedule(context.Background(), eventID)
+		venues, err := d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 

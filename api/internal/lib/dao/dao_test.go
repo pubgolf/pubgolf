@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"context"
 	"database/sql"
 	"os"
 	"testing"
@@ -53,7 +52,7 @@ func Test_txQuerier(t *testing.T) {
 	t.Run("Succeeds when DAO is constructed with New()", func(t *testing.T) {
 		t.Parallel()
 
-		ctx := context.Background()
+		ctx := t.Context()
 
 		dao, err := New(ctx, _sharedDB, false)
 		require.NoError(t, err)
@@ -77,7 +76,7 @@ func Test_txQuerier(t *testing.T) {
 		m := new(dbc.MockQuerier)
 		dao := Queries{dbc: m, db: db}
 
-		tx, err := dao.db.BeginTx(context.Background(), &sql.TxOptions{})
+		tx, err := dao.db.BeginTx(t.Context(), &sql.TxOptions{})
 		require.NoError(t, err)
 
 		_, err = dao.txQuerier(tx)

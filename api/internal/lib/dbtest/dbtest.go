@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -26,6 +27,12 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
 
+// ErrMissingRequiredArg is returned when a required argument is missing.
+var ErrMissingRequiredArg = errors.New("missing required arg")
+
+// ErrPortOutOfRange is returned when a port number is outside the valid range.
+var ErrPortOutOfRange = errors.New("port out of range")
+
 // namespacePrefix is prepended to ephemeral files or databases.
 const namespacePrefix = "pubgolf-api-dbtest-"
 
@@ -33,6 +40,10 @@ const namespacePrefix = "pubgolf-api-dbtest-"
 func createEmbeddedURL(namespace string, enableLogging bool) (string, func()) {
 	port, err := freeport.GetFreePort()
 	guardSetup(err, "find open port")
+
+	if port < 0 || port > math.MaxUint32 {
+		guardSetup(ErrPortOutOfRange, "validate port range")
+	}
 
 	dbURL := fmt.Sprintf("host=localhost port=%d user=postgres password=postgres dbname=postgres sslmode=disable", port)
 
@@ -62,7 +73,7 @@ func createSharedURL(namespace string) (string, func()) {
 
 	pw, ok := url.User.Password()
 	if !ok {
-		guardSetup(errors.New("missing required arg"), "parse password from PUBGOLF_SHARED_DB_URL") //nolint:goerr113
+		guardSetup(ErrMissingRequiredArg, "parse password from PUBGOLF_SHARED_DB_URL")
 	}
 
 	cfg, err := pgx.ParseConfig(fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", url.Hostname(), url.Port(), url.User.Username(), pw, strings.Trim(url.Path, "/")))
@@ -127,27 +138,12 @@ func MigrationDir() string {
 func NewTestTx(t *testing.T, db *sql.DB) (context.Context, *sql.Tx, func()) {
 	t.Helper()
 
-	ctx, cancel := newTestContext(t)
+	ctx := t.Context()
 	tx, rollback := newTx(ctx, t, db)
 
 	return ctx, tx, func() {
 		rollback()
-		cancel()
 	}
-}
-
-// newTestContext returns a context.Context which respects the test's timeout.
-func newTestContext(t *testing.T) (context.Context, func()) {
-	t.Helper()
-
-	ctx := context.Background()
-	cancel := func() {}
-
-	if dl, ok := t.Deadline(); ok {
-		ctx, cancel = context.WithDeadline(ctx, dl)
-	}
-
-	return ctx, cancel
 }
 
 // newTx returns a transaction and a cleanup function to roll back changes from aa test case.

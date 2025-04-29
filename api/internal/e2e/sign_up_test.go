@@ -2,7 +2,6 @@
 package e2e
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -16,7 +15,7 @@ import (
 )
 
 func Test_ClientVersion(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	res, err := c.ClientVersion(ctx, connect.NewRequest(&apiv1.ClientVersionRequest{
@@ -31,7 +30,7 @@ func Test_SignUpFlow(t *testing.T) {
 	_, err := sharedTestDB.Exec("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
 	require.NoError(t, err, "seed DB: insert future event")
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 

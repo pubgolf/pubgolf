@@ -2,7 +2,6 @@
 package e2e
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -17,7 +16,7 @@ import (
 func Test_SubmitScore_NineHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-nine-hole"
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
@@ -33,13 +32,13 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	// Set up venues and stages.
 	for i := range 9 {
 		row := sharedTestDB.QueryRow("INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
-		require.NoError(t, row.Err(), fmt.Sprintf("seed DB: insert venue %d", i))
+		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
 
 		var venueID models.VenueID
 		require.NoError(t, row.Scan(&venueID), "scan returned venue ID")
 
 		row = sharedTestDB.QueryRow("INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30) RETURNING id", eventID, venueID, (i+1)*10)
-		require.NoError(t, row.Err(), fmt.Sprintf("seed DB: insert stage %d", i))
+		require.NoError(t, row.Err(), "seed DB: insert stage %d", i)
 
 		if i == 1 {
 			require.NoError(t, row.Scan(&stageID), "scan returned stage ID")
@@ -76,7 +75,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAdminAuth(&apiv1.CreateAdjustmentTemplateRequest{
 		Data: &apiv1.AdjustmentTemplateData{
 			EventKey: testEventKey,
-			StageId:  &[]string{stageID.DatabaseULID.String()}[0],
+			StageId:  &[]string{stageID.String()}[0],
 			Adjustment: &apiv1.AdjustmentData{
 				Label: "Venue-Specific Penalty",
 				Value: 1,
@@ -248,7 +247,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 func Test_SubmitScore_FiveHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-five-hole"
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
@@ -265,13 +264,13 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	// Set up venues and stages.
 	for i := range 9 {
 		row := sharedTestDB.QueryRow("INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
-		require.NoError(t, row.Err(), fmt.Sprintf("seed DB: insert venue %d", i))
+		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
 
 		var venueID models.VenueID
 		require.NoError(t, row.Scan(&venueID), "scan returned venue ID")
 
 		_, err := sharedTestDB.Exec("INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30)", eventID, venueID, (i+1)*10)
-		require.NoError(t, err, fmt.Sprintf("seed DB: insert stage %d", i))
+		require.NoError(t, err, "seed DB: insert stage %d", i)
 	}
 
 	// Set up 5-hole player and auth token.
