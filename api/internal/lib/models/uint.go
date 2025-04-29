@@ -44,7 +44,7 @@ func (v VenueKey) Value() (driver.Value, error) {
 }
 
 // UInt32 returns the underling uint32 data.
-func (v VenueKey) UInt32() uint32 {
+func (v *VenueKey) UInt32() uint32 {
 	return v.uint32
 }
 
@@ -83,7 +83,7 @@ func (n *NullUInt32) Scan(src any) error {
 // Value implements the driver Valuer interface.
 func (n NullUInt32) Value() (driver.Value, error) {
 	if !n.Valid {
-		return nil, nil
+		return nil, nil //nolint:nilnil // Returning nil,nil is the standard way to represent NULL in database/sql
 	}
 
 	return int64(n.UInt32), nil
@@ -96,4 +96,33 @@ func UInt32FromInt64(x int64) (uint32, error) {
 	}
 
 	return uint32(x), nil
+}
+
+// ClampUInt32 clamps an integer value to the valid range of uint32.
+// If the value is negative, returns 0. If the value exceeds math.MaxUint32, returns math.MaxUint32.
+func ClampUInt32(x int) uint32 {
+	if x < 0 {
+		return 0
+	}
+
+	if x > math.MaxUint32 {
+		return math.MaxUint32
+	}
+
+	return uint32(x)
+}
+
+// ClampInt32 clamps an integer value to the valid range of int32.
+// If the value is less than math.MinInt32, returns math.MinInt32.
+// If the value exceeds math.MaxInt32, returns math.MaxInt32.
+func ClampInt32(x int) int32 {
+	if x < math.MinInt32 {
+		return math.MinInt32
+	}
+
+	if x > math.MaxInt32 {
+		return math.MaxInt32
+	}
+
+	return int32(x)
 }

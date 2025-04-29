@@ -52,8 +52,8 @@ func (db *DatabaseULID) Scan(src interface{}) error {
 // Value serializes a ULID into a UUID-formatted string representing the same underlying byte content.
 func (db DatabaseULID) Value() (driver.Value, error) {
 	if db.ULID == (ulid.ULID{}) {
-		return nil, nil
+		return nil, nil //nolint:nilnil // Returning nil,nil is the standard way to represent NULL in database/sql
 	}
 
-	return db.ULID.MarshalBinary() //nolint:wrapcheck
+	return db.MarshalBinary() //nolint:wrapcheck
 }

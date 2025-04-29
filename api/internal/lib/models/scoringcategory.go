@@ -13,6 +13,8 @@ import (
 var errInvalidScoringCategory = errors.New("invalid apiv1.ScoringCategory_name")
 
 // ScoringCategory describes a game type for purposes of calculating scores.
+//
+//nolint:recvcheck // TODO: Remove this once we figure out how to properly exclude generated files
 type ScoringCategory int
 
 // ScoringCategory values.
@@ -24,7 +26,11 @@ const (
 )
 
 // ProtoEnum returns an enum compatible with the generated proto code.
-func (sc ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
+func (sc *ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
+	if sc == nil {
+		return apiv1.ScoringCategory(0), fmt.Errorf("convert nil ScoringCategory to protobuf enum: %w", errInvalidScoringCategory)
+	}
+
 	if val, ok := apiv1.ScoringCategory_value[sc.String()]; ok {
 		return apiv1.ScoringCategory(val), nil
 	}
@@ -61,14 +67,14 @@ func (nsc *NullScoringCategory) Scan(value interface{}) error {
 // Value implements the driver Valuer interface.
 func (nsc NullScoringCategory) Value() (driver.Value, error) {
 	if !nsc.Valid {
-		return nil, nil
+		return nil, nil //nolint:nilnil // Returning nil,nil is the standard way to represent NULL in database/sql
 	}
 
 	return nsc.ScoringCategory.Value()
 }
 
 // ProtoEnum returns an enum compatible with the generated proto code, or a nil pointer if the value was null.
-func (nsc NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
+func (nsc *NullScoringCategory) ProtoEnum() (*apiv1.ScoringCategory, error) {
 	if !nsc.Valid {
 		return nil, nil //nolint:nilnil // Nil is a valid return value.
 	}

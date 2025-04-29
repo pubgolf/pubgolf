@@ -161,7 +161,7 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 			var s string
 			require.NoError(t, rows.Scan(&s))
 
-			t.Run(s, func(t *testing.T) {
+			t.Run(s, func(t *testing.T) { //nolint:paralleltest // Cannot parallelize because this test uses a shared rows variable
 				var nsc NullScoringCategory
 				require.NoError(t, rows.Scan(&nsc))
 
