@@ -19,7 +19,7 @@ type AdjustmentTemplatesByStageIDAsyncResult struct {
 // AdjustmentTemplatesByStageIDAsync constructs a AdjustmentTemplatesByStageIDAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) AdjustmentTemplatesByStageIDAsync(stageID models.StageID) *AdjustmentTemplatesByStageIDAsyncResult {
 	var res AdjustmentTemplatesByStageIDAsyncResult
-	res.asyncResult.query = func(ctx context.Context) {
+	res.query = func(ctx context.Context) {
 		res.Templates, res.Err = q.AdjustmentTemplatesByStageID(ctx, stageID)
 	}
 

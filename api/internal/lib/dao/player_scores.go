@@ -26,7 +26,7 @@ type PlayerScoresAsyncResult struct {
 // PlayerScoresAsync constructs a PlayerScoresAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) PlayerScoresAsync(eventID models.EventID, playerID models.PlayerID) *PlayerScoresAsyncResult {
 	var res PlayerScoresAsyncResult
-	res.asyncResult.query = func(ctx context.Context) {
+	res.query = func(ctx context.Context) {
 		res.Scores, res.Err = q.PlayerScores(ctx, eventID, playerID)
 	}
 

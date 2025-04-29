@@ -17,7 +17,7 @@ type EventStartTimeAsyncResult struct {
 // EventStartTimeAsync constructs a EventStartTimeAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) EventStartTimeAsync(id models.EventID) *EventStartTimeAsyncResult {
 	var res EventStartTimeAsyncResult
-	res.asyncResult.query = func(ctx context.Context) {
+	res.query = func(ctx context.Context) {
 		res.StartTime, res.Err = q.EventStartTime(ctx, id)
 	}
 

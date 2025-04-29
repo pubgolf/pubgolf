@@ -26,7 +26,7 @@ type EventScheduleAsyncResult struct {
 // EventScheduleAsync constructs a EventScheduleAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) EventScheduleAsync(id models.EventID) *EventScheduleAsyncResult {
 	var res EventScheduleAsyncResult
-	res.asyncResult.query = func(ctx context.Context) {
+	res.query = func(ctx context.Context) {
 		res.Schedule, res.Err = q.EventSchedule(ctx, id)
 	}
 
