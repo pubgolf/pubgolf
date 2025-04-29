@@ -137,7 +137,7 @@ type PubGolfServiceClient interface {
 	UpdateRegistration(context.Context, *connect.Request[v1.UpdateRegistrationRequest]) (*connect.Response[v1.UpdateRegistrationResponse], error)
 	// UpdatePlayerData updates the given player's profile data.
 	UpdatePlayerData(context.Context, *connect.Request[v1.UpdatePlayerDataRequest]) (*connect.Response[v1.UpdatePlayerDataResponse], error)
-	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
+	// GetSchedule returns the list of visible venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
 	GetVenue(context.Context, *connect.Request[v1.GetVenueRequest]) (*connect.Response[v1.GetVenueResponse], error)
@@ -416,7 +416,7 @@ type PubGolfServiceHandler interface {
 	UpdateRegistration(context.Context, *connect.Request[v1.UpdateRegistrationRequest]) (*connect.Response[v1.UpdateRegistrationResponse], error)
 	// UpdatePlayerData updates the given player's profile data.
 	UpdatePlayerData(context.Context, *connect.Request[v1.UpdatePlayerDataRequest]) (*connect.Response[v1.UpdatePlayerDataResponse], error)
-	// GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
+	// GetSchedule returns the list of visible venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
 	// GetVenue performs a bulk lookup of venue metadata by ID. IDs are scoped to an event key.
 	GetVenue(context.Context, *connect.Request[v1.GetVenueRequest]) (*connect.Response[v1.GetVenueResponse], error)

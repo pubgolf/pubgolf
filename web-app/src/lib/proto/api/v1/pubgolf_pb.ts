@@ -1025,7 +1025,7 @@ export const PubGolfService: GenService<{
     output: typeof UpdatePlayerDataResponseSchema;
   },
   /**
-   * GetSchedule returns the list of visble venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
+   * GetSchedule returns the list of visible venues, as well as the next venue transition time. It optionally accepts a data version to allow local caching.
    *
    * @generated from rpc api.v1.PubGolfService.GetSchedule
    */
