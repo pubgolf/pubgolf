@@ -32,6 +32,7 @@ func Test_SignUpFlow(t *testing.T) {
 	require.NoError(t, err, "seed DB: insert future event")
 
 	ctx := context.Background()
+	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Log in
@@ -131,6 +132,9 @@ func Test_SignUpFlow(t *testing.T) {
 	require.Equal(t, expectedNewCategory, reg.GetScoringCategory(), "new event category matches")
 
 	// Old auth token now fails
+
+	_, err = ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	require.NoError(t, err)
 
 	_, err = c.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.Error(t, err)

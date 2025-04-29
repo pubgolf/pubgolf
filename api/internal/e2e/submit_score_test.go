@@ -259,6 +259,9 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	var eventID models.EventID
 	require.NoError(t, row.Scan(&eventID), "scan returned event ID")
 
+	_, err := ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	require.NoError(t, err)
+
 	// Set up venues and stages.
 	for i := range 9 {
 		row := sharedTestDB.QueryRow("INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
@@ -317,6 +320,9 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	_, err = sharedTestDB.Exec("UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
 	require.NoError(t, err, "seed DB: change event start time")
+
+	_, err = ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	require.NoError(t, err)
 
 	schedule, err = c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: testEventKey,
