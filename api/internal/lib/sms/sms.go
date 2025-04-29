@@ -41,7 +41,7 @@ type Client struct {
 	allowed config.PhoneNumSet
 }
 
-// New takes Twilio credentials and returns a client which is only allowed to make requests on behalf of the specified set of phone numbers.
+// New creates a new SMS client with the given authentication and allowed phone numbers.
 func New(auth config.TwilioAuth, allowed config.PhoneNumSet) *Client {
 	return &Client{
 		hc: &http.Client{
@@ -53,26 +53,7 @@ func New(auth config.TwilioAuth, allowed config.PhoneNumSet) *Client {
 	}
 }
 
-func (c *Client) doVerificationServicePost(ctx context.Context, endpoint string, data url.Values) (*http.Response, error) {
-	path := fmt.Sprintf("https://verify.twilio.com/v2/Services/%s/%s", c.Auth.VerificationSID, endpoint)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, strings.NewReader(data.Encode()))
-	if err != nil {
-		return nil, fmt.Errorf("create http request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(c.Auth.AccountSID, c.Auth.AuthToken)
-
-	res, err := c.hc.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("make HTTP request: %w", err)
-	}
-
-	return res, nil
-}
-
-// SendVerification sends an SMS verification message to the given number.
+// SendVerification sends a verification code to the given phone number.
 func (c *Client) SendVerification(ctx context.Context, to models.PhoneNum) error {
 	defer telemetry.FnSpan(&ctx)()
 	span := trace.SpanFromContext(ctx)
@@ -110,7 +91,7 @@ func (c *Client) SendVerification(ctx context.Context, to models.PhoneNum) error
 	return nil
 }
 
-// CheckVerification validates the auth code matches the last verification sent to the given number.
+// CheckVerification verifies a code sent to a phone number.
 func (c *Client) CheckVerification(ctx context.Context, to models.PhoneNum, code string) (bool, error) {
 	defer telemetry.FnSpan(&ctx)()
 	span := trace.SpanFromContext(ctx)
@@ -160,4 +141,24 @@ func (c *Client) CheckVerification(ctx context.Context, to models.PhoneNum, code
 	}
 
 	return r.Status == "approved", nil
+}
+
+// doVerificationServicePost is a helper method to make POST requests to the Twilio verification service.
+func (c *Client) doVerificationServicePost(ctx context.Context, endpoint string, data url.Values) (*http.Response, error) {
+	path := fmt.Sprintf("https://verify.twilio.com/v2/Services/%s/%s", c.Auth.VerificationSID, endpoint)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("create http request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(c.Auth.AccountSID, c.Auth.AuthToken)
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("make HTTP request: %w", err)
+	}
+
+	return res, nil
 }
