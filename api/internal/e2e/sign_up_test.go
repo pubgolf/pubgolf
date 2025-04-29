@@ -16,9 +16,10 @@ import (
 )
 
 func Test_ClientVersion(t *testing.T) {
+	ctx := context.Background()
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
-	res, err := c.ClientVersion(context.Background(), connect.NewRequest(&apiv1.ClientVersionRequest{
+	res, err := c.ClientVersion(ctx, connect.NewRequest(&apiv1.ClientVersionRequest{
 		ClientVersion: 1,
 	}))
 	require.NoError(t, err)
@@ -30,17 +31,18 @@ func Test_SignUpFlow(t *testing.T) {
 	_, err := sharedTestDB.Exec("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
 	require.NoError(t, err, "seed DB: insert future event")
 
+	ctx := context.Background()
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Log in
 
 	phoneNum := "+15551231234"
-	_, err = c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
+	_, err = c.StartPlayerLogin(ctx, connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 		PhoneNumber: phoneNum,
 	}))
 	require.NoError(t, err)
 
-	cplRes, err := c.CompletePlayerLogin(context.Background(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
+	cplRes, err := c.CompletePlayerLogin(ctx, connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
 		PhoneNumber: phoneNum,
 		AuthCode:    sms.MockAuthCode,
 	}))
@@ -57,7 +59,7 @@ func Test_SignUpFlow(t *testing.T) {
 	// Register for event
 
 	expectedCategory := apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE
-	_, err = c.UpdateRegistration(context.Background(), requestWithAuth(&apiv1.UpdateRegistrationRequest{
+	_, err = c.UpdateRegistration(ctx, requestWithAuth(&apiv1.UpdateRegistrationRequest{
 		PlayerId: playerID,
 		Registration: &apiv1.EventRegistration{
 			EventKey:        testEventKey,
@@ -69,7 +71,7 @@ func Test_SignUpFlow(t *testing.T) {
 	// Set player's display name
 
 	playerName := "Bob Smith"
-	_, err = c.UpdatePlayerData(context.Background(), requestWithAuth(&apiv1.UpdatePlayerDataRequest{
+	_, err = c.UpdatePlayerData(ctx, requestWithAuth(&apiv1.UpdatePlayerDataRequest{
 		PlayerId: playerID,
 		Data: &apiv1.PlayerData{
 			Name: playerName,
@@ -79,7 +81,7 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Fetch player info
 
-	gmpRes, err := c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	gmpRes, err := c.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.NoError(t, err)
 
 	require.Equal(t, playerID, gmpRes.Msg.GetPlayer().GetId(), "has matching player ID")
@@ -94,7 +96,7 @@ func Test_SignUpFlow(t *testing.T) {
 	// Change scoring category
 
 	expectedNewCategory := apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE
-	_, err = c.UpdateRegistration(context.Background(), requestWithAuth(&apiv1.UpdateRegistrationRequest{
+	_, err = c.UpdateRegistration(ctx, requestWithAuth(&apiv1.UpdateRegistrationRequest{
 		PlayerId: playerID,
 		Registration: &apiv1.EventRegistration{
 			EventKey:        testEventKey,
@@ -105,12 +107,12 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Log in again
 
-	_, err = c.StartPlayerLogin(context.Background(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
+	_, err = c.StartPlayerLogin(ctx, connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 		PhoneNumber: phoneNum,
 	}))
 	require.NoError(t, err)
 
-	cplRes2, err := c.CompletePlayerLogin(context.Background(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
+	cplRes2, err := c.CompletePlayerLogin(ctx, connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
 		PhoneNumber: phoneNum,
 		AuthCode:    sms.MockAuthCode,
 	}))
@@ -130,7 +132,7 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Old auth token now fails
 
-	_, err = c.GetMyPlayer(context.Background(), requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
+	_, err = c.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.Error(t, err)
 	require.Equal(t, connect.CodePermissionDenied, connect.CodeOf(err))
 }
