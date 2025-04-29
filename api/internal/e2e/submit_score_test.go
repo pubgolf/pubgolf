@@ -18,6 +18,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-nine-hole"
 
 	ctx := context.Background()
+	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Event started 45 mins ago, currently on stage 2 of 9.
@@ -45,25 +46,63 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 		}
 	}
 
-	_, err := sharedTestDB.Exec("INSERT INTO adjustment_templates (event_id, label, value, rank) VALUES ($1, 'Event Penalty', 3, 20) RETURNING id", eventID)
-	require.NoError(t, err, "seed DB: insert event penalty template")
+	// Create adjustment templates
+	_, err := ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+		Data: &apiv1.AdjustmentTemplateData{
+			EventKey: testEventKey,
+			Adjustment: &apiv1.AdjustmentData{
+				Label: "Event Penalty",
+				Value: 3,
+			},
+			Rank:      20,
+			IsVisible: true,
+		},
+	}, "admin-api-token-value"))
+	require.NoError(t, err, "create event penalty template")
 
-	_, err = sharedTestDB.Exec("INSERT INTO adjustment_templates (event_id, label, value, rank) VALUES ($1, 'Event Bonus', -1, 10) RETURNING id", eventID)
-	require.NoError(t, err, "seed DB: insert event bonus template")
+	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+		Data: &apiv1.AdjustmentTemplateData{
+			EventKey: testEventKey,
+			Adjustment: &apiv1.AdjustmentData{
+				Label: "Event Bonus",
+				Value: -1,
+			},
+			Rank:      10,
+			IsVisible: true,
+		},
+	}, "admin-api-token-value"))
+	require.NoError(t, err, "create event bonus template")
 
-	_, err = sharedTestDB.Exec("INSERT INTO adjustment_templates (stage_id, label, value, rank) VALUES ($1, 'Venue-Specific Penalty', 1, 50) RETURNING id", stageID)
-	require.NoError(t, err, "seed DB: insert venue-specific template")
+	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+		Data: &apiv1.AdjustmentTemplateData{
+			EventKey: testEventKey,
+			StageId:  &[]string{stageID.DatabaseULID.String()}[0],
+			Adjustment: &apiv1.AdjustmentData{
+				Label: "Venue-Specific Penalty",
+				Value: 1,
+			},
+			Rank:      50,
+			IsVisible: true,
+		},
+	}, "admin-api-token-value"))
+	require.NoError(t, err, "create venue-specific template")
 
 	// Set up 9-hole player and auth token.
 
-	row = sharedTestDB.QueryRow("INSERT INTO players (name, phone_number) VALUES ('', '+15559284019') RETURNING id")
-	require.NoError(t, row.Err(), "seed DB: insert player")
+	playerResp, err := ac.CreatePlayer(ctx, requestWithAuth(&apiv1.AdminServiceCreatePlayerRequest{
+		PlayerData: &apiv1.PlayerData{
+			Name: "",
+		},
+		PhoneNumber: "+15559284019",
+		Registration: &apiv1.EventRegistration{
+			EventKey:        testEventKey,
+			ScoringCategory: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		},
+	}, "admin-api-token-value"))
+	require.NoError(t, err, "create player")
 
-	var playerID models.PlayerID
-	require.NoError(t, row.Scan(&playerID), "scan returned player ID")
-
-	_, err = sharedTestDB.Exec("INSERT INTO event_players (event_id, player_id, scoring_category) VALUES ($1, $2, 'SCORING_CATEGORY_PUB_GOLF_NINE_HOLE')", eventID, playerID)
-	require.NoError(t, err, "insert registration")
+	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
+	require.NoError(t, err, "convert player ID")
 
 	row = sharedTestDB.QueryRow("INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
 	require.NoError(t, row.Err(), "insert auth token")
@@ -210,6 +249,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-five-hole"
 
 	ctx := context.Background()
+	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Event started 45 mins ago, currently on stage 2 of 9.
@@ -233,14 +273,20 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Set up 5-hole player and auth token.
 
-	row = sharedTestDB.QueryRow("INSERT INTO players (name, phone_number) VALUES ('', '+15555284015') RETURNING id")
-	require.NoError(t, row.Err(), "seed DB: insert player ")
+	playerResp, err := ac.CreatePlayer(ctx, requestWithAuth(&apiv1.AdminServiceCreatePlayerRequest{
+		PlayerData: &apiv1.PlayerData{
+			Name: "",
+		},
+		PhoneNumber: "+15555284015",
+		Registration: &apiv1.EventRegistration{
+			EventKey:        testEventKey,
+			ScoringCategory: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
+		},
+	}, "admin-api-token-value"))
+	require.NoError(t, err, "create player")
 
-	var playerID models.PlayerID
-	require.NoError(t, row.Scan(&playerID), "scan returned player ID")
-
-	_, err := sharedTestDB.Exec("INSERT INTO event_players (event_id, player_id, scoring_category) VALUES ($1, $2, 'SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE')", eventID, playerID)
-	require.NoError(t, err, "insert registration")
+	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
+	require.NoError(t, err, "convert player ID")
 
 	row = sharedTestDB.QueryRow("INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
 	require.NoError(t, row.Err(), "insert auth token")
