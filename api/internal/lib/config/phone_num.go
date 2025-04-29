@@ -50,7 +50,7 @@ func (pns *PhoneNumSet) Set(value string) error {
 }
 
 // Match returns true if the provided num is contained within the set.
-func (pns PhoneNumSet) Match(num models.PhoneNum) bool {
+func (pns *PhoneNumSet) Match(num models.PhoneNum) bool {
 	if pns.universal {
 		return true
 	}

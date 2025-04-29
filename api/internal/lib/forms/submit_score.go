@@ -77,7 +77,7 @@ func groupAdjustmentTemplates(adj []models.AdjustmentTemplate) ([]*apiv1.SelectM
 		active := at.Active
 
 		option := &apiv1.SelectManyInputOption{
-			Id:           at.ID.ULID.String(),
+			Id:           at.ID.String(),
 			Label:        fmt.Sprintf("%s (%+d)", at.Label, at.Value),
 			DefaultValue: &active,
 		}

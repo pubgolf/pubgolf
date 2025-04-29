@@ -25,7 +25,7 @@ func TestPhoneNumSet(t *testing.T) {
 
 		for range numTrials {
 			matchNum := models.PhoneNum(faker.E164PhoneNumber())
-			assert.True(t, pns.Match(matchNum), fmt.Sprintf("Expected valid phone number %q to match", matchNum))
+			assert.True(t, pns.Match(matchNum), "Expected valid phone number %q to match", matchNum)
 		}
 	})
 
@@ -37,7 +37,7 @@ func TestPhoneNumSet(t *testing.T) {
 
 		for range numTrials {
 			matchNum := models.PhoneNum(faker.E164PhoneNumber())
-			assert.False(t, pns.Match(matchNum), fmt.Sprintf("Expected valid phone number %q to fail to match", matchNum))
+			assert.False(t, pns.Match(matchNum), "Expected valid phone number %q to fail to match", matchNum)
 		}
 	})
 
@@ -69,7 +69,7 @@ func TestPhoneNumSet(t *testing.T) {
 					continue
 				}
 
-				assert.False(t, pns.Match(models.PhoneNum(genNum)), fmt.Sprintf("Expected valid phone number %q to fail to match", genNum))
+				assert.False(t, pns.Match(models.PhoneNum(genNum)), "Expected valid phone number %q to fail to match", genNum)
 			}
 		}
 	})
@@ -108,7 +108,7 @@ func TestPhoneNumSet(t *testing.T) {
 					continue
 				}
 
-				assert.False(t, pns.Match(num), fmt.Sprintf("Expected valid phone number %q to fail to match", num))
+				assert.False(t, pns.Match(num), "Expected valid phone number %q to fail to match", num)
 
 				i++
 			}
