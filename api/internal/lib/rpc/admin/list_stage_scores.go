@@ -22,10 +22,7 @@ func (s *Server) ListStageScores(ctx context.Context, req *connect.Request[apiv1
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup event key: %w", err))
 	}
 
-	includeVerified := true
-	if req.Msg.GetVerifiedFilter() == apiv1.StageScoreVerifiedFilter_STAGE_SCORE_VERIFIED_FILTER_ONLY_UNVERIFIED {
-		includeVerified = false
-	}
+	includeVerified := req.Msg.GetVerifiedFilter() != apiv1.StageScoreVerifiedFilter_STAGE_SCORE_VERIFIED_FILTER_ONLY_UNVERIFIED
 
 	dbStageScores, err := s.dao.EventScores(ctx, eventID, includeVerified)
 	if err != nil {

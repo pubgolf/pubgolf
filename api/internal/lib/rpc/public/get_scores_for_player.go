@@ -54,19 +54,19 @@ func (s *Server) GetScoresForPlayer(ctx context.Context, req *connect.Request[ap
 	log.Printf("EventStartTimeAsyncResult = %+v\n", est)
 
 	if ps.Err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get score info: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get score info: %w", ps.Err))
 	}
 
 	if pa.Err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get adjustments info: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get adjustments info: %w", pa.Err))
 	}
 
 	if est.Err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event start time: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event start time: %w", est.Err))
 	}
 
 	if es.Err != nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get event schedule: %w", es.Err))
 	}
 
 	return connect.NewResponse(&apiv1.GetScoresForPlayerResponse{
@@ -98,9 +98,9 @@ func buildPlayerScoreBoard(scores []dao.PlayerVenueScore, adjs []dao.PlayerVenue
 		entries = append(entries, &apiv1.ScoreBoard_ScoreBoardEntry{
 			EntityId:           p(s.VenueID.String()),
 			Label:              applyUnverifiedLabel(s.VenueName, status),
-			Score:              int32(s.Score),
+			Score:              models.ClampInt32(int(s.Score)),
 			DisplayScoreSigned: false,
-			Rank:               p(uint32(venueIdx + 1)),
+			Rank:               p(models.ClampUInt32(venueIdx + 1)),
 			Status:             status,
 		})
 

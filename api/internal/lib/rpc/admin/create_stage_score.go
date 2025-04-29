@@ -66,8 +66,8 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 
 	return connect.NewResponse(&apiv1.CreateStageScoreResponse{
 		Score: &apiv1.StageScore{
-			PlayerId: playerID.ULID.String(),
-			StageId:  stageID.ULID.String(),
+			PlayerId: playerID.String(),
+			StageId:  stageID.String(),
 			Score: &apiv1.Score{
 				Id: score.ID.String(),
 				Data: &apiv1.ScoreData{
