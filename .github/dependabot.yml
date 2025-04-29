@@ -1,0 +1,51 @@
+# Dependabot configuration file
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/web-app"
+    schedule:
+      interval: "weekly"
+    # Raise pull requests for version updates
+    # to npm packages with a version update
+    versioning-strategy: increase
+    # Add labels for npm dependencies
+    labels:
+      - "npm"
+      - "dependencies"
+    # Set reviewers
+    reviewers:
+      - "pubgolf/maintainers"
+    # Groups
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@connectrpc/*"
+          - "lucide-svelte"
+
+  # Enable version updates for Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Add labels for go modules dependencies
+    labels:
+      - "go"
+      - "dependencies"
+    # Set reviewers
+    reviewers:
+      - "pubgolf/maintainers"
+    # Groups
+    groups:
+      otel:
+        patterns:
+          - "go.opentelemetry.io/*"
+      connect:
+        patterns:
+          - "connectrpc.com/*"
+      testing:
+        patterns:
+          - "github.com/stretchr/testify"
+          - "github.com/DATA-DOG/go-sqlmock"
