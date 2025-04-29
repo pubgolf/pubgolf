@@ -17,6 +17,9 @@ import (
 func Test_SubmitScore_NineHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-nine-hole"
 
+	ctx := context.Background()
+	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
+
 	// Event started 45 mins ago, currently on stage 2 of 9.
 	row := sharedTestDB.QueryRow("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
 	require.NoError(t, row.Err(), "seed DB: insert future event")
@@ -68,9 +71,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	var playerToken models.AuthToken
 	require.NoError(t, row.Scan(&playerToken), "scan returned auth token")
 
-	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
-
-	schedule, err := c.GetSchedule(context.Background(), requestWithAuth(&apiv1.GetScheduleRequest{
+	schedule, err := c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: testEventKey,
 	}, playerToken.String()))
 	require.NoError(t, err, "GetSchedule()")
@@ -81,7 +82,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	// Get score submission form.
 
-	form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+	form, err := c.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
@@ -115,7 +116,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	expectedNumSips := int64(3)
 
-	_, err = c.SubmitScore(context.Background(), requestWithAuth(&apiv1.SubmitScoreRequest{
+	_, err = c.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
@@ -144,7 +145,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	// Score is reflected back in scoreboard and defaults for the edit score form.
 
-	scores, err := c.GetScoresForPlayer(context.Background(), requestWithAuth(&apiv1.GetScoresForPlayerRequest{
+	scores, err := c.GetScoresForPlayer(ctx, requestWithAuth(&apiv1.GetScoresForPlayerRequest{
 		EventKey: testEventKey,
 		PlayerId: playerID.String(),
 	}, playerToken.String()))
@@ -156,7 +157,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.EqualValues(t, expectedNumSips, scores.Msg.GetScoreBoard().GetScores()[1].GetScore(), "score reflected for submitted venue")
 	require.Equal(t, "\t😇 Event Bonus", scores.Msg.GetScoreBoard().GetScores()[2].GetLabel())
 
-	form, err = c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+	form, err = c.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
@@ -176,7 +177,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	// Re-submit with Event Bonus now unselected, and confirm the scoreboard reflects the change.
 
-	_, err = c.SubmitScore(context.Background(), requestWithAuth(&apiv1.SubmitScoreRequest{
+	_, err = c.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
@@ -193,7 +194,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	}, playerToken.String()))
 	require.NoError(t, err)
 
-	scores, err = c.GetScoresForPlayer(context.Background(), requestWithAuth(&apiv1.GetScoresForPlayerRequest{
+	scores, err = c.GetScoresForPlayer(ctx, requestWithAuth(&apiv1.GetScoresForPlayerRequest{
 		EventKey: testEventKey,
 		PlayerId: playerID.String(),
 	}, playerToken.String()))
@@ -207,6 +208,9 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 func Test_SubmitScore_FiveHole(t *testing.T) {
 	testEventKey := "test-event-key-submit-score-five-hole"
+
+	ctx := context.Background()
+	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Event started 45 mins ago, currently on stage 2 of 9.
 	row := sharedTestDB.QueryRow("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
@@ -244,9 +248,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	var playerToken models.AuthToken
 	require.NoError(t, row.Scan(&playerToken), "scan returned auth token")
 
-	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
-
-	schedule, err := c.GetSchedule(context.Background(), requestWithAuth(&apiv1.GetScheduleRequest{
+	schedule, err := c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: testEventKey,
 	}, playerToken.String()))
 	require.NoError(t, err, "GetSchedule()")
@@ -257,7 +259,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Get score submission form, which is optional for 5-hole players.
 
-	form, err := c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+	form, err := c.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
@@ -270,7 +272,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	_, err = sharedTestDB.Exec("UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
 	require.NoError(t, err, "seed DB: change event start time")
 
-	schedule, err = c.GetSchedule(context.Background(), requestWithAuth(&apiv1.GetScheduleRequest{
+	schedule, err = c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: testEventKey,
 	}, playerToken.String()))
 	require.NoError(t, err, "GetSchedule()")
@@ -281,7 +283,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Get score submission form on the next hole, which is required for 5-hole players.
 
-	form, err = c.GetSubmitScoreForm(context.Background(), requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+	form, err = c.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
 		EventKey: testEventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: playerID.String(),
