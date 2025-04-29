@@ -188,3 +188,11 @@ func requestWithAuth[T any](msg *T, token string) *connect.Request[T] {
 
 	return req
 }
+
+// requestWithAdminAuth makes an RPC call with an admin auth header.
+func requestWithAdminAuth[T any](msg *T) *connect.Request[T] {
+	req := connect.NewRequest(msg)
+	req.Header().Set("X-Pubgolf-Authtoken", "admin-api-token-value")
+
+	return req
+}

@@ -47,7 +47,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	}
 
 	// Create adjustment templates
-	_, err := ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+	_, err := ac.CreateAdjustmentTemplate(ctx, requestWithAdminAuth(&apiv1.CreateAdjustmentTemplateRequest{
 		Data: &apiv1.AdjustmentTemplateData{
 			EventKey: testEventKey,
 			Adjustment: &apiv1.AdjustmentData{
@@ -57,10 +57,10 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 			Rank:      20,
 			IsVisible: true,
 		},
-	}, "admin-api-token-value"))
+	}))
 	require.NoError(t, err, "create event penalty template")
 
-	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAdminAuth(&apiv1.CreateAdjustmentTemplateRequest{
 		Data: &apiv1.AdjustmentTemplateData{
 			EventKey: testEventKey,
 			Adjustment: &apiv1.AdjustmentData{
@@ -70,10 +70,10 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 			Rank:      10,
 			IsVisible: true,
 		},
-	}, "admin-api-token-value"))
+	}))
 	require.NoError(t, err, "create event bonus template")
 
-	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAuth(&apiv1.CreateAdjustmentTemplateRequest{
+	_, err = ac.CreateAdjustmentTemplate(ctx, requestWithAdminAuth(&apiv1.CreateAdjustmentTemplateRequest{
 		Data: &apiv1.AdjustmentTemplateData{
 			EventKey: testEventKey,
 			StageId:  &[]string{stageID.DatabaseULID.String()}[0],
@@ -84,12 +84,12 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 			Rank:      50,
 			IsVisible: true,
 		},
-	}, "admin-api-token-value"))
+	}))
 	require.NoError(t, err, "create venue-specific template")
 
 	// Set up 9-hole player and auth token.
 
-	playerResp, err := ac.CreatePlayer(ctx, requestWithAuth(&apiv1.AdminServiceCreatePlayerRequest{
+	playerResp, err := ac.CreatePlayer(ctx, requestWithAdminAuth(&apiv1.AdminServiceCreatePlayerRequest{
 		PlayerData: &apiv1.PlayerData{
 			Name: "",
 		},
@@ -98,7 +98,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 			EventKey:        testEventKey,
 			ScoringCategory: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
 		},
-	}, "admin-api-token-value"))
+	}))
 	require.NoError(t, err, "create player")
 
 	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
@@ -259,7 +259,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	var eventID models.EventID
 	require.NoError(t, row.Scan(&eventID), "scan returned event ID")
 
-	_, err := ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	_, err := ac.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
 	require.NoError(t, err)
 
 	// Set up venues and stages.
@@ -276,7 +276,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Set up 5-hole player and auth token.
 
-	playerResp, err := ac.CreatePlayer(ctx, requestWithAuth(&apiv1.AdminServiceCreatePlayerRequest{
+	playerResp, err := ac.CreatePlayer(ctx, requestWithAdminAuth(&apiv1.AdminServiceCreatePlayerRequest{
 		PlayerData: &apiv1.PlayerData{
 			Name: "",
 		},
@@ -285,7 +285,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 			EventKey:        testEventKey,
 			ScoringCategory: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
 		},
-	}, "admin-api-token-value"))
+	}))
 	require.NoError(t, err, "create player")
 
 	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
@@ -321,7 +321,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	_, err = sharedTestDB.Exec("UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
 	require.NoError(t, err, "seed DB: change event start time")
 
-	_, err = ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	_, err = ac.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
 	require.NoError(t, err)
 
 	schedule, err = c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{

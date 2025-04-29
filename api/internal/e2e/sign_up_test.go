@@ -133,7 +133,7 @@ func Test_SignUpFlow(t *testing.T) {
 
 	// Old auth token now fails
 
-	_, err = ac.PurgeAllCaches(ctx, requestWithAuth(&apiv1.PurgeAllCachesRequest{}, "admin-api-token-value"))
+	_, err = ac.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
 	require.NoError(t, err)
 
 	_, err = c.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
