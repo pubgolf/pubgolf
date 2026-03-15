@@ -113,7 +113,7 @@ func (s *Server) guardStageID(ctx context.Context, eventID models.EventID, vk mo
 	stageID, err := s.dao.StageIDByVenueKey(ctx, eventID, vk)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.StageID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("venue key %q: %w", vk, errIDNotFound))
+			return models.StageID{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("venue key %d: %w", vk.UInt32(), errIDNotFound))
 		}
 
 		return models.StageID{}, connect.NewError(connect.CodeUnavailable, fmt.Errorf("lookup stage ID: %w", err))
