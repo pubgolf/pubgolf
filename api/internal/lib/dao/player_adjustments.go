@@ -18,6 +18,7 @@ type PlayerVenueAdjustment struct {
 // PlayerAdjustmentsAsyncResult holds the result of a PlayerAdjustments call.
 type PlayerAdjustmentsAsyncResult struct {
 	asyncResult
+
 	Adjs []PlayerVenueAdjustment
 	Err  error
 }
@@ -25,6 +26,7 @@ type PlayerAdjustmentsAsyncResult struct {
 // PlayerAdjustmentsAsync constructs a PlayerAdjustmentsAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) PlayerAdjustmentsAsync(eventID models.EventID, playerID models.PlayerID) *PlayerAdjustmentsAsyncResult {
 	var res PlayerAdjustmentsAsyncResult
+
 	res.query = func(ctx context.Context) {
 		res.Adjs, res.Err = q.PlayerAdjustments(ctx, eventID, playerID)
 	}

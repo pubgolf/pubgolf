@@ -10,6 +10,7 @@ import (
 // EventStartTimeAsyncResult holds the result of a EventStartTime call.
 type EventStartTimeAsyncResult struct {
 	asyncResult
+
 	StartTime time.Time
 	Err       error
 }
@@ -17,6 +18,7 @@ type EventStartTimeAsyncResult struct {
 // EventStartTimeAsync constructs a EventStartTimeAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) EventStartTimeAsync(id models.EventID) *EventStartTimeAsyncResult {
 	var res EventStartTimeAsyncResult
+
 	res.query = func(ctx context.Context) {
 		res.StartTime, res.Err = q.EventStartTime(ctx, id)
 	}

@@ -10,6 +10,7 @@ import (
 // Server implements the gRPC handlers for the Admin API.
 type Server struct {
 	apiv1connect.UnimplementedAdminServiceHandler
+
 	shared *shared.Server
 	dao    dao.QueryProvider
 }

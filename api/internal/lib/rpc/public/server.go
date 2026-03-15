@@ -24,6 +24,7 @@ var (
 // Server implements the gRPC handlers for the PubGolf API.
 type Server struct {
 	apiv1connect.UnimplementedPubGolfServiceHandler
+
 	shared *shared.Server
 	dao    dao.QueryProvider
 	mes    sms.Messenger

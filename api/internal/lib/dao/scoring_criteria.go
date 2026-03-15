@@ -11,6 +11,7 @@ import (
 // ScoringCriteriaAsyncResult holds the result of a ScoringCriteria call.
 type ScoringCriteriaAsyncResult struct {
 	asyncResult
+
 	Scores []models.ScoringInput
 	Err    error
 }
@@ -18,6 +19,7 @@ type ScoringCriteriaAsyncResult struct {
 // ScoringCriteriaAsync constructs a ScoringCriteriaAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) ScoringCriteriaAsync(eventID models.EventID, category models.ScoringCategory) *ScoringCriteriaAsyncResult {
 	var res ScoringCriteriaAsyncResult
+
 	res.query = func(ctx context.Context) {
 		res.Scores, res.Err = q.ScoringCriteria(ctx, eventID, category)
 	}
