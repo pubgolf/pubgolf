@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download Buf CLI
         uses: bufbuild/buf-setup-action@v1
         with:
@@ -37,7 +37,7 @@ jobs:
           cd build/proto/swift
           zip -r ${{ github.workspace }}/build/swift-client-lib.zip ./*
       - name: Upload Generated Client Libs as CI Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: github.ref == 'refs/heads/main'
         with:
           name: pubgolf-client-libs
@@ -48,23 +48,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
       - name: Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.1
+          version: v2.11
           args: ./tools/...
       - name: Test
         run: go test ./tools/lib/...
       - name: Build
         run: GOOS=darwin GOARCH=amd64 go build -v ./tools/cmd/pubgolf-devctrl
       - name: Upload Built Tools as CI Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: github.ref == 'refs/heads/main'
         with:
           name: pubgolf-devctrl
@@ -75,23 +75,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
       - name: Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.1
+          version: v2.11
           args: ./api/...
       - name: Test
         run: go test ./api/...
       - name: Build API Server Binary
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v ./api/cmd/pubgolf-api-server
       - name: Upload API Server Binary as CI Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: github.ref == 'refs/heads/main'
         with:
           name: pubgolf-api-server
@@ -103,14 +103,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
       - name: Install Doppler CLI
-        uses: dopplerhq/cli-action@v3
+        uses: dopplerhq/cli-action@v4
       - name: Run E2E Tests
         run: go test ./api/internal/e2e -v -e2e=true
         env:
@@ -121,11 +121,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: web-app/package-lock.json
       - name: NPM Install
@@ -141,6 +141,7 @@ jobs:
         run: npm run build
       - name: Upload Assets to R2
         if: github.ref == 'refs/heads/main'
+        # Repo archived 2025; consider migrating to aws-actions/configure-aws-credentials + aws s3 sync if needed
         uses: jakejarvis/s3-sync-action@v0.5.1
         env:
           AWS_S3_ENDPOINT: https://cc720e9866469bbe052e0c3d90b4c016.r2.cloudflarestorage.com
@@ -151,7 +152,7 @@ jobs:
           DEST_DIR: _app/immutable/
       - name: Upload Web App Dynamic Files as CI Artifact
         if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pubgolf-web-app
           path: |
@@ -167,11 +168,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Generated RPC Client Libs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pubgolf-client-libs
       - name: Download pubgolf-devctrl Tool
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pubgolf-devctrl
       - name: Get short SHA
@@ -198,33 +199,33 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Auth with Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract Metadata for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/pubgolf/pubgolf
           tags: |
             type=sha
       - name: Download API Server Binary as CI Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pubgolf-api-server
       - name: Download Web App Dynamic Files as CI Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pubgolf-web-app
           path: web-app-content
       - name: Build and push Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           file: ./infra/Dockerfile
