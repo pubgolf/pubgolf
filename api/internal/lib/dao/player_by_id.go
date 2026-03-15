@@ -13,11 +13,13 @@ import (
 func (q *Queries) PlayerByID(ctx context.Context, playerID models.PlayerID) (models.Player, error) {
 	defer daoSpan(&ctx)()
 
-	var wg sync.WaitGroup
-	var pRow dbc.PlayerByIDRow
-	var pErr error
-	var regRows []dbc.PlayerRegistrationsByIDRow
-	var regErr error
+	var (
+		wg      sync.WaitGroup
+		pRow    dbc.PlayerByIDRow
+		pErr    error
+		regRows []dbc.PlayerRegistrationsByIDRow
+		regErr  error
+	)
 
 	runAsync(ctx, &wg, func(ctx context.Context) {
 		pRow, pErr = q.dbc.PlayerByID(ctx, playerID)

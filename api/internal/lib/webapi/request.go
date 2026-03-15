@@ -37,6 +37,7 @@ func parseJSONRequest(w http.ResponseWriter, r *http.Request, dst any) error {
 	err := dec.Decode(&dst)
 	if err != nil {
 		var syntaxError *json.SyntaxError
+
 		var unmarshalTypeError *json.UnmarshalTypeError
 
 		switch {

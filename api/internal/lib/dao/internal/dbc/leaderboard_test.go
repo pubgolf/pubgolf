@@ -436,6 +436,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 
 				for _, s := range fix.StageIDs {
 					var skip bool
+
 					err := faker.FakeData(&skip)
 					require.NoError(t, err, "generate random bool")
 
@@ -830,6 +831,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 						}
 
 						var skip bool
+
 						err := faker.FakeData(&skip)
 						require.NoError(t, err, "generate random bool")
 

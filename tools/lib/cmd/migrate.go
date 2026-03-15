@@ -96,6 +96,7 @@ var migrateCreateCmd = &cobra.Command{
 		)
 
 		var migratorContent bytes.Buffer
+
 		migrator.Stdout = os.Stdout
 		migrator.Stderr = io.MultiWriter(os.Stderr, &migratorContent)
 		guard(migrator.Run(), "execute `migrate ...` command")
@@ -104,7 +105,9 @@ var migrateCreateCmd = &cobra.Command{
 		for _, name := range outLines[:len(outLines)-1] {
 			f, err := os.OpenFile(name, os.O_RDWR, 0o644)
 			guard(err, "open migration file to add boilerplate")
+
 			defer f.Close()
+
 			_, err = f.WriteString("BEGIN;\n\n-- Migration logic goes here...\n\nCOMMIT;\n")
 			guard(err, "write boilerplate to migration file")
 		}

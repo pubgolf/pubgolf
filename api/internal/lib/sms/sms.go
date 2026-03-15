@@ -56,6 +56,7 @@ func New(auth config.TwilioAuth, allowed config.PhoneNumSet) *Client {
 // SendVerification sends a verification code to the given phone number.
 func (c *Client) SendVerification(ctx context.Context, to models.PhoneNum) error {
 	defer telemetry.FnSpan(&ctx)()
+
 	span := trace.SpanFromContext(ctx)
 
 	if !c.allowed.Match(to) {
@@ -94,6 +95,7 @@ func (c *Client) SendVerification(ctx context.Context, to models.PhoneNum) error
 // CheckVerification verifies a code sent to a phone number.
 func (c *Client) CheckVerification(ctx context.Context, to models.PhoneNum, code string) (bool, error) {
 	defer telemetry.FnSpan(&ctx)()
+
 	span := trace.SpanFromContext(ctx)
 
 	if !c.allowed.Match(to) {

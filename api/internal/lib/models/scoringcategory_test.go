@@ -38,6 +38,7 @@ func TestScoringCategory_FromProtoEnum(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.Description, func(t *testing.T) {
 			var sc ScoringCategory
+
 			err := sc.FromProtoEnum(tc.Given)
 
 			if tc.ExpectedScoringCategory != nil {
@@ -59,6 +60,7 @@ func TestScoringCategory_FromProtoEnum(t *testing.T) {
 			pe := apiv1.ScoringCategory(v)
 
 			var nsc NullScoringCategory
+
 			err := nsc.FromProtoEnum(&pe)
 
 			assert.Equal(t, pe.String(), nsc.ScoringCategory.String())
@@ -134,12 +136,15 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 		// Insert NULL value.
 		inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Scan(value) VALUES (NULL) RETURNING id")
 		require.NoError(t, inRow.Err())
+
 		var id int
+
 		require.NoError(t, inRow.Scan(&id))
 
 		// Retrieve as NullScoringCategory.
 		outRow := tx.QueryRowContext(ctx, "SELECT value FROM TestNullScoringCategory_Scan WHERE id = $1", id)
 		require.NoError(t, outRow.Err())
+
 		var nsc NullScoringCategory
 
 		// Scans without error and sets `valid = false`.
@@ -155,6 +160,7 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 
 		rows, err := tx.QueryContext(ctx, "SELECT value FROM enum_scoring_categories")
 		require.NoError(t, err)
+
 		defer rows.Close()
 
 		for rows.Next() {
@@ -193,7 +199,9 @@ func TestNullScoringCategory_Value(t *testing.T) {
 		nsc := NullScoringCategory{Valid: false}
 		inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Value(value) VALUES ($1) RETURNING id", nsc)
 		require.NoError(t, inRow.Err())
+
 		var id int
+
 		require.NoError(t, inRow.Scan(&id))
 
 		// Retrieve as string.
@@ -226,11 +234,14 @@ func TestNullScoringCategory_Value(t *testing.T) {
 
 				inRow := tx.QueryRowContext(ctx, "INSERT INTO TestNullScoringCategory_Value(value) VALUES ($1) RETURNING id", NullScoringCategory{sc, true})
 				require.NoError(t, inRow.Err())
+
 				var id int
+
 				require.NoError(t, inRow.Scan(&id))
 
 				outRow := tx.QueryRowContext(ctx, "SELECT value FROM TestNullScoringCategory_Value WHERE id = $1", id)
 				require.NoError(t, outRow.Err())
+
 				var dbEnum string
 				require.NoError(t, outRow.Scan(&dbEnum))
 
@@ -278,6 +289,7 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 			t.Parallel()
 
 			var nsc NullScoringCategory
+
 			err := nsc.FromProtoEnum(tc.Given)
 
 			if tc.ExpectedScoringCategory != nil {
@@ -301,6 +313,7 @@ func TestNullScoringCategory_FromProtoEnum(t *testing.T) {
 			pe := apiv1.ScoringCategory(v)
 
 			var nsc NullScoringCategory
+
 			err := nsc.FromProtoEnum(&pe)
 
 			assert.Equal(t, pe.String(), nsc.ScoringCategory.String())

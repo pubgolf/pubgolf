@@ -22,6 +22,7 @@ const (
 // GenerateSubmitScoreForm creates a player-facing score submission form. Pass in a non-zero score to indicate this is a re-submission/edit form.
 func GenerateSubmitScoreForm(score uint32, adj []models.AdjustmentTemplate) *apiv1.Form {
 	var defaultScore *int64
+
 	formTitle := "Submit Your Score"
 	formAction := "Submit"
 
@@ -122,6 +123,7 @@ func makeAdjustmentGroup(label, id string, adj []*apiv1.SelectManyInputOption) *
 // ParseSubmitScoreForm takes in a score form submission and returns the score along with a list of activated adjustment template IDs.
 func ParseSubmitScoreForm(vs []*apiv1.FormValue) (uint32, []models.AdjustmentTemplateID, error) {
 	var score *uint32
+
 	var adjIDs []models.AdjustmentTemplateID
 
 	for _, v := range vs {

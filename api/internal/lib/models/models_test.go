@@ -30,6 +30,7 @@ func executeTests(m *testing.M) int {
 
 	_sharedDB, _sharedDBCleanup = dbtest.NewConn("models-test-migrated")
 	defer _sharedDBCleanup()
+
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
 
 	return m.Run()

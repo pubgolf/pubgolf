@@ -18,6 +18,7 @@ func (q *Queries) EventScores(ctx context.Context, eventID models.EventID, inclu
 	defer daoSpan(&ctx)()
 
 	var stageScores []models.StageScore
+
 	err := q.useTx(ctx, func(ctx context.Context, q *Queries) error {
 		sRows, err := q.dbc.EventScores(ctx, dbc.EventScoresParams{
 			EventID:         eventID,

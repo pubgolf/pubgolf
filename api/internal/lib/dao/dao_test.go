@@ -69,6 +69,7 @@ func Test_txQuerier(t *testing.T) {
 
 		db, dbMock, err := sqlmock.New()
 		require.NoError(t, err)
+
 		defer db.Close()
 
 		dbMock.ExpectBegin()
