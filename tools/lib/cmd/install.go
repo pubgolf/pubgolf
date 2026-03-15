@@ -9,11 +9,12 @@ import (
 )
 
 var goTools = map[string]string{
-	"migrate":    "github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0",
-	"sqlc":       "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0",
-	"mockery":    "github.com/vektra/mockery/v2@v2.42.2",
-	"ifacemaker": "github.com/vburenin/ifacemaker@v1.2.1",
-	"enumer":     "github.com/dmarkham/enumer@v1.5.9",
+	"migrate":        "github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0",
+	"sqlc":           "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0",
+	"mockery":        "github.com/vektra/mockery/v2@v2.42.2",
+	"ifacemaker":     "github.com/vburenin/ifacemaker@v1.2.1",
+	"enumer":         "github.com/dmarkham/enumer@v1.5.9",
+	"golangci-lint":  "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3",
 }
 
 func init() {
