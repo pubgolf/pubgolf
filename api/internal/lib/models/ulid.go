@@ -16,7 +16,7 @@ var ErrCannotScanType = errors.New("source value must be a byte slice or string"
 type DatabaseULID struct{ ulid.ULID }
 
 // Scan accepts a string-formatted UUID (36 char, hex encoded) as a []byte, and parses it into a ULID type with the same underlying byte content.
-func (db *DatabaseULID) Scan(src interface{}) error {
+func (db *DatabaseULID) Scan(src any) error {
 	if x, ok := src.([]byte); ok {
 		parsed, err := uuid.FromString(string(x))
 		if err != nil {

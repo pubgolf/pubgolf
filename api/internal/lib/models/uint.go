@@ -18,7 +18,7 @@ var errNoScanConversionDefined = errors.New("no scan conversion for type")
 type VenueKey struct{ uint32 }
 
 // Scan parses an int64 into a VenueKey if it is in the valid range for a uint32.
-func (v *VenueKey) Scan(src interface{}) error {
+func (v *VenueKey) Scan(src any) error {
 	if src == nil {
 		v.uint32 = 0
 

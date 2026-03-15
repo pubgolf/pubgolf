@@ -26,7 +26,7 @@ func (pns *PhoneNumSet) Set(value string) error {
 
 	ns := make(map[models.PhoneNum]struct{})
 
-	for _, n := range strings.Split(value, ",") {
+	for n := range strings.SplitSeq(value, ",") {
 		n = strings.TrimSpace(n)
 
 		if n == "" {

@@ -22,8 +22,8 @@ var (
 
 type mockDBCCall struct {
 	ShouldCall bool
-	Args       []interface{}
-	Return     []interface{}
+	Args       []any
+	Return     []any
 }
 
 func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {

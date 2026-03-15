@@ -19,11 +19,11 @@ import (
 func mockEventIDByKey(m *dao.MockQueryProvider, eventKey string, eventID models.EventID) {
 	dao.MockDAOCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventKey,
 		},
-		Return: []interface{}{
+		Return: []any{
 			eventID,
 			nil,
 		},
@@ -33,12 +33,12 @@ func mockEventIDByKey(m *dao.MockQueryProvider, eventKey string, eventID models.
 func mockPlayerRegisteredForEvent(m *dao.MockQueryProvider, playerID models.PlayerID, eventID models.EventID) {
 	dao.MockDAOCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			playerID,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			true,
 			nil,
 		},
@@ -48,11 +48,11 @@ func mockPlayerRegisteredForEvent(m *dao.MockQueryProvider, playerID models.Play
 func mockEventStartTime(m *dao.MockQueryProvider, eventID models.EventID, startTime time.Time) {
 	dao.MockDAOCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			startTime,
 			nil,
 		},
@@ -62,11 +62,11 @@ func mockEventStartTime(m *dao.MockQueryProvider, eventID models.EventID, startT
 func mockEventSchedule(m *dao.MockQueryProvider, eventID models.EventID, schedule []dao.VenueStop) {
 	dao.MockDAOCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			schedule,
 			nil,
 		},
@@ -76,12 +76,12 @@ func mockEventSchedule(m *dao.MockQueryProvider, eventID models.EventID, schedul
 func mockEventScheduleCacheVersion(m *dao.MockQueryProvider, eventID models.EventID, version uint32, matched bool) {
 	dao.MockDAOCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 			mock.Anything,
 		},
-		Return: []interface{}{
+		Return: []any{
 			version,
 			matched,
 			nil,

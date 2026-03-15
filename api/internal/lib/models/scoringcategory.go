@@ -53,7 +53,7 @@ type NullScoringCategory struct {
 }
 
 // Scan implements the Scanner interface for NullScoringCategory.
-func (nsc *NullScoringCategory) Scan(value interface{}) error {
+func (nsc *NullScoringCategory) Scan(value any) error {
 	var sc ScoringCategory
 	if err := sc.Scan(value); err != nil {
 		return err

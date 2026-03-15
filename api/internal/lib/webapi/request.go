@@ -22,7 +22,7 @@ func (mr *malformedRequestError) Error() string {
 	return mr.Msg
 }
 
-func parseJSONRequest(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+func parseJSONRequest(w http.ResponseWriter, r *http.Request, dst any) error {
 	if r.Header.Get("Content-Type") != "application/json" {
 		msg := "Content-Type header is not application/json"
 

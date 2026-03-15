@@ -25,6 +25,9 @@ linters:
     - unused
     - varnamelen
   settings:
+    modernize:
+      disable:
+        - newexpr
     exhaustive:
       check:
         - switch

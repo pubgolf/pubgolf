@@ -19,10 +19,7 @@ func (ar *asyncResult) Run(ctx context.Context, wg *sync.WaitGroup) {
 func runAsync(ctx context.Context, wg *sync.WaitGroup, fn func(ctx context.Context)) {
 	defer telemetry.FnSpan(&ctx)()
 
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		fn(ctx)
-	}()
+	})
 }

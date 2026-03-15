@@ -3,8 +3,8 @@ package dao
 // MockDAOCall holds data to allow mocking a DAO query method.
 type MockDAOCall struct {
 	ShouldCall bool
-	Args       []interface{}
-	Return     []interface{}
+	Args       []any
+	Return     []any
 }
 
 // Bind sets up assertions based on the data in the MockDAOCall.

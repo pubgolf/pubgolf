@@ -18,11 +18,11 @@ import (
 func mockSetEventVenueKeys(m *dbc.MockQuerier, eventID models.EventID, shouldCall bool) {
 	mockDBCCall{
 		ShouldCall: shouldCall,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			nil,
 		},
 	}.Bind(m, "SetEventVenueKeys")
@@ -31,11 +31,11 @@ func mockSetEventVenueKeys(m *dbc.MockQuerier, eventID models.EventID, shouldCal
 func mockSetNextEventVenueKey(m *dbc.MockQuerier, eventID models.EventID, shouldCall bool) {
 	mockDBCCall{
 		ShouldCall: shouldCall,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			nil,
 		},
 	}.Bind(m, "SetNextEventVenueKey")
@@ -44,11 +44,11 @@ func mockSetNextEventVenueKey(m *dbc.MockQuerier, eventID models.EventID, should
 func mockEventSchedule(m *dbc.MockQuerier, eventID models.EventID, schedule []dbc.EventScheduleRow) {
 	mockDBCCall{
 		ShouldCall: true,
-		Args: []interface{}{
+		Args: []any{
 			mock.Anything,
 			eventID,
 		},
-		Return: []interface{}{
+		Return: []any{
 			schedule,
 			nil,
 		},

@@ -113,7 +113,7 @@ func readDopplerVars(project, env, prefix string, vars []string) map[string]stri
 
 	guard(doppler.Run(), "execute `doppler ...` command")
 
-	var data map[string]interface{}
+	var data map[string]any
 	guard(json.NewDecoder(&dopplerContent).Decode(&data), "read JSON output from doppler")
 
 	outData := make(map[string]string)
@@ -124,7 +124,7 @@ func readDopplerVars(project, env, prefix string, vars []string) map[string]stri
 			continue
 		}
 
-		inner, ok := secret.(map[string]interface{})
+		inner, ok := secret.(map[string]any)
 		if !ok {
 			continue
 		}
