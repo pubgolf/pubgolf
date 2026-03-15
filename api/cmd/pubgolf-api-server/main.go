@@ -46,6 +46,7 @@ func main() {
 
 	migrationFlag := flag.Bool("run-migrations", false, "run migrations and exit")
 	noTelemetry := flag.Bool("disable-telemetry", false, "do not initialize OTel or send telemetry to Honeycomb")
+
 	flag.Parse()
 
 	if *noTelemetry {
@@ -54,6 +55,7 @@ func main() {
 		// Initialize telemetry.
 		cleanupTelemetry, err := telemetry.Init(cfg)
 		guard(err, "init otel")
+
 		defer cleanupTelemetry()
 	}
 
@@ -93,7 +95,8 @@ func main() {
 	bootSpan.End()
 	log.Printf("Listening on port %d...", cfg.Port)
 
-	if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+	err = server.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
 		guard(err, "listen and serve")
 	}
 

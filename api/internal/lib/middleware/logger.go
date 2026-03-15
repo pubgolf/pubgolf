@@ -56,7 +56,8 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 			}
 
 			if err != nil {
-				if connectErr := new(connect.Error); errors.As(err, &connectErr) {
+				connectErr := new(connect.Error)
+				if errors.As(err, &connectErr) {
 					span.SetAttributes(attribute.String("error.message", connectErr.Message()))
 
 					log.Printf("%s.%s(%s) completed in %q with code: \"%d %s\" error: %q\n", service, method, args, duration, connectErr.Code(), connectErr.Code(), connectErr.Message())

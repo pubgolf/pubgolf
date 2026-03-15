@@ -21,7 +21,8 @@ func Recoverer(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func(ctx context.Context) {
 			if rvr := recover(); rvr != nil {
-				if err, ok := rvr.(error); ok && errors.Is(err, http.ErrAbortHandler) {
+				err, ok := rvr.(error)
+				if ok && errors.Is(err, http.ErrAbortHandler) {
 					// we don't recover http.ErrAbortHandler so the response
 					// to the client is aborted, this should not be logged
 					panic(rvr)

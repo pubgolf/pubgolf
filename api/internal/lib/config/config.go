@@ -13,7 +13,9 @@ const envVarPrefix = "pubgolf"
 // Init checks for env vars matching the `envVarPrefix` and returns a populated config struct.
 func Init() (*App, error) {
 	var c App
-	if err := envconfig.Process(envVarPrefix, &c); err != nil {
+
+	err := envconfig.Process(envVarPrefix, &c)
+	if err != nil {
 		return nil, fmt.Errorf("read env vars into config: %w", err)
 	}
 

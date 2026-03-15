@@ -41,6 +41,7 @@ func (sc *ScoringCategory) ProtoEnum() (apiv1.ScoringCategory, error) {
 // FromProtoEnum parses an enum from a proto message into an internal representation.
 func (sc *ScoringCategory) FromProtoEnum(pe apiv1.ScoringCategory) error {
 	var err error
+
 	*sc, err = ScoringCategoryString(pe.String())
 
 	return err
@@ -55,7 +56,9 @@ type NullScoringCategory struct {
 // Scan implements the Scanner interface for NullScoringCategory.
 func (nsc *NullScoringCategory) Scan(value any) error {
 	var sc ScoringCategory
-	if err := sc.Scan(value); err != nil {
+
+	err := sc.Scan(value)
+	if err != nil {
 		return err
 	}
 

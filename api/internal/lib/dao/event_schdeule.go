@@ -19,6 +19,7 @@ type VenueStop struct {
 // EventScheduleAsyncResult holds the result of a EventSchedule call.
 type EventScheduleAsyncResult struct {
 	asyncResult
+
 	Schedule []VenueStop
 	Err      error
 }
@@ -26,6 +27,7 @@ type EventScheduleAsyncResult struct {
 // EventScheduleAsync constructs a EventScheduleAsyncResult struct, which can be fulfilled by calling the Run method.
 func (q *Queries) EventScheduleAsync(id models.EventID) *EventScheduleAsyncResult {
 	var res EventScheduleAsyncResult
+
 	res.query = func(ctx context.Context) {
 		res.Schedule, res.Err = q.EventSchedule(ctx, id)
 	}
@@ -44,11 +46,13 @@ func (q *Queries) EventSchedule(ctx context.Context, id models.EventID) ([]Venue
 
 	venueStops, ok := buildVenueStops(schedule)
 	if !ok {
-		if err := q.dbc.SetEventVenueKeys(ctx, id); err != nil {
+		err = q.dbc.SetEventVenueKeys(ctx, id)
+		if err != nil {
 			return nil, fmt.Errorf("set venue keys: %w", err)
 		}
 
-		if err := q.dbc.SetNextEventVenueKey(ctx, id); err != nil {
+		err = q.dbc.SetNextEventVenueKey(ctx, id)
+		if err != nil {
 			return nil, fmt.Errorf("reset venue key iterator: %w", err)
 		}
 

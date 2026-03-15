@@ -44,7 +44,8 @@ func Execute(toolsDirHash string, c CLIConfig) {
 
 	log.SetPrefix(fmt.Sprintf("[%s] ", config.CLIName))
 
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -96,6 +97,7 @@ func runPar(cmd *cobra.Command, args []string, commands ...*cobra.Command) {
 	for _, c := range commands {
 		go func(cmd *cobra.Command, args []string, c *cobra.Command) {
 			defer wg.Done()
+
 			log.Printf("Running `%s`...\n", c.Use)
 			c.Run(cmd, args)
 		}(cmd, args, c)
