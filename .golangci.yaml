@@ -24,6 +24,7 @@ linters:
     - unparam
     - unused
     - varnamelen
+    - wsl
   settings:
     modernize:
       disable:
@@ -32,9 +33,6 @@ linters:
       check:
         - switch
         - map
-    wsl:
-      allow-cuddle-declarations: true
-      force-err-cuddling: true
     recvcheck:
       exclusions:
         - "*.Value"
