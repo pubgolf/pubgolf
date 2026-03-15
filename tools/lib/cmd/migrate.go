@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"io"
 	"os"
@@ -42,8 +43,8 @@ var migrateUpCmd = &cobra.Command{
 	Use:   "up [num_steps]",
 	Short: "Apply up migrations (defaults to running all migrations)",
 	Args:  cobra.MaximumNArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
-		m := getMigrator()
+	Run: func(cmd *cobra.Command, args []string) {
+		m := getMigrator(cmd.Context())
 
 		if len(args) < 1 {
 			guard(m.Up(), "run up migration")
@@ -61,8 +62,8 @@ var migrateDownCmd = &cobra.Command{
 	Use:   "down [num_steps]",
 	Short: "Apply down migrations (defaults to running all migrations)",
 	Args:  cobra.MaximumNArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
-		m := getMigrator()
+	Run: func(cmd *cobra.Command, args []string) {
+		m := getMigrator(cmd.Context())
 
 		if len(args) < 1 {
 			guard(m.Down(), "run up migration")
@@ -85,9 +86,9 @@ var migrateCreateCmd = &cobra.Command{
 	Use:   "create {migration_name}",
 	Short: "Create new migration files",
 	Args:  cobra.ExactArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		// Creating migration files isn't supported via the programmatic API, so create using the following shell command: `migrate create -seq -ext 'sql' -dir "api/internal/db/migrations" "$1"`
-		migrator := exec.Command("migrate",
+		migrator := exec.CommandContext(cmd.Context(), "migrate",
 			"create",
 			"-seq",
 			"-ext", "sql",
@@ -118,8 +119,8 @@ var migrateFixCmd = &cobra.Command{
 	Use:   "fix {version}",
 	Short: "Reset the migration state of a DB to a known valid migration version, assuming all migrations were transacted",
 	Args:  cobra.ExactArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
-		dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
+	Run: func(cmd *cobra.Command, args []string) {
+		dbURL := getDatabaseURL(cmd.Context(), config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
 		db, err := sql.Open(config.DBDriver.driverString(false), dbURL)
 		guard(err, "open DB connection")
 
@@ -138,8 +139,8 @@ var migrateFixCmd = &cobra.Command{
 	},
 }
 
-func getMigrator() *migrate.Migrate {
-	dbURL := getDatabaseURL(config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
+func getMigrator(ctx context.Context) *migrate.Migrate {
+	dbURL := getDatabaseURL(ctx, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 

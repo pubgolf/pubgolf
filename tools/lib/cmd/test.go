@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/exec"
@@ -75,7 +76,7 @@ var testCmd = &cobra.Command{
 			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir: %w")
 		}
 
-		tester := exec.Command("doppler", args...)
+		tester := exec.CommandContext(cmd.Context(), "doppler", args...)
 
 		tester.Stdout = os.Stdout
 		tester.Stderr = os.Stderr
@@ -84,13 +85,14 @@ var testCmd = &cobra.Command{
 		err = tester.Run()
 		if err != nil {
 			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-			if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+			exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+			if !ok || exitErr.ExitCode() != 1 {
 				guard(err, "execute `go test ...` command")
 			}
 		}
 
 		if coverageFlag {
-			cover := exec.Command("go",
+			cover := exec.CommandContext(cmd.Context(), "go",
 				"tool", "cover",
 				"-html", coverageFile,
 			)
@@ -115,14 +117,14 @@ var testE2ECmd = &cobra.Command{
 		guard(err, "check '--local' flag")
 
 		// Start initial process.
-		stopFn := runE2ETest(!watchFlag, localFlag)
+		stopFn := runE2ETest(cmd.Context(), !watchFlag, localFlag)
 
 		// Launch watcher, if applicable.
 		if watchFlag {
 			go func() {
 				watch("api", "e2e test", func(_ watcher.Event) {
 					stopFn()
-					stopFn = runE2ETest(false, localFlag)
+					stopFn = runE2ETest(context.Background(), false, localFlag)
 				})
 			}()
 		}
@@ -132,7 +134,7 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(stopOnExit, localOnly bool) func() {
+func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
 	args := []string{
 		"run",
 		"--project", config.ServerBinName,
@@ -163,7 +165,7 @@ func runE2ETest(stopOnExit, localOnly bool) func() {
 		}...)
 	}
 
-	tester := exec.Command("doppler", args...)
+	tester := exec.CommandContext(ctx, "doppler", args...)
 
 	tester.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
@@ -176,7 +178,8 @@ func runE2ETest(stopOnExit, localOnly bool) func() {
 	err := tester.Start()
 	if err != nil {
 		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-		if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+		exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+		if !ok || exitErr.ExitCode() != 1 {
 			guard(err, "execute `go test ...` command")
 		}
 	}
@@ -188,7 +191,8 @@ func runE2ETest(stopOnExit, localOnly bool) func() {
 			err := tester.Wait()
 			if err != nil {
 				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-				if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != 1 { //nolint:errorlint // Casting to extract data.
+				exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+				if !ok || exitErr.ExitCode() != 1 {
 					guard(err, "execute `go test ...` command")
 				}
 			}

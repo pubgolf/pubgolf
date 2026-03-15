@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/exec"
@@ -44,8 +45,8 @@ var runAPIServerCmd = &cobra.Command{
 var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
-	Run: func(_ *cobra.Command, _ []string) {
-		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName,
+	Run: func(cmd *cobra.Command, _ []string) {
+		dopplerDockerRun(cmd.Context(), config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			// "api-blob-storage",
 		)
@@ -55,8 +56,8 @@ var runAPIBgCmd = &cobra.Command{
 var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
-	Run: func(_ *cobra.Command, _ []string) {
-		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-db")
+	Run: func(cmd *cobra.Command, _ []string) {
+		dopplerDockerRun(cmd.Context(), config.ServerBinName, config.DopplerEnvName, "api-db")
 	},
 }
 
@@ -68,7 +69,7 @@ var runAPIDatabaseCmd = &cobra.Command{
 // 	},
 // }
 
-func dopplerDockerRun(project, env string, services ...string) {
+func dopplerDockerRun(ctx context.Context, project, env string, services ...string) {
 	args := []string{
 		"run",
 		"--project", project,
@@ -82,7 +83,7 @@ func dopplerDockerRun(project, env string, services ...string) {
 	}
 	args = append(args, services...)
 
-	doppler := exec.Command("doppler", args...)
+	doppler := exec.CommandContext(ctx, "doppler", args...)
 
 	doppler.Stdout = os.Stdout
 	doppler.Stderr = os.Stderr
@@ -96,7 +97,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	stopFn := dopplerGoRun(project, env, bin, args, !watchFlag)
+	stopFn := dopplerGoRun(cmd.Context(), project, env, bin, args, !watchFlag)
 
 	// Launch watcher, if applicable.
 	if watchFlag {
@@ -104,7 +105,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 			watch("api", "restart API server", func(_ watcher.Event) {
 				// Start the old process and keep track of the new cleanup handler.
 				stopFn()
-				stopFn = dopplerGoRun(project, env, bin, args, false)
+				stopFn = dopplerGoRun(context.Background(), project, env, bin, args, false)
 			})
 		}()
 	}
@@ -114,7 +115,7 @@ func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []
 	stopFn()
 }
 
-func dopplerGoRun(project, env, bin string, args []string, stopOnExit bool) func() {
+func dopplerGoRun(ctx context.Context, project, env, bin string, args []string, stopOnExit bool) func() {
 	allArgs := append(
 		[]string{
 			"run",
@@ -124,7 +125,7 @@ func dopplerGoRun(project, env, bin string, args []string, stopOnExit bool) func
 			"go", "run", bin,
 		}, args...)
 
-	doppler := exec.Command("doppler", allArgs...)
+	doppler := exec.CommandContext(ctx, "doppler", allArgs...)
 
 	doppler.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 

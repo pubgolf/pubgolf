@@ -21,7 +21,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Event started 45 mins ago, currently on stage 2 of 9.
-	row := sharedTestDB.QueryRow("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
+	row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
 	require.NoError(t, row.Err(), "seed DB: insert future event")
 
 	var eventID models.EventID
@@ -31,13 +31,13 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 
 	// Set up venues and stages.
 	for i := range 9 {
-		row := sharedTestDB.QueryRow("INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
+		row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
 		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
 
 		var venueID models.VenueID
 		require.NoError(t, row.Scan(&venueID), "scan returned venue ID")
 
-		row = sharedTestDB.QueryRow("INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30) RETURNING id", eventID, venueID, (i+1)*10)
+		row = sharedTestDB.QueryRowContext(ctx, "INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30) RETURNING id", eventID, venueID, (i+1)*10)
 		require.NoError(t, row.Err(), "seed DB: insert stage %d", i)
 
 		if i == 1 {
@@ -103,7 +103,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
 	require.NoError(t, err, "convert player ID")
 
-	row = sharedTestDB.QueryRow("INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
+	row = sharedTestDB.QueryRowContext(ctx, "INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
 	require.NoError(t, row.Err(), "insert auth token")
 
 	var playerToken models.AuthToken
@@ -252,7 +252,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 
 	// Event started 45 mins ago, currently on stage 2 of 9.
-	row := sharedTestDB.QueryRow("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
+	row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
 	require.NoError(t, row.Err(), "seed DB: insert future event")
 
 	var eventID models.EventID
@@ -263,13 +263,13 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Set up venues and stages.
 	for i := range 9 {
-		row := sharedTestDB.QueryRow("INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
+		row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
 		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
 
 		var venueID models.VenueID
 		require.NoError(t, row.Scan(&venueID), "scan returned venue ID")
 
-		_, err := sharedTestDB.Exec("INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30)", eventID, venueID, (i+1)*10)
+		_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30)", eventID, venueID, (i+1)*10)
 		require.NoError(t, err, "seed DB: insert stage %d", i)
 	}
 
@@ -290,7 +290,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
 	require.NoError(t, err, "convert player ID")
 
-	row = sharedTestDB.QueryRow("INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
+	row = sharedTestDB.QueryRowContext(ctx, "INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
 	require.NoError(t, row.Err(), "insert auth token")
 
 	var playerToken models.AuthToken
@@ -317,7 +317,7 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 
 	// Advance by one hole.
 
-	_, err = sharedTestDB.Exec("UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
+	_, err = sharedTestDB.ExecContext(ctx, "UPDATE events SET starts_at = NOW() + '-75 min' WHERE id = $1", eventID)
 	require.NoError(t, err, "seed DB: change event start time")
 
 	_, err = ac.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))

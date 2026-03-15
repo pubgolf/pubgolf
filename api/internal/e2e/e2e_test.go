@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -56,6 +57,7 @@ func TestMain(m *testing.M) {
 	dbURL, dbCleanupFn := dbtest.NewURL("pubgolf-e2e")
 
 	var err error
+
 	sharedTestDB, err = sql.Open("pgx", dbURL)
 	guard(err, "open DB connection")
 
@@ -96,7 +98,7 @@ func runAPIMigrator(dbURL string) {
 		}...)
 	}
 
-	migrator := exec.Command("doppler", args...)
+	migrator := exec.CommandContext(context.Background(), "doppler", args...)
 
 	migrator.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
 
@@ -134,7 +136,7 @@ func runAPIServer(dbURL string) func() {
 		}...)
 	}
 
-	server := exec.Command("doppler", args...)
+	server := exec.CommandContext(context.Background(), "doppler", args...)
 
 	server.Env = append(os.Environ(), "PUBGOLF_APP_DATABASE_URL="+dbURL)
 	server.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}

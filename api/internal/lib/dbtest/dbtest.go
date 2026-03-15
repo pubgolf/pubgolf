@@ -52,7 +52,7 @@ func createEmbeddedURL(namespace string, enableLogging bool) (string, func()) {
 
 	pgConfig := epg.DefaultConfig().
 		Version(epg.V16).
-		Port(uint32(port)).
+		Port(uint32(port)). //nolint:gosec // Port is validated above to be in [0, MaxUint32].
 		RuntimePath(tempDir)
 	if !enableLogging {
 		pgConfig = pgConfig.Logger(io.Discard)
@@ -81,13 +81,13 @@ func createSharedURL(namespace string) (string, func()) {
 
 	conn := stdlib.OpenDB(*cfg)
 	dbName := strings.ReplaceAll(namespacePrefix+namespace, "-", "_")
-	_, err = conn.Exec("CREATE DATABASE " + dbName)
+	_, err = conn.ExecContext(context.Background(), "CREATE DATABASE "+dbName)
 	guardSetup(err, "create shared DB "+dbName)
 
 	dbURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", url.Hostname(), url.Port(), url.User.Username(), pw, dbName)
 
 	return dbURL, func() {
-		_, err = conn.Exec(fmt.Sprintf("DROP DATABASE %s WITH (FORCE)", dbName))
+		_, err = conn.ExecContext(context.Background(), fmt.Sprintf("DROP DATABASE %s WITH (FORCE)", dbName))
 		guardSetup(err, "clean up shared DB "+dbName)
 	}
 }
@@ -162,6 +162,6 @@ func newTx(ctx context.Context, t *testing.T, db *sql.DB) (*sql.Tx, func()) {
 // guard logs and exits on error.
 func guardSetup(err error, msg string) {
 	if err != nil {
-		log.Panicf("%s: %v", msg, err.Error())
+		log.Panicf("%s: %v", msg, err.Error()) //nolint:gosec // Log injection is not a concern in test helpers.
 	}
 }

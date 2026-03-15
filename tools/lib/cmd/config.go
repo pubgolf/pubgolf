@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/url"
 	"os"
@@ -63,8 +64,8 @@ func (c *CLIConfig) setDefaults() {
 }
 
 // getDatabaseURL queries Doppler for DB connection details.
-func getDatabaseURL(driver DBDriver, project, env, prefix string, isMigrator bool) string {
-	vars := readDopplerVars(project, env, prefix, []string{
+func getDatabaseURL(ctx context.Context, driver DBDriver, project, env, prefix string, isMigrator bool) string {
+	vars := readDopplerVars(ctx, project, env, prefix, []string{
 		"SQLITE_PATH",
 		"DB_USER",
 		"DB_PASSWORD",
@@ -99,8 +100,8 @@ func getDatabaseURL(driver DBDriver, project, env, prefix string, isMigrator boo
 }
 
 // readDopplerVars queries the Doppler CLI for a requested set of computed env vars.
-func readDopplerVars(project, env, prefix string, vars []string) map[string]string {
-	doppler := exec.Command("doppler",
+func readDopplerVars(ctx context.Context, project, env, prefix string, vars []string) map[string]string {
+	doppler := exec.CommandContext(ctx, "doppler",
 		"secrets",
 		"--project", project,
 		"--config", env,
@@ -108,6 +109,7 @@ func readDopplerVars(project, env, prefix string, vars []string) map[string]stri
 	)
 
 	var dopplerContent bytes.Buffer
+
 	doppler.Stdout = &dopplerContent
 	doppler.Stderr = os.Stderr
 

@@ -27,10 +27,11 @@ func Test_ClientVersion(t *testing.T) {
 
 func Test_SignUpFlow(t *testing.T) {
 	testEventKey := "test-event-key-sign-up"
-	_, err := sharedTestDB.Exec("INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
+	ctx := t.Context()
+
+	_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", testEventKey)
 	require.NoError(t, err, "seed DB: insert future event")
 
-	ctx := t.Context()
 	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
 

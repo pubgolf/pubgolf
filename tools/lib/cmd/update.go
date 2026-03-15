@@ -16,13 +16,13 @@ func init() {
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Compiles the latest changes into the devctl binary",
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		curToolsHash, err := dirhash.HashDir("tools", "", dirhash.DefaultHash)
 		guard(err, "hash tools dir")
 
 		// TODO: include go.sum in generated hash.
 
-		compiler := exec.Command("go", //nolint:gosec // Input is not dynamically provided by end-user.
+		compiler := exec.CommandContext(cmd.Context(), "go", //nolint:gosec // Input is not dynamically provided by end-user.
 			"install",
 			"-ldflags", "-X main.toolsHash="+curToolsHash,
 			filepath.FromSlash("./tools/cmd/"+config.CLIName),

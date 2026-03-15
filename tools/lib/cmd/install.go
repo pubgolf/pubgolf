@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,12 +10,12 @@ import (
 )
 
 var goTools = map[string]string{
-	"migrate":        "github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0",
-	"sqlc":           "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0",
-	"mockery":        "github.com/vektra/mockery/v2@v2.42.2",
-	"ifacemaker":     "github.com/vburenin/ifacemaker@v1.2.1",
-	"enumer":         "github.com/dmarkham/enumer@v1.5.9",
-	"golangci-lint":  "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3",
+	"migrate":       "github.com/golang-migrate/migrate/v4/cmd/migrate@v4.17.0",
+	"sqlc":          "github.com/sqlc-dev/sqlc/cmd/sqlc@v1.24.0",
+	"mockery":       "github.com/vektra/mockery/v2@v2.42.2",
+	"ifacemaker":    "github.com/vburenin/ifacemaker@v1.2.1",
+	"enumer":        "github.com/dmarkham/enumer@v1.5.9",
+	"golangci-lint": "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3",
 }
 
 func init() {
@@ -50,8 +51,8 @@ func generateGoInstallers() []*cobra.Command {
 		cs = append(cs, &cobra.Command{
 			Use:   n,
 			Short: fmt.Sprintf("Install the %q CLI tool", n),
-			Run: func(_ *cobra.Command, _ []string) {
-				installWithGolang(v)
+			Run: func(cmd *cobra.Command, _ []string) {
+				installWithGolang(cmd.Context(), v)
 			},
 		})
 	}
@@ -62,29 +63,29 @@ func generateGoInstallers() []*cobra.Command {
 var installDopplerCmd = &cobra.Command{
 	Use:   "doppler",
 	Short: "Install the `doppler` CLI tool",
-	Run: func(_ *cobra.Command, _ []string) {
-		installWithHomebrew("gnupg")
-		installWithHomebrew("dopplerhq/cli/doppler")
+	Run: func(cmd *cobra.Command, _ []string) {
+		installWithHomebrew(cmd.Context(), "gnupg")
+		installWithHomebrew(cmd.Context(), "dopplerhq/cli/doppler")
 	},
 }
 
 var installBufCmd = &cobra.Command{
 	Use:   "buf",
 	Short: "Install the `buf` CLI tool",
-	Run: func(_ *cobra.Command, _ []string) {
-		installWithHomebrew("bufbuild/buf/buf")
+	Run: func(cmd *cobra.Command, _ []string) {
+		installWithHomebrew(cmd.Context(), "bufbuild/buf/buf")
 	},
 }
 
-func installWithGolang(pkg string) {
-	installer := exec.Command("go", "install", pkg)
+func installWithGolang(ctx context.Context, pkg string) {
+	installer := exec.CommandContext(ctx, "go", "install", pkg)
 	installer.Stdout = os.Stdout
 	installer.Stderr = os.Stderr
 	guard(installer.Run(), fmt.Sprintf("execute `go install ...` command for package '%s'", pkg))
 }
 
-func installWithHomebrew(pkg string) {
-	installer := exec.Command("brew", "install", pkg)
+func installWithHomebrew(ctx context.Context, pkg string) {
+	installer := exec.CommandContext(ctx, "brew", "install", pkg)
 	installer.Stdout = os.Stdout
 	installer.Stderr = os.Stderr
 	guard(installer.Run(), fmt.Sprintf("execute `brew install ...` command for package '%s'", pkg))

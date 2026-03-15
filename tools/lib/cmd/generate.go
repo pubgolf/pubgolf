@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -45,13 +46,15 @@ var generateProtoCmd = &cobra.Command{
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
-		guard(generateProto(), "execute `buf ...` command")
+		guard(generateProto(cmd.Context()), "execute `buf ...` command")
+
 		if !watchFlag {
 			return
 		}
 
 		go watch(filepath.FromSlash("proto/"), "Proto codegen", func(_ watcher.Event) {
-			if err := generateProto(); err != nil {
+			err := generateProto(context.Background())
+			if err != nil {
 				log.Printf("Encountered error while running 'Proto codegen' task. Waiting to re-run...")
 			}
 		})
@@ -60,8 +63,8 @@ var generateProtoCmd = &cobra.Command{
 	},
 }
 
-func generateProto() error {
-	buf := exec.Command("buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
+func generateProto(ctx context.Context) error {
+	buf := exec.CommandContext(ctx, "buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
 	buf.Stdout = os.Stdout
 	buf.Stderr = os.Stderr
 
@@ -80,13 +83,15 @@ var generateSQLcCmd = &cobra.Command{
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
-		guard(generateSQLc(), "execute `sqlc ...` command")
+		guard(generateSQLc(cmd.Context()), "execute `sqlc ...` command")
+
 		if !watchFlag {
 			return
 		}
 
 		go watch(filepath.FromSlash("api/internal/db/"), "SQLc codegen", func(_ watcher.Event) {
-			if err := generateSQLc(); err != nil {
+			err := generateSQLc(context.Background())
+			if err != nil {
 				log.Printf("Encountered error while running 'SQLc codegen' task. Waiting to re-run...")
 			}
 		})
@@ -95,8 +100,8 @@ var generateSQLcCmd = &cobra.Command{
 	},
 }
 
-func generateSQLc() error {
-	sqlc := exec.Command("sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
+func generateSQLc(ctx context.Context) error {
+	sqlc := exec.CommandContext(ctx, "sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
 	sqlc.Stdout = os.Stdout
 	sqlc.Stderr = os.Stderr
 
@@ -111,13 +116,13 @@ func generateSQLc() error {
 var generateEnumCmd = &cobra.Command{
 	Use:   "enum",
 	Short: "Generate enum stringers",
-	Run: func(_ *cobra.Command, _ []string) {
-		guard(generateEnum("ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
+	Run: func(cmd *cobra.Command, _ []string) {
+		guard(generateEnum(cmd.Context(), "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
 	},
 }
 
-func generateEnum(typ, pkg string) error {
-	enumer := exec.Command("enumer", "-sql", "-transform", "snake-upper", "-type", typ, pkg)
+func generateEnum(ctx context.Context, typ, pkg string) error {
+	enumer := exec.CommandContext(ctx, "enumer", "-sql", "-transform", "snake-upper", "-type", typ, pkg)
 	enumer.Stdout = os.Stdout
 	enumer.Stderr = os.Stderr
 
@@ -145,9 +150,9 @@ var generateMockCmd = &cobra.Command{
 var generateDBCMockCmd = &cobra.Command{
 	Use:   "dbc",
 	Short: "Generate DBC mock",
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateMock("Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
+			generateMock(cmd.Context(), "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
 			"generate mock DBC",
 		)
 	},
@@ -156,9 +161,9 @@ var generateDBCMockCmd = &cobra.Command{
 var generateDAOMockCmd = &cobra.Command{
 	Use:   "dao",
 	Short: "Generate DAO interface and mock",
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateInterfaceAndMock(mockConfig{
+			generateInterfaceAndMock(cmd.Context(), mockConfig{
 				targetStruct: "Queries",
 				ifaceName:    "QueryProvider",
 				ifaceComment: "QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.",
@@ -173,9 +178,9 @@ var generateDAOMockCmd = &cobra.Command{
 var generateSMSMockCmd = &cobra.Command{
 	Use:   "sms",
 	Short: "Generate SMS client interface and mock",
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateInterfaceAndMock(mockConfig{
+			generateInterfaceAndMock(cmd.Context(), mockConfig{
 				targetStruct: "Client",
 				ifaceName:    "Messenger",
 				ifaceComment: "Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.",
@@ -195,19 +200,21 @@ type mockConfig struct {
 	pkgName      string
 }
 
-func generateInterfaceAndMock(mc mockConfig) error {
-	if err := generateInterface(mc); err != nil {
+func generateInterfaceAndMock(ctx context.Context, mc mockConfig) error {
+	err := generateInterface(ctx, mc)
+	if err != nil {
 		return fmt.Errorf("generate interface: %w", err)
 	}
 
-	if err := generateMock(mc.ifaceName, mc.genDir); err != nil {
+	err = generateMock(ctx, mc.ifaceName, mc.genDir)
+	if err != nil {
 		return fmt.Errorf("generate mock: %w", err)
 	}
 
 	return nil
 }
 
-func generateInterface(mc mockConfig) error {
+func generateInterface(ctx context.Context, mc mockConfig) error {
 	args := []string{
 		"--struct", mc.targetStruct,
 		"--iface", mc.ifaceName,
@@ -241,20 +248,21 @@ func generateInterface(mc mockConfig) error {
 		args = append(args, "--file", filepath.Join(mc.genDir, f.Name()))
 	}
 
-	iface := exec.Command("ifacemaker", args...)
+	iface := exec.CommandContext(ctx, "ifacemaker", args...)
 
 	iface.Stdout = os.Stdout
 	iface.Stderr = os.Stderr
 
-	if err := iface.Run(); err != nil {
+	err = iface.Run()
+	if err != nil {
 		return fmt.Errorf("run interface generator command: %w", err)
 	}
 
 	return nil
 }
 
-func generateMock(ifaceName, genDir string) error {
-	mock := exec.Command("mockery",
+func generateMock(ctx context.Context, ifaceName, genDir string) error {
+	mock := exec.CommandContext(ctx, "mockery",
 		"--dir", genDir,
 		"--name", ifaceName,
 		"--filename", "gen_mock.go",
@@ -264,7 +272,8 @@ func generateMock(ifaceName, genDir string) error {
 	mock.Stdout = os.Stdout
 	mock.Stderr = os.Stderr
 
-	if err := mock.Run(); err != nil {
+	err := mock.Run()
+	if err != nil {
 		return fmt.Errorf("run mock generator command: %w", err)
 	}
 
