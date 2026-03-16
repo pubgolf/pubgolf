@@ -29,10 +29,26 @@ func parseDBCQueryAttributes(_ context.Context, method otelsql.Method, _ string,
 	}
 }
 
-// WrapDB returns an OTel-instrumented DB handle.
-func WrapDB(db driver.Connector) *sql.DB {
+// WrapDB wraps a database connector with OpenTelemetry instrumentation.
+// statsProvider is called on each span to attach live pool stats; pass nil to omit.
+func WrapDB(db driver.Connector, statsProvider func() sql.DBStats) *sql.DB {
 	return otelsql.OpenDB(db,
 		otelsql.WithSpanNameFormatter(parseDBCQueryName),
-		otelsql.WithAttributesGetter(parseDBCQueryAttributes),
+		otelsql.WithAttributesGetter(func(ctx context.Context, method otelsql.Method, query string, args []driver.NamedValue) []attribute.KeyValue {
+			attrs := parseDBCQueryAttributes(ctx, method, query, args)
+
+			if statsProvider != nil {
+				s := statsProvider()
+				attrs = append(attrs,
+					attribute.Int("db.pool.open", s.OpenConnections),
+					attribute.Int("db.pool.in_use", s.InUse),
+					attribute.Int("db.pool.idle", s.Idle),
+					attribute.Int64("db.pool.wait_count", s.WaitCount),
+					attribute.Int64("db.pool.wait_duration_ms", s.WaitDuration.Milliseconds()),
+				)
+			}
+
+			return attrs
+		}),
 	)
 }

@@ -124,14 +124,27 @@ func Migrate(conn *sql.DB, migrationDir string) {
 	guardSetup(migrator.Up(), "migrate test DB")
 }
 
-// MigrationDir returns the relative path to the migrations directory. Must be called directly from within the package being tested, since that's what sets the current working directory of the test process.
+// MigrationDir returns the absolute path to the migrations directory.
 func MigrationDir() string {
-	_, filename, _, _ := runtime.Caller(1)
-	testDir := filepath.Dir(filename)
-	parts := strings.Split(testDir, filepath.FromSlash("/pubgolf/api/"))
-	numDirs := strings.Count(parts[1], string(filepath.Separator))
+	_, filename, _, _ := runtime.Caller(0)
 
-	return filepath.FromSlash(strings.Repeat("../", numDirs) + "db/migrations")
+	dir := filepath.Dir(filename)
+
+	for range 20 { // bounded: prevents infinite walk in misconfigured environments
+		_, statErr := os.Stat(filepath.Join(dir, "go.mod"))
+		if statErr == nil {
+			return filepath.Join(dir, "api", "internal", "db", "migrations")
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+
+		dir = parent
+	}
+
+	panic("dbtest.MigrationDir: could not locate repo root (go.mod not found)")
 }
 
 // NewTestTx returns a context, transaction and cleanup function to isolate a test run into a rolled-back transaction.
