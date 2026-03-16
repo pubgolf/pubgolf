@@ -28,6 +28,7 @@ import (
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/pubgolf/pubgolf/api/internal/db"
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
@@ -98,7 +99,11 @@ func main() {
 	}()
 
 	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
-	server := makeServer(cfg, daoInstance, mes, dbConn)
+
+	bs, err := blobstore.New(cfg.BlobStore)
+	guard(err, "init blob store")
+
+	server := makeServer(cfg, daoInstance, mes, dbConn, bs)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -158,7 +163,7 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *sql.DB) *http.Server {
+func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *sql.DB, bs blobstore.BlobStore) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.ChiMiddleware(r)...)
 
@@ -175,11 +180,11 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *s
 		stdInterceptors, err := middleware.ConnectInterceptors()
 		guard(err, "construct interceptors")
 
-		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes),
+		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes, bs),
 			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAuthInterceptor(dao)),
 		))
-		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
+		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao, bs),
 			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAdminAuthInterceptor(cfg)),
 		))

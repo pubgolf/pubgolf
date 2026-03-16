@@ -234,7 +234,7 @@ func cleanDockerOrphans(ctx context.Context, activeSlugs map[string]bool, force 
 func cleanFilesystemOrphans(activeSlugs map[string]bool, force bool) bool {
 	found := false
 
-	for _, base := range []string{"data/postgres", "data/go-test-coverage"} {
+	for _, base := range []string{"data/postgres", "data/minio", "data/go-test-coverage"} {
 		pattern := filepath.Join(projectRoot, base+"-*")
 
 		matches, err := filepath.Glob(pattern)

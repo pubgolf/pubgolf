@@ -15,7 +15,7 @@ func init() {
 	runCmd.AddCommand(runAPIServerCmd)
 	runCmd.AddCommand(runAPIBgCmd)
 	runCmd.AddCommand(runAPIDatabaseCmd)
-	// runCmd.AddCommand(runAPIMinioCmd)
+	runCmd.AddCommand(runAPIMinioCmd)
 	runCmd.AddCommand(runWebCmd)
 	rootCmd.AddCommand(runCmd)
 
@@ -98,7 +98,7 @@ var runAPIBgCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
-			// "api-blob-storage",
+			"api-blob-storage",
 		))
 	},
 }
@@ -131,13 +131,13 @@ var runWebCmd = &cobra.Command{
 	},
 }
 
-// var runAPIMinioCmd = &cobra.Command{
-// 	Use:   "api-minio",
-// 	Short: "Run API server's blob storage (Minio) instance",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		dockerRun(runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-blob-storage")
-// 	},
-// }
+var runAPIMinioCmd = &cobra.Command{
+	Use:   "api-minio",
+	Short: "Run API server's blob storage (Minio) instance",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-blob-storage"))
+	},
+}
 
 func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg string, services ...string) error {
 	env, err := ep.Env(ctx, project, envCfg)
@@ -153,7 +153,9 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	env = append(env,
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
+		fmt.Sprintf("PUBGOLF_BLOB_STORE_PORT=%d", 9000+offset),
 		"PUBGOLF_DB_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/postgres")),
+		"PUBGOLF_BLOB_STORE_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/minio")),
 	)
 
 	projectName := worktreeDockerProject(ctx)
@@ -179,8 +181,8 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 
 	// Post-start reminder for worktree users.
 	if slug, _ := worktreeSlug(ctx); slug != "" {
-		log.Printf("Started services for worktree %q (DB: port %d).\n"+
-			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset)
+		log.Printf("Started services for worktree %q (DB: port %d, Minio: port %d).\n"+
+			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset, 9000+offset)
 	}
 
 	return nil

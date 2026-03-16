@@ -16,6 +16,7 @@ func init() {
 	generateMockCmd.AddCommand(generateDBCMockCmd)
 	generateMockCmd.AddCommand(generateDAOMockCmd)
 	generateMockCmd.AddCommand(generateSMSMockCmd)
+	generateMockCmd.AddCommand(generateBlobStoreMockCmd)
 	generateCmd.AddCommand(generateProtoCmd)
 	generateCmd.AddCommand(generateSQLcCmd)
 	generateCmd.AddCommand(generateEnumCmd)
@@ -145,20 +146,23 @@ func generateEnum(ctx context.Context, r Runner, typ, pkg string) error {
 
 var generateMockCmd = &cobra.Command{
 	Use:   "mock",
-	Short: "Generate IO clients' (DAO and SMS) interfaces and mocks",
+	Short: "Generate IO clients' (DAO, SMS, and blob store) interfaces and mocks",
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(generateAllMocks(cmd.Context(), runner))
 	},
 }
 
 func generateAllMocks(ctx context.Context, r Runner) error {
-	// DBC and SMS mocks can run in parallel.
+	// DBC, SMS, and blob store mocks can run in parallel.
 	err := runPar(ctx, r,
 		func(ctx context.Context, r Runner) error {
 			return generateMock(ctx, r, "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/"))
 		},
 		func(ctx context.Context, r Runner) error {
 			return generateInterfaceAndMock(ctx, r, smsConfig)
+		},
+		func(ctx context.Context, r Runner) error {
+			return generateInterfaceAndMock(ctx, r, blobStoreConfig)
 		},
 	)
 	if err != nil {
@@ -206,6 +210,22 @@ var generateSMSMockCmd = &cobra.Command{
 	Short: "Generate SMS client interface and mock",
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(generateInterfaceAndMock(cmd.Context(), runner, smsConfig))
+	},
+}
+
+var blobStoreConfig = mockConfig{
+	targetStruct: "Client",
+	ifaceName:    "BlobStore",
+	ifaceComment: "BlobStore describes all of the operations exposed by the blob storage client, to allow for testing mocks.",
+	genDir:       filepath.FromSlash("api/internal/lib/blobstore/"),
+	pkgName:      "blobstore",
+}
+
+var generateBlobStoreMockCmd = &cobra.Command{
+	Use:   "blobstore",
+	Short: "Generate blob store client interface and mock",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(generateInterfaceAndMock(cmd.Context(), runner, blobStoreConfig))
 	},
 }
 

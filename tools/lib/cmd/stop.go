@@ -92,7 +92,7 @@ func removeWorktreeData(ctx context.Context) error {
 		return fmtErr(err, "determine worktree slug")
 	}
 
-	for _, base := range []string{"data/postgres", "data/go-test-coverage"} {
+	for _, base := range []string{"data/postgres", "data/minio", "data/go-test-coverage"} {
 		dir := filepath.Join(projectRoot, dataDirForSlug(base, slug))
 
 		info, statErr := os.Stat(dir)
