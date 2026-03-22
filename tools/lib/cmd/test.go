@@ -186,7 +186,7 @@ func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
 
 	if stopOnExit {
 		go func() {
-			defer close(beginShutdown)
+			defer triggerShutdown()
 
 			err := tester.Wait()
 			if err != nil {

@@ -139,7 +139,7 @@ func dopplerGoRun(ctx context.Context, project, env, bin string, args []string, 
 	if stopOnExit {
 		go func() {
 			guard(doppler.Wait(), "wait on process")
-			close(beginShutdown)
+			triggerShutdown()
 		}()
 	}
 

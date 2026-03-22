@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,7 +15,7 @@ func init() {
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: fmt.Sprintf("Stop all background processes started with `%s run ...`", config.CLIName),
+	Short: "Stop all background processes started with `pubgolf-devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
 		dopplerDockerStop(cmd.Context(), config.ServerBinName, config.DopplerEnvName)
 	},
