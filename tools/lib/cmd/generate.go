@@ -28,13 +28,15 @@ func init() {
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Run all code generation sub-tasks",
-	Run: func(cmd *cobra.Command, args []string) {
-		runPar(cmd, args,
-			generateProtoCmd,
-			generateSQLcCmd,
-			generateEnumCmd,
-		)
-		generateMockCmd.Run(cmd, args)
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(runPar(cmd.Context(), runner,
+			generateProto,
+			generateSQLc,
+			func(ctx context.Context, r Runner) error {
+				return generateEnum(ctx, r, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models"))
+			},
+		))
+		classifyAndExit(generateAllMocks(cmd.Context(), runner))
 	},
 }
 
@@ -43,9 +45,9 @@ var generateProtoCmd = &cobra.Command{
 	Short: "Generate protobuf and gRPC code",
 	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
-		guard(err, "check '--watch' flag")
+		classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
-		guard(generateProto(cmd.Context(), runner), "execute `buf ...` command")
+		classifyAndExit(generateProto(cmd.Context(), runner))
 
 		if !watchFlag {
 			return
@@ -79,9 +81,9 @@ var generateSQLcCmd = &cobra.Command{
 	Short: "Generate SQLc queries and data holders",
 	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
-		guard(err, "check '--watch' flag")
+		classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
-		guard(generateSQLc(cmd.Context(), runner), "execute `sqlc ...` command")
+		classifyAndExit(generateSQLc(cmd.Context(), runner))
 
 		if !watchFlag {
 			return
@@ -114,7 +116,7 @@ var generateEnumCmd = &cobra.Command{
 	Use:   "enum",
 	Short: "Generate enum stringers",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(generateEnum(cmd.Context(), runner, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
+		classifyAndExit(generateEnum(cmd.Context(), runner, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")))
 	},
 }
 
@@ -133,24 +135,50 @@ func generateEnum(ctx context.Context, r Runner, typ, pkg string) error {
 var generateMockCmd = &cobra.Command{
 	Use:   "mock",
 	Short: "Generate IO clients' (DAO and SMS) interfaces and mocks",
-	Run: func(cmd *cobra.Command, args []string) {
-		runPar(cmd, args,
-			generateDBCMockCmd,
-			generateSMSMockCmd,
-		)
-		// generateDAOMockCmd must be called after generateDBCMockCmd.
-		generateDAOMockCmd.Run(cmd, args)
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(generateAllMocks(cmd.Context(), runner))
 	},
+}
+
+func generateAllMocks(ctx context.Context, r Runner) error {
+	// DBC and SMS mocks can run in parallel.
+	err := runPar(ctx, r,
+		func(ctx context.Context, r Runner) error {
+			return generateMock(ctx, r, "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/"))
+		},
+		func(ctx context.Context, r Runner) error {
+			return generateInterfaceAndMock(ctx, r, smsConfig)
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	// generateDAOMock must be called after generateDBCMock.
+	return generateInterfaceAndMock(ctx, r, daoConfig)
+}
+
+var daoConfig = mockConfig{
+	targetStruct: "Queries",
+	ifaceName:    "QueryProvider",
+	ifaceComment: "QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.",
+	genDir:       filepath.FromSlash("api/internal/lib/dao/"),
+	pkgName:      "dao",
+}
+
+var smsConfig = mockConfig{
+	targetStruct: "Client",
+	ifaceName:    "Messenger",
+	ifaceComment: "Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.",
+	genDir:       filepath.FromSlash("api/internal/lib/sms/"),
+	pkgName:      "sms",
 }
 
 var generateDBCMockCmd = &cobra.Command{
 	Use:   "dbc",
 	Short: "Generate DBC mock",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(
-			generateMock(cmd.Context(), runner, "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
-			"generate mock DBC",
-		)
+		classifyAndExit(generateMock(cmd.Context(), runner, "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")))
 	},
 }
 
@@ -158,16 +186,7 @@ var generateDAOMockCmd = &cobra.Command{
 	Use:   "dao",
 	Short: "Generate DAO interface and mock",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(
-			generateInterfaceAndMock(cmd.Context(), runner, mockConfig{
-				targetStruct: "Queries",
-				ifaceName:    "QueryProvider",
-				ifaceComment: "QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.",
-				genDir:       filepath.FromSlash("api/internal/lib/dao/"),
-				pkgName:      "dao",
-			}),
-			"generate mock DAO",
-		)
+		classifyAndExit(generateInterfaceAndMock(cmd.Context(), runner, daoConfig))
 	},
 }
 
@@ -175,16 +194,7 @@ var generateSMSMockCmd = &cobra.Command{
 	Use:   "sms",
 	Short: "Generate SMS client interface and mock",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(
-			generateInterfaceAndMock(cmd.Context(), runner, mockConfig{
-				targetStruct: "Client",
-				ifaceName:    "Messenger",
-				ifaceComment: "Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.",
-				genDir:       filepath.FromSlash("api/internal/lib/sms/"),
-				pkgName:      "sms",
-			}),
-			"generate mock SMS Client",
-		)
+		classifyAndExit(generateInterfaceAndMock(cmd.Context(), runner, smsConfig))
 	},
 }
 

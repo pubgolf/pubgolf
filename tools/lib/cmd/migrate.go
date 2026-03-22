@@ -47,14 +47,14 @@ var migrateUpCmd = &cobra.Command{
 		m := getMigrator(cmd.Context())
 
 		if len(args) < 1 {
-			guard(m.Up(), "run up migration")
+			classifyAndExit(fmtErr(m.Up(), "run up migration"))
 
 			return
 		}
 
 		steps, err := strconv.ParseInt(args[0], 10, 32)
-		guard(err, "parse number of migration steps")
-		guard(m.Steps(int(steps)), "run up migration")
+		classifyAndExit(fmtErr(err, "parse number of migration steps"))
+		classifyAndExit(fmtErr(m.Steps(int(steps)), "run up migration"))
 	},
 }
 
@@ -66,19 +66,19 @@ var migrateDownCmd = &cobra.Command{
 		m := getMigrator(cmd.Context())
 
 		if len(args) < 1 {
-			guard(m.Down(), "run up migration")
+			classifyAndExit(fmtErr(m.Down(), "run down migration"))
 
 			return
 		}
 
 		steps, err := strconv.ParseInt(args[0], 10, 32)
-		guard(err, "parse number of migration steps")
+		classifyAndExit(fmtErr(err, "parse number of migration steps"))
 
 		if steps > 0 {
 			steps = -steps
 		}
 
-		guard(m.Steps(int(steps)), "run up migration")
+		classifyAndExit(fmtErr(m.Steps(int(steps)), "run down migration"))
 	},
 }
 
@@ -87,18 +87,21 @@ var migrateCreateCmd = &cobra.Command{
 	Short: "Create new migration files",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		migrateCreate(cmd.Context(), runner, args[0])
+		classifyAndExit(migrateCreate(cmd.Context(), runner, args[0]))
 	},
 }
 
-func migrateCreate(ctx context.Context, r Runner, name string) {
+func migrateCreate(ctx context.Context, r Runner, name string) error {
 	var migratorContent bytes.Buffer
 
-	guard(r.Run(ctx, Cmd{
+	err := r.Run(ctx, Cmd{
 		Name:   "migrate",
 		Args:   []string{"create", "-seq", "-ext", "sql", "-dir", migrationDirectory, name},
 		Stderr: io.MultiWriter(os.Stderr, &migratorContent),
-	}), "execute `migrate ...` command")
+	})
+	if err != nil {
+		return fmtErr(err, "execute `migrate ...` command")
+	}
 
 	outLines := strings.Split(migratorContent.String(), "\n")
 	foundFiles := false
@@ -112,17 +115,23 @@ func migrateCreate(ctx context.Context, r Runner, name string) {
 		foundFiles = true
 
 		f, err := os.OpenFile(name, os.O_RDWR, 0o644)
-		guard(err, "open migration file to add boilerplate")
+		if err != nil {
+			return fmtErr(err, "open migration file to add boilerplate")
+		}
 
 		defer f.Close()
 
 		_, err = f.WriteString("BEGIN;\n\n-- Migration logic goes here...\n\nCOMMIT;\n")
-		guard(err, "write boilerplate to migration file")
+		if err != nil {
+			return fmtErr(err, "write boilerplate to migration file")
+		}
 	}
 
 	if !foundFiles {
 		log.Println("WARNING: no migration files found in migrate output")
 	}
+
+	return nil
 }
 
 var migrateFixCmd = &cobra.Command{
@@ -132,27 +141,27 @@ var migrateFixCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		dbURL := getDatabaseURL(cmd.Context(), envProvider, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
 		db, err := sql.Open(config.DBDriver.driverString(false), dbURL)
-		guard(err, "open DB connection")
+		classifyAndExit(fmtErr(err, "open DB connection"))
 
 		version, err := strconv.ParseInt(args[0], 10, 32)
-		guard(err, "parse desired version")
+		classifyAndExit(fmtErr(err, "parse desired version"))
 
 		if version < 1 {
 			_, err = db.Exec("DROP TABLE IF EXISTS schema_migrations;")
-			guard(err, "drop schema_migrations table")
+			classifyAndExit(fmtErr(err, "drop schema_migrations table"))
 
 			return
 		}
 
 		_, err = db.Exec("UPDATE schema_migrations SET version = $1, dirty = false;", version)
-		guard(err, "reset schema_migrations table")
+		classifyAndExit(fmtErr(err, "reset schema_migrations table"))
 	},
 }
 
 func getMigrator(ctx context.Context) *migrate.Migrate {
 	dbURL := getDatabaseURL(ctx, envProvider, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
 	m, err := migrate.New(migrationSource, dbURL)
-	guard(err, "construct DB migrator")
+	classifyAndExit(fmtErr(err, "construct DB migrator"))
 
 	return m
 }

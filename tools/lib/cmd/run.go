@@ -23,10 +23,12 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run all server executables",
 	Run: func(cmd *cobra.Command, args []string) {
-		runAPIBgCmd.Run(cmd, args)
-		runPar(cmd, args,
-			runAPIServerCmd,
-		)
+		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
+			"api-db",
+		))
+
+		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
+		watchableGoRun(cmd, runner, envProvider, config.ServerBinName, config.DopplerEnvName, binPath, args)
 	},
 }
 
@@ -43,10 +45,10 @@ var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
+		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			// "api-blob-storage",
-		), "execute `docker-compose up ...` command")
+		))
 	},
 }
 
@@ -54,8 +56,7 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-db"),
-			"execute `docker-compose up ...` command")
+		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-db"))
 	},
 }
 
@@ -96,7 +97,7 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 
 func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) {
 	watchFlag, err := cmd.Flags().GetBool("watch")
-	guard(err, "check '--watch' flag")
+	classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
 	// Start initial process
 	proc := startGoRun(cmd.Context(), r, ep, project, envCfg, bin, args)
@@ -126,7 +127,7 @@ func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCf
 
 func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) Process { //nolint:ireturn // Returns Process interface by design.
 	env, err := ep.Env(ctx, project, envCfg)
-	guard(err, "fetch go run environment")
+	classifyAndExit(fmtErr(err, "fetch go run environment"))
 
 	allArgs := append([]string{"run", bin}, args...)
 
@@ -137,7 +138,7 @@ func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, 
 		Args: allArgs,
 		Env:  env,
 	})
-	guard(startErr, "execute `go run ...` command")
+	classifyAndExit(fmtErr(startErr, "execute `go run ...` command"))
 
 	return proc
 }
