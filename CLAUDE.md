@@ -11,20 +11,24 @@ devctrl handles them: `sqlc`, `mockery`, `enumer`, `ifacemaker`, `migrate`, `go 
 The following tools require approval (prefer the devctrl equivalent):
 `buf`, `golangci-lint`, `go build`, `go mod`, `npm run`.
 
-| Task | Command | Status |
-|------|---------|--------|
-| Code gen (proto, SQL, mocks, enums) | `pubgolf-devctrl generate:*` | auto-approved |
-| DB migrations | `pubgolf-devctrl migrate:*` | auto-approved |
-| Run servers locally | `pubgolf-devctrl run:*` | auto-approved |
-| Run full test suite (with Doppler) | `pubgolf-devctrl test:*` | auto-approved |
-| Lint/check all packages | `pubgolf-devctrl check:go` | auto-approved |
-| Lint/check proto files | `pubgolf-devctrl check:proto` | auto-approved |
-| Check web app (lint + type-check) | `pubgolf-devctrl check:web` | auto-approved |
-| Install dev deps | `pubgolf-devctrl install:*` | auto-approved |
-| Stop servers | `pubgolf-devctrl stop:*` | auto-approved |
-| Update devctrl itself | `pubgolf-devctrl update:*` | requires approval |
+**Syntax**: devctrl uses space-separated subcommands — e.g. `pubgolf-devctrl check go`,
+NOT `pubgolf-devctrl check:go`. The colon notation in the table below (`check:*`) is
+shorthand for permission grouping, not the actual CLI syntax.
 
-**Single-package Go tests**: `pubgolf-devctrl test:*` always runs the full suite with
+| Task | Command (shorthand) | Status |
+|------|---------------------|--------|
+| Code gen (proto, SQL, mocks, enums) | `pubgolf-devctrl generate *` | auto-approved |
+| DB migrations | `pubgolf-devctrl migrate *` | auto-approved |
+| Run servers locally | `pubgolf-devctrl run *` | auto-approved |
+| Run full test suite (with Doppler) | `pubgolf-devctrl test [*]` | auto-approved |
+| Lint/check all packages | `pubgolf-devctrl check go` | auto-approved |
+| Lint/check proto files | `pubgolf-devctrl check proto` | auto-approved |
+| Check web app (lint + type-check) | `pubgolf-devctrl check web` | auto-approved |
+| Install dev deps | `pubgolf-devctrl install *` | auto-approved |
+| Stop servers | `pubgolf-devctrl stop *` | auto-approved |
+| Update devctrl itself | `pubgolf-devctrl update *` | requires approval |
+
+**Single-package Go tests**: `pubgolf-devctrl test` always runs the full suite with
 Doppler secrets. For iterating on a single package (no DB/secrets needed), use
 `go test ./api/internal/lib/your/pkg/...` directly — this is pre-approved.
 
@@ -58,8 +62,8 @@ use devctrl subcommands.
 
 ## Proto Workflow
 1. Edit `.proto` files
-2. `pubgolf-devctrl generate:proto` (regenerates all client libs)
-3. `pubgolf-devctrl check:proto` (runs buf lint + format diff)
+2. `pubgolf-devctrl generate proto` (regenerates all client libs)
+3. `pubgolf-devctrl check proto` (runs buf lint + format diff)
 4. Commit generated files
 
 Always run generate before check — check will fail on stale generated output.
@@ -70,13 +74,13 @@ Do not use "equivalent" alternatives — use the canonical command.
 
 | Change type | Verification command |
 |-------------|---------------------|
-| Go code changes | `pubgolf-devctrl check:go` then `go test ./affected/pkg/...` |
-| Proto file changes | `pubgolf-devctrl generate:proto` then `pubgolf-devctrl check:proto` |
-| Codegen-affecting changes | `pubgolf-devctrl generate:*` before running tests |
-| Web app changes | `pubgolf-devctrl check:web` |
+| Go code changes | `pubgolf-devctrl check go` then `go test ./affected/pkg/...` |
+| Proto file changes | `pubgolf-devctrl generate proto` then `pubgolf-devctrl check proto` |
+| Codegen-affecting changes | `pubgolf-devctrl generate *` before running tests |
+| Web app changes | `pubgolf-devctrl check web` |
 
 **Web verification is always pre-approved via devctrl.** Do not use `npm run check` or
-`npm run ci:lint` directly — `pubgolf-devctrl check:web` runs both automatically.
+`npm run ci:lint` directly — `pubgolf-devctrl check web` runs both automatically.
 
 ## Autonomous and Subagent Tasks
 When running as a subagent or background task, approval prompts cannot be fulfilled.
@@ -86,8 +90,8 @@ If a task requires `npm run *`, `go build`, `buf`, or other ask-gated commands,
 surface this as a limitation before starting — provide the commands for the user
 to run manually rather than blocking mid-task.
 
-`pubgolf-devctrl update:*` will trigger an approval prompt mid-task. Do not invoke it
-as part of an automated sequence.
+`pubgolf-devctrl update` will trigger an approval prompt mid-task. Do not invoke it
+as part of an automated sequence unless it is necessary specifically for tool development.
 
 ## Testing
 Go tests use [Testify](https://github.com/stretchr/testify). Use `require` for
