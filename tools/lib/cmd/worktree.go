@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"os"
@@ -11,6 +12,9 @@ import (
 	"strconv"
 	"strings"
 )
+
+// errEmptySlug is returned when a worktree directory name normalizes to an empty string.
+var errEmptySlug = errors.New("worktree directory normalizes to an empty slug")
 
 // worktreeSlug returns a normalized identifier for the current git worktree.
 // Returns ("", nil) for the main working tree, (slug, nil) for a worktree,
@@ -41,8 +45,13 @@ func worktreeSlug() (string, error) {
 	// If commonDir is not a prefix of topLevel, we're in a worktree.
 	if !strings.HasPrefix(commonDir, topLevel) {
 		raw := filepath.Base(topLevel)
+		slug := normalizeSlug(raw)
 
-		return normalizeSlug(raw), nil
+		if slug == "" {
+			return "", fmt.Errorf("%w: %q", errEmptySlug, raw)
+		}
+
+		return slug, nil
 	}
 
 	return "", nil

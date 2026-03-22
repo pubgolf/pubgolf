@@ -3,6 +3,9 @@ package cmd
 import (
 	"hash/fnv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNormalizeSlug(t *testing.T) {
@@ -33,10 +36,7 @@ func TestNormalizeSlug(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := normalizeSlug(tt.in)
-			if got != tt.want {
-				t.Errorf("normalizeSlug(%q) = %q, want %q", tt.in, got, tt.want)
-			}
+			assert.Equal(t, tt.want, normalizeSlug(tt.in))
 		})
 	}
 }
@@ -47,13 +47,8 @@ func TestNormalizeSlug_TruncationMaxLength(t *testing.T) {
 	got := normalizeSlug("issue-1234-some-very-long-description-of-the-bug")
 
 	// 20 chars + "-" + 6 hex chars = 27 max
-	if len(got) > 27 {
-		t.Errorf("normalizeSlug produced %d chars, want <= 27: %q", len(got), got)
-	}
-
-	if len(got) != 27 {
-		t.Errorf("normalizeSlug produced %d chars, want exactly 27 for truncated input: %q", len(got), got)
-	}
+	assert.LessOrEqual(t, len(got), 27, "slug should be at most 27 chars: %q", got)
+	assert.Len(t, got, 27, "truncated slug should be exactly 27 chars: %q", got)
 }
 
 func TestNormalizeSlug_TruncationDeterministic(t *testing.T) {
@@ -61,20 +56,15 @@ func TestNormalizeSlug_TruncationDeterministic(t *testing.T) {
 
 	input := "a-very-long-worktree-name-that-exceeds-the-limit"
 	first := normalizeSlug(input)
-
 	second := normalizeSlug(input)
-	if first != second {
-		t.Errorf("normalizeSlug is not deterministic: %q != %q", first, second)
-	}
+
+	assert.Equal(t, first, second, "normalizeSlug should be deterministic")
 }
 
 func TestPortOffsetForSlug_MainTree(t *testing.T) {
 	t.Parallel()
 
-	got := portOffsetForSlug("")
-	if got != 0 {
-		t.Errorf("portOffsetForSlug(\"\") = %d, want 0", got)
-	}
+	assert.Equal(t, 0, portOffsetForSlug(""))
 }
 
 func TestPortOffsetForSlug_Deterministic(t *testing.T) {
@@ -82,11 +72,9 @@ func TestPortOffsetForSlug_Deterministic(t *testing.T) {
 
 	slug := "fix-auth"
 	first := portOffsetForSlug(slug)
-
 	second := portOffsetForSlug(slug)
-	if first != second {
-		t.Errorf("portOffsetForSlug not deterministic: %d != %d", first, second)
-	}
+
+	assert.Equal(t, first, second, "portOffsetForSlug should be deterministic")
 }
 
 func TestPortOffsetForSlug_Range(t *testing.T) {
@@ -95,31 +83,24 @@ func TestPortOffsetForSlug_Range(t *testing.T) {
 	slugs := []string{"fix-auth", "add-leaderboard", "refactor-db", "test-worktree", "my-feature"}
 	for _, slug := range slugs {
 		got := portOffsetForSlug(slug)
-		if got < 1 || got > 500 {
-			t.Errorf("portOffsetForSlug(%q) = %d, want in [1, 500]", slug, got)
-		}
+		assert.GreaterOrEqual(t, got, 1, "portOffsetForSlug(%q) should be >= 1", slug)
+		assert.LessOrEqual(t, got, 500, "portOffsetForSlug(%q) should be <= 500", slug)
 	}
 }
 
 func TestPortOffsetForSlug_EnvOverride(t *testing.T) {
 	t.Setenv("PUBGOLF_PORT_OFFSET", "42")
 
-	got := portOffsetForSlug("any-slug")
-	if got != 42 {
-		t.Errorf("portOffsetForSlug with PUBGOLF_PORT_OFFSET=42 = %d, want 42", got)
-	}
+	assert.Equal(t, 42, portOffsetForSlug("any-slug"))
 }
 
 func TestPortOffsetForSlug_EnvOverrideInvalid(t *testing.T) {
 	slug := "fix-auth"
 
 	// Get the expected hash-based offset.
-	expected := func() int {
-		h := fnv.New32a()
-		h.Write([]byte(slug))
-
-		return int(h.Sum32()%500) + 1
-	}()
+	h := fnv.New32a()
+	h.Write([]byte(slug))
+	expected := int(h.Sum32()%500) + 1
 
 	tests := []struct {
 		name string
@@ -139,10 +120,7 @@ func TestPortOffsetForSlug_EnvOverrideInvalid(t *testing.T) {
 				t.Setenv("PUBGOLF_PORT_OFFSET", tt.val)
 			}
 
-			got := portOffsetForSlug(slug)
-			if got != expected {
-				t.Errorf("portOffsetForSlug(%q) with PUBGOLF_PORT_OFFSET=%q = %d, want %d", slug, tt.val, got, expected)
-			}
+			require.Equal(t, expected, portOffsetForSlug(slug))
 		})
 	}
 }
@@ -163,10 +141,7 @@ func TestDockerProjectForSlug(t *testing.T) {
 		t.Run(tt.slug, func(t *testing.T) {
 			t.Parallel()
 
-			got := dockerProjectForSlug(tt.slug)
-			if got != tt.want {
-				t.Errorf("dockerProjectForSlug(%q) = %q, want %q", tt.slug, got, tt.want)
-			}
+			assert.Equal(t, tt.want, dockerProjectForSlug(tt.slug))
 		})
 	}
 }
@@ -188,10 +163,7 @@ func TestDataDirForSlug(t *testing.T) {
 		t.Run(tt.base+"/"+tt.slug, func(t *testing.T) {
 			t.Parallel()
 
-			got := dataDirForSlug(tt.base, tt.slug)
-			if got != tt.want {
-				t.Errorf("dataDirForSlug(%q, %q) = %q, want %q", tt.base, tt.slug, got, tt.want)
-			}
+			assert.Equal(t, tt.want, dataDirForSlug(tt.base, tt.slug))
 		})
 	}
 }
