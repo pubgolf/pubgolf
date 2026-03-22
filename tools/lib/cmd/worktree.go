@@ -13,8 +13,13 @@ import (
 	"strings"
 )
 
-// errEmptySlug is returned when a worktree directory name normalizes to an empty string.
-var errEmptySlug = errors.New("worktree directory normalizes to an empty slug")
+var (
+	// errEmptySlug is returned when a worktree directory name normalizes to an empty string.
+	errEmptySlug = errors.New("worktree directory normalizes to an empty slug")
+
+	// errInvalidPortOffset is returned when PUBGOLF_PORT_OFFSET is set to an invalid value.
+	errInvalidPortOffset = errors.New("invalid PUBGOLF_PORT_OFFSET")
+)
 
 // worktreeSlug returns a normalized identifier for the current git worktree.
 // Returns ("", nil) for the main working tree, (slug, nil) for a worktree,
@@ -79,30 +84,40 @@ func normalizeSlug(raw string) string {
 }
 
 // portOffsetForSlug computes the port offset for a given slug.
-// Returns 0 for empty slug (main tree). For non-empty slugs, checks
+// Returns (0, nil) for empty slug (main tree). For non-empty slugs, checks
 // PUBGOLF_PORT_OFFSET env var first, then falls back to FNV-32a hash.
+// Returns errInvalidPortOffset if the env var is set but not a valid integer in [1, 499].
 // The offset is always in the range [1, 500].
-func portOffsetForSlug(slug string) int {
+func portOffsetForSlug(slug string) (int, error) {
 	if slug == "" {
-		return 0
+		return 0, nil
 	}
 
 	if v := os.Getenv("PUBGOLF_PORT_OFFSET"); v != "" {
 		offset, err := strconv.Atoi(v)
-		if err == nil && offset > 0 && offset < 500 {
-			return offset
+		if err != nil {
+			return 0, fmt.Errorf("%w: %q is not a valid integer", errInvalidPortOffset, v)
 		}
+
+		if offset < 1 || offset > 499 {
+			return 0, fmt.Errorf("%w: %d is not in range [1, 499]", errInvalidPortOffset, offset)
+		}
+
+		return offset, nil
 	}
 
 	h := fnv.New32a()
 	h.Write([]byte(slug))
 
-	return int(h.Sum32()%500) + 1
+	return int(h.Sum32()%500) + 1, nil
 }
 
 // worktreePortOffset returns the port offset for the current worktree.
-func worktreePortOffset() int {
-	slug, _ := worktreeSlug()
+func worktreePortOffset() (int, error) {
+	slug, err := worktreeSlug()
+	if err != nil {
+		return 0, err
+	}
 
 	return portOffsetForSlug(slug)
 }

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"hash/fnv"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -64,44 +64,62 @@ func TestNormalizeSlug_TruncationDeterministic(t *testing.T) {
 func TestPortOffsetForSlug_MainTree(t *testing.T) {
 	t.Parallel()
 
-	assert.Equal(t, 0, portOffsetForSlug(""))
+	got, err := portOffsetForSlug("")
+	require.NoError(t, err)
+	assert.Equal(t, 0, got)
 }
 
 func TestPortOffsetForSlug_Deterministic(t *testing.T) {
 	t.Parallel()
 
 	slug := "fix-auth"
-	first := portOffsetForSlug(slug)
-	second := portOffsetForSlug(slug)
+	first, err := portOffsetForSlug(slug)
+	require.NoError(t, err)
+
+	second, err := portOffsetForSlug(slug)
+	require.NoError(t, err)
 
 	assert.Equal(t, first, second, "portOffsetForSlug should be deterministic")
 }
 
-func TestPortOffsetForSlug_Range(t *testing.T) {
-	t.Parallel()
+func FuzzPortOffsetForSlug_Range(f *testing.F) {
+	f.Add("fix-auth")
+	f.Add("add-leaderboard")
+	f.Add("x")
+	f.Add("a-very-long-worktree-name")
 
-	slugs := []string{"fix-auth", "add-leaderboard", "refactor-db", "test-worktree", "my-feature"}
-	for _, slug := range slugs {
-		got := portOffsetForSlug(slug)
+	f.Fuzz(func(t *testing.T, slug string) {
+		if slug == "" {
+			t.Skip("empty slug returns 0, not in [1, 500]")
+		}
+
+		got, err := portOffsetForSlug(slug)
+		require.NoError(t, err)
 		assert.GreaterOrEqual(t, got, 1, "portOffsetForSlug(%q) should be >= 1", slug)
 		assert.LessOrEqual(t, got, 500, "portOffsetForSlug(%q) should be <= 500", slug)
-	}
+	})
 }
 
-func TestPortOffsetForSlug_EnvOverride(t *testing.T) {
-	t.Setenv("PUBGOLF_PORT_OFFSET", "42")
+func FuzzPortOffsetForSlug_EnvOverride(f *testing.F) {
+	f.Add(1)
+	f.Add(42)
+	f.Add(499)
+	f.Add(250)
 
-	assert.Equal(t, 42, portOffsetForSlug("any-slug"))
+	f.Fuzz(func(t *testing.T, offset int) {
+		if offset < 1 || offset > 499 {
+			t.Skip("out of valid range")
+		}
+
+		t.Setenv("PUBGOLF_PORT_OFFSET", strconv.Itoa(offset))
+
+		got, err := portOffsetForSlug("any-slug")
+		require.NoError(t, err)
+		assert.Equal(t, offset, got)
+	})
 }
 
 func TestPortOffsetForSlug_EnvOverrideInvalid(t *testing.T) {
-	slug := "fix-auth"
-
-	// Get the expected hash-based offset.
-	h := fnv.New32a()
-	h.Write([]byte(slug))
-	expected := int(h.Sum32()%500) + 1
-
 	tests := []struct {
 		name string
 		val  string
@@ -111,16 +129,14 @@ func TestPortOffsetForSlug_EnvOverrideInvalid(t *testing.T) {
 		{name: "too high", val: "500"},
 		{name: "way too high", val: "1000"},
 		{name: "not a number", val: "abc"},
-		{name: "empty", val: ""},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.val != "" {
-				t.Setenv("PUBGOLF_PORT_OFFSET", tt.val)
-			}
+			t.Setenv("PUBGOLF_PORT_OFFSET", tt.val)
 
-			require.Equal(t, expected, portOffsetForSlug(slug))
+			_, err := portOffsetForSlug("fix-auth")
+			require.ErrorIs(t, err, errInvalidPortOffset)
 		})
 	}
 }
