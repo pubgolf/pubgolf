@@ -19,10 +19,15 @@ type QueryProvider interface {
 	AdjustmentsByPlayerStage(ctx context.Context, playerID models.PlayerID, stageID models.StageID) ([]models.Adjustment, error)
 	// AllVenues returns venue info for the venue key and event id.
 	AllVenues(ctx context.Context) ([]models.Venue, error)
+	// ClaimIdempotencyKey attempts to claim an idempotency key for the given scope.
+	// Returns true if the key was newly claimed, false if it was already claimed.
+	ClaimIdempotencyKey(ctx context.Context, key string, scope string) (bool, error)
 	// CreateAdjustmentTemplate sets the properties for a new adjustment template. If the StageID is not set, the provided eventID will be linked to make the adjustment template apply to all stages.
 	CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)
 	// CreatePlayer creates a new player.
 	CreatePlayer(ctx context.Context, name string, phoneNum models.PhoneNum) (models.Player, error)
+	// Close releases any prepared statements held by the DAO.
+	Close() error
 	// DeletePlayer hard deletes all data related to the given player ID.
 	DeletePlayer(ctx context.Context, playerID models.PlayerID) error
 	// DeleteScore creates score and adjustment records for a given stage.
