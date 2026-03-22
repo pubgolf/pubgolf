@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,6 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+// errMissingTools is returned when doctor finds tools that are not installed.
+var errMissingTools = errors.New("missing tools")
 
 func init() {
 	rootCmd.AddCommand(doctorCmd)
@@ -143,7 +147,7 @@ func runDoctorChecks(ctx context.Context) error {
 	fmt.Fprintf(w, "  %-16s %-18s %s\n", "Project root:", projectRoot, "\u2713")
 
 	if len(missing) > 0 {
-		return fmt.Errorf("missing tools: %s", strings.Join(missing, ", "))
+		return fmt.Errorf("%w: %s", errMissingTools, strings.Join(missing, ", "))
 	}
 
 	return nil

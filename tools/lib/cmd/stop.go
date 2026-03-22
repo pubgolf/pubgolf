@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -78,11 +79,7 @@ func stopAllWorktrees(ctx context.Context, r Runner) error {
 		}
 	}
 
-	if len(stopErrors) > 0 {
-		return fmt.Errorf("some projects failed to stop: %v", stopErrors)
-	}
-
-	return nil
+	return errors.Join(stopErrors...)
 }
 
 // removeWorktreeData removes this worktree's data directories.
