@@ -135,7 +135,7 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process {
+func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
 	env, err := ep.Env(ctx, config.ServerBinName, "test")
 	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
 
