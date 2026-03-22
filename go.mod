@@ -32,6 +32,7 @@ require (
 	go.opentelemetry.io/contrib/processors/baggagecopy v0.15.0
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
+	go.uber.org/goleak v1.3.0
 	golang.org/x/mod v0.34.0
 	golang.org/x/net v0.52.0
 	google.golang.org/protobuf v1.36.11

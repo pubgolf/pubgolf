@@ -2,11 +2,13 @@ package dao
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
@@ -34,16 +36,27 @@ func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 
 func TestMain(m *testing.M) {
 	testguard.UnitTest()
-	os.Exit(executeTests(m))
-}
 
-func executeTests(m *testing.M) int {
 	_sharedDB, _sharedDBCleanup = dbtest.NewConn("dao")
-	defer _sharedDBCleanup()
-
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
 
-	return m.Run()
+	code := m.Run()
+
+	_sharedDBCleanup()
+
+	// Check for leaks after cleanup
+	if code == 0 {
+		err := goleak.Find(
+			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
+			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "goleak: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	os.Exit(code)
 }
 
 func Test_txQuerier(t *testing.T) {
