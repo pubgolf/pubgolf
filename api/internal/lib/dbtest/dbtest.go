@@ -80,7 +80,7 @@ func createSharedURL(namespace string) (string, func()) {
 	guardSetup(err, "prase test DB config")
 
 	conn := stdlib.OpenDB(*cfg)
-	dbName := strings.ReplaceAll(namespacePrefix+namespace, "-", "_")
+	dbName := sharedDBName(namespace)
 	_, err = conn.ExecContext(context.Background(), "CREATE DATABASE "+dbName)
 	guardSetup(err, "create shared DB "+dbName)
 
@@ -90,6 +90,17 @@ func createSharedURL(namespace string) (string, func()) {
 		_, err = conn.ExecContext(context.Background(), fmt.Sprintf("DROP DATABASE %s WITH (FORCE)", dbName))
 		guardSetup(err, "clean up shared DB "+dbName)
 	}
+}
+
+// sharedDBName returns the database name for shared-postgres mode,
+// including a worktree slug suffix when PUBGOLF_WORKTREE_SLUG is set.
+func sharedDBName(namespace string) string {
+	base := strings.ReplaceAll(namespacePrefix+namespace, "-", "_")
+	if slug := os.Getenv("PUBGOLF_WORKTREE_SLUG"); slug != "" {
+		base += "_" + strings.ReplaceAll(slug, "-", "_")
+	}
+
+	return base
 }
 
 // NewURL returns a URL for an empty, ephemeral database, as well as a cleanup function. Namespace must be a unique identifier for the instance.

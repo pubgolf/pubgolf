@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -74,9 +75,23 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 		return fmtErr(err, "fetch docker-compose environment")
 	}
 
+	offset, offsetErr := worktreePortOffset(ctx)
+	if offsetErr != nil {
+		return fmtErr(offsetErr, "compute port offset")
+	}
+
+	env = append(env,
+		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
+		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
+		"PUBGOLF_DB_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/postgres")),
+	)
+
+	projectName := worktreeDockerProject(ctx)
+
 	args := []string{
 		"compose",
 		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
+		"--project-name", projectName,
 		"up",
 		"--detach",
 		"--",
@@ -90,6 +105,12 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	})
 	if runErr != nil {
 		return fmtErr(runErr, "run docker-compose up cmd")
+	}
+
+	// Post-start reminder for worktree users.
+	if slug, _ := worktreeSlug(ctx); slug != "" {
+		log.Printf("Started services for worktree %q (DB: port %d).\n"+
+			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset)
 	}
 
 	return nil
@@ -125,9 +146,18 @@ func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCf
 	proc.Stop()
 }
 
-func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) Process { //nolint:ireturn // Returns Process interface by design.
+//nolint:ireturn // Returns Process interface by design.
+func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) Process {
 	env, err := ep.Env(ctx, project, envCfg)
 	classifyAndExit(fmtErr(err, "fetch go run environment"))
+
+	offset, offsetErr := worktreePortOffset(ctx)
+	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+
+	env = append(env,
+		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
+		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
+	)
 
 	allArgs := append([]string{"run", bin}, args...)
 

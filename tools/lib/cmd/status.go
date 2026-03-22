@@ -32,7 +32,7 @@ var statusCmd = &cobra.Command{
 }
 
 func printCurrentStatus(ctx context.Context) error {
-	slug, err := worktreeSlug() //nolint:contextcheck // worktreeSlug uses background context internally.
+	slug, err := worktreeSlug(ctx)
 	if err != nil {
 		return fmtErr(err, "determine worktree slug")
 	}

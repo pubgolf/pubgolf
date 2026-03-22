@@ -31,18 +31,21 @@ var stopCmd = &cobra.Command{
 		}
 
 		if removeDataFlag {
-			classifyAndExit(removeWorktreeData())
+			classifyAndExit(removeWorktreeData(cmd.Context()))
 		}
 	},
 }
 
 func dockerStop(ctx context.Context, r Runner) error {
+	projectName := worktreeDockerProject(ctx)
+
 	// docker compose down doesn't need secrets; run without env injection.
 	err := r.Run(ctx, Cmd{
 		Name: "docker",
 		Args: []string{
 			"compose",
 			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
+			"--project-name", projectName,
 			"down",
 		},
 	})
@@ -83,8 +86,8 @@ func stopAllWorktrees(ctx context.Context, r Runner) error {
 }
 
 // removeWorktreeData removes this worktree's data directories.
-func removeWorktreeData() error {
-	slug, err := worktreeSlug()
+func removeWorktreeData(ctx context.Context) error {
+	slug, err := worktreeSlug(ctx)
 	if err != nil {
 		return fmtErr(err, "determine worktree slug")
 	}

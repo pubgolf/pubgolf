@@ -2,10 +2,17 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
+	"net"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -26,7 +33,7 @@ var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run all automated unit/integration tests",
 	Run: func(cmd *cobra.Command, _ []string) {
-		coverageDir := filepath.FromSlash("./data/go-test-coverage")
+		coverageDir := filepath.Join(projectRoot, worktreeDataDir(cmd.Context(), "data/go-test-coverage"))
 		coverageFile := filepath.Join(coverageDir, "api.cover")
 
 		coverageFlag, err := cmd.Flags().GetBool("coverage")
@@ -40,6 +47,26 @@ var testCmd = &cobra.Command{
 
 		env, envErr := envProvider.Env(cmd.Context(), config.ServerBinName, "test")
 		classifyAndExit(fmtErr(envErr, "fetch test environment"))
+
+		// Inject worktree isolation env vars.
+		slug, slugErr := worktreeSlug(cmd.Context())
+		classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+
+		if slug != "" {
+			env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+		}
+
+		offset, offsetErr := worktreePortOffset(cmd.Context())
+		classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+
+		if localFlag && offset > 0 {
+			env = replaceSharedDBPort(env, offset)
+		}
+
+		// Pre-flight infrastructure check for shared-postgres mode.
+		if localFlag {
+			classifyAndExit(preflight(cmd.Context(), offset))
+		}
 
 		args := []string{"test", filepath.FromSlash("./api/...")}
 
@@ -112,6 +139,21 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 	env, err := ep.Env(ctx, config.ServerBinName, "test")
 	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
 
+	// Inject worktree isolation env vars.
+	slug, slugErr := worktreeSlug(ctx)
+	classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+
+	if slug != "" {
+		env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+	}
+
+	offset, offsetErr := worktreePortOffset(ctx)
+	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+
+	if localOnly && offset > 0 {
+		env = replaceSharedDBPort(env, offset)
+	}
+
 	args := []string{
 		"test",
 		filepath.FromSlash("./api/internal/e2e"),
@@ -158,4 +200,52 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 	}
 
 	return proc
+}
+
+// errDBNotRunning is returned when the pre-flight health check cannot reach the database.
+var errDBNotRunning = errors.New("DB container is not reachable")
+
+// preflight checks that the database container is reachable before running tests.
+func preflight(ctx context.Context, offset int) error {
+	dbPort := 5432 + offset
+
+	dialer := &net.Dialer{Timeout: 2 * time.Second}
+
+	conn, err := dialer.DialContext(ctx, "tcp", fmt.Sprintf("localhost:%d", dbPort))
+	if err != nil {
+		return fmt.Errorf("%w on port %d.\n"+
+			"  Run 'pubgolf-devctrl run bg' to start it.\n"+
+			"  This is an infrastructure issue, not a code problem", errDBNotRunning, dbPort)
+	}
+
+	conn.Close()
+
+	return nil
+}
+
+// replaceSharedDBPort finds PUBGOLF_SHARED_DB_URL in the env slice, parses it,
+// replaces the port with the offset port, and returns the updated env slice.
+// If the variable is not present or cannot be parsed, the slice is returned unchanged.
+func replaceSharedDBPort(env []string, offset int) []string {
+	const key = "PUBGOLF_SHARED_DB_URL="
+
+	for i, v := range env {
+		if !strings.HasPrefix(v, key) {
+			continue
+		}
+
+		raw := strings.TrimPrefix(v, key)
+
+		u, err := url.Parse(raw)
+		if err != nil {
+			return env
+		}
+
+		u.Host = net.JoinHostPort(u.Hostname(), strconv.Itoa(5432+offset))
+		env[i] = key + u.String()
+
+		return env
+	}
+
+	return env
 }

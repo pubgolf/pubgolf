@@ -30,12 +30,25 @@ var checkGoCmd = &cobra.Command{
 }
 
 func checkGo(ctx context.Context, r Runner) error {
-	err := r.Run(ctx, Cmd{
-		Name: "golangci-lint",
-		Args: []string{"run", "./api/...", "./tools/..."},
-	})
-	if err != nil {
-		return fmtErr(err, "run golangci-lint cmd")
+	// Lint each directory separately to match CI and avoid golangci-lint
+	// cross-directory analysis bugs (e.g. ireturn off-by-one).
+	// Cache is cleared between runs to prevent stale analysis state.
+	for _, dir := range []string{"./api/...", "./tools/..."} {
+		err := r.Run(ctx, Cmd{
+			Name: "golangci-lint",
+			Args: []string{"cache", "clean"},
+		})
+		if err != nil {
+			return fmtErr(err, "clean golangci-lint cache")
+		}
+
+		err = r.Run(ctx, Cmd{
+			Name: "golangci-lint",
+			Args: []string{"run", dir},
+		})
+		if err != nil {
+			return fmtErr(err, "run golangci-lint cmd")
+		}
 	}
 
 	return nil
