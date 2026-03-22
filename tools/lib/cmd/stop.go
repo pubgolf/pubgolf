@@ -2,12 +2,17 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	stopCmd.Flags().Bool("all", false, "Stop services across all worktree projects")
+	stopCmd.Flags().Bool("remove-data", false, "Remove this worktree's data directories after stopping")
 	rootCmd.AddCommand(stopCmd)
 }
 
@@ -15,7 +20,18 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop all background processes started with `devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
-		classifyAndExit(dockerStop(cmd.Context(), runner))
+		allFlag, _ := cmd.Flags().GetBool("all")
+		removeDataFlag, _ := cmd.Flags().GetBool("remove-data")
+
+		if allFlag {
+			classifyAndExit(stopAllWorktrees(cmd.Context(), runner))
+		} else {
+			classifyAndExit(dockerStop(cmd.Context(), runner))
+		}
+
+		if removeDataFlag {
+			classifyAndExit(removeWorktreeData())
+		}
 	},
 }
 
@@ -31,6 +47,69 @@ func dockerStop(ctx context.Context, r Runner) error {
 	})
 	if err != nil {
 		return fmtErr(err, "run docker-compose down cmd")
+	}
+
+	return nil
+}
+
+// stopAllWorktrees stops Docker services for every known worktree project.
+func stopAllWorktrees(ctx context.Context, r Runner) error {
+	worktrees, err := listWorktrees(ctx)
+	if err != nil {
+		return fmtErr(err, "list worktrees")
+	}
+
+	var stopErrors []error
+
+	for _, wt := range worktrees {
+		project := dockerProjectForSlug(wt.slug)
+		log.Printf("Stopping project %s...", project)
+
+		stopErr := r.Run(ctx, Cmd{
+			Name: "docker",
+			Args: []string{
+				"compose",
+				"--project-name", project,
+				"down",
+			},
+		})
+		if stopErr != nil {
+			stopErrors = append(stopErrors, fmt.Errorf("stop %s: %w", project, stopErr))
+		}
+	}
+
+	if len(stopErrors) > 0 {
+		return fmt.Errorf("some projects failed to stop: %v", stopErrors)
+	}
+
+	return nil
+}
+
+// removeWorktreeData removes this worktree's data directories.
+func removeWorktreeData() error {
+	slug, err := worktreeSlug()
+	if err != nil {
+		return fmtErr(err, "determine worktree slug")
+	}
+
+	for _, base := range []string{"data/postgres", "data/go-test-coverage"} {
+		dir := filepath.Join(projectRoot, dataDirForSlug(base, slug))
+
+		info, statErr := os.Stat(dir)
+		if statErr != nil {
+			continue // Doesn't exist, nothing to do.
+		}
+
+		if !info.IsDir() {
+			continue
+		}
+
+		log.Printf("Removing %s...", dir)
+
+		rmErr := os.RemoveAll(dir)
+		if rmErr != nil {
+			return fmtErr(rmErr, "remove "+dir)
+		}
 	}
 
 	return nil
