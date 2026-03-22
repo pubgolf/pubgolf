@@ -97,25 +97,32 @@ func watchableDopplerGoRun(cmd *cobra.Command, r Runner, project, env, bin strin
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	proc := dopplerGoRun(cmd.Context(), r, project, env, bin, args, !watchFlag)
+	proc := startDopplerGoRun(cmd.Context(), r, project, env, bin, args)
 
-	// Launch watcher, if applicable.
-	if watchFlag {
-		go func() {
-			watch("api", "restart API server", func(_ watcher.Event) {
-				// Stop the old process and keep track of the new one.
-				proc.Stop()
-				proc = dopplerGoRun(context.Background(), r, project, env, bin, args, false)
-			})
-		}()
+	if !watchFlag {
+		// Wait for process to exit, then shut down.
+		waitErr := proc.Wait()
+		if waitErr != nil {
+			log.Printf("process exited with error: %v", waitErr)
+		}
+
+		return
 	}
 
-	// Hold process open
+	// Launch watcher to restart the process on file changes.
+	go func() {
+		watch("api", "restart API server", func(_ watcher.Event) {
+			proc.Stop()
+			proc = startDopplerGoRun(context.Background(), r, project, env, bin, args)
+		})
+	}()
+
+	// Hold process open until shutdown signal.
 	<-shuttingDown
 	proc.Stop()
 }
 
-func dopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args []string, stopOnExit bool) Process { //nolint:ireturn // Returns Process interface by design.
+func startDopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args []string) Process { //nolint:ireturn // Returns Process interface by design.
 	allArgs := append(
 		[]string{
 			"run",
@@ -132,17 +139,6 @@ func dopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args 
 		Args: allArgs,
 	})
 	guard(err, "execute `go run ...` command")
-
-	if stopOnExit {
-		go func() {
-			waitErr := proc.Wait()
-			if waitErr != nil {
-				log.Printf("process exited with error: %v", waitErr)
-			}
-
-			triggerShutdown()
-		}()
-	}
 
 	return proc
 }
