@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/radovskyb/watcher"
@@ -24,15 +27,12 @@ func init() {
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
 	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output")
 	testCmd.PersistentFlags().Bool("local", false, "Run tests in a mode that disables external network dependencies")
-	testCmd.PersistentFlags().Int("port-offset", 0, "Override the port offset for this worktree (sets PUBGOLF_PORT_OFFSET)")
 }
 
 var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run all automated unit/integration tests",
 	Run: func(cmd *cobra.Command, _ []string) {
-		applyPortOffsetFlag(cmd)
-
 		coverageDir := filepath.Join(projectRoot, worktreeDataDir(cmd.Context(), "data/go-test-coverage"))
 		coverageFile := filepath.Join(coverageDir, "api.cover")
 
@@ -60,9 +60,7 @@ var testCmd = &cobra.Command{
 		classifyAndExit(fmtErr(offsetErr, "compute port offset"))
 
 		if localFlag && offset > 0 {
-			sharedURL := fmt.Sprintf("postgres://pubgolf_dev:pubgolf_dev@localhost:%d/pubgolf_dev?sslmode=disable",
-				5432+offset)
-			env = append(env, "PUBGOLF_SHARED_DB_URL="+sharedURL)
+			env = replaceSharedDBPort(env, offset)
 		}
 
 		// Pre-flight infrastructure check for shared-postgres mode.
@@ -137,8 +135,8 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process {
-	env, err := ep.Env(ctx, config.ServerBinName, "test")
+func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
+	env, err := ep.Env(ctx, config.ServerBinName, "test") //nolint:ireturn // False positive: linter reports ireturn on body line.
 	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
 
 	// Inject worktree isolation env vars.
@@ -153,9 +151,7 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
 
 	if localOnly && offset > 0 {
-		sharedURL := fmt.Sprintf("postgres://pubgolf_dev:pubgolf_dev@localhost:%d/pubgolf_dev?sslmode=disable",
-			5432+offset)
-		env = append(env, "PUBGOLF_SHARED_DB_URL="+sharedURL)
+		env = replaceSharedDBPort(env, offset)
 	}
 
 	args := []string{
@@ -225,4 +221,31 @@ func preflight(ctx context.Context, offset int) error {
 	conn.Close()
 
 	return nil
+}
+
+// replaceSharedDBPort finds PUBGOLF_SHARED_DB_URL in the env slice, parses it,
+// replaces the port with the offset port, and returns the updated env slice.
+// If the variable is not present or cannot be parsed, the slice is returned unchanged.
+func replaceSharedDBPort(env []string, offset int) []string {
+	const key = "PUBGOLF_SHARED_DB_URL="
+
+	for i, v := range env {
+		if !strings.HasPrefix(v, key) {
+			continue
+		}
+
+		raw := strings.TrimPrefix(v, key)
+
+		u, err := url.Parse(raw)
+		if err != nil {
+			return env
+		}
+
+		u.Host = net.JoinHostPort(u.Hostname(), strconv.Itoa(5432+offset))
+		env[i] = key + u.String()
+
+		return env
+	}
+
+	return env
 }

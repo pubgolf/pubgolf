@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -20,14 +18,12 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 
 	runAPIServerCmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically restart the server.")
-	runCmd.PersistentFlags().Int("port-offset", 0, "Override the port offset for this worktree (sets PUBGOLF_PORT_OFFSET)")
 }
 
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run all server executables",
 	Run: func(cmd *cobra.Command, args []string) {
-		applyPortOffsetFlag(cmd)
 		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 		))
@@ -175,15 +171,4 @@ func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, 
 	classifyAndExit(fmtErr(startErr, "execute `go run ...` command"))
 
 	return proc
-}
-
-// applyPortOffsetFlag reads the --port-offset flag and sets PUBGOLF_PORT_OFFSET
-// in the process environment so worktreePortOffset() picks it up.
-func applyPortOffsetFlag(cmd *cobra.Command) {
-	offset, err := cmd.Flags().GetInt("port-offset")
-	classifyAndExit(fmtErr(err, "check '--port-offset' flag"))
-
-	if offset > 0 {
-		classifyAndExit(fmtErr(os.Setenv("PUBGOLF_PORT_OFFSET", strconv.Itoa(offset)), "set PUBGOLF_PORT_OFFSET"))
-	}
 }
