@@ -89,6 +89,11 @@ to run manually rather than blocking mid-task.
 `pubgolf-devctrl update:*` will trigger an approval prompt mid-task. Do not invoke it
 as part of an automated sequence.
 
+## Testing
+Go tests use [Testify](https://github.com/stretchr/testify). Use `require` for
+setup/preconditions (hard-fail) and `assert` for result assertions (soft-fail).
+Do not use raw `t.Errorf`/`t.Fatalf` — always prefer `assert.*` / `require.*`.
+
 ## Git
 `git push` always requires explicit approval.
 Do not edit `.git/hooks/` or run `git config --global`.
