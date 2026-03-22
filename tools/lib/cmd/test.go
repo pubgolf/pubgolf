@@ -30,16 +30,16 @@ var testCmd = &cobra.Command{
 		coverageFile := filepath.Join(coverageDir, "api.cover")
 
 		coverageFlag, err := cmd.Flags().GetBool("coverage")
-		guard(err, "check '--coverage' flag")
+		classifyAndExit(fmtErr(err, "check '--coverage' flag"))
 
 		verboseFlag, err := cmd.Flags().GetBool("verbose")
-		guard(err, "check '--verbose' flag")
+		classifyAndExit(fmtErr(err, "check '--verbose' flag"))
 
 		localFlag, err := cmd.Flags().GetBool("local")
-		guard(err, "check '--local' flag")
+		classifyAndExit(fmtErr(err, "check '--local' flag"))
 
 		env, envErr := envProvider.Env(cmd.Context(), config.ServerBinName, "test")
-		guard(envErr, "fetch test environment")
+		classifyAndExit(fmtErr(envErr, "fetch test environment"))
 
 		args := []string{"test", filepath.FromSlash("./api/...")}
 
@@ -54,8 +54,8 @@ var testCmd = &cobra.Command{
 		if coverageFlag {
 			args = append(args, "-coverprofile", coverageFile)
 
-			guard(os.RemoveAll(coverageDir), "clean old output dir")
-			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir")
+			classifyAndExit(fmtErr(os.RemoveAll(coverageDir), "clean old output dir"))
+			classifyAndExit(fmtErr(os.MkdirAll(coverageDir, 0o755), "make new output dir"))
 		}
 
 		err = runner.Run(cmd.Context(), Cmd{
@@ -64,18 +64,18 @@ var testCmd = &cobra.Command{
 			Env:  env,
 		})
 		if err != nil {
-			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+			// Allow exit code 1 through — it means the test suite failed (not infrastructure).
 			exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 			if !ok || exitErr.ExitCode() != 1 {
-				guard(err, "execute `go test ...` command")
+				classifyAndExit(fmtErr(err, "execute `go test ...` command"))
 			}
 		}
 
 		if coverageFlag {
-			guard(runner.Run(cmd.Context(), Cmd{
+			classifyAndExit(fmtErr(runner.Run(cmd.Context(), Cmd{
 				Name: "go",
 				Args: []string{"tool", "cover", "-html", coverageFile},
-			}), "execute `go tool cover ...` command")
+			}), "execute `go tool cover ...` command"))
 		}
 	},
 }
@@ -85,10 +85,10 @@ var testE2ECmd = &cobra.Command{
 	Short: "Run all automated e2e tests",
 	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
-		guard(err, "check '--watch' flag")
+		classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
 		localFlag, err := cmd.Flags().GetBool("local")
-		guard(err, "check '--local' flag")
+		classifyAndExit(fmtErr(err, "check '--local' flag"))
 
 		// Start initial process.
 		proc := runE2ETest(cmd.Context(), runner, envProvider, !watchFlag, localFlag)
@@ -110,7 +110,7 @@ var testE2ECmd = &cobra.Command{
 
 func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
 	env, err := ep.Env(ctx, config.ServerBinName, "test")
-	guard(err, "fetch e2e test environment")
+	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
 
 	args := []string{
 		"test",
@@ -135,10 +135,10 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 		Env:  env,
 	})
 	if startErr != nil {
-		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+		// Allow exit code 1 through — it means the test suite failed (not infrastructure).
 		exitErr, ok := startErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 		if !ok || exitErr.ExitCode() != 1 {
-			guard(startErr, "execute `go test ...` command")
+			classifyAndExit(fmtErr(startErr, "execute `go test ...` command"))
 		}
 	}
 
@@ -148,10 +148,10 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 
 			waitErr := proc.Wait()
 			if waitErr != nil {
-				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
+				// Allow exit code 1 through — it means the test suite failed (not infrastructure).
 				exitErr, ok := waitErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 				if !ok || exitErr.ExitCode() != 1 {
-					guard(waitErr, "execute `go test ...` command")
+					classifyAndExit(fmtErr(waitErr, "execute `go test ...` command"))
 				}
 			}
 		}()

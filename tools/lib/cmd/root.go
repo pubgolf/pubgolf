@@ -2,6 +2,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -134,7 +135,7 @@ func init() {
 
 func checkVersion() {
 	curToolsHash, err := dirhash.HashDir(filepath.Join(projectRoot, "tools"), "", dirhash.DefaultHash)
-	guard(err, "hash tools dir")
+	classifyAndExit(fmtErr(err, "hash tools dir"))
 
 	if installedToolsHash != curToolsHash {
 		log.Printf(`The installed version of %[1]s is out of date. Run the following to update:
@@ -145,29 +146,36 @@ func checkVersion() {
 	}
 }
 
-// guard logs and exits on error.
-func guard(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %v", msg, err.Error())
-	}
-}
+// runPar executes all of the specified functions in parallel and returns a joined error.
+func runPar(ctx context.Context, r Runner, fns ...func(context.Context, Runner) error) error {
+	var (
+		mu   sync.Mutex
+		errs []error
+		wg   sync.WaitGroup
+	)
 
-// runPar executes all of the specified commands in parallel.
-func runPar(cmd *cobra.Command, args []string, commands ...*cobra.Command) {
-	var wg sync.WaitGroup
+	for _, fn := range fns {
+		wg.Add(1)
 
-	wg.Add(len(commands))
-
-	for _, c := range commands {
-		go func(cmd *cobra.Command, args []string, c *cobra.Command) {
+		go func(f func(context.Context, Runner) error) {
 			defer wg.Done()
 
-			log.Printf("Running `%s`...\n", c.Use)
-			c.Run(cmd, args)
-		}(cmd, args, c)
+			err := f(ctx, r)
+			if err == nil {
+				return
+			}
+
+			mu.Lock()
+
+			errs = append(errs, err)
+
+			mu.Unlock()
+		}(fn)
 	}
 
 	wg.Wait()
+
+	return errors.Join(errs...)
 }
 
 // ignoredDirPatterns lists directory names that file watchers should skip.
@@ -202,15 +210,15 @@ func watch(dir, label string, callback func(watcher.Event)) {
 				callback(ev)
 				log.Printf("Task '%s' completed.\n", label)
 			case err := <-w.Error:
-				guard(err, "watcher failed")
+				classifyAndExit(fmtErr(err, "watcher failed"))
 			case <-w.Closed:
 				return
 			}
 		}
 	}()
 
-	guard(w.AddRecursive(dir), "create watcher")
+	classifyAndExit(fmtErr(w.AddRecursive(dir), "create watcher"))
 	log.Printf("Watching '%s' for changes...\n", dir)
 
-	go guard(w.Start(100*time.Millisecond), "start watcher")
+	go classifyAndExit(fmtErr(w.Start(100*time.Millisecond), "start watcher"))
 }

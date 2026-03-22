@@ -15,8 +15,7 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop all background processes started with `devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(dockerStop(cmd.Context(), runner),
-			"execute `docker-compose down ...` command")
+		classifyAndExit(dockerStop(cmd.Context(), runner))
 	},
 }
 
