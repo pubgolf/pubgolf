@@ -24,9 +24,7 @@ var (
 // worktreeSlug returns a normalized identifier for the current git worktree.
 // Returns ("", nil) for the main working tree, (slug, nil) for a worktree,
 // or ("", err) if git commands fail.
-func worktreeSlug() (string, error) {
-	ctx := context.Background()
-
+func worktreeSlug(ctx context.Context) (string, error) {
 	topLevelOut, err := exec.CommandContext(ctx, "git", "rev-parse", "--show-toplevel").Output()
 	if err != nil {
 		return "", fmt.Errorf("git rev-parse --show-toplevel: %w", err)
@@ -113,8 +111,8 @@ func portOffsetForSlug(slug string) (int, error) {
 }
 
 // worktreePortOffset returns the port offset for the current worktree.
-func worktreePortOffset() (int, error) {
-	slug, err := worktreeSlug()
+func worktreePortOffset(ctx context.Context) (int, error) {
+	slug, err := worktreeSlug(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -133,8 +131,8 @@ func dockerProjectForSlug(slug string) string {
 }
 
 // worktreeDockerProject returns the Docker Compose project name for the current worktree.
-func worktreeDockerProject() string {
-	slug, _ := worktreeSlug()
+func worktreeDockerProject(ctx context.Context) string {
+	slug, _ := worktreeSlug(ctx)
 
 	return dockerProjectForSlug(slug)
 }
@@ -150,8 +148,8 @@ func dataDirForSlug(base, slug string) string {
 }
 
 // worktreeDataDir returns the data directory path, namespaced by worktree slug.
-func worktreeDataDir(base string) string {
-	slug, _ := worktreeSlug()
+func worktreeDataDir(ctx context.Context, base string) string {
+	slug, _ := worktreeSlug(ctx)
 
 	return dataDirForSlug(base, slug)
 }

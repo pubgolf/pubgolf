@@ -2,10 +2,14 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -20,13 +24,16 @@ func init() {
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
 	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output")
 	testCmd.PersistentFlags().Bool("local", false, "Run tests in a mode that disables external network dependencies")
+	testCmd.PersistentFlags().Int("port-offset", 0, "Override the port offset for this worktree (sets PUBGOLF_PORT_OFFSET)")
 }
 
 var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run all automated unit/integration tests",
 	Run: func(cmd *cobra.Command, _ []string) {
-		coverageDir := filepath.FromSlash("./data/go-test-coverage")
+		applyPortOffsetFlag(cmd)
+
+		coverageDir := filepath.Join(projectRoot, worktreeDataDir(cmd.Context(), "data/go-test-coverage"))
 		coverageFile := filepath.Join(coverageDir, "api.cover")
 
 		coverageFlag, err := cmd.Flags().GetBool("coverage")
@@ -40,6 +47,28 @@ var testCmd = &cobra.Command{
 
 		env, envErr := envProvider.Env(cmd.Context(), config.ServerBinName, "test")
 		classifyAndExit(fmtErr(envErr, "fetch test environment"))
+
+		// Inject worktree isolation env vars.
+		slug, slugErr := worktreeSlug(cmd.Context())
+		classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+
+		if slug != "" {
+			env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+		}
+
+		offset, offsetErr := worktreePortOffset(cmd.Context())
+		classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+
+		if localFlag && offset > 0 {
+			sharedURL := fmt.Sprintf("postgres://pubgolf_dev:pubgolf_dev@localhost:%d/pubgolf_dev?sslmode=disable",
+				5432+offset)
+			env = append(env, "PUBGOLF_SHARED_DB_URL="+sharedURL)
+		}
+
+		// Pre-flight infrastructure check for shared-postgres mode.
+		if localFlag {
+			classifyAndExit(preflight(cmd.Context(), offset))
+		}
 
 		args := []string{"test", filepath.FromSlash("./api/...")}
 
@@ -108,9 +137,26 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
+func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process {
 	env, err := ep.Env(ctx, config.ServerBinName, "test")
 	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
+
+	// Inject worktree isolation env vars.
+	slug, slugErr := worktreeSlug(ctx)
+	classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+
+	if slug != "" {
+		env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+	}
+
+	offset, offsetErr := worktreePortOffset(ctx)
+	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+
+	if localOnly && offset > 0 {
+		sharedURL := fmt.Sprintf("postgres://pubgolf_dev:pubgolf_dev@localhost:%d/pubgolf_dev?sslmode=disable",
+			5432+offset)
+		env = append(env, "PUBGOLF_SHARED_DB_URL="+sharedURL)
+	}
 
 	args := []string{
 		"test",
@@ -158,4 +204,25 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 	}
 
 	return proc
+}
+
+// errDBNotRunning is returned when the pre-flight health check cannot reach the database.
+var errDBNotRunning = errors.New("DB container is not reachable")
+
+// preflight checks that the database container is reachable before running tests.
+func preflight(ctx context.Context, offset int) error {
+	dbPort := 5432 + offset
+
+	dialer := &net.Dialer{Timeout: 2 * time.Second}
+
+	conn, err := dialer.DialContext(ctx, "tcp", fmt.Sprintf("localhost:%d", dbPort))
+	if err != nil {
+		return fmt.Errorf("%w on port %d.\n"+
+			"  Run 'pubgolf-devctrl run bg' to start it.\n"+
+			"  This is an infrastructure issue, not a code problem", errDBNotRunning, dbPort)
+	}
+
+	conn.Close()
+
+	return nil
 }
