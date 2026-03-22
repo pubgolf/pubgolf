@@ -100,7 +100,7 @@ func getDatabaseURL(ctx context.Context, ep EnvProvider, driver DBDriver, projec
 // keys (with the configured prefix stripped).
 func readEnvVars(ctx context.Context, ep EnvProvider, project, env, prefix string, vars []string) map[string]string {
 	envSlice, err := ep.Env(ctx, project, env)
-	guard(err, "fetch environment variables")
+	classifyAndExit(fmtErr(err, "fetch environment variables"))
 
 	// Build a lookup from the returned KEY=VALUE pairs.
 	envMap := make(map[string]string, len(envSlice))

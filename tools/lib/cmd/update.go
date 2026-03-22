@@ -16,17 +16,17 @@ var updateCmd = &cobra.Command{
 	Short: "Compiles the latest changes into the devctl binary",
 	Run: func(cmd *cobra.Command, _ []string) {
 		curToolsHash, err := dirhash.HashDir("tools", "", dirhash.DefaultHash)
-		guard(err, "hash tools dir")
+		classifyAndExit(fmtErr(err, "hash tools dir"))
 
 		// TODO: include go.sum in generated hash.
 
-		guard(runner.Run(cmd.Context(), Cmd{
+		classifyAndExit(fmtErr(runner.Run(cmd.Context(), Cmd{
 			Name: "go",
 			Args: []string{
 				"install",
 				"-ldflags", "-X main.toolsHash=" + curToolsHash,
 				filepath.FromSlash("./tools/cmd/" + config.CLIName),
 			},
-		}), "execute `go install ...` command")
+		}), "execute `go install ...` command"))
 	},
 }
