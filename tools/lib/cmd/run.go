@@ -43,10 +43,10 @@ var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName,
+		guard(dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			// "api-blob-storage",
-		)
+		), "execute `docker-compose up ...` command")
 	},
 }
 
@@ -54,7 +54,8 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName, "api-db")
+		guard(dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName, "api-db"),
+			"execute `docker-compose up ...` command")
 	},
 }
 
@@ -66,7 +67,7 @@ var runAPIDatabaseCmd = &cobra.Command{
 // 	},
 // }
 
-func dopplerDockerRun(ctx context.Context, r Runner, project, env string, services ...string) {
+func dopplerDockerRun(ctx context.Context, r Runner, project, env string, services ...string) error {
 	args := []string{
 		"run",
 		"--project", project,
@@ -80,10 +81,15 @@ func dopplerDockerRun(ctx context.Context, r Runner, project, env string, servic
 	}
 	args = append(args, services...)
 
-	guard(r.Run(ctx, Cmd{
+	err := r.Run(ctx, Cmd{
 		Name: "doppler",
 		Args: args,
-	}), "execute `docker-compose up ...` command")
+	})
+	if err != nil {
+		return fmtErr(err, "run docker-compose up cmd")
+	}
+
+	return nil
 }
 
 func watchableDopplerGoRun(cmd *cobra.Command, r Runner, project, env, bin string, args []string) {
@@ -129,7 +135,9 @@ func dopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args 
 
 	if stopOnExit {
 		go func() {
-			guard(proc.Wait(), "wait on process")
+			if err := proc.Wait(); err != nil {
+				log.Printf("process exited with error: %v", err)
+			}
 			triggerShutdown()
 		}()
 	}

@@ -15,12 +15,13 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop all background processes started with `devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerStop(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName)
+		guard(dopplerDockerStop(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName),
+			"execute `docker-compose down ...` command")
 	},
 }
 
-func dopplerDockerStop(ctx context.Context, r Runner, project, env string) {
-	guard(r.Run(ctx, Cmd{
+func dopplerDockerStop(ctx context.Context, r Runner, project, env string) error {
+	err := r.Run(ctx, Cmd{
 		Name: "doppler",
 		Args: []string{
 			"run",
@@ -31,5 +32,10 @@ func dopplerDockerStop(ctx context.Context, r Runner, project, env string) {
 			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
 			"down",
 		},
-	}), "execute `docker-compose down ...` command")
+	})
+	if err != nil {
+		return fmtErr(err, "run docker-compose down cmd")
+	}
+
+	return nil
 }
