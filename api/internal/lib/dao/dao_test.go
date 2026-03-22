@@ -54,7 +54,7 @@ func Test_txQuerier(t *testing.T) {
 
 		ctx := t.Context()
 
-		dao, err := New(ctx, _sharedDB, false)
+		dao, err := New(ctx, _sharedDB, false, nil)
 		require.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(ctx, &sql.TxOptions{})

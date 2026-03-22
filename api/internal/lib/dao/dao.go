@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -24,15 +25,23 @@ var (
 
 const fallbackVenueImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
 
+// Clock is a function that returns the current time. Used for dependency injection in tests.
+type Clock func() time.Time
+
 // Queries holds references to all data stores and provides query methods.
 type Queries struct {
-	db  *sql.DB
-	tx  *sql.Tx
-	dbc dbc.Querier
+	db    *sql.DB
+	tx    *sql.Tx
+	dbc   dbc.Querier
+	clock Clock
 }
 
 // New returns a concrete implementation of `QueryProvider`.
-func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, error) {
+func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool, clock Clock) (*Queries, error) {
+	if clock == nil {
+		clock = time.Now
+	}
+
 	q, err := dbc.Prepare(ctx, db)
 	if err != nil {
 		if forcePreparedQueries {
@@ -43,8 +52,9 @@ func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, 
 	}
 
 	return &Queries{
-		db:  db,
-		dbc: q,
+		db:    db,
+		dbc:   q,
+		clock: clock,
 	}, nil
 }
 
@@ -62,6 +72,8 @@ func (q *Queries) Close() error {
 
 	return nil
 }
+
+func (q *Queries) now() time.Time { return q.clock() }
 
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
 	defer telemetry.FnSpan(&ctx)()
@@ -81,7 +93,7 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 		return fmt.Errorf("acquire transacted DAO: %w", err)
 	}
 
-	err = query(ctx, &Queries{tx: tx, dbc: tDBC})
+	err = query(ctx, &Queries{tx: tx, dbc: tDBC, clock: q.clock})
 	if err != nil {
 		tx.Rollback() //nolint:errcheck // Already recovering from query error.
 

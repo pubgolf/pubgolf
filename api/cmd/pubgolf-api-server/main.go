@@ -85,7 +85,7 @@ func main() {
 
 	// Initialize server.
 
-	daoInstance, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest)
+	daoInstance, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest, nil)
 	guard(err, "init DAO")
 
 	defer func() {

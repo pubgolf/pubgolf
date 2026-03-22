@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
@@ -17,7 +16,7 @@ func (q *Queries) CreateAdjustmentTemplate(ctx context.Context, eventID models.E
 	deletedAt := sql.NullTime{}
 	if !t.IsVisible {
 		deletedAt.Valid = true
-		deletedAt.Time = time.Now()
+		deletedAt.Time = q.now()
 	}
 
 	linkedEventID := models.EventID{}
