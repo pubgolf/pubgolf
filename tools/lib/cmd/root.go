@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
@@ -122,10 +123,29 @@ func runPar(cmd *cobra.Command, args []string, commands ...*cobra.Command) {
 	wg.Wait()
 }
 
+// ignoredDirPatterns lists directory names that file watchers should skip.
+var ignoredDirPatterns = []string{
+	".worktrees",
+	"node_modules",
+	"vendor",
+	"data",
+	".git",
+}
+
 // watch sets up a recursive file watcher to re-run tasks.
 func watch(dir, label string, callback func(watcher.Event)) {
 	w := watcher.New()
 	w.SetMaxEvents(1)
+	w.AddFilterHook(func(_ os.FileInfo, fullPath string) error {
+		for _, pattern := range ignoredDirPatterns {
+			if strings.Contains(fullPath, string(os.PathSeparator)+pattern+string(os.PathSeparator)) ||
+				strings.HasSuffix(fullPath, string(os.PathSeparator)+pattern) {
+				return watcher.ErrSkip
+			}
+		}
+
+		return nil
+	})
 
 	go func() {
 		for {
