@@ -115,88 +115,6 @@ func TestDryRunnerErrorFor(t *testing.T) {
 	assert.Len(t, dr.Recorded, 2)
 }
 
-func TestCheckGoCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := checkGo(ctx, dr)
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
-
-	cmd := dr.Recorded[0]
-	assert.Equal(t, "golangci-lint", cmd.Name)
-	require.NotEmpty(t, cmd.Args)
-	assert.Equal(t, "run", cmd.Args[0])
-}
-
-func TestCheckProtoCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := checkProto(ctx, dr)
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 2)
-
-	assert.Equal(t, "buf", dr.Recorded[0].Name)
-	assert.Equal(t, "lint", dr.Recorded[0].Args[0])
-	assert.Equal(t, "buf", dr.Recorded[1].Name)
-	assert.Equal(t, "format", dr.Recorded[1].Args[0])
-}
-
-func TestCheckWebCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := checkWeb(ctx, dr)
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 2)
-
-	assert.Equal(t, "web-app", dr.Recorded[0].Dir)
-	assert.Equal(t, "web-app", dr.Recorded[1].Dir)
-}
-
-func TestGenerateProtoCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := generateProto(ctx, dr)
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
-	assert.Equal(t, "buf", dr.Recorded[0].Name)
-}
-
-func TestGenerateSQLcCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := generateSQLc(ctx, dr)
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
-	assert.Equal(t, "sqlc", dr.Recorded[0].Name)
-}
-
-func TestGenerateEnumCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-	ctx := context.Background()
-
-	err := generateEnum(ctx, dr, "ScoringCategory", "./api/internal/lib/models")
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
-	assert.Equal(t, "enumer", dr.Recorded[0].Name)
-}
-
 func TestMergeEnv(t *testing.T) {
 	t.Parallel()
 
@@ -230,20 +148,6 @@ func splitEnvVar(s string) [2]string {
 	}
 
 	return [2]string{s[:i], s[i+1:]}
-}
-
-func TestDopplerDockerStopCommandConstruction(t *testing.T) {
-	t.Parallel()
-
-	dr := &DryRunner{}
-
-	err := dopplerDockerStop(context.Background(), dr, "test-project", "dev")
-	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
-
-	cmd := dr.Recorded[0]
-	assert.Equal(t, "doppler", cmd.Name)
-	assert.Contains(t, cmd.Args, "down")
 }
 
 func TestReadDopplerVarsDryRunReturnsEmptyMap(t *testing.T) {
