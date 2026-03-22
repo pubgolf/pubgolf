@@ -43,6 +43,14 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      # golangci-lint bug: ireturn reports at an off-by-one line inside the
+      # function body when ./api/... and ./tools/... are linted together,
+      # making inline //nolint directives insufficient.
+      - linters:
+          - ireturn
+        text: "runE2ETest returns interface"
+        path: tools/lib/cmd/test\.go
     paths:
       - third_party$
       - builtin$
