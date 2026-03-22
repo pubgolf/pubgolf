@@ -32,7 +32,7 @@ var checkGoCmd = &cobra.Command{
 func checkGo(ctx context.Context, r Runner) error {
 	err := r.Run(ctx, Cmd{
 		Name: "golangci-lint",
-		Args: []string{"run", "--exclude-dirs", `\.worktrees`, "./api/...", "./tools/..."},
+		Args: []string{"run", "./api/...", "./tools/..."},
 	})
 	if err != nil {
 		return fmtErr(err, "run golangci-lint cmd")

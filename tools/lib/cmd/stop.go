@@ -21,10 +21,11 @@ var stopCmd = &cobra.Command{
 }
 
 func dockerStop(ctx context.Context, r Runner) error {
-	// docker-compose down doesn't need secrets; run without env injection.
+	// docker compose down doesn't need secrets; run without env injection.
 	err := r.Run(ctx, Cmd{
-		Name: "docker-compose",
+		Name: "docker",
 		Args: []string{
+			"compose",
 			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
 			"down",
 		},

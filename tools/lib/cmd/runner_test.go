@@ -149,4 +149,3 @@ func splitEnvVar(s string) [2]string {
 
 	return [2]string{s[:i], s[i+1:]}
 }
-

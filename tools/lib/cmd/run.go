@@ -74,6 +74,7 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	}
 
 	args := []string{
+		"compose",
 		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
 		"up",
 		"--detach",
@@ -82,7 +83,7 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	args = append(args, services...)
 
 	runErr := r.Run(ctx, Cmd{
-		Name: "docker-compose",
+		Name: "docker",
 		Args: args,
 		Env:  env,
 	})
