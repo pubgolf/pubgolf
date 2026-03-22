@@ -162,7 +162,9 @@ func runPar(ctx context.Context, r Runner, fns ...func(context.Context, Runner) 
 			}
 
 			mu.Lock()
+
 			errs = append(errs, err)
+
 			mu.Unlock()
 		})
 	}
