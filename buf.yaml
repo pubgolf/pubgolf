@@ -1,8 +1,6 @@
 version: v2
 modules:
   - path: proto
-    excludes:
-      - .worktrees
     lint:
       disallow_comment_ignores: true
     breaking:
