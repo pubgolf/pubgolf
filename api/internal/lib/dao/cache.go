@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
@@ -40,8 +41,12 @@ type Purger interface {
 // allCaches is a list of all in-memory caches to allow purging.
 var allCaches []Purger
 
+var cacheMu sync.Mutex
+
 // PurgeAllCaches purges all in-memory caches.
 func PurgeAllCaches() {
+	cacheMu.Lock()
+	defer cacheMu.Unlock()
 	for _, c := range allCaches {
 		c.Purge()
 	}
@@ -58,7 +63,9 @@ func emptyEvictionCallback[K comparable, V any](_ K, _ V) {}
 // makeCache creates a new in-memory cache with the provided size and expiration, registering it to allow purging.
 func makeCache[K comparable, V any](size cacheSize, exp cacheExpiration) cache[K, V] {
 	c := expirable.NewLRU(int(size), emptyEvictionCallback[K, V], time.Duration(exp))
+	cacheMu.Lock()
 	allCaches = append(allCaches, c)
+	cacheMu.Unlock()
 
 	return c
 }
