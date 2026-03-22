@@ -63,6 +63,7 @@ func main() {
 
 	// Initialize DB.
 	dbConn := makeDB(ctx, cfg)
+	defer dbConn.Close()
 
 	// Run migrations and exit if migrator instance.
 	if *migrationFlag {
@@ -84,11 +85,18 @@ func main() {
 
 	// Initialize server.
 
-	dao, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest)
+	daoInstance, err := dao.New(ctx, dbConn, cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest)
 	guard(err, "init DAO")
 
+	defer func() {
+		closeErr := daoInstance.Close()
+		if closeErr != nil {
+			log.Printf("DAO close error: %v", closeErr)
+		}
+	}()
+
 	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
-	server := makeServer(cfg, dao, mes)
+	server := makeServer(cfg, daoInstance, mes, dbConn)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -110,28 +118,51 @@ func guard(err error, msg string) {
 	}
 }
 
-// makeDB instantiates a database connection, verifies ability to connect and initializes tracing/debugging tools as necessary.
+// makeDB instantiates a database connection pool with explicit tuning and initializes tracing/debugging tools as necessary.
 func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
-	conConfig, err := pgxpool.New(ctx, cfg.AppDatabaseURL)
+	poolCfg, err := pgxpool.ParseConfig(cfg.AppDatabaseURL)
 	guard(err, "parse database config")
 
-	db := telemetry.WrapDB(stdlib.GetPoolConnector(conConfig))
+	poolCfg.MaxConns = 25 // validate against Postgres max_connections
+	poolCfg.MinConns = 2
+	poolCfg.MaxConnLifetime = 1 * time.Hour
+	poolCfg.MaxConnLifetimeJitter = 10 * time.Minute // spread recycling; prevents thundering herd
+	poolCfg.MaxConnIdleTime = 10 * time.Minute       // set below firewall/LB idle timeout
+	poolCfg.HealthCheckPeriod = 1 * time.Minute
+	poolCfg.ConnConfig.RuntimeParams["statement_timeout"] = "5000" // 5 seconds
 
-	if cfg.EnvName == config.DeployEnvDev || cfg.EnvName == config.DeployEnvE2ETest {
-		err = db.PingContext(ctx)
-		guard(err, "ping database")
+	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
+	guard(err, "create connection pool")
+
+	var db *sql.DB
+
+	db = telemetry.WrapDB(stdlib.GetPoolConnector(pool), func() sql.DBStats {
+		return db.Stats()
+	})
+
+	// Align database/sql's own pool layer with pgxpool settings so the two
+	// stacked pools don't compete with each other's eviction policies.
+	db.SetMaxOpenConns(int(poolCfg.MaxConns))
+	db.SetMaxIdleConns(int(poolCfg.MaxConns))
+	db.SetConnMaxLifetime(poolCfg.MaxConnLifetime)
+	db.SetConnMaxIdleTime(poolCfg.MaxConnIdleTime)
+
+	pingErr := db.PingContext(ctx)
+	if pingErr != nil {
+		log.Printf("Warning: DB not reachable at startup: %v — will retry on first request", pingErr)
 	}
 
 	return db
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger) *http.Server {
+func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *sql.DB) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.ChiMiddleware(r)...)
 
 	// Mount routes.
 	r.Get("/health-check", healthCheck(cfg))
+	r.Get("/status", status(db))
 	r.Get("/robots.txt", robots(cfg))
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {

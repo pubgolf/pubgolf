@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
@@ -45,6 +46,21 @@ func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, 
 		db:  db,
 		dbc: q,
 	}, nil
+}
+
+// Close releases any prepared statements held by the DAO.
+func (q *Queries) Close() error {
+	closer, ok := q.dbc.(io.Closer)
+	if !ok {
+		return nil
+	}
+
+	closeErr := closer.Close()
+	if closeErr != nil {
+		return fmt.Errorf("close prepared statements: %w", closeErr)
+	}
+
+	return nil
 }
 
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
