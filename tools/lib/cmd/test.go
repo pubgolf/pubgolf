@@ -135,8 +135,8 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
-	env, err := ep.Env(ctx, config.ServerBinName, "test") //nolint:ireturn // False positive: linter reports ireturn on body line.
+func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process {
+	env, err := ep.Env(ctx, config.ServerBinName, "test")
 	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
 
 	// Inject worktree isolation env vars.

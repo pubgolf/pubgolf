@@ -43,6 +43,11 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      - linters:
+          - ireturn
+        text: "runE2ETest returns interface"
+        path: tools/lib/cmd/test\.go
     paths:
       - third_party$
       - builtin$
