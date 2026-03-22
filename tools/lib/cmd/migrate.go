@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -100,7 +101,16 @@ func migrateCreate(ctx context.Context, r Runner, name string) {
 	}), "execute `migrate ...` command")
 
 	outLines := strings.Split(migratorContent.String(), "\n")
-	for _, name := range outLines[:len(outLines)-1] {
+	foundFiles := false
+
+	for _, name := range outLines {
+		name = strings.TrimSpace(name)
+		if name == "" || !strings.Contains(name, migrationDirectory) {
+			continue
+		}
+
+		foundFiles = true
+
 		f, err := os.OpenFile(name, os.O_RDWR, 0o644)
 		guard(err, "open migration file to add boilerplate")
 
@@ -108,6 +118,10 @@ func migrateCreate(ctx context.Context, r Runner, name string) {
 
 		_, err = f.WriteString("BEGIN;\n\n-- Migration logic goes here...\n\nCOMMIT;\n")
 		guard(err, "write boilerplate to migration file")
+	}
+
+	if !foundFiles {
+		log.Println("WARNING: no migration files found in migrate output")
 	}
 }
 

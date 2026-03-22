@@ -171,6 +171,8 @@ func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Proce
 
 	if stopOnExit {
 		go func() {
+			defer triggerShutdown()
+
 			err := proc.Wait()
 			if err != nil {
 				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
@@ -179,8 +181,6 @@ func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Proce
 					guard(err, "execute `go test ...` command")
 				}
 			}
-
-			triggerShutdown()
 		}()
 	}
 

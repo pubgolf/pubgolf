@@ -2,18 +2,24 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/sumdb/dirhash"
 )
+
+// errProjectRootNotFound is returned when go.mod cannot be found in any parent directory.
+var errProjectRootNotFound = errors.New("go.mod not found in any parent directory")
 
 // Internal plumbing.
 var (
@@ -29,6 +35,8 @@ var (
 	installedToolsHash string
 	// config holds the provided configuration options.
 	config CLIConfig
+	// projectRoot holds the resolved absolute path to the project root directory.
+	projectRoot string
 	// runner is the package-level Runner used by all command handlers.
 	runner Runner
 )
@@ -42,10 +50,41 @@ func Execute(toolsDirHash string, c CLIConfig) {
 
 	log.SetPrefix(fmt.Sprintf("[%s] ", config.CLIName))
 
-	err := rootCmd.Execute()
+	root, err := resolveProjectRoot()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s must be run from within the project directory: %v\n", config.CLIName, err)
+		os.Exit(1)
+	}
+
+	projectRoot = root
+	log.Printf("Resolved project root: %s", projectRoot)
+
+	err = rootCmd.Execute()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
+	}
+}
+
+// resolveProjectRoot walks up from CWD looking for go.mod to find the project root.
+func resolveProjectRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("get working directory: %w", err)
+	}
+
+	for {
+		_, statErr := os.Stat(filepath.Join(dir, "go.mod"))
+		if statErr == nil {
+			return dir, nil
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", errProjectRootNotFound
+		}
+
+		dir = parent
 	}
 }
 
@@ -72,9 +111,10 @@ var rootCmd = &cobra.Command{
 			checkVersion()
 		}
 
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 		go func() {
-			sigCh := make(chan os.Signal, 1)
-			signal.Notify(sigCh, os.Interrupt)
 			<-sigCh
 			triggerShutdown()
 		}()
@@ -86,7 +126,7 @@ func init() {
 }
 
 func checkVersion() {
-	curToolsHash, err := dirhash.HashDir("tools", "", dirhash.DefaultHash)
+	curToolsHash, err := dirhash.HashDir(filepath.Join(projectRoot, "tools"), "", dirhash.DefaultHash)
 	guard(err, "hash tools dir")
 
 	if installedToolsHash != curToolsHash {
