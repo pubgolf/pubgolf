@@ -47,6 +47,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - \.worktrees
 formatters:
   enable:
     - gci

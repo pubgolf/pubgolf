@@ -1,12 +1,10 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"log"
 	"net/url"
 	"path/filepath"
+	"strings"
 )
 
 // DBDriver is an enum specifying which database driver to use for migrations and DAO codegen.
@@ -62,9 +60,9 @@ func (c *CLIConfig) setDefaults() {
 	}
 }
 
-// getDatabaseURL queries Doppler for DB connection details.
-func getDatabaseURL(ctx context.Context, r Runner, driver DBDriver, project, env, prefix string, isMigrator bool) string {
-	vars := readDopplerVars(ctx, r, project, env, prefix, []string{
+// getDatabaseURL uses the EnvProvider to fetch DB connection details and build a URL.
+func getDatabaseURL(ctx context.Context, ep EnvProvider, driver DBDriver, project, env, prefix string, isMigrator bool) string {
+	vars := readEnvVars(ctx, ep, project, env, prefix, []string{
 		"SQLITE_PATH",
 		"DB_USER",
 		"DB_PASSWORD",
@@ -98,59 +96,26 @@ func getDatabaseURL(ctx context.Context, r Runner, driver DBDriver, project, env
 	return u.String()
 }
 
-// readDopplerVars queries the Doppler CLI for a requested set of computed env vars.
-// In dry-run mode, it records the command and returns an empty map (defaults will be used).
-func readDopplerVars(ctx context.Context, r Runner, project, env, prefix string, vars []string) map[string]string {
-	if isDryRun() {
-		// Record the command that would be executed, but return empty map so defaults are used.
-		_ = r.Run(ctx, Cmd{
-			Name: "doppler",
-			Args: []string{"secrets", "--project", project, "--config", env, "--json"},
-		})
+// readEnvVars fetches env vars from the provider and extracts the requested
+// keys (with the configured prefix stripped).
+func readEnvVars(ctx context.Context, ep EnvProvider, project, env, prefix string, vars []string) map[string]string {
+	envSlice, err := ep.Env(ctx, project, env)
+	guard(err, "fetch environment variables")
 
-		return make(map[string]string)
+	// Build a lookup from the returned KEY=VALUE pairs.
+	envMap := make(map[string]string, len(envSlice))
+	for _, entry := range envSlice {
+		k, v, _ := strings.Cut(entry, "=")
+		envMap[k] = v
 	}
 
-	var dopplerContent bytes.Buffer
-
-	err := r.Run(ctx, Cmd{
-		Name:   "doppler",
-		Args:   []string{"secrets", "--project", project, "--config", env, "--json"},
-		Stdout: &dopplerContent,
-	})
-	guard(err, "execute `doppler ...` command")
-
-	var data map[string]any
-	guard(json.NewDecoder(&dopplerContent).Decode(&data), "read JSON output from doppler")
-
+	// Extract requested vars, stripping the prefix.
 	outData := make(map[string]string)
 
 	for _, key := range vars {
-		secret, ok := data[prefix+key]
-		if !ok {
-			continue
+		if v, ok := envMap[prefix+key]; ok {
+			outData[key] = v
 		}
-
-		inner, ok := secret.(map[string]any)
-		if !ok {
-			continue
-		}
-
-		val, ok := inner["computed"]
-		if !ok {
-			continue
-		}
-
-		v, ok := val.(string)
-		if !ok {
-			continue
-		}
-
-		outData[key] = v
-	}
-
-	if len(outData) > 0 {
-		log.Printf("Loaded %d secrets from Doppler", len(outData))
 	}
 
 	return outData

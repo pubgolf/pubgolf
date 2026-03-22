@@ -240,13 +240,6 @@ func mergeEnv(parent, extra []string) []string {
 	return result
 }
 
-// isDryRun reports whether the package-level runner is a DryRunner.
-func isDryRun() bool {
-	_, ok := runner.(*DryRunner)
-
-	return ok
-}
-
 // fmtErr wraps an error with a descriptive message, matching the existing guard pattern.
 func fmtErr(err error, msg string) error {
 	if err == nil {
