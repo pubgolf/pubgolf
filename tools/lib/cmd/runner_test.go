@@ -65,13 +65,13 @@ func TestDryRunnerRecordsCommands(t *testing.T) {
 		Name: "golangci-lint",
 		Args: []string{"run", "./api/...", "./tools/..."},
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	err = dr.Run(ctx, Cmd{
 		Name: "buf",
 		Args: []string{"generate", "--template", "buf.gen.dev.yaml"},
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	require.Len(t, dr.Recorded, 2)
 	assert.Equal(t, "golangci-lint", dr.Recorded[0].Name)
@@ -89,10 +89,10 @@ func TestDryRunnerStartRecordsAndReturnsProcess(t *testing.T) {
 		Args: []string{"run", "--", "go", "run", "./api/cmd/server"},
 	})
 	require.NoError(t, err)
-	require.Len(t, dr.Recorded, 1)
+	assert.Len(t, dr.Recorded, 1)
 
 	// Process.Wait and Process.Stop should be no-ops.
-	assert.NoError(t, proc.Wait())
+	require.NoError(t, proc.Wait())
 	proc.Stop() // should not panic
 }
 
@@ -107,10 +107,10 @@ func TestDryRunnerErrorFor(t *testing.T) {
 	ctx := context.Background()
 
 	err := dr.Run(ctx, Cmd{Name: "golangci-lint", Args: []string{"run"}})
-	assert.ErrorIs(t, err, errSimulated)
+	require.ErrorIs(t, err, errSimulated)
 
 	err = dr.Run(ctx, Cmd{Name: "buf", Args: []string{"lint"}})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Len(t, dr.Recorded, 2)
 }
@@ -205,7 +205,7 @@ func TestMergeEnv(t *testing.T) {
 
 	result := mergeEnv(parent, extra)
 
-	require.Len(t, result, 4)
+	assert.Len(t, result, 4)
 
 	resultMap := make(map[string]string, len(result))
 	for _, v := range result {
@@ -237,8 +237,8 @@ func TestDopplerDockerStopCommandConstruction(t *testing.T) {
 
 	dr := &DryRunner{}
 
-	dopplerDockerStop(context.Background(), dr, "test-project", "dev")
-
+	err := dopplerDockerStop(context.Background(), dr, "test-project", "dev")
+	require.NoError(t, err)
 	require.Len(t, dr.Recorded, 1)
 
 	cmd := dr.Recorded[0]
