@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -87,32 +86,29 @@ var migrateCreateCmd = &cobra.Command{
 	Short: "Create new migration files",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// Creating migration files isn't supported via the programmatic API, so create using the following shell command: `migrate create -seq -ext 'sql' -dir "api/internal/db/migrations" "$1"`
-		migrator := exec.CommandContext(cmd.Context(), "migrate",
-			"create",
-			"-seq",
-			"-ext", "sql",
-			"-dir", migrationDirectory,
-			args[0],
-		)
-
-		var migratorContent bytes.Buffer
-
-		migrator.Stdout = os.Stdout
-		migrator.Stderr = io.MultiWriter(os.Stderr, &migratorContent)
-		guard(migrator.Run(), "execute `migrate ...` command")
-
-		outLines := strings.Split(migratorContent.String(), "\n")
-		for _, name := range outLines[:len(outLines)-1] {
-			f, err := os.OpenFile(name, os.O_RDWR, 0o644)
-			guard(err, "open migration file to add boilerplate")
-
-			defer f.Close()
-
-			_, err = f.WriteString("BEGIN;\n\n-- Migration logic goes here...\n\nCOMMIT;\n")
-			guard(err, "write boilerplate to migration file")
-		}
+		migrateCreate(cmd.Context(), runner, args[0])
 	},
+}
+
+func migrateCreate(ctx context.Context, r Runner, name string) {
+	var migratorContent bytes.Buffer
+
+	guard(r.Run(ctx, Cmd{
+		Name:   "migrate",
+		Args:   []string{"create", "-seq", "-ext", "sql", "-dir", migrationDirectory, name},
+		Stderr: io.MultiWriter(os.Stderr, &migratorContent),
+	}), "execute `migrate ...` command")
+
+	outLines := strings.Split(migratorContent.String(), "\n")
+	for _, name := range outLines[:len(outLines)-1] {
+		f, err := os.OpenFile(name, os.O_RDWR, 0o644)
+		guard(err, "open migration file to add boilerplate")
+
+		defer f.Close()
+
+		_, err = f.WriteString("BEGIN;\n\n-- Migration logic goes here...\n\nCOMMIT;\n")
+		guard(err, "write boilerplate to migration file")
+	}
 }
 
 var migrateFixCmd = &cobra.Command{
@@ -120,7 +116,7 @@ var migrateFixCmd = &cobra.Command{
 	Short: "Reset the migration state of a DB to a known valid migration version, assuming all migrations were transacted",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		dbURL := getDatabaseURL(cmd.Context(), config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
+		dbURL := getDatabaseURL(cmd.Context(), runner, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, false)
 		db, err := sql.Open(config.DBDriver.driverString(false), dbURL)
 		guard(err, "open DB connection")
 
@@ -140,7 +136,7 @@ var migrateFixCmd = &cobra.Command{
 }
 
 func getMigrator(ctx context.Context) *migrate.Migrate {
-	dbURL := getDatabaseURL(ctx, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
+	dbURL := getDatabaseURL(ctx, runner, config.DBDriver, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, true)
 	m, err := migrate.New(migrationSource, dbURL)
 	guard(err, "construct DB migrator")
 

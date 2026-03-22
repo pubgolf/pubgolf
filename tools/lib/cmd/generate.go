@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -46,14 +45,14 @@ var generateProtoCmd = &cobra.Command{
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
-		guard(generateProto(cmd.Context()), "execute `buf ...` command")
+		guard(generateProto(cmd.Context(), runner), "execute `buf ...` command")
 
 		if !watchFlag {
 			return
 		}
 
 		go watch(filepath.FromSlash("proto/"), "Proto codegen", func(_ watcher.Event) {
-			err := generateProto(context.Background())
+			err := generateProto(context.Background(), runner)
 			if err != nil {
 				log.Printf("Encountered error while running 'Proto codegen' task. Waiting to re-run...")
 			}
@@ -63,14 +62,13 @@ var generateProtoCmd = &cobra.Command{
 	},
 }
 
-func generateProto(ctx context.Context) error {
-	buf := exec.CommandContext(ctx, "buf", "generate", "--template", filepath.FromSlash("buf.gen.dev.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
-	buf.Stdout = os.Stdout
-	buf.Stderr = os.Stderr
-
-	err := buf.Run()
+func generateProto(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: "buf",
+		Args: []string{"generate", "--template", filepath.FromSlash("buf.gen.dev.yaml")},
+	})
 	if err != nil {
-		return fmt.Errorf("run buf generate cmd: %w", err)
+		return fmtErr(err, "run buf generate cmd")
 	}
 
 	return nil
@@ -83,14 +81,14 @@ var generateSQLcCmd = &cobra.Command{
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		guard(err, "check '--watch' flag")
 
-		guard(generateSQLc(cmd.Context()), "execute `sqlc ...` command")
+		guard(generateSQLc(cmd.Context(), runner), "execute `sqlc ...` command")
 
 		if !watchFlag {
 			return
 		}
 
 		go watch(filepath.FromSlash("api/internal/db/"), "SQLc codegen", func(_ watcher.Event) {
-			err := generateSQLc(context.Background())
+			err := generateSQLc(context.Background(), runner)
 			if err != nil {
 				log.Printf("Encountered error while running 'SQLc codegen' task. Waiting to re-run...")
 			}
@@ -100,14 +98,13 @@ var generateSQLcCmd = &cobra.Command{
 	},
 }
 
-func generateSQLc(ctx context.Context) error {
-	sqlc := exec.CommandContext(ctx, "sqlc", "generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml")) //nolint:gosec // Input is not dynamically provided by end-user.
-	sqlc.Stdout = os.Stdout
-	sqlc.Stderr = os.Stderr
-
-	err := sqlc.Run()
+func generateSQLc(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: "sqlc",
+		Args: []string{"generate", "--file", filepath.FromSlash("api/internal/db/sqlc.yaml")},
+	})
 	if err != nil {
-		return fmt.Errorf("run sqlc generate cmd: %w", err)
+		return fmtErr(err, "run sqlc generate cmd")
 	}
 
 	return nil
@@ -117,18 +114,17 @@ var generateEnumCmd = &cobra.Command{
 	Use:   "enum",
 	Short: "Generate enum stringers",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(generateEnum(cmd.Context(), "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
+		guard(generateEnum(cmd.Context(), runner, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")), "execute `enumer ...` command for ")
 	},
 }
 
-func generateEnum(ctx context.Context, typ, pkg string) error {
-	enumer := exec.CommandContext(ctx, "enumer", "-sql", "-transform", "snake-upper", "-type", typ, pkg)
-	enumer.Stdout = os.Stdout
-	enumer.Stderr = os.Stderr
-
-	err := enumer.Run()
+func generateEnum(ctx context.Context, r Runner, typ, pkg string) error {
+	err := r.Run(ctx, Cmd{
+		Name: "enumer",
+		Args: []string{"-sql", "-transform", "snake-upper", "-type", typ, pkg},
+	})
 	if err != nil {
-		return fmt.Errorf("run enumer cmd: %w", err)
+		return fmtErr(err, "run enumer cmd")
 	}
 
 	return nil
@@ -152,7 +148,7 @@ var generateDBCMockCmd = &cobra.Command{
 	Short: "Generate DBC mock",
 	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateMock(cmd.Context(), "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
+			generateMock(cmd.Context(), runner, "Querier", filepath.FromSlash("api/internal/lib/dao/internal/dbc/")),
 			"generate mock DBC",
 		)
 	},
@@ -163,7 +159,7 @@ var generateDAOMockCmd = &cobra.Command{
 	Short: "Generate DAO interface and mock",
 	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateInterfaceAndMock(cmd.Context(), mockConfig{
+			generateInterfaceAndMock(cmd.Context(), runner, mockConfig{
 				targetStruct: "Queries",
 				ifaceName:    "QueryProvider",
 				ifaceComment: "QueryProvider describes all of the queries exposed by the DAO, to allow for testing mocks.",
@@ -180,7 +176,7 @@ var generateSMSMockCmd = &cobra.Command{
 	Short: "Generate SMS client interface and mock",
 	Run: func(cmd *cobra.Command, _ []string) {
 		guard(
-			generateInterfaceAndMock(cmd.Context(), mockConfig{
+			generateInterfaceAndMock(cmd.Context(), runner, mockConfig{
 				targetStruct: "Client",
 				ifaceName:    "Messenger",
 				ifaceComment: "Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.",
@@ -200,13 +196,13 @@ type mockConfig struct {
 	pkgName      string
 }
 
-func generateInterfaceAndMock(ctx context.Context, mc mockConfig) error {
-	err := generateInterface(ctx, mc)
+func generateInterfaceAndMock(ctx context.Context, r Runner, mc mockConfig) error {
+	err := generateInterface(ctx, r, mc)
 	if err != nil {
 		return fmt.Errorf("generate interface: %w", err)
 	}
 
-	err = generateMock(ctx, mc.ifaceName, mc.genDir)
+	err = generateMock(ctx, r, mc.ifaceName, mc.genDir)
 	if err != nil {
 		return fmt.Errorf("generate mock: %w", err)
 	}
@@ -214,7 +210,7 @@ func generateInterfaceAndMock(ctx context.Context, mc mockConfig) error {
 	return nil
 }
 
-func generateInterface(ctx context.Context, mc mockConfig) error {
+func generateInterface(ctx context.Context, r Runner, mc mockConfig) error {
 	args := []string{
 		"--struct", mc.targetStruct,
 		"--iface", mc.ifaceName,
@@ -248,33 +244,29 @@ func generateInterface(ctx context.Context, mc mockConfig) error {
 		args = append(args, "--file", filepath.Join(mc.genDir, f.Name()))
 	}
 
-	iface := exec.CommandContext(ctx, "ifacemaker", args...)
-
-	iface.Stdout = os.Stdout
-	iface.Stderr = os.Stderr
-
-	err = iface.Run()
+	err = r.Run(ctx, Cmd{
+		Name: "ifacemaker",
+		Args: args,
+	})
 	if err != nil {
-		return fmt.Errorf("run interface generator command: %w", err)
+		return fmtErr(err, "run interface generator command")
 	}
 
 	return nil
 }
 
-func generateMock(ctx context.Context, ifaceName, genDir string) error {
-	mock := exec.CommandContext(ctx, "mockery",
-		"--dir", genDir,
-		"--name", ifaceName,
-		"--filename", "gen_mock.go",
-		"--inpackage",
-	)
-
-	mock.Stdout = os.Stdout
-	mock.Stderr = os.Stderr
-
-	err := mock.Run()
+func generateMock(ctx context.Context, r Runner, ifaceName, genDir string) error {
+	err := r.Run(ctx, Cmd{
+		Name: "mockery",
+		Args: []string{
+			"--dir", genDir,
+			"--name", ifaceName,
+			"--filename", "gen_mock.go",
+			"--inpackage",
+		},
+	})
 	if err != nil {
-		return fmt.Errorf("run mock generator command: %w", err)
+		return fmtErr(err, "run mock generator command")
 	}
 
 	return nil

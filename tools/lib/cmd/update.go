@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -22,14 +20,13 @@ var updateCmd = &cobra.Command{
 
 		// TODO: include go.sum in generated hash.
 
-		compiler := exec.CommandContext(cmd.Context(), "go", //nolint:gosec // Input is not dynamically provided by end-user.
-			"install",
-			"-ldflags", "-X main.toolsHash="+curToolsHash,
-			filepath.FromSlash("./tools/cmd/"+config.CLIName),
-		)
-		compiler.Stderr = os.Stderr
-		compiler.Stdout = os.Stdout
-
-		guard(compiler.Run(), "execute `go install ...` command")
+		guard(runner.Run(cmd.Context(), Cmd{
+			Name: "go",
+			Args: []string{
+				"install",
+				"-ldflags", "-X main.toolsHash=" + curToolsHash,
+				filepath.FromSlash("./tools/cmd/" + config.CLIName),
+			},
+		}), "execute `go install ...` command")
 	},
 }

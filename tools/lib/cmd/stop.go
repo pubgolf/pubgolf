@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -16,25 +13,23 @@ func init() {
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: fmt.Sprintf("Stop all background processes started with `%s run ...`", config.CLIName),
+	Short: "Stop all background processes started with `devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerStop(cmd.Context(), config.ServerBinName, config.DopplerEnvName)
+		dopplerDockerStop(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName)
 	},
 }
 
-func dopplerDockerStop(ctx context.Context, project, env string) {
-	doppler := exec.CommandContext(ctx, "doppler",
-		"run",
-		"--project", project,
-		"--config", env,
-		"--",
-		"docker-compose",
-		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
-		"down")
-
-	doppler.Stdout = os.Stdout
-	doppler.Stderr = os.Stderr
-	doppler.Stdin = os.Stdin
-
-	guard(doppler.Run(), "execute `docker-compose up ...` command")
+func dopplerDockerStop(ctx context.Context, r Runner, project, env string) {
+	guard(r.Run(ctx, Cmd{
+		Name: "doppler",
+		Args: []string{
+			"run",
+			"--project", project,
+			"--config", env,
+			"--",
+			"docker-compose",
+			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
+			"down",
+		},
+	}), "execute `docker-compose down ...` command")
 }
