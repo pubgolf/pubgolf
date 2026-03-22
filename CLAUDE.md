@@ -26,7 +26,13 @@ shorthand for permission grouping, not the actual CLI syntax.
 | Check web app (lint + type-check) | `pubgolf-devctrl check web` | auto-approved |
 | Install dev deps | `pubgolf-devctrl install *` | auto-approved |
 | Stop servers | `pubgolf-devctrl stop *` | auto-approved |
+| Inspect worktree status | `pubgolf-devctrl status` | auto-approved |
+| Inspect all worktrees | `pubgolf-devctrl status --all` | auto-approved |
+| Check dev environment | `pubgolf-devctrl doctor` | auto-approved |
+| Preview cleanup | `pubgolf-devctrl clean` | auto-approved |
+| Dry-run any command | `pubgolf-devctrl --dry-run <cmd>` | auto-approved |
 | Update devctrl itself | `pubgolf-devctrl update *` | requires approval |
+| Force cleanup | `pubgolf-devctrl clean --force` | requires approval |
 
 **Single-package Go tests**: `pubgolf-devctrl test` always runs the full suite with
 Doppler secrets. For iterating on a single package (no DB/secrets needed), use
@@ -92,6 +98,16 @@ to run manually rather than blocking mid-task.
 
 `pubgolf-devctrl update` will trigger an approval prompt mid-task. Do not invoke it
 as part of an automated sequence unless it is necessary specifically for tool development.
+
+## Exit Codes
+- Exit 1: test/lint failure (debug your code).
+- Exit 2: infrastructure failure (check services, not your code).
+
+## Worktree Port Collisions
+If you encounter "address already in use", set `PUBGOLF_PORT_OFFSET` to a
+number between 1 and 499 and retry:
+
+    export PUBGOLF_PORT_OFFSET=42
 
 ## Testing
 Go tests use [Testify](https://github.com/stretchr/testify). Use `require` for
