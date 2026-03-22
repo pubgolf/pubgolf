@@ -34,7 +34,21 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 		})
 	}
 
-	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true)
+	shouldUpsert := true
+
+	if key := req.Msg.IdempotencyKey; key != nil && *key != "" {
+		isNew, err := s.dao.ClaimIdempotencyKey(ctx, *key, "create_stage_score")
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check idempotency key: %w", err))
+		}
+
+		shouldUpsert = isNew
+	}
+
+	if shouldUpsert {
+		err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true)
+	}
+
 	if err != nil {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)

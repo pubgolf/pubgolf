@@ -25,7 +25,18 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, err
 	}
 
-	// TODO: Handle idempotency key.
+	if key := req.Msg.IdempotencyKey; key != nil && *key != "" {
+		isNew, err := s.dao.ClaimIdempotencyKey(ctx, *key, "submit_score")
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check idempotency key: %w", err))
+		}
+
+		if !isNew {
+			return connect.NewResponse(&apiv1.SubmitScoreResponse{
+				Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE,
+			}), nil
+		}
+	}
 
 	stageID, err := s.guardStageID(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
 	if err != nil {
