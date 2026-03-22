@@ -65,13 +65,13 @@ func TestDryRunnerRecordsCommands(t *testing.T) {
 		Name: "golangci-lint",
 		Args: []string{"run", "./api/...", "./tools/..."},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = dr.Run(ctx, Cmd{
 		Name: "buf",
 		Args: []string{"generate", "--template", "buf.gen.dev.yaml"},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	require.Len(t, dr.Recorded, 2)
 	assert.Equal(t, "golangci-lint", dr.Recorded[0].Name)

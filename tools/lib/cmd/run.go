@@ -135,9 +135,11 @@ func dopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args 
 
 	if stopOnExit {
 		go func() {
-			if err := proc.Wait(); err != nil {
-				log.Printf("process exited with error: %v", err)
+			waitErr := proc.Wait()
+			if waitErr != nil {
+				log.Printf("process exited with error: %v", waitErr)
 			}
+
 			triggerShutdown()
 		}()
 	}
