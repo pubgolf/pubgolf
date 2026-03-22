@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"crypto/subtle"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -114,7 +115,7 @@ func NewAdminAuthInterceptor(cfg *config.App) connect.UnaryInterceptorFunc {
 				return nil, connect.NewError(connect.CodeUnauthenticated, errMissingAuthToken)
 			}
 
-			if req.Header().Get(tokenHeader) != cfg.AdminAuth.AdminServiceToken {
+			if subtle.ConstantTimeCompare([]byte(req.Header().Get(tokenHeader)), []byte(cfg.AdminAuth.AdminServiceToken)) != 1 {
 				return nil, connect.NewError(connect.CodePermissionDenied, errInvalidAuthToken)
 			}
 
