@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"syscall"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -76,13 +75,10 @@ var testCmd = &cobra.Command{
 			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir: %w")
 		}
 
-		tester := exec.CommandContext(cmd.Context(), "doppler", args...)
-
-		tester.Stdout = os.Stdout
-		tester.Stderr = os.Stderr
-		tester.Stdin = os.Stdin
-
-		err = tester.Run()
+		err = runner.Run(cmd.Context(), Cmd{
+			Name: "doppler",
+			Args: args,
+		})
 		if err != nil {
 			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
 			exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
@@ -92,16 +88,10 @@ var testCmd = &cobra.Command{
 		}
 
 		if coverageFlag {
-			cover := exec.CommandContext(cmd.Context(), "go",
-				"tool", "cover",
-				"-html", coverageFile,
-			)
-
-			cover.Stdout = os.Stdout
-			cover.Stderr = os.Stderr
-			cover.Stdin = os.Stdin
-
-			guard(cover.Run(), "execute `go tool cover ...` command")
+			guard(runner.Run(cmd.Context(), Cmd{
+				Name: "go",
+				Args: []string{"tool", "cover", "-html", coverageFile},
+			}), "execute `go tool cover ...` command")
 		}
 	},
 }
@@ -117,14 +107,14 @@ var testE2ECmd = &cobra.Command{
 		guard(err, "check '--local' flag")
 
 		// Start initial process.
-		stopFn := runE2ETest(cmd.Context(), !watchFlag, localFlag)
+		proc := runE2ETest(cmd.Context(), runner, !watchFlag, localFlag)
 
 		// Launch watcher, if applicable.
 		if watchFlag {
 			go func() {
 				watch("api", "e2e test", func(_ watcher.Event) {
-					stopFn()
-					stopFn = runE2ETest(context.Background(), false, localFlag)
+					proc.Stop()
+					proc = runE2ETest(context.Background(), runner, false, localFlag)
 				})
 			}()
 		}
@@ -134,7 +124,7 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
+func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
 	args := []string{
 		"run",
 		"--project", config.ServerBinName,
@@ -165,17 +155,12 @@ func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
 		}...)
 	}
 
-	tester := exec.CommandContext(ctx, "doppler", args...)
-
-	tester.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-	tester.Stdout = os.Stdout
-	tester.Stderr = os.Stderr
-	tester.Stdin = os.Stdin
-
 	log.Println("Starting e2e test run...")
 
-	err := tester.Start()
+	proc, err := r.Start(ctx, Cmd{
+		Name: "doppler",
+		Args: args,
+	})
 	if err != nil {
 		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
 		exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
@@ -186,9 +171,7 @@ func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
 
 	if stopOnExit {
 		go func() {
-			defer close(beginShutdown)
-
-			err := tester.Wait()
+			err := proc.Wait()
 			if err != nil {
 				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
 				exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
@@ -196,16 +179,10 @@ func runE2ETest(ctx context.Context, stopOnExit, localOnly bool) func() {
 					guard(err, "execute `go test ...` command")
 				}
 			}
+
+			triggerShutdown()
 		}()
 	}
 
-	return func() {
-		pgid, err := syscall.Getpgid(tester.Process.Pid)
-		if err != nil {
-			// Previous run has already finished.
-			return
-		}
-
-		guard(syscall.Kill(-pgid, syscall.SIGINT), "send SIGINT to running process")
-	}
+	return proc
 }

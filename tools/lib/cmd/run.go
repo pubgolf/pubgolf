@@ -3,10 +3,7 @@ package cmd
 import (
 	"context"
 	"log"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"syscall"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -38,7 +35,7 @@ var runAPIServerCmd = &cobra.Command{
 	Short: "Run API server",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-		watchableDopplerGoRun(cmd, config.ServerBinName, config.DopplerEnvName, binPath, args)
+		watchableDopplerGoRun(cmd, runner, config.ServerBinName, config.DopplerEnvName, binPath, args)
 	},
 }
 
@@ -46,10 +43,10 @@ var runAPIBgCmd = &cobra.Command{
 	Use:   "bg",
 	Short: "Run all supporting services for the API server",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerRun(cmd.Context(), config.ServerBinName, config.DopplerEnvName,
+		guard(dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
 			// "api-blob-storage",
-		)
+		), "execute `docker-compose up ...` command")
 	},
 }
 
@@ -57,7 +54,8 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Use:   "api-db",
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, _ []string) {
-		dopplerDockerRun(cmd.Context(), config.ServerBinName, config.DopplerEnvName, "api-db")
+		guard(dopplerDockerRun(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName, "api-db"),
+			"execute `docker-compose up ...` command")
 	},
 }
 
@@ -65,11 +63,11 @@ var runAPIDatabaseCmd = &cobra.Command{
 // 	Use:   "api-minio",
 // 	Short: "Run API server's blob storage (Minio) instance",
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		dopplerDockerRun(config.ServerBinName, config.DopplerEnvName, "api-blob-storage")
+// 		dopplerDockerRun(runner, config.ServerBinName, config.DopplerEnvName, "api-blob-storage")
 // 	},
 // }
 
-func dopplerDockerRun(ctx context.Context, project, env string, services ...string) {
+func dopplerDockerRun(ctx context.Context, r Runner, project, env string, services ...string) error {
 	args := []string{
 		"run",
 		"--project", project,
@@ -83,39 +81,48 @@ func dopplerDockerRun(ctx context.Context, project, env string, services ...stri
 	}
 	args = append(args, services...)
 
-	doppler := exec.CommandContext(ctx, "doppler", args...)
+	err := r.Run(ctx, Cmd{
+		Name: "doppler",
+		Args: args,
+	})
+	if err != nil {
+		return fmtErr(err, "run docker-compose up cmd")
+	}
 
-	doppler.Stdout = os.Stdout
-	doppler.Stderr = os.Stderr
-	doppler.Stdin = os.Stdin
-
-	guard(doppler.Run(), "execute `docker-compose up ...` command")
+	return nil
 }
 
-func watchableDopplerGoRun(cmd *cobra.Command, project, env, bin string, args []string) {
+func watchableDopplerGoRun(cmd *cobra.Command, r Runner, project, env, bin string, args []string) {
 	watchFlag, err := cmd.Flags().GetBool("watch")
 	guard(err, "check '--watch' flag")
 
 	// Start initial process
-	stopFn := dopplerGoRun(cmd.Context(), project, env, bin, args, !watchFlag)
+	proc := startDopplerGoRun(cmd.Context(), r, project, env, bin, args)
 
-	// Launch watcher, if applicable.
-	if watchFlag {
-		go func() {
-			watch("api", "restart API server", func(_ watcher.Event) {
-				// Start the old process and keep track of the new cleanup handler.
-				stopFn()
-				stopFn = dopplerGoRun(context.Background(), project, env, bin, args, false)
-			})
-		}()
+	if !watchFlag {
+		// Wait for process to exit, then shut down.
+		waitErr := proc.Wait()
+		if waitErr != nil {
+			log.Printf("process exited with error: %v", waitErr)
+		}
+
+		return
 	}
 
-	// Hold process open
+	// Launch watcher to restart the process on file changes.
+	go func() {
+		watch("api", "restart API server", func(_ watcher.Event) {
+			proc.Stop()
+			proc = startDopplerGoRun(context.Background(), r, project, env, bin, args)
+		})
+	}()
+
+	// Hold process open until shutdown signal.
 	<-shuttingDown
-	stopFn()
+	proc.Stop()
 }
 
-func dopplerGoRun(ctx context.Context, project, env, bin string, args []string, stopOnExit bool) func() {
+func startDopplerGoRun(ctx context.Context, r Runner, project, env, bin string, args []string) Process { //nolint:ireturn // Returns Process interface by design.
 	allArgs := append(
 		[]string{
 			"run",
@@ -125,34 +132,13 @@ func dopplerGoRun(ctx context.Context, project, env, bin string, args []string, 
 			"go", "run", bin,
 		}, args...)
 
-	doppler := exec.CommandContext(ctx, "doppler", allArgs...)
-
-	doppler.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-	doppler.Stdout = os.Stdout
-	doppler.Stderr = os.Stderr
-	doppler.Stdin = os.Stdin
-
 	log.Printf("Starting '%s'...\n", bin)
-	guard(doppler.Start(), "execute `go run ...` command")
 
-	if stopOnExit {
-		go func() {
-			guard(doppler.Wait(), "wait on process")
-			close(beginShutdown)
-		}()
-	}
+	proc, err := r.Start(ctx, Cmd{
+		Name: "doppler",
+		Args: allArgs,
+	})
+	guard(err, "execute `go run ...` command")
 
-	return func() {
-		log.Printf("Calling Doppler shutdown for pid %d...", doppler.Process.Pid)
-
-		pgid, err := syscall.Getpgid(doppler.Process.Pid)
-		if err != nil {
-			log.Println("Could not get pgid. Assuming process has already shut down.")
-
-			return
-		}
-
-		guard(syscall.Kill(-pgid, syscall.SIGKILL), "send SIGINT to running process")
-	}
+	return proc
 }

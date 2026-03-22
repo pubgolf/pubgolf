@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/radovskyb/watcher"
@@ -17,10 +16,10 @@ import (
 
 // Internal plumbing.
 var (
-	// beginShutdown indicates we've received an OS signal to begin shutting down.
-	beginShutdown = make(chan os.Signal, 1)
 	// shuttingDown is a broadcast channel that closes to tell all processes to begin cleanup.
 	shuttingDown = make(chan struct{})
+	// shutdownOnce ensures triggerShutdown is called at most once.
+	shutdownOnce sync.Once
 )
 
 // Package parameters.
@@ -29,11 +28,9 @@ var (
 	installedToolsHash string
 	// config holds the provided configuration options.
 	config CLIConfig
+	// runner is the package-level Runner used by all command handlers.
+	runner Runner
 )
-
-func init() {
-	signal.Notify(beginShutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-}
 
 // Execute is the entrypoint for calling the CLI.
 func Execute(toolsDirHash string, c CLIConfig) {
@@ -51,21 +48,40 @@ func Execute(toolsDirHash string, c CLIConfig) {
 	}
 }
 
+// triggerShutdown closes the shuttingDown channel exactly once.
+func triggerShutdown() {
+	shutdownOnce.Do(func() { close(shuttingDown) })
+}
+
 var rootCmd = &cobra.Command{
 	Use:   config.CLIName,
 	Short: "DevCtrl is a task runner for local dev",
 	Long:  `An opinionated task runner for personal use by @thedeerchild`,
 	PersistentPreRun: func(cmd *cobra.Command, _ []string) {
-		// Skip the update warning for the update command itself
-		if cmd.CommandPath() != " update" {
+		// Initialize the runner based on the --dry-run flag.
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			runner = &DryRunner{}
+		} else {
+			runner = ExecRunner{}
+		}
+
+		// Skip the update warning for the update command itself and in dry-run mode.
+		if !dryRun && cmd.CommandPath() != " update" {
 			checkVersion()
 		}
 
 		go func() {
-			<-beginShutdown
-			close(shuttingDown)
+			sigCh := make(chan os.Signal, 1)
+			signal.Notify(sigCh, os.Interrupt)
+			<-sigCh
+			triggerShutdown()
 		}()
 	},
+}
+
+func init() {
+	rootCmd.PersistentFlags().Bool("dry-run", false, "Print commands that would be executed without running them")
 }
 
 func checkVersion() {

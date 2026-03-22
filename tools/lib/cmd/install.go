@@ -3,8 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -52,7 +50,7 @@ func generateGoInstallers() []*cobra.Command {
 			Use:   n,
 			Short: fmt.Sprintf("Install the %q CLI tool", n),
 			Run: func(cmd *cobra.Command, _ []string) {
-				installWithGolang(cmd.Context(), v)
+				guard(installWithGolang(cmd.Context(), runner, v), "install Go tool")
 			},
 		})
 	}
@@ -64,8 +62,8 @@ var installDopplerCmd = &cobra.Command{
 	Use:   "doppler",
 	Short: "Install the `doppler` CLI tool",
 	Run: func(cmd *cobra.Command, _ []string) {
-		installWithHomebrew(cmd.Context(), "gnupg")
-		installWithHomebrew(cmd.Context(), "dopplerhq/cli/doppler")
+		guard(installWithHomebrew(cmd.Context(), runner, "gnupg"), "install gnupg")
+		guard(installWithHomebrew(cmd.Context(), runner, "dopplerhq/cli/doppler"), "install doppler")
 	},
 }
 
@@ -73,20 +71,30 @@ var installBufCmd = &cobra.Command{
 	Use:   "buf",
 	Short: "Install the `buf` CLI tool",
 	Run: func(cmd *cobra.Command, _ []string) {
-		installWithHomebrew(cmd.Context(), "bufbuild/buf/buf")
+		guard(installWithHomebrew(cmd.Context(), runner, "bufbuild/buf/buf"), "install buf")
 	},
 }
 
-func installWithGolang(ctx context.Context, pkg string) {
-	installer := exec.CommandContext(ctx, "go", "install", pkg)
-	installer.Stdout = os.Stdout
-	installer.Stderr = os.Stderr
-	guard(installer.Run(), fmt.Sprintf("execute `go install ...` command for package '%s'", pkg))
+func installWithGolang(ctx context.Context, r Runner, pkg string) error {
+	err := r.Run(ctx, Cmd{
+		Name: "go",
+		Args: []string{"install", pkg},
+	})
+	if err != nil {
+		return fmtErr(err, fmt.Sprintf("run go install cmd for package '%s'", pkg))
+	}
+
+	return nil
 }
 
-func installWithHomebrew(ctx context.Context, pkg string) {
-	installer := exec.CommandContext(ctx, "brew", "install", pkg)
-	installer.Stdout = os.Stdout
-	installer.Stderr = os.Stderr
-	guard(installer.Run(), fmt.Sprintf("execute `brew install ...` command for package '%s'", pkg))
+func installWithHomebrew(ctx context.Context, r Runner, pkg string) error {
+	err := r.Run(ctx, Cmd{
+		Name: "brew",
+		Args: []string{"install", pkg},
+	})
+	if err != nil {
+		return fmtErr(err, fmt.Sprintf("run brew install cmd for package '%s'", pkg))
+	}
+
+	return nil
 }
