@@ -150,19 +150,3 @@ func splitEnvVar(s string) [2]string {
 	return [2]string{s[:i], s[i+1:]}
 }
 
-func TestReadDopplerVarsDryRunReturnsEmptyMap(t *testing.T) {
-	t.Parallel()
-
-	// Use a local DryRunner and set the package-level runner temporarily.
-	origRunner := runner
-	dr := &DryRunner{}
-	runner = dr
-
-	defer func() { runner = origRunner }()
-
-	result := readDopplerVars(context.Background(), dr, "test-project", "dev", "PREFIX_", []string{"DB_HOST"})
-
-	assert.Empty(t, result)
-	require.Len(t, dr.Recorded, 1)
-	assert.Equal(t, "doppler", dr.Recorded[0].Name)
-}

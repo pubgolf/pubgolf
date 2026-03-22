@@ -15,20 +15,16 @@ var stopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop all background processes started with `devctrl run ...`",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(dopplerDockerStop(cmd.Context(), runner, config.ServerBinName, config.DopplerEnvName),
+		guard(dockerStop(cmd.Context(), runner),
 			"execute `docker-compose down ...` command")
 	},
 }
 
-func dopplerDockerStop(ctx context.Context, r Runner, project, env string) error {
+func dockerStop(ctx context.Context, r Runner) error {
+	// docker-compose down doesn't need secrets; run without env injection.
 	err := r.Run(ctx, Cmd{
-		Name: "doppler",
+		Name: "docker-compose",
 		Args: []string{
-			"run",
-			"--project", project,
-			"--config", env,
-			"--",
-			"docker-compose",
 			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
 			"down",
 		},

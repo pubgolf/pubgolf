@@ -39,6 +39,8 @@ var (
 	projectRoot string
 	// runner is the package-level Runner used by all command handlers.
 	runner Runner
+	// envProvider is the package-level EnvProvider used by commands that need secrets.
+	envProvider EnvProvider
 )
 
 // Execute is the entrypoint for calling the CLI.
@@ -106,6 +108,10 @@ var rootCmd = &cobra.Command{
 			runner = ExecRunner{}
 		}
 
+		// Initialize the env provider.
+		envProviderFlag, _ := cmd.Flags().GetString("env-provider")
+		envProvider = newEnvProvider(envProviderFlag, dryRun, runner)
+
 		// Skip the update warning for the update command itself and in dry-run mode.
 		if !dryRun && cmd.CommandPath() != " update" {
 			checkVersion()
@@ -123,6 +129,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Print commands that would be executed without running them")
+	rootCmd.PersistentFlags().String("env-provider", "auto", "Environment provider: auto, doppler, or env")
 }
 
 func checkVersion() {

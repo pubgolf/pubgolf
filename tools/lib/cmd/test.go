@@ -38,25 +38,10 @@ var testCmd = &cobra.Command{
 		localFlag, err := cmd.Flags().GetBool("local")
 		guard(err, "check '--local' flag")
 
-		args := []string{
-			"run",
-			"--project", config.ServerBinName,
-			"--config", "test",
-		}
+		env, envErr := envProvider.Env(cmd.Context(), config.ServerBinName, "test")
+		guard(envErr, "fetch test environment")
 
-		if localFlag {
-			args = append(args, []string{
-				"--no-check-version",
-				"--fallback-only",
-			}...)
-		}
-
-		args = append(args, []string{
-			"--",
-			"go",
-			"test",
-			filepath.FromSlash("./api/..."),
-		}...)
+		args := []string{"test", filepath.FromSlash("./api/...")}
 
 		if localFlag {
 			args = append(args, "-shared-postgres=true")
@@ -67,17 +52,16 @@ var testCmd = &cobra.Command{
 		}
 
 		if coverageFlag {
-			args = append(args,
-				"-coverprofile", coverageFile,
-			)
+			args = append(args, "-coverprofile", coverageFile)
 
-			guard(os.RemoveAll(coverageDir), "clean old output dir: %w")
-			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir: %w")
+			guard(os.RemoveAll(coverageDir), "clean old output dir")
+			guard(os.MkdirAll(coverageDir, 0o755), "make new output dir")
 		}
 
 		err = runner.Run(cmd.Context(), Cmd{
-			Name: "doppler",
+			Name: "go",
 			Args: args,
+			Env:  env,
 		})
 		if err != nil {
 			// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
@@ -107,14 +91,14 @@ var testE2ECmd = &cobra.Command{
 		guard(err, "check '--local' flag")
 
 		// Start initial process.
-		proc := runE2ETest(cmd.Context(), runner, !watchFlag, localFlag)
+		proc := runE2ETest(cmd.Context(), runner, envProvider, !watchFlag, localFlag)
 
 		// Launch watcher, if applicable.
 		if watchFlag {
 			go func() {
 				watch("api", "e2e test", func(_ watcher.Event) {
 					proc.Stop()
-					proc = runE2ETest(context.Background(), runner, false, localFlag)
+					proc = runE2ETest(context.Background(), runner, envProvider, false, localFlag)
 				})
 			}()
 		}
@@ -124,28 +108,16 @@ var testE2ECmd = &cobra.Command{
 	},
 }
 
-func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
+func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
+	env, err := ep.Env(ctx, config.ServerBinName, "test")
+	guard(err, "fetch e2e test environment")
+
 	args := []string{
-		"run",
-		"--project", config.ServerBinName,
-		"--config", "test",
-	}
-
-	if localOnly {
-		args = append(args, []string{
-			"--no-check-version",
-			"--fallback-only",
-		}...)
-	}
-
-	args = append(args, []string{
-		"--",
-		"go",
 		"test",
 		filepath.FromSlash("./api/internal/e2e"),
 		"-v",
 		"-e2e=true",
-	}...)
+	}
 
 	if localOnly {
 		args = append(args, []string{
@@ -157,15 +129,16 @@ func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Proce
 
 	log.Println("Starting e2e test run...")
 
-	proc, err := r.Start(ctx, Cmd{
-		Name: "doppler",
+	proc, startErr := r.Start(ctx, Cmd{
+		Name: "go",
 		Args: args,
+		Env:  env,
 	})
-	if err != nil {
+	if startErr != nil {
 		// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-		exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+		exitErr, ok := startErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 		if !ok || exitErr.ExitCode() != 1 {
-			guard(err, "execute `go test ...` command")
+			guard(startErr, "execute `go test ...` command")
 		}
 	}
 
@@ -173,12 +146,12 @@ func runE2ETest(ctx context.Context, r Runner, stopOnExit, localOnly bool) Proce
 		go func() {
 			defer triggerShutdown()
 
-			err := proc.Wait()
-			if err != nil {
+			waitErr := proc.Wait()
+			if waitErr != nil {
 				// Panic on error, unless the exit code is 1, in which case it just means our test suite failed.
-				exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+				exitErr, ok := waitErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 				if !ok || exitErr.ExitCode() != 1 {
-					guard(err, "execute `go test ...` command")
+					guard(waitErr, "execute `go test ...` command")
 				}
 			}
 		}()
