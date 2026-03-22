@@ -41,7 +41,6 @@ var (
 	runner Runner
 )
 
-
 // Execute is the entrypoint for calling the CLI.
 func Execute(toolsDirHash string, c CLIConfig) {
 	installedToolsHash = toolsDirHash
