@@ -160,8 +160,7 @@ func TestNullScoringCategory_Scan(t *testing.T) {
 
 		rows, err := tx.QueryContext(ctx, "SELECT value FROM enum_scoring_categories")
 		require.NoError(t, err)
-
-		defer rows.Close()
+		t.Cleanup(func() { rows.Close() })
 
 		for rows.Next() {
 			var s string

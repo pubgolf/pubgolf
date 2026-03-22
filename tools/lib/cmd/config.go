@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log"
 	"net/url"
-	"os"
-	"os/exec"
 	"path/filepath"
 )
 
@@ -64,8 +63,8 @@ func (c *CLIConfig) setDefaults() {
 }
 
 // getDatabaseURL queries Doppler for DB connection details.
-func getDatabaseURL(ctx context.Context, driver DBDriver, project, env, prefix string, isMigrator bool) string {
-	vars := readDopplerVars(ctx, project, env, prefix, []string{
+func getDatabaseURL(ctx context.Context, r Runner, driver DBDriver, project, env, prefix string, isMigrator bool) string {
+	vars := readDopplerVars(ctx, r, project, env, prefix, []string{
 		"SQLITE_PATH",
 		"DB_USER",
 		"DB_PASSWORD",
@@ -100,20 +99,26 @@ func getDatabaseURL(ctx context.Context, driver DBDriver, project, env, prefix s
 }
 
 // readDopplerVars queries the Doppler CLI for a requested set of computed env vars.
-func readDopplerVars(ctx context.Context, project, env, prefix string, vars []string) map[string]string {
-	doppler := exec.CommandContext(ctx, "doppler",
-		"secrets",
-		"--project", project,
-		"--config", env,
-		"--json",
-	)
+// In dry-run mode, it records the command and returns an empty map (defaults will be used).
+func readDopplerVars(ctx context.Context, r Runner, project, env, prefix string, vars []string) map[string]string {
+	if isDryRun() {
+		// Record the command that would be executed, but return empty map so defaults are used.
+		_ = r.Run(ctx, Cmd{
+			Name: "doppler",
+			Args: []string{"secrets", "--project", project, "--config", env, "--json"},
+		})
+
+		return make(map[string]string)
+	}
 
 	var dopplerContent bytes.Buffer
 
-	doppler.Stdout = &dopplerContent
-	doppler.Stderr = os.Stderr
-
-	guard(doppler.Run(), "execute `doppler ...` command")
+	err := r.Run(ctx, Cmd{
+		Name:   "doppler",
+		Args:   []string{"secrets", "--project", project, "--config", env, "--json"},
+		Stdout: &dopplerContent,
+	})
+	guard(err, "execute `doppler ...` command")
 
 	var data map[string]any
 	guard(json.NewDecoder(&dopplerContent).Decode(&data), "read JSON output from doppler")
@@ -142,6 +147,10 @@ func readDopplerVars(ctx context.Context, project, env, prefix string, vars []st
 		}
 
 		outData[key] = v
+	}
+
+	if len(outData) > 0 {
+		log.Printf("Loaded %d secrets from Doppler", len(outData))
 	}
 
 	return outData

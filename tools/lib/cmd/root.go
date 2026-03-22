@@ -24,7 +24,7 @@ var errProjectRootNotFound = errors.New("go.mod not found in any parent director
 var (
 	// shuttingDown is a broadcast channel that closes to tell all processes to begin cleanup.
 	shuttingDown = make(chan struct{})
-	// shutdownOnce ensures triggerShutdown only closes the channel once.
+	// shutdownOnce ensures triggerShutdown is called at most once.
 	shutdownOnce sync.Once
 )
 
@@ -36,12 +36,10 @@ var (
 	config CLIConfig
 	// projectRoot holds the resolved absolute path to the project root directory.
 	projectRoot string
+	// runner is the package-level Runner used by all command handlers.
+	runner Runner
 )
 
-// triggerShutdown safely closes the shuttingDown channel exactly once.
-func triggerShutdown() {
-	shutdownOnce.Do(func() { close(shuttingDown) })
-}
 
 // Execute is the entrypoint for calling the CLI.
 func Execute(toolsDirHash string, c CLIConfig) {
@@ -90,13 +88,26 @@ func resolveProjectRoot() (string, error) {
 	}
 }
 
+// triggerShutdown closes the shuttingDown channel exactly once.
+func triggerShutdown() {
+	shutdownOnce.Do(func() { close(shuttingDown) })
+}
+
 var rootCmd = &cobra.Command{
 	Use:   config.CLIName,
 	Short: "DevCtrl is a task runner for local dev",
 	Long:  `An opinionated task runner for personal use by @thedeerchild`,
 	PersistentPreRun: func(cmd *cobra.Command, _ []string) {
-		// Skip the update warning for the update command itself
-		if cmd.CommandPath() != " update" {
+		// Initialize the runner based on the --dry-run flag.
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			runner = &DryRunner{}
+		} else {
+			runner = ExecRunner{}
+		}
+
+		// Skip the update warning for the update command itself and in dry-run mode.
+		if !dryRun && cmd.CommandPath() != " update" {
 			checkVersion()
 		}
 
@@ -108,6 +119,10 @@ var rootCmd = &cobra.Command{
 			triggerShutdown()
 		}()
 	},
+}
+
+func init() {
+	rootCmd.PersistentFlags().Bool("dry-run", false, "Print commands that would be executed without running them")
 }
 
 func checkVersion() {
