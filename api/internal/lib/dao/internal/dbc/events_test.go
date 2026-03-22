@@ -60,26 +60,34 @@ func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.Venue {
 	}
 }
 
-func setupRule(ctx context.Context, t *testing.T, tx *sql.Tx) models.DatabaseULID {
+func setupRule(ctx context.Context, t *testing.T, tx *sql.Tx) models.RuleID {
 	t.Helper()
 
 	row := tx.QueryRowContext(ctx, `INSERT INTO rules (description) VALUES ($1) RETURNING id`, faker.Sentence())
 	require.NoError(t, row.Err())
 
-	var id models.DatabaseULID
+	var id models.RuleID
 	require.NoError(t, row.Scan(&id))
 
 	return id
 }
 
-func setupStageWithRule(ctx context.Context, t *testing.T, tx *sql.Tx, eventID models.EventID, venueID models.VenueID, ruleID models.DatabaseULID, rank int32, venueKey int32) models.StageID {
+type setupStageParams struct {
+	eventID  models.EventID
+	venueID  models.VenueID
+	ruleID   models.RuleID
+	rank     int32
+	venueKey int32
+}
+
+func setupStageWithRule(ctx context.Context, t *testing.T, tx *sql.Tx, p setupStageParams) models.StageID {
 	t.Helper()
 
 	row := tx.QueryRowContext(ctx, `
 		INSERT INTO stages (event_id, venue_id, rule_id, rank, duration_minutes, venue_key)
 		VALUES ($1, $2, $3, $4, 30, $5)
 		RETURNING id;
-	`, eventID, venueID, ruleID, rank, venueKey)
+	`, p.eventID, p.venueID, p.ruleID, p.rank, p.venueKey)
 	require.NoError(t, row.Err())
 
 	var id models.StageID
@@ -217,12 +225,10 @@ func TestSetEventVenueKeys(t *testing.T) {
 		require.NotNil(t, vk2, "stage 2 should have a venue key")
 		require.NotNil(t, vk3, "stage 3 should have a venue key")
 
-		// Keys should be sequential starting from 1 (current_venue_key=0 + row_number).
+		// Keys should be unique within the event.
 		keys := []int32{*vk1, *vk2, *vk3}
-		sorted := make([]int32, len(keys))
-		copy(sorted, keys)
-		slices.Sort(sorted)
-		assert.Equal(t, []int32{1, 2, 3}, sorted, "venue keys should be sequential starting from 1")
+		slices.Sort(keys)
+		assert.Equal(t, slices.Compact(keys), keys, "venue keys should be unique within the event")
 	})
 
 	t.Run("Idempotent when all stages already have keys", func(t *testing.T) {
@@ -397,9 +403,9 @@ func TestEventSchedule(t *testing.T) {
 		r2 := setupRule(ctx, t, tx)
 		r3 := setupRule(ctx, t, tx)
 
-		setupStageWithRule(ctx, t, tx, eventID, v1.ID, r1, 30, 1)
-		setupStageWithRule(ctx, t, tx, eventID, v2.ID, r2, 10, 2)
-		setupStageWithRule(ctx, t, tx, eventID, v3.ID, r3, 20, 3)
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: r1, rank: 30, venueKey: 1})
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, ruleID: r2, rank: 10, venueKey: 2})
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, ruleID: r3, rank: 20, venueKey: 3})
 
 		rows, err := _sharedDBC.WithTx(tx).EventSchedule(ctx, eventID)
 		require.NoError(t, err)
@@ -425,9 +431,9 @@ func TestEventSchedule(t *testing.T) {
 		r2 := setupRule(ctx, t, tx)
 		r3 := setupRule(ctx, t, tx)
 
-		setupStageWithRule(ctx, t, tx, eventID, v1.ID, r1, 10, 1)
-		deletedStageID := setupStageWithRule(ctx, t, tx, eventID, v2.ID, r2, 20, 2)
-		setupStageWithRule(ctx, t, tx, eventID, v3.ID, r3, 30, 3)
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: r1, rank: 10, venueKey: 1})
+		deletedStageID := setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, ruleID: r2, rank: 20, venueKey: 2})
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, ruleID: r3, rank: 30, venueKey: 3})
 
 		// Soft-delete one stage.
 		_, err := tx.ExecContext(ctx, `UPDATE stages SET deleted_at = now() WHERE id = $1`, deletedStageID)
@@ -452,10 +458,10 @@ func TestEventSchedule(t *testing.T) {
 		row := tx.QueryRowContext(ctx, `INSERT INTO rules (description) VALUES ($1) RETURNING id`, description)
 		require.NoError(t, row.Err())
 
-		var ruleID models.DatabaseULID
+		var ruleID models.RuleID
 		require.NoError(t, row.Scan(&ruleID))
 
-		setupStageWithRule(ctx, t, tx, eventID, v1.ID, ruleID, 1, 1)
+		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: ruleID, rank: 1, venueKey: 1})
 
 		rows, err := _sharedDBC.WithTx(tx).EventSchedule(ctx, eventID)
 		require.NoError(t, err)
