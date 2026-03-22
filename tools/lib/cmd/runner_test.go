@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -148,4 +149,38 @@ func splitEnvVar(s string) [2]string {
 	}
 
 	return [2]string{s[:i], s[i+1:]}
+}
+
+var (
+	errRunParA = fmt.Errorf("error A: %w", errSimulated)
+	errRunParB = fmt.Errorf("error B: %w", errSimulated)
+)
+
+func TestRunParCollectsErrors(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	dr := &DryRunner{}
+
+	err := runPar(ctx, dr,
+		func(_ context.Context, _ Runner) error { return errRunParA },
+		func(_ context.Context, _ Runner) error { return nil },
+		func(_ context.Context, _ Runner) error { return errRunParB },
+	)
+	require.Error(t, err)
+	require.ErrorIs(t, err, errRunParA)
+	require.ErrorIs(t, err, errRunParB)
+}
+
+func TestRunParNoErrors(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	dr := &DryRunner{}
+
+	err := runPar(ctx, dr,
+		func(_ context.Context, _ Runner) error { return nil },
+		func(_ context.Context, _ Runner) error { return nil },
+	)
+	assert.NoError(t, err)
 }

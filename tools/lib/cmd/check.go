@@ -16,8 +16,8 @@ func init() {
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Run all linting and static analysis sub-tasks",
-	Run: func(cmd *cobra.Command, args []string) {
-		runPar(cmd, args, checkGoCmd, checkWebCmd, checkProtoCmd)
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(runPar(cmd.Context(), runner, checkGo, checkWeb, checkProto))
 	},
 }
 
@@ -25,7 +25,7 @@ var checkGoCmd = &cobra.Command{
 	Use:   "go",
 	Short: "Run golangci-lint on Go code",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(checkGo(cmd.Context(), runner), "execute `golangci-lint run` command")
+		classifyAndExit(checkGo(cmd.Context(), runner))
 	},
 }
 
@@ -45,7 +45,7 @@ var checkWebCmd = &cobra.Command{
 	Use:   "web",
 	Short: "Run ESLint, Prettier, and svelte-check on web code",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(checkWeb(cmd.Context(), runner), "execute web lint commands")
+		classifyAndExit(checkWeb(cmd.Context(), runner))
 	},
 }
 
@@ -75,7 +75,7 @@ var checkProtoCmd = &cobra.Command{
 	Use:   "proto",
 	Short: "Run buf lint and format check on proto files",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(checkProto(cmd.Context(), runner), "execute proto lint commands")
+		classifyAndExit(checkProto(cmd.Context(), runner))
 	},
 }
 

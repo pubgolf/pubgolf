@@ -30,15 +30,28 @@ func init() {
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Run all tool installation sub-tasks",
-	Run: func(cmd *cobra.Command, args []string) {
-		installers := []*cobra.Command{
-			installDopplerCmd,
-			installBufCmd,
+	Run: func(cmd *cobra.Command, _ []string) {
+		fns := []func(context.Context, Runner) error{
+			func(ctx context.Context, r Runner) error {
+				err := installWithHomebrew(ctx, r, "gnupg")
+				if err != nil {
+					return err
+				}
+
+				return installWithHomebrew(ctx, r, "dopplerhq/cli/doppler")
+			},
+			func(ctx context.Context, r Runner) error {
+				return installWithHomebrew(ctx, r, "bufbuild/buf/buf")
+			},
 		}
 
-		installers = append(installers, generateGoInstallers()...)
+		for _, pkg := range goTools {
+			fns = append(fns, func(ctx context.Context, r Runner) error {
+				return installWithGolang(ctx, r, pkg)
+			})
+		}
 
-		runPar(cmd, args, installers...)
+		classifyAndExit(runPar(cmd.Context(), runner, fns...))
 	},
 }
 
@@ -50,7 +63,7 @@ func generateGoInstallers() []*cobra.Command {
 			Use:   n,
 			Short: fmt.Sprintf("Install the %q CLI tool", n),
 			Run: func(cmd *cobra.Command, _ []string) {
-				guard(installWithGolang(cmd.Context(), runner, v), "install Go tool")
+				classifyAndExit(installWithGolang(cmd.Context(), runner, v))
 			},
 		})
 	}
@@ -62,8 +75,8 @@ var installDopplerCmd = &cobra.Command{
 	Use:   "doppler",
 	Short: "Install the `doppler` CLI tool",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(installWithHomebrew(cmd.Context(), runner, "gnupg"), "install gnupg")
-		guard(installWithHomebrew(cmd.Context(), runner, "dopplerhq/cli/doppler"), "install doppler")
+		classifyAndExit(installWithHomebrew(cmd.Context(), runner, "gnupg"))
+		classifyAndExit(installWithHomebrew(cmd.Context(), runner, "dopplerhq/cli/doppler"))
 	},
 }
 
@@ -71,7 +84,7 @@ var installBufCmd = &cobra.Command{
 	Use:   "buf",
 	Short: "Install the `buf` CLI tool",
 	Run: func(cmd *cobra.Command, _ []string) {
-		guard(installWithHomebrew(cmd.Context(), runner, "bufbuild/buf/buf"), "install buf")
+		classifyAndExit(installWithHomebrew(cmd.Context(), runner, "bufbuild/buf/buf"))
 	},
 }
 
