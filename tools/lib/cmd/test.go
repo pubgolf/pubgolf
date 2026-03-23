@@ -119,8 +119,8 @@ var testWebCmd = &cobra.Command{
 
 func testWeb(ctx context.Context, r Runner) error {
 	err := r.Run(ctx, Cmd{
-		Name: "npm",
-		Args: []string{"run", "test:unit", "--", "--run"},
+		Name: filepath.FromSlash("./node_modules/.bin/vitest"),
+		Args: []string{"--run"},
 		Dir:  "web-app",
 	})
 	if err != nil {
