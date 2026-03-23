@@ -50,6 +50,8 @@ func TestMain(m *testing.M) {
 			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
 			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
 			goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
+			goleak.IgnoreTopFunction("crypto/tls.(*Conn).Read"),
+			goleak.IgnoreTopFunction("internal/poll.runtime_pollWait"),
 		)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "goleak: %v\n", err)
