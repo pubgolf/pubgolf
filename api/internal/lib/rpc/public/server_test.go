@@ -14,6 +14,7 @@ func TestMain(m *testing.M) {
 	testguard.UnitTest()
 	goleak.VerifyTestMain(m,
 		goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+		goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
 	)
 }
 
