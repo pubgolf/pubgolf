@@ -125,7 +125,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.mise.toml'
           cache: npm
           cache-dependency-path: web-app/package-lock.json
       - name: NPM Install
