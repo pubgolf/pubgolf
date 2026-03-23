@@ -5,12 +5,8 @@ import { ScoringCategory } from '$lib/proto/api/v1/shared_pb';
 describe('scoringCategoryToDisplayName', () => {
 	it('has an entry for every ScoringCategory enum value', () => {
 		expect(scoringCategoryToDisplayName).toHaveProperty(String(ScoringCategory.UNSPECIFIED));
-		expect(scoringCategoryToDisplayName).toHaveProperty(
-			String(ScoringCategory.PUB_GOLF_NINE_HOLE)
-		);
-		expect(scoringCategoryToDisplayName).toHaveProperty(
-			String(ScoringCategory.PUB_GOLF_FIVE_HOLE)
-		);
+		expect(scoringCategoryToDisplayName).toHaveProperty(String(ScoringCategory.PUB_GOLF_NINE_HOLE));
+		expect(scoringCategoryToDisplayName).toHaveProperty(String(ScoringCategory.PUB_GOLF_FIVE_HOLE));
 		expect(scoringCategoryToDisplayName).toHaveProperty(
 			String(ScoringCategory.PUB_GOLF_CHALLENGES)
 		);
