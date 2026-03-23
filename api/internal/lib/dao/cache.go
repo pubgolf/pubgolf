@@ -47,6 +47,7 @@ var cacheMu sync.Mutex
 func PurgeAllCaches() {
 	cacheMu.Lock()
 	defer cacheMu.Unlock()
+
 	for _, c := range allCaches {
 		c.Purge()
 	}
@@ -63,7 +64,9 @@ func emptyEvictionCallback[K comparable, V any](_ K, _ V) {}
 // makeCache creates a new in-memory cache with the provided size and expiration, registering it to allow purging.
 func makeCache[K comparable, V any](size cacheSize, exp cacheExpiration) cache[K, V] {
 	c := expirable.NewLRU(int(size), emptyEvictionCallback[K, V], time.Duration(exp))
+
 	cacheMu.Lock()
+
 	allCaches = append(allCaches, c)
 	cacheMu.Unlock()
 
