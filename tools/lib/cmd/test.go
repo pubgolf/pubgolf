@@ -20,7 +20,9 @@ import (
 
 func init() {
 	testCmd.AddCommand(testE2ECmd)
-	testE2ECmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically restart the e2e test")
+	testE2ECmd.AddCommand(testE2EAPICmd)
+	testE2ECmd.AddCommand(testE2EWebCmd)
+	testE2EAPICmd.Flags().Bool("watch", false, "Watch the input directory and automatically restart the e2e test")
 
 	rootCmd.AddCommand(testCmd)
 
@@ -111,6 +113,29 @@ var testE2ECmd = &cobra.Command{
 	Use:   "e2e",
 	Short: "Run all automated e2e tests",
 	Run: func(cmd *cobra.Command, _ []string) {
+		localFlag, err := cmd.Flags().GetBool("local")
+		classifyAndExit(fmtErr(err, "check '--local' flag"))
+
+		// Run API e2e first (stopOnExit=false so we can block here and sequence).
+		proc := runE2ETest(cmd.Context(), runner, envProvider, false, localFlag)
+
+		waitErr := proc.Wait()
+		if waitErr != nil {
+			exitErr, ok := waitErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+			if !ok || exitErr.ExitCode() != 1 {
+				classifyAndExit(fmtErr(waitErr, "execute API e2e tests"))
+			}
+		}
+
+		// Then run web e2e.
+		classifyAndExit(testE2EWeb(cmd.Context(), runner))
+	},
+}
+
+var testE2EAPICmd = &cobra.Command{
+	Use:   "api",
+	Short: "Run Go API e2e tests",
+	Run: func(cmd *cobra.Command, _ []string) {
 		watchFlag, err := cmd.Flags().GetBool("watch")
 		classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
@@ -133,6 +158,27 @@ var testE2ECmd = &cobra.Command{
 		// Hold process open
 		<-shuttingDown
 	},
+}
+
+var testE2EWebCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Run Playwright e2e tests on web code",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(testE2EWeb(cmd.Context(), runner))
+	},
+}
+
+func testE2EWeb(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: filepath.FromSlash("./node_modules/.bin/playwright"),
+		Args: []string{"test"},
+		Dir:  "web-app",
+	})
+	if err != nil {
+		return fmtErr(err, "run Playwright e2e tests")
+	}
+
+	return nil
 }
 
 func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
