@@ -19,6 +19,7 @@ var goTools = map[string]string{
 func init() {
 	installCmd.AddCommand(installDopplerCmd)
 	installCmd.AddCommand(installBufCmd)
+	installCmd.AddCommand(installWebCmd)
 
 	for _, cmd := range generateGoInstallers() {
 		installCmd.AddCommand(cmd)
@@ -43,6 +44,7 @@ var installCmd = &cobra.Command{
 			func(ctx context.Context, r Runner) error {
 				return installWithHomebrew(ctx, r, "bufbuild/buf/buf")
 			},
+			installWeb,
 		}
 
 		for _, pkg := range goTools {
@@ -107,6 +109,27 @@ func installWithHomebrew(ctx context.Context, r Runner, pkg string) error {
 	})
 	if err != nil {
 		return fmtErr(err, fmt.Sprintf("run brew install cmd for package '%s'", pkg))
+	}
+
+	return nil
+}
+
+var installWebCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Install web-app npm dependencies",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(installWeb(cmd.Context(), runner))
+	},
+}
+
+func installWeb(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: "npm",
+		Args: []string{"ci"},
+		Dir:  "web-app",
+	})
+	if err != nil {
+		return fmtErr(err, "install web-app npm dependencies")
 	}
 
 	return nil
