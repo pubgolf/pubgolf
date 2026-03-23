@@ -22,6 +22,8 @@ func init() {
 	testE2ECmd.AddCommand(testE2EAPICmd)
 	testE2ECmd.AddCommand(testE2EWebCmd)
 
+	testCmd.AddCommand(testWebCmd)
+
 	rootCmd.AddCommand(testCmd)
 
 	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
@@ -105,6 +107,27 @@ var testCmd = &cobra.Command{
 			}), "execute `go tool cover ...` command"))
 		}
 	},
+}
+
+var testWebCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Run vitest unit tests on web code",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(testWeb(cmd.Context(), runner))
+	},
+}
+
+func testWeb(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: "npm",
+		Args: []string{"run", "test:unit", "--", "--run"},
+		Dir:  "web-app",
+	})
+	if err != nil {
+		return fmtErr(err, "run vitest unit tests")
+	}
+
+	return nil
 }
 
 var testE2ECmd = &cobra.Command{
