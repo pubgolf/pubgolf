@@ -22,7 +22,10 @@ const config = {
 			fallback: 'index.html'
 		}),
 		paths: {
-			assets: 'https://assets.pubgolf.co'
+			assets:
+				'SVELTE_ASSETS_PATH' in process.env
+					? process.env.SVELTE_ASSETS_PATH
+					: 'https://assets.pubgolf.co'
 		},
 		prerender: {
 			entries: [
