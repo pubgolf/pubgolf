@@ -2,23 +2,21 @@ import { describe, it, expect } from 'vitest';
 import { cleanPhoneNumber } from './phone';
 
 describe('cleanPhoneNumber', () => {
-	it('strips dashes and adds +1 prefix', () => {
-		expect(cleanPhoneNumber('555-867-5309')).toBe('+15558675309');
-	});
-
-	it('strips parentheses and spaces and adds +1 prefix', () => {
-		expect(cleanPhoneNumber('(555) 867-5309')).toBe('+15558675309');
-	});
-
-	it('prepends + when 11 digits starting with 1', () => {
-		expect(cleanPhoneNumber('15558675309')).toBe('+15558675309');
-	});
-
-	it('adds 1 for 10-digit number', () => {
-		expect(cleanPhoneNumber('5558675309')).toBe('+15558675309');
-	});
-
-	it('handles empty input (documents current behavior)', () => {
-		expect(cleanPhoneNumber('')).toBe('+1');
+	it.each([
+		{ input: '555-867-5309', expected: '+15558675309', label: 'strips dashes and adds +1 prefix' },
+		{
+			input: '(555) 867-5309',
+			expected: '+15558675309',
+			label: 'strips parentheses and spaces'
+		},
+		{
+			input: '15558675309',
+			expected: '+15558675309',
+			label: 'prepends + when 11 digits starting with 1'
+		},
+		{ input: '5558675309', expected: '+15558675309', label: 'adds 1 for 10-digit number' },
+		{ input: '', expected: '', label: 'returns empty for empty input' }
+	])('$label: "$input" -> "$expected"', ({ input, expected }) => {
+		expect(cleanPhoneNumber(input)).toBe(expected);
 	});
 });

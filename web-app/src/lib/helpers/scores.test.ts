@@ -1,47 +1,22 @@
 import { describe, it, expect } from 'vitest';
+import { create } from '@bufbuild/protobuf';
 import { separateIds, combineIds } from './scores';
-import type { StageScore } from '$lib/proto/api/v1/admin_pb';
+import { StageScoreSchema } from '$lib/proto/api/v1/admin_pb';
 
-// Construct a minimal StageScore fixture that matches the proto-generated shape.
-// We use plain objects cast to the type rather than proto create() to avoid
-// runtime proto registry setup in unit tests.
-
-function makeStageScore(overrides: Partial<StageScore> = {}): StageScore {
-	return {
-		$typeName: 'api.v1.StageScore',
+function makeStageScore() {
+	return create(StageScoreSchema, {
 		stageId: 'stage-1',
 		playerId: 'player-1',
 		score: {
-			$typeName: 'api.v1.Score',
 			id: 'score-id-1',
-			data: {
-				$typeName: 'api.v1.ScoreData',
-				value: 5
-			}
+			data: { value: 5 }
 		},
 		adjustments: [
-			{
-				$typeName: 'api.v1.Adjustment',
-				id: 'adj-id-1',
-				data: {
-					$typeName: 'api.v1.AdjustmentData',
-					value: -1,
-					label: 'Birdie'
-				}
-			},
-			{
-				$typeName: 'api.v1.Adjustment',
-				id: 'adj-id-2',
-				data: {
-					$typeName: 'api.v1.AdjustmentData',
-					value: 1,
-					label: 'Bogey'
-				}
-			}
+			{ id: 'adj-id-1', data: { value: -1, label: 'Birdie' } },
+			{ id: 'adj-id-2', data: { value: 1, label: 'Bogey' } }
 		],
-		isVerified: false,
-		...overrides
-	} as StageScore;
+		isVerified: false
+	});
 }
 
 describe('separateIds', () => {
@@ -65,7 +40,11 @@ describe('separateIds', () => {
 	});
 
 	it('returns empty adjustment arrays when there are no adjustments', () => {
-		const s = makeStageScore({ adjustments: [] });
+		const s = create(StageScoreSchema, {
+			stageId: 'stage-1',
+			playerId: 'player-1',
+			score: { id: 'score-id-1', data: { value: 5 } }
+		});
 		const result = separateIds(s);
 
 		expect(result.data.adjustments).toHaveLength(0);
@@ -73,7 +52,10 @@ describe('separateIds', () => {
 	});
 
 	it('returns defaults for missing score', () => {
-		const s = makeStageScore({ score: undefined });
+		const s = create(StageScoreSchema, {
+			stageId: 'stage-1',
+			playerId: 'player-1'
+		});
 		const result = separateIds(s);
 
 		expect(result.data.score?.value).toBe(0);
@@ -105,5 +87,12 @@ describe('combineIds', () => {
 		expect(combined.adjustments[0].id).toBe('adj-id-1');
 		expect(combined.adjustments[1].data).toMatchObject({ value: 1, label: 'Bogey' });
 		expect(combined.adjustments[1].id).toBe('adj-id-2');
+	});
+
+	it('throws when ids.adjustments is shorter than data.adjustments', () => {
+		const s = makeStageScore();
+		const { data, ids } = separateIds(s);
+		ids.adjustments.pop();
+		expect(() => combineIds({ data, ids })).toThrow();
 	});
 });
