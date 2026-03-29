@@ -64,7 +64,6 @@ func makeCache[K comparable, V any](size cacheSize, exp cacheExpiration) cache[K
 }
 
 // wrapWithCache handles access and instrumentation of the provided cache, falling back to access via the provided query function.
-//
 func wrapWithCache[K comparable, V any](ctx context.Context, cache *expirable.LRU[K, V], query func(context.Context, K) (V, error), params K) (V, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.Bool("dao.cache.available", true))
