@@ -149,7 +149,9 @@ func runDoctorChecks(ctx context.Context) error {
 
 	// Web-app npm dependencies check.
 	nodeModulesPath := filepath.Join(projectRoot, "web-app", "node_modules")
-	if _, err := os.Stat(nodeModulesPath); err != nil {
+
+	_, statErr := os.Stat(nodeModulesPath)
+	if statErr != nil {
 		missing = append(missing, "web-app npm deps")
 
 		fmt.Fprintf(w, "  %-16s %-18s %s  (run 'pubgolf-devctrl install web')\n", "npm deps:", "not installed", "\u2717")
