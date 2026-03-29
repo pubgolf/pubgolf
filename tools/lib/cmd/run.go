@@ -15,6 +15,7 @@ func init() {
 	runCmd.AddCommand(runAPIBgCmd)
 	runCmd.AddCommand(runAPIDatabaseCmd)
 	// runCmd.AddCommand(runAPIMinioCmd)
+	runCmd.AddCommand(runWebCmd)
 	rootCmd.AddCommand(runCmd)
 
 	runAPIServerCmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically restart the server.")
@@ -58,6 +59,26 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-db"))
+	},
+}
+
+var runWebCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Run SvelteKit dev server",
+	Run: func(cmd *cobra.Command, _ []string) {
+		env, err := envProvider.Env(cmd.Context(), "web-app", "dev")
+		classifyAndExit(fmtErr(err, "fetch web-app environment"))
+
+		proc, startErr := runner.Start(cmd.Context(), Cmd{
+			Name: filepath.FromSlash("./node_modules/.bin/vite"),
+			Args: []string{"dev"},
+			Dir:  "web-app",
+			Env:  env,
+		})
+		classifyAndExit(fmtErr(startErr, "start vite dev server"))
+
+		<-shuttingDown
+		proc.Stop()
 	},
 }
 
