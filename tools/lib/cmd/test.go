@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +21,6 @@ func init() {
 	testCmd.AddCommand(testE2ECmd)
 	testE2ECmd.AddCommand(testE2EAPICmd)
 	testE2ECmd.AddCommand(testE2EWebCmd)
-	testE2EAPICmd.Flags().Bool("watch", false, "Watch the input directory and automatically restart the e2e test")
 
 	rootCmd.AddCommand(testCmd)
 
@@ -116,19 +114,12 @@ var testE2ECmd = &cobra.Command{
 		localFlag, err := cmd.Flags().GetBool("local")
 		classifyAndExit(fmtErr(err, "check '--local' flag"))
 
-		// Run API e2e first (stopOnExit=false so we can block here and sequence).
-		proc := runE2ETest(cmd.Context(), runner, envProvider, false, localFlag)
-
-		waitErr := proc.Wait()
-		if waitErr != nil {
-			exitErr, ok := waitErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
-			if !ok || exitErr.ExitCode() != 1 {
-				classifyAndExit(fmtErr(waitErr, "execute API e2e tests"))
-			}
-		}
-
-		// Then run web e2e.
-		classifyAndExit(testE2EWeb(cmd.Context(), runner))
+		classifyAndExit(runPar(cmd.Context(), runner,
+			func(ctx context.Context, r Runner) error {
+				return testE2EAPI(ctx, r, envProvider, localFlag)
+			},
+			testE2EWeb,
+		))
 	},
 }
 
@@ -136,27 +127,10 @@ var testE2EAPICmd = &cobra.Command{
 	Use:   "api",
 	Short: "Run Go API e2e tests",
 	Run: func(cmd *cobra.Command, _ []string) {
-		watchFlag, err := cmd.Flags().GetBool("watch")
-		classifyAndExit(fmtErr(err, "check '--watch' flag"))
-
 		localFlag, err := cmd.Flags().GetBool("local")
 		classifyAndExit(fmtErr(err, "check '--local' flag"))
 
-		// Start initial process.
-		proc := runE2ETest(cmd.Context(), runner, envProvider, !watchFlag, localFlag)
-
-		// Launch watcher, if applicable.
-		if watchFlag {
-			go func() {
-				watch("api", "e2e test", func(_ watcher.Event) {
-					proc.Stop()
-					proc = runE2ETest(context.Background(), runner, envProvider, false, localFlag)
-				})
-			}()
-		}
-
-		// Hold process open
-		<-shuttingDown
+		classifyAndExit(testE2EAPI(cmd.Context(), runner, envProvider, localFlag))
 	},
 }
 
@@ -168,33 +142,26 @@ var testE2EWebCmd = &cobra.Command{
 	},
 }
 
-func testE2EWeb(ctx context.Context, r Runner) error {
-	err := r.Run(ctx, Cmd{
-		Name: filepath.FromSlash("./node_modules/.bin/playwright"),
-		Args: []string{"test"},
-		Dir:  "web-app",
-	})
-	if err != nil {
-		return fmtErr(err, "run Playwright e2e tests")
-	}
-
-	return nil
-}
-
-func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, localOnly bool) Process { //nolint:ireturn // Returns Process interface by design.
+func testE2EAPI(ctx context.Context, r Runner, ep EnvProvider, localOnly bool) error {
 	env, err := ep.Env(ctx, config.ServerBinName, "test")
-	classifyAndExit(fmtErr(err, "fetch e2e test environment"))
+	if err != nil {
+		return fmtErr(err, "fetch e2e test environment")
+	}
 
 	// Inject worktree isolation env vars.
 	slug, slugErr := worktreeSlug(ctx)
-	classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+	if slugErr != nil {
+		return fmtErr(slugErr, "determine worktree slug")
+	}
 
 	if slug != "" {
 		env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
 	}
 
 	offset, offsetErr := worktreePortOffset(ctx)
-	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+	if offsetErr != nil {
+		return fmtErr(offsetErr, "compute port offset")
+	}
 
 	if localOnly && offset > 0 {
 		env = replaceSharedDBPort(env, offset)
@@ -217,35 +184,32 @@ func runE2ETest(ctx context.Context, r Runner, ep EnvProvider, stopOnExit, local
 
 	log.Println("Starting e2e test run...")
 
-	proc, startErr := r.Start(ctx, Cmd{
+	err = r.Run(ctx, Cmd{
 		Name: "go",
 		Args: args,
 		Env:  env,
 	})
-	if startErr != nil {
-		// Allow exit code 1 through — it means the test suite failed (not infrastructure).
-		exitErr, ok := startErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
+	if err != nil {
+		exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
 		if !ok || exitErr.ExitCode() != 1 {
-			classifyAndExit(fmtErr(startErr, "execute `go test ...` command"))
+			return fmtErr(err, "execute API e2e tests")
 		}
 	}
 
-	if stopOnExit {
-		go func() {
-			defer triggerShutdown()
+	return nil
+}
 
-			waitErr := proc.Wait()
-			if waitErr != nil {
-				// Allow exit code 1 through — it means the test suite failed (not infrastructure).
-				exitErr, ok := waitErr.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
-				if !ok || exitErr.ExitCode() != 1 {
-					classifyAndExit(fmtErr(waitErr, "execute `go test ...` command"))
-				}
-			}
-		}()
+func testE2EWeb(ctx context.Context, r Runner) error {
+	err := r.Run(ctx, Cmd{
+		Name: filepath.FromSlash("./node_modules/.bin/playwright"),
+		Args: []string{"test"},
+		Dir:  "web-app",
+	})
+	if err != nil {
+		return fmtErr(err, "run Playwright e2e tests")
 	}
 
-	return proc
+	return nil
 }
 
 // errDBNotRunning is returned when the pre-flight health check cannot reach the database.
