@@ -41,6 +41,14 @@ func TestMain(m *testing.M) {
 			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
 			// Background cache eviction goroutine from expirable LRU cache used by config package.
 			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+			// HTTP/2 client keep-alive reader spawned by Go's net/http transport during DB connections over TLS.
+			goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
+			// TLS read goroutine — the same HTTP/2 keep-alive reader, but on CI the stack unwinds
+			// into crypto/tls rather than net/http depending on timing.
+			goleak.IgnoreTopFunction("crypto/tls.(*Conn).Read"),
+			// Low-level poll wait backing the TLS/HTTP goroutines above; appears on CI when the
+			// goroutine is parked in the network poller rather than in user-space Read.
+			goleak.IgnoreTopFunction("internal/poll.runtime_pollWait"),
 		)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "goleak: %v\n", err)
