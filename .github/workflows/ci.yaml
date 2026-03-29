@@ -59,6 +59,7 @@ jobs:
         with:
           version: v2.11.4
           args: ./tools/...
+          skip-cache: true
       - name: Test
         run: go test ./tools/lib/...
       - name: Build
@@ -86,6 +87,7 @@ jobs:
         with:
           version: v2.11.4
           args: ./api/...
+          skip-cache: true
       - name: Test
         run: go test ./api/...
       - name: Build API Server Binary
