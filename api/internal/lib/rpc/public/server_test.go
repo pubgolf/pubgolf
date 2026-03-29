@@ -13,7 +13,9 @@ import (
 func TestMain(m *testing.M) {
 	testguard.UnitTest()
 	goleak.VerifyTestMain(m,
+		// Background cache eviction goroutine from expirable LRU cache used by config package.
 		goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+		// HTTP/2 client keep-alive reader spawned by Go's net/http transport during Connect-RPC calls.
 		goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
 	)
 }

@@ -44,13 +44,23 @@ func TestMain(m *testing.M) {
 
 	_sharedDBCleanup()
 
-	// Check for leaks after cleanup
+	// Check for leaks after cleanup. Uses goleak.Find instead of VerifyTestMain because
+	// the DB connection must be cleaned up before leak checking (connectionOpener goroutine
+	// is expected while the pool is open).
 	if code == 0 {
 		err := goleak.Find(
+			// database/sql spawns a persistent goroutine to open connections on demand; it exits
+			// when the DB is closed, but may still be winding down at check time.
 			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
+			// Background cache eviction goroutine from expirable LRU cache used by config package.
 			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+			// HTTP/2 client keep-alive reader spawned by Go's net/http transport during Connect-RPC calls.
 			goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
+			// TLS read goroutine — the same HTTP/2 keep-alive reader, but on CI the stack unwinds
+			// into crypto/tls rather than net/http depending on timing.
 			goleak.IgnoreTopFunction("crypto/tls.(*Conn).Read"),
+			// Low-level poll wait backing the TLS/HTTP goroutines above; appears on CI when the
+			// goroutine is parked in the network poller rather than in user-space Read.
 			goleak.IgnoreTopFunction("internal/poll.runtime_pollWait"),
 		)
 		if err != nil {

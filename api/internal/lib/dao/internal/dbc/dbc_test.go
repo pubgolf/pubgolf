@@ -3,10 +3,12 @@ package dbc_test
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/goleak"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
@@ -23,17 +25,30 @@ var (
 
 func TestMain(m *testing.M) {
 	testguard.UnitTest()
-	os.Exit(executeTests(m))
-}
 
-func executeTests(m *testing.M) int {
 	_sharedDB, _sharedDBCleanup = dbtest.NewConn("dbc")
-	defer _sharedDBCleanup()
-
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
 	_sharedDBC = dbc.New(_sharedDB)
 
-	return m.Run()
+	code := m.Run()
+
+	_sharedDBCleanup()
+
+	if code == 0 {
+		err := goleak.Find(
+			// database/sql spawns a persistent goroutine to open connections on demand; it exits
+			// when the DB is closed, but may still be winding down at check time.
+			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
+			// Background cache eviction goroutine from expirable LRU cache used by config package.
+			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "goleak: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	os.Exit(code)
 }
 
 func initDB(t *testing.T) (context.Context, *sql.Tx, func()) {

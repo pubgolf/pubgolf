@@ -49,6 +49,10 @@ func (lw LogWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+// Note: goleak is intentionally excluded from e2e tests. The full API server spawns many
+// background goroutines (HTTP listeners, gRPC handlers, telemetry, DB pool) that would
+// require an impractical ignore list without catching real leaks in application code.
+// Unit test suites cover goroutine leak detection.
 func TestMain(m *testing.M) {
 	testguard.E2ETest()
 
