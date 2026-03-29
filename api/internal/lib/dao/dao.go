@@ -96,6 +96,7 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 	return nil
 }
 
+//nolint:ireturn // Required for mocking support.
 func (q *Queries) txQuerier(tx *sql.Tx) (dbc.Querier, error) {
 	if q.tx != nil {
 		return q.dbc, nil
