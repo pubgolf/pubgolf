@@ -131,6 +131,9 @@ jobs:
       - name: NPM Install
         working-directory: ./web-app
         run: npm ci
+      - name: Run Web Unit Tests
+        working-directory: ./web-app
+        run: npm run test:unit -- --run
       - name: Run Web App Checks
         working-directory: ./web-app
         run: |

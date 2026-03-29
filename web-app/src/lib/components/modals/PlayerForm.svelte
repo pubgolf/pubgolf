@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import { scoringCategoryToDisplayName } from '$lib/helpers/scoring-category';
+	import { cleanPhoneNumber } from '$lib/helpers/phone';
 	import {
 		PlayerDataSchema,
 		ScoringCategory,
@@ -43,15 +44,6 @@
 	let error: DisplayError = null;
 	function clearError() {
 		error = null;
-	}
-
-	function cleanPhoneNumber(num: string): string {
-		num = num.replaceAll(/[^\d]/g, '');
-		if (num.length < 11 && !num.startsWith('1')) {
-			num = '1' + num;
-		}
-
-		return '+' + num;
 	}
 
 	async function onFormSubmit() {
