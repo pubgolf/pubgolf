@@ -50,7 +50,8 @@ func TestMain(m *testing.M) {
 			// database/sql spawns a persistent goroutine to open connections on demand; it exits
 			// when the DB is closed, but may still be winding down at check time.
 			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
-			// Background cache eviction goroutine from expirable LRU cache used by config package.
+			// dao package initializes expirable LRU caches at package level; their eviction
+			// goroutines run for the lifetime of the process and can't be stopped.
 			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
 			// HTTP/2 client keep-alive reader from test infrastructure (dbtest) HTTP calls.
 			goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
