@@ -2,11 +2,13 @@ package dao
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dbtest"
@@ -34,16 +36,39 @@ func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 
 func TestMain(m *testing.M) {
 	testguard.UnitTest()
-	os.Exit(executeTests(m))
-}
 
-func executeTests(m *testing.M) int {
 	_sharedDB, _sharedDBCleanup = dbtest.NewConn("dao")
-	defer _sharedDBCleanup()
-
 	dbtest.Migrate(_sharedDB, dbtest.MigrationDir())
 
-	return m.Run()
+	code := m.Run()
+
+	_sharedDBCleanup()
+
+	// Check for leaks after cleanup.
+	if code == 0 {
+		err := goleak.Find(
+			// database/sql spawns a persistent goroutine to open connections on demand; it exits
+			// when the DB is closed, but may still be winding down at check time.
+			goleak.IgnoreTopFunction("database/sql.(*DB).connectionOpener"),
+			// dao package initializes expirable LRU caches at package level; their eviction
+			// goroutines run for the lifetime of the process and can't be stopped.
+			goleak.IgnoreTopFunction("github.com/hashicorp/golang-lru/v2/expirable.NewLRU[...].func1"),
+			// HTTP/2 client keep-alive reader from test infrastructure (dbtest) HTTP calls.
+			goleak.IgnoreTopFunction("net/http.(*http2clientConnReadLoop).run"),
+			// TLS read goroutine — the same HTTP/2 keep-alive reader, but on CI the stack unwinds
+			// into crypto/tls rather than net/http depending on timing.
+			goleak.IgnoreTopFunction("crypto/tls.(*Conn).Read"),
+			// Low-level poll wait backing the TLS/HTTP goroutines above; appears on CI when the
+			// goroutine is parked in the network poller rather than in user-space Read.
+			goleak.IgnoreTopFunction("internal/poll.runtime_pollWait"),
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "goleak: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	os.Exit(code)
 }
 
 func Test_txQuerier(t *testing.T) {
