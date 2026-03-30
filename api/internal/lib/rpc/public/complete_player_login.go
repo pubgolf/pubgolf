@@ -59,7 +59,7 @@ func (s *Server) CompletePlayerLogin(ctx context.Context, req *connect.Request[a
 
 	p, err := player.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.CompletePlayerLoginResponse{

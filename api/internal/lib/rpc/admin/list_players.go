@@ -21,7 +21,7 @@ func (s *Server) ListPlayers(ctx context.Context, req *connect.Request[apiv1.Lis
 	for _, p := range dbPlayers {
 		pp, err := p.Proto()
 		if err != nil {
-			return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 		}
 
 		players = append(players, pp)
