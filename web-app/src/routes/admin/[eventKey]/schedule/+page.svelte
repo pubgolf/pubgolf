@@ -15,10 +15,9 @@
 	import { create } from '@bufbuild/protobuf';
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-	import { noop, type ComponentProps } from 'svelte/internal';
+	import { onMount, type ComponentProps } from 'svelte';
 
-	let refreshProgress: Promise<void> = new Promise(noop);
+	let refreshProgress: Promise<void> = Promise.resolve();
 	let lastRefresh: Date;
 
 	let venues: Venue[] = [];
@@ -40,7 +39,7 @@
 	}
 
 	async function refreshData() {
-		refreshProgress = Promise.all([fetchVenues(), fetchStages()]).then(noop);
+		refreshProgress = Promise.all([fetchVenues(), fetchStages()]).then(() => undefined);
 		await refreshProgress;
 		lastRefresh = new Date();
 	}
