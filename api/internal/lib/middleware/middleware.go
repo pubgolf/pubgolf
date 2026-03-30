@@ -23,6 +23,7 @@ func ConnectInterceptors() ([]connect.Interceptor, error) {
 	return []connect.Interceptor{
 		otel,
 		NewLoggingInterceptor(),
+		NewContextErrorInterceptor(),
 		NewRecoveringInterceptor(),
 	}, nil
 }
