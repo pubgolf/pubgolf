@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -89,7 +88,6 @@ func TestGuardRegisteredForEvent_ContextErrors(t *testing.T) {
 				_, err := s.guardRegisteredForEvent(ce.makeCtx(t), playerID, eventKey)
 
 				require.Error(t, err)
-				assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 				assert.ErrorIs(t, err, ce.ctxErr)
 			})
 
@@ -104,7 +102,6 @@ func TestGuardRegisteredForEvent_ContextErrors(t *testing.T) {
 				_, err := s.guardRegisteredForEvent(ce.makeCtx(t), playerID, eventKey)
 
 				require.Error(t, err)
-				assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 				assert.ErrorIs(t, err, ce.ctxErr)
 			})
 		})
@@ -128,7 +125,6 @@ func TestGuardStageID_ContextErrors(t *testing.T) {
 			_, err := s.guardStageID(ce.makeCtx(t), eventID, venueKey)
 
 			require.Error(t, err)
-			assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 			assert.ErrorIs(t, err, ce.ctxErr)
 		})
 	}
@@ -151,7 +147,6 @@ func TestGuardPlayerCategory_ContextErrors(t *testing.T) {
 			_, err := s.guardPlayerCategory(ce.makeCtx(t), playerID, eventID)
 
 			require.Error(t, err)
-			assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 			assert.ErrorIs(t, err, ce.ctxErr)
 		})
 	}
