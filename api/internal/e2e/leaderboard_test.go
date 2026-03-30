@@ -2,142 +2,84 @@
 package e2e
 
 import (
-	"fmt"
-	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
-	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 )
 
 func Test_LeaderboardRanking(t *testing.T) {
-	testEventKey := "test-event-key-leaderboard"
-	ctx := t.Context()
+	const eventKey = "test-event-key-leaderboard"
 
-	ac := apiv1connect.NewAdminServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
-	c := apiv1connect.NewPubGolfServiceClient(http.DefaultClient, "http://localhost:3100/rpc")
+	ctx := t.Context()
+	tc := newTestClients()
 
 	// Event started 45min ago, currently on stage 2 of 9.
-	row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '-45 minutes') RETURNING id", testEventKey)
-	require.NoError(t, row.Err(), "seed DB: insert event")
-
-	var eventID models.EventID
-	require.NoError(t, row.Scan(&eventID), "scan returned event ID")
-
-	// Set up 9 venues and stages.
-	for i := range 9 {
-		row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id", fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
-		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
-
-		var venueID models.VenueID
-		require.NoError(t, row.Scan(&venueID), "scan returned venue ID")
-
-		_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO stages (event_id, venue_id, rank, duration_minutes) VALUES ($1, $2, $3, 30)", eventID, venueID, (i+1)*10)
-		require.NoError(t, err, "seed DB: insert stage %d", i)
-	}
+	seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
 
 	// Create 3 players: 2 nine-hole, 1 five-hole.
-	type playerInfo struct {
-		id    models.PlayerID
-		token models.AuthToken
-	}
+	player1 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380001", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
+	player2 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380002", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
+	player3 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380003", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE, "")
 
-	createPlayer := func(phone string, category apiv1.ScoringCategory) playerInfo {
-		t.Helper()
-
-		playerResp, err := ac.CreatePlayer(ctx, requestWithAdminAuth(&apiv1.AdminServiceCreatePlayerRequest{
-			PlayerData: &apiv1.PlayerData{
-				Name: "",
-			},
-			PhoneNumber: phone,
-			Registration: &apiv1.EventRegistration{
-				EventKey:        testEventKey,
-				ScoringCategory: category,
-			},
-		}))
-		require.NoError(t, err, "create player %s", phone)
-
-		pid, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
-		require.NoError(t, err, "convert player ID %s", phone)
-
-		row := sharedTestDB.QueryRowContext(ctx, "INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", pid)
-		require.NoError(t, row.Err(), "insert auth token for %s", phone)
-
-		var tok models.AuthToken
-		require.NoError(t, row.Scan(&tok), "scan auth token for %s", phone)
-
-		return playerInfo{id: pid, token: tok}
-	}
-
-	player1 := createPlayer("+15559380001", apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE)
-	player2 := createPlayer("+15559380002", apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE)
-	player3 := createPlayer("+15559380003", apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE)
-
-	_, err := ac.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
-	require.NoError(t, err)
-
-	// Get schedule to find current venue key.
-	schedule, err := c.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
-		EventKey: testEventKey,
-	}, player1.token.String()))
+	// Get current venue key from schedule.
+	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
+		EventKey: eventKey,
+	}, player1.token))
 	require.NoError(t, err, "GetSchedule()")
 
 	currentVenueKey := schedule.Msg.GetSchedule().GetCurrentVenueKey()
 	require.NotZero(t, currentVenueKey, "has current venue key")
 
-	// Get submit score form to find the score input ID.
-	form, err := c.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
-		EventKey: testEventKey,
+	// Get score input ID from submit form.
+	form, err := tc.pub.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+		EventKey: eventKey,
 		VenueKey: currentVenueKey,
 		PlayerId: player1.id.String(),
-	}, player1.token.String()))
+	}, player1.token))
 	require.NoError(t, err, "GetSubmitScoreForm()")
 
 	scoreInputID := form.Msg.GetForm().GetGroups()[0].GetInputs()[0].GetId()
 
 	// Submit scores for each player at current venue.
-	submitScore := func(pi playerInfo, score int64) {
-		t.Helper()
-
-		_, err := c.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
-			EventKey: testEventKey,
+	for _, tt := range []struct {
+		player seededPlayer
+		score  int64
+	}{
+		{player1, 3},
+		{player2, 5},
+		{player3, 4},
+	} {
+		_, err := tc.pub.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
+			EventKey: eventKey,
 			VenueKey: currentVenueKey,
-			PlayerId: pi.id.String(),
+			PlayerId: tt.player.id.String(),
 			Data: &apiv1.FormSubmission{
 				Values: []*apiv1.FormValue{
 					{
 						Id: scoreInputID,
 						Value: &apiv1.FormValue_Numeric{
-							Numeric: score,
+							Numeric: tt.score,
 						},
 					},
 				},
 			},
-		}, pi.token.String()))
-		require.NoError(t, err, "submit score %d for player %s", score, pi.id.String())
+		}, tt.player.token))
+		require.NoError(t, err, "submit score %d for player %s", tt.score, tt.player.id.String())
 	}
 
-	submitScore(player1, 3)
-	submitScore(player2, 5)
-	submitScore(player3, 4)
-
 	// Verify nine-hole leaderboard: 2 entries, player 1 ranked higher (lower score).
-	nineHoleScores, err := c.GetScoresForCategory(ctx, requestWithAuth(&apiv1.GetScoresForCategoryRequest{
-		EventKey: testEventKey,
+	nineHoleScores, err := tc.pub.GetScoresForCategory(ctx, requestWithAuth(&apiv1.GetScoresForCategoryRequest{
+		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
-	}, player1.token.String()))
+	}, player1.token))
 	require.NoError(t, err, "GetScoresForCategory(NINE_HOLE)")
 
-	nineHoleEntries := nineHoleScores.Msg.GetScoreBoard().GetScores()
-
-	// Filter to entries that have an entity ID (player entries, not adjustments or venue labels).
 	var nineHolePlayers []*apiv1.ScoreBoard_ScoreBoardEntry
 
-	for _, entry := range nineHoleEntries {
+	for _, entry := range nineHoleScores.Msg.GetScoreBoard().GetScores() {
 		if entry.EntityId != nil {
 			nineHolePlayers = append(nineHolePlayers, entry)
 		}
@@ -151,17 +93,15 @@ func Test_LeaderboardRanking(t *testing.T) {
 	}
 
 	// Verify five-hole leaderboard: 1 entry for the five-hole player.
-	fiveHoleScores, err := c.GetScoresForCategory(ctx, requestWithAuth(&apiv1.GetScoresForCategoryRequest{
-		EventKey: testEventKey,
+	fiveHoleScores, err := tc.pub.GetScoresForCategory(ctx, requestWithAuth(&apiv1.GetScoresForCategoryRequest{
+		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
-	}, player3.token.String()))
+	}, player3.token))
 	require.NoError(t, err, "GetScoresForCategory(FIVE_HOLE)")
-
-	fiveHoleEntries := fiveHoleScores.Msg.GetScoreBoard().GetScores()
 
 	var fiveHolePlayers []*apiv1.ScoreBoard_ScoreBoardEntry
 
-	for _, entry := range fiveHoleEntries {
+	for _, entry := range fiveHoleScores.Msg.GetScoreBoard().GetScores() {
 		if entry.EntityId != nil {
 			fiveHolePlayers = append(fiveHolePlayers, entry)
 		}
