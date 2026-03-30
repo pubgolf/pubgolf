@@ -57,11 +57,15 @@ func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) 
 		return fmtErr(err, "start vite preview server")
 	}
 
-	binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-
-	apiProc, err := startAPIServer(ctx, r, ep, config.ServerBinName, config.DopplerEnvName, binPath, args,
-		fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", previewPort),
-	)
+	apiProc, err := startAPIServer(ctx, APIServerOpts{
+		Runner:      r,
+		EnvProvider: ep,
+		Project:     config.ServerBinName,
+		EnvCfg:      config.DopplerEnvName,
+		Bin:         filepath.FromSlash("./api/cmd/" + config.ServerBinName),
+		Args:        args,
+		ExtraEnv:    []string{fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", previewPort)},
+	})
 	if err != nil {
 		previewProc.Stop()
 
@@ -90,8 +94,14 @@ var runAPIServerCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Run API server",
 	Run: func(cmd *cobra.Command, args []string) {
-		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-		watchableGoRun(cmd, runner, envProvider, config.ServerBinName, config.DopplerEnvName, binPath, args)
+		watchableGoRun(cmd, APIServerOpts{
+			Runner:      runner,
+			EnvProvider: envProvider,
+			Project:     config.ServerBinName,
+			EnvCfg:      config.DopplerEnvName,
+			Bin:         filepath.FromSlash("./api/cmd/" + config.ServerBinName),
+			Args:        args,
+		})
 	},
 }
 
@@ -189,15 +199,13 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	return nil
 }
 
-func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) {
+func watchableGoRun(cmd *cobra.Command, opts APIServerOpts) {
 	watchFlag, err := cmd.Flags().GetBool("watch")
 	classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
-	// Start initial process
-	proc := startGoRun(cmd.Context(), r, ep, project, envCfg, bin, args)
+	proc := startGoRun(cmd.Context(), opts)
 
 	if !watchFlag {
-		// Wait for process to exit, then shut down.
 		waitErr := proc.Wait()
 		if waitErr != nil {
 			log.Printf("process exited with error: %v", waitErr)
@@ -206,30 +214,39 @@ func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCf
 		return
 	}
 
-	// Launch watcher to restart the process on file changes.
 	go func() {
 		watch("api", "restart API server", func(_ watcher.Event) {
 			proc.Stop()
-			proc = startGoRun(context.Background(), r, ep, project, envCfg, bin, args)
+			proc = startGoRun(context.Background(), opts)
 		})
 	}()
 
-	// Hold process open until shutdown signal.
 	<-shuttingDown
 	proc.Stop()
 }
 
+// APIServerOpts configures an API server process.
+type APIServerOpts struct {
+	Runner      Runner
+	EnvProvider EnvProvider
+	Project     string
+	EnvCfg      string
+	Bin         string
+	Args        []string
+	ExtraEnv    []string
+}
+
 //nolint:ireturn // Returns Process interface by design.
-func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) Process {
-	proc, err := startAPIServer(ctx, r, ep, project, envCfg, bin, args)
+func startGoRun(ctx context.Context, opts APIServerOpts) Process {
+	proc, err := startAPIServer(ctx, opts)
 	classifyAndExit(err)
 
 	return proc
 }
 
 //nolint:ireturn // Returns Process interface by design.
-func startAPIServer(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string, extraEnv ...string) (Process, error) {
-	env, err := ep.Env(ctx, project, envCfg)
+func startAPIServer(ctx context.Context, opts APIServerOpts) (Process, error) {
+	env, err := opts.EnvProvider.Env(ctx, opts.Project, opts.EnvCfg)
 	if err != nil {
 		return nil, fmtErr(err, "fetch go run environment")
 	}
@@ -243,13 +260,13 @@ func startAPIServer(ctx context.Context, r Runner, ep EnvProvider, project, envC
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
 	)
-	env = append(env, extraEnv...)
+	env = append(env, opts.ExtraEnv...)
 
-	allArgs := append([]string{"run", bin}, args...)
+	allArgs := append([]string{"run", opts.Bin}, opts.Args...)
 
-	log.Printf("Starting '%s'...\n", bin)
+	log.Printf("Starting '%s'...\n", opts.Bin)
 
-	proc, err := r.Start(ctx, Cmd{
+	proc, err := opts.Runner.Start(ctx, Cmd{
 		Name: "go",
 		Args: allArgs,
 		Env:  env,
