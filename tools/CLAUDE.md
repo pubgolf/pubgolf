@@ -114,6 +114,32 @@ Each function passed to `runPar` must have the signature
 - Handler functions: `verbNoun` (e.g. `checkGo`, `generateProto`, `dockerRun`).
 - Cobra vars: `{group}Cmd`, `{group}{Sub}Cmd` (e.g. `checkCmd`, `checkGoCmd`).
 
+## Function Signatures
+
+**Rule of thumb: 4 parameters max** (not counting `ctx context.Context`). When a
+function needs more than 4 params, group the extras into an options/args struct:
+
+```go
+// Bad: 6 parameters — hard to read, easy to swap strings
+func startServer(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) error
+
+// Good: struct groups related config
+type ServerOpts struct {
+    Runner      Runner
+    EnvProvider EnvProvider
+    Project     string
+    EnvCfg      string
+    Bin         string
+    Args        []string
+}
+
+func startServer(ctx context.Context, opts ServerOpts) error
+```
+
+Interfaces (`Runner`, `EnvProvider`) and `context.Context` are fine as direct
+params — they represent cross-cutting concerns, not configuration. The struct
+is for the rest.
+
 ## nolint Annotations
 
 - `//nolint:ireturn` — on functions that return an interface by design (Runner, Process, EnvProvider).
