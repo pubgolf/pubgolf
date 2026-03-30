@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"testing"
 
@@ -278,5 +279,8 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 	})
 }
 
-// Ensure DatabaseULID implements driver.Valuer.
-var _ driver.Valuer = DatabaseULID{}
+// Ensure DatabaseULID implements driver.Valuer and sql.Scanner.
+var (
+	_ driver.Valuer = DatabaseULID{}
+	_ sql.Scanner   = (*DatabaseULID)(nil)
+)
