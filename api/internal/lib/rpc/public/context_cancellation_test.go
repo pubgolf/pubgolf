@@ -3,6 +3,7 @@ package public
 import (
 	"context"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/oklog/ulid/v2"
@@ -11,240 +12,147 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
-	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
-	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
-func TestGetSchedule_ContextCancellation(t *testing.T) {
-	t.Parallel()
+// mockDAOCallWithError sets up a DAO mock method to return the given error with
+// a zero-value result. argCount specifies the number of arguments (all matched
+// with mock.Anything).
+func mockDAOCallWithError(m *dao.MockQueryProvider, method string, zeroVal any, ctxErr error, argCount int) {
+	args := make([]any, argCount)
+	for i := range args {
+		args[i] = mock.Anything
+	}
 
-	t.Run("returns error when context is already cancelled", func(t *testing.T) {
-		t.Parallel()
-
-		// Create a pre-cancelled context
-		ctx, cancel := context.WithCancel(t.Context())
-		cancel()
-
-		playerID := models.PlayerIDFromULID(ulid.Make())
-		ctx = middleware.ContextWithPlayerID(ctx, playerID)
-
-		m := new(dao.MockQueryProvider)
-		// EventIDByKey should propagate the context cancellation
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				models.EventID{},
-				context.Canceled,
-			},
-		}.Bind(m, "EventIDByKey")
-
-		server := makeTestServer(m)
-
-		_, err := server.GetSchedule(ctx, connect.NewRequest(&apiv1.GetScheduleRequest{
-			EventKey: "test-event",
-		}))
-
-		require.Error(t, err)
-		assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
-	})
+	dao.MockDAOCall{
+		ShouldCall: true,
+		Args:       args,
+		Return:     []any{zeroVal, ctxErr},
+	}.Bind(m, method)
 }
 
-func TestSubmitScore_ContextCancellation(t *testing.T) {
-	t.Parallel()
+// contextErrorCases returns table-driven test cases for both flavors of context
+// error: a pre-canceled context and an already-expired deadline.
+func contextErrorCases() []struct {
+	name    string
+	makeCtx func(t *testing.T) context.Context
+	ctxErr  error
+} {
+	return []struct {
+		name    string
+		makeCtx func(t *testing.T) context.Context
+		ctxErr  error
+	}{
+		{
+			name: "canceled context",
+			makeCtx: func(t *testing.T) context.Context {
+				t.Helper()
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
 
-	t.Run("returns error when context is cancelled during EventIDByKey call", func(t *testing.T) {
-		t.Parallel()
-
-		// Create a pre-cancelled context
-		ctx, cancel := context.WithCancel(t.Context())
-		cancel()
-
-		playerID := models.PlayerIDFromULID(ulid.Make())
-		ctx = middleware.ContextWithPlayerID(ctx, playerID)
-
-		m := new(dao.MockQueryProvider)
-		// EventIDByKey should propagate the context cancellation
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
+				return ctx
 			},
-			Return: []any{
-				models.EventID{},
-				context.Canceled,
+			ctxErr: context.Canceled,
+		},
+		{
+			name: "expired deadline",
+			makeCtx: func(t *testing.T) context.Context {
+				t.Helper()
+				ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(-time.Second))
+				t.Cleanup(cancel)
+
+				return ctx
 			},
-		}.Bind(m, "EventIDByKey")
-
-		server := makeTestServer(m)
-
-		_, err := server.SubmitScore(ctx, connect.NewRequest(&apiv1.SubmitScoreRequest{
-			EventKey: "test-event",
-			VenueKey: 1,
-			PlayerId: playerID.String(),
-		}))
-
-		require.Error(t, err)
-		assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
-	})
-
-	t.Run("returns error when context is cancelled during PlayerRegisteredForEvent call", func(t *testing.T) {
-		t.Parallel()
-
-		// Create a pre-cancelled context
-		ctx, cancel := context.WithCancel(t.Context())
-		cancel()
-
-		playerID := models.PlayerIDFromULID(ulid.Make())
-		ctx = middleware.ContextWithPlayerID(ctx, playerID)
-		eventID := models.EventIDFromULID(ulid.Make())
-
-		m := new(dao.MockQueryProvider)
-
-		// EventIDByKey succeeds
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				eventID,
-				nil,
-			},
-		}.Bind(m, "EventIDByKey")
-
-		// PlayerRegisteredForEvent propagates context cancellation
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				false,
-				context.Canceled,
-			},
-		}.Bind(m, "PlayerRegisteredForEvent")
-
-		server := makeTestServer(m)
-
-		_, err := server.SubmitScore(ctx, connect.NewRequest(&apiv1.SubmitScoreRequest{
-			EventKey: "test-event",
-			VenueKey: 1,
-			PlayerId: playerID.String(),
-		}))
-
-		require.Error(t, err)
-		assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
-	})
-
-	t.Run("returns error when context is cancelled during StageIDByVenueKey call", func(t *testing.T) {
-		t.Parallel()
-
-		// Create a pre-cancelled context
-		ctx, cancel := context.WithCancel(t.Context())
-		cancel()
-
-		playerID := models.PlayerIDFromULID(ulid.Make())
-		ctx = middleware.ContextWithPlayerID(ctx, playerID)
-		eventID := models.EventIDFromULID(ulid.Make())
-
-		m := new(dao.MockQueryProvider)
-
-		// EventIDByKey succeeds
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				eventID,
-				nil,
-			},
-		}.Bind(m, "EventIDByKey")
-
-		// PlayerRegisteredForEvent succeeds
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				true,
-				nil,
-			},
-		}.Bind(m, "PlayerRegisteredForEvent")
-
-		// StageIDByVenueKey propagates context cancellation
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				models.StageID{},
-				context.Canceled,
-			},
-		}.Bind(m, "StageIDByVenueKey")
-
-		server := makeTestServer(m)
-
-		_, err := server.SubmitScore(ctx, connect.NewRequest(&apiv1.SubmitScoreRequest{
-			EventKey: "test-event",
-			VenueKey: 1,
-			PlayerId: playerID.String(),
-		}))
-
-		require.Error(t, err)
-		assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
-	})
+			ctxErr: context.DeadlineExceeded,
+		},
+	}
 }
 
-func TestGetSchedule_ContextDeadline(t *testing.T) {
+func TestGuardRegisteredForEvent_ContextErrors(t *testing.T) {
 	t.Parallel()
 
-	t.Run("returns error when context has exceeded deadline", func(t *testing.T) {
-		t.Parallel()
+	playerID := models.PlayerIDFromULID(ulid.Make())
+	eventID := models.EventIDFromULID(ulid.Make())
+	eventKey := "test-event"
 
-		// Create a context with an already-passed deadline
-		ctx, cancel := context.WithCancel(t.Context())
-		cancel()
+	for _, ce := range contextErrorCases() {
+		t.Run(ce.name, func(t *testing.T) {
+			t.Parallel()
 
-		playerID := models.PlayerIDFromULID(ulid.Make())
-		ctx = middleware.ContextWithPlayerID(ctx, playerID)
+			t.Run("propagates from EventIDByKey", func(t *testing.T) {
+				t.Parallel()
 
-		m := new(dao.MockQueryProvider)
-		// EventIDByKey should propagate the deadline exceeded error
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				mock.Anything,
-			},
-			Return: []any{
-				models.EventID{},
-				context.Canceled,
-			},
-		}.Bind(m, "EventIDByKey")
+				m := new(dao.MockQueryProvider)
+				mockDAOCallWithError(m, "EventIDByKey", models.EventID{}, ce.ctxErr, 2)
+				s := makeTestServer(m)
 
-		server := makeTestServer(m)
+				_, err := s.guardRegisteredForEvent(ce.makeCtx(t), playerID, eventKey)
 
-		_, err := server.GetSchedule(ctx, connect.NewRequest(&apiv1.GetScheduleRequest{
-			EventKey: "test-event",
-		}))
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
+				assert.ErrorIs(t, err, ce.ctxErr)
+			})
 
-		assert.Error(t, err)
-	})
+			t.Run("propagates from PlayerRegisteredForEvent mid-request", func(t *testing.T) {
+				t.Parallel()
+
+				m := new(dao.MockQueryProvider)
+				mockEventIDByKey(m, eventKey, eventID)
+				mockDAOCallWithError(m, "PlayerRegisteredForEvent", false, ce.ctxErr, 3)
+				s := makeTestServer(m)
+
+				_, err := s.guardRegisteredForEvent(ce.makeCtx(t), playerID, eventKey)
+
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
+				assert.ErrorIs(t, err, ce.ctxErr)
+			})
+		})
+	}
+}
+
+func TestGuardStageID_ContextErrors(t *testing.T) {
+	t.Parallel()
+
+	eventID := models.EventIDFromULID(ulid.Make())
+	venueKey := models.VenueKeyFromUInt32(1)
+
+	for _, ce := range contextErrorCases() {
+		t.Run(ce.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := new(dao.MockQueryProvider)
+			mockDAOCallWithError(m, "StageIDByVenueKey", models.StageID{}, ce.ctxErr, 3)
+			s := makeTestServer(m)
+
+			_, err := s.guardStageID(ce.makeCtx(t), eventID, venueKey)
+
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
+			assert.ErrorIs(t, err, ce.ctxErr)
+		})
+	}
+}
+
+func TestGuardPlayerCategory_ContextErrors(t *testing.T) {
+	t.Parallel()
+
+	playerID := models.PlayerIDFromULID(ulid.Make())
+	eventID := models.EventIDFromULID(ulid.Make())
+
+	for _, ce := range contextErrorCases() {
+		t.Run(ce.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := new(dao.MockQueryProvider)
+			mockDAOCallWithError(m, "PlayerCategoryForEvent", models.ScoringCategoryUnspecified, ce.ctxErr, 3)
+			s := makeTestServer(m)
+
+			_, err := s.guardPlayerCategory(ce.makeCtx(t), playerID, eventID)
+
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
+			assert.ErrorIs(t, err, ce.ctxErr)
+		})
+	}
 }
