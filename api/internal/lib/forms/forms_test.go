@@ -235,22 +235,22 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		assert.Equal(t, "Did you commit any party fouls?", form.GetGroups()[1].GetLabel())
 	})
 
-	t.Run("venue and standard adjustments produce separate groups", func(t *testing.T) {
+	t.Run("venue group before standard group regardless of input order", func(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
 			{
 				ID:            models.AdjustmentTemplateIDFromULID(id1),
-				Label:         "Venue Bonus",
-				Value:         1,
-				VenueSpecific: true,
+				Label:         "Standard Penalty",
+				Value:         -1,
+				VenueSpecific: false,
 				Active:        false,
 			},
 			{
 				ID:            models.AdjustmentTemplateIDFromULID(id2),
-				Label:         "Standard Penalty",
-				Value:         -1,
-				VenueSpecific: false,
+				Label:         "Venue Bonus",
+				Value:         1,
+				VenueSpecific: true,
 				Active:        false,
 			},
 		}
@@ -261,7 +261,7 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		assert.Equal(t, "Did you commit any party fouls?", form.GetGroups()[2].GetLabel())
 	})
 
-	t.Run("active flag maps to default value", func(t *testing.T) {
+	t.Run("active adjustments selected by default", func(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
@@ -295,14 +295,19 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		require.True(t, ok)
 
 		opts := smVariant.SelectMany.GetOptions()
-		require.Len(t, opts, 3)
+		require.Len(t, opts, len(adj))
+
+		wantDefaults := make([]bool, len(adj))
+		for i, a := range adj {
+			wantDefaults[i] = a.Active
+		}
 
 		gotDefaults := make([]bool, len(opts))
 		for i, o := range opts {
 			gotDefaults[i] = o.GetDefaultValue()
 		}
 
-		assert.Equal(t, []bool{true, false, true}, gotDefaults)
+		assert.Equal(t, wantDefaults, gotDefaults)
 	})
 }
 
@@ -329,24 +334,30 @@ func TestParseSubmitScoreForm(t *testing.T) {
 		}
 	}
 
+	randSips := func() int64 {
+		return int64(rand.IntN(SubmitScoreSipsMax-SubmitScoreSipsMin+1) + SubmitScoreSipsMin) //nolint:gosec // test-only randomness
+	}
+
 	t.Run("valid score only", func(t *testing.T) {
 		t.Parallel()
 
-		score, adj, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(3)})
+		sips := randSips()
+		score, adj, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(sips)})
 		require.NoError(t, err)
-		assert.Equal(t, uint32(3), score)
+		assert.Equal(t, uint32(sips), score) //nolint:gosec // sips is bounded by [SipsMin, SipsMax]
 		assert.Empty(t, adj)
 	})
 
 	t.Run("score with venue adjustments", func(t *testing.T) {
 		t.Parallel()
 
+		sips := randSips()
 		score, adj, err := ParseSubmitScoreForm([]*apiv1.FormValue{
-			numericVal(5),
+			numericVal(sips),
 			selectManyVal(SubmitScoreInputIDVenueAdj, []string{id1.String(), id2.String()}),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, uint32(5), score)
+		assert.Equal(t, uint32(sips), score) //nolint:gosec // sips is bounded by [SipsMin, SipsMax]
 		assert.Equal(t, []models.AdjustmentTemplateID{
 			models.AdjustmentTemplateIDFromULID(id1),
 			models.AdjustmentTemplateIDFromULID(id2),
@@ -356,12 +367,13 @@ func TestParseSubmitScoreForm(t *testing.T) {
 	t.Run("score with standard adjustments", func(t *testing.T) {
 		t.Parallel()
 
+		sips := randSips()
 		score, adj, err := ParseSubmitScoreForm([]*apiv1.FormValue{
-			numericVal(2),
+			numericVal(sips),
 			selectManyVal(SubmitScoreInputIDStandardAdj, []string{id1.String()}),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, uint32(2), score)
+		assert.Equal(t, uint32(sips), score) //nolint:gosec // sips is bounded by [SipsMin, SipsMax]
 		assert.Equal(t, []models.AdjustmentTemplateID{
 			models.AdjustmentTemplateIDFromULID(id1),
 		}, adj)
@@ -370,13 +382,14 @@ func TestParseSubmitScoreForm(t *testing.T) {
 	t.Run("score with both adjustment types", func(t *testing.T) {
 		t.Parallel()
 
+		sips := randSips()
 		score, adj, err := ParseSubmitScoreForm([]*apiv1.FormValue{
-			numericVal(4),
+			numericVal(sips),
 			selectManyVal(SubmitScoreInputIDVenueAdj, []string{id1.String()}),
 			selectManyVal(SubmitScoreInputIDStandardAdj, []string{id2.String(), id3.String()}),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, uint32(4), score)
+		assert.Equal(t, uint32(sips), score) //nolint:gosec // sips is bounded by [SipsMin, SipsMax]
 		assert.Equal(t, []models.AdjustmentTemplateID{
 			models.AdjustmentTemplateIDFromULID(id1),
 			models.AdjustmentTemplateIDFromULID(id2),
