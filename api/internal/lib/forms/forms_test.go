@@ -158,14 +158,28 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 	id2 := ulid.Make()
 	id3 := ulid.Make()
 
-	t.Run("new score no adjustments", func(t *testing.T) {
+	t.Run("zero score uses submit labels", func(t *testing.T) {
 		t.Parallel()
 
 		form := GenerateSubmitScoreForm(0, nil)
 
 		assert.Equal(t, "Submit Your Score", form.GetLabel())
 		assert.Equal(t, "Submit", form.GetActionLabel())
-		require.Len(t, form.GetGroups(), 1)
+	})
+
+	t.Run("nonzero score uses edit labels", func(t *testing.T) {
+		t.Parallel()
+
+		form := GenerateSubmitScoreForm(5, nil)
+
+		assert.Equal(t, "Edit Your Score", form.GetLabel())
+		assert.Equal(t, "Re-Submit", form.GetActionLabel())
+	})
+
+	t.Run("zero score has no default sips value", func(t *testing.T) {
+		t.Parallel()
+
+		form := GenerateSubmitScoreForm(0, nil)
 
 		sipsInput := form.GetGroups()[0].GetInputs()[0]
 		assert.Equal(t, SubmitScoreInputIDSips, sipsInput.GetId())
@@ -175,18 +189,21 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		assert.Nil(t, numVariant.Numeric.DefaultValue)
 	})
 
-	t.Run("edit score no adjustments", func(t *testing.T) {
+	t.Run("nonzero score defaults sips to current score", func(t *testing.T) {
 		t.Parallel()
 
 		form := GenerateSubmitScoreForm(5, nil)
 
-		assert.Equal(t, "Edit Your Score", form.GetLabel())
-		assert.Equal(t, "Re-Submit", form.GetActionLabel())
-		require.Len(t, form.GetGroups(), 1)
-
 		numVariant, ok := form.GetGroups()[0].GetInputs()[0].GetVariant().(*apiv1.FormInput_Numeric)
 		require.True(t, ok)
 		assert.Equal(t, int64(5), numVariant.Numeric.GetDefaultValue())
+	})
+
+	t.Run("nil adjustments produces only sips group", func(t *testing.T) {
+		t.Parallel()
+
+		form := GenerateSubmitScoreForm(0, nil)
+		require.Len(t, form.GetGroups(), 1)
 	})
 
 	t.Run("venue specific adjustments only", func(t *testing.T) {
@@ -412,5 +429,23 @@ func TestParseSubmitScoreForm(t *testing.T) {
 			selectManyVal(SubmitScoreInputIDVenueAdj, []string{"not-a-ulid"}),
 		})
 		require.Error(t, err)
+	})
+
+	t.Run("nil form value in slice returns error", func(t *testing.T) {
+		t.Parallel()
+
+		_, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{nil, numericVal(3)})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrUnexpectedInput)
+	})
+
+	t.Run("nil sips form value returns wrong variant", func(t *testing.T) {
+		t.Parallel()
+
+		_, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{
+			{Id: SubmitScoreInputIDSips},
+		})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, ErrWrongInputVariant)
 	})
 }
