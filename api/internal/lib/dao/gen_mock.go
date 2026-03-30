@@ -127,7 +127,7 @@ func (_m *MockQueryProvider) AllVenues(ctx context.Context) ([]models.Venue, err
 }
 
 // ClaimIdempotencyKey provides a mock function with given fields: ctx, key, scope
-func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key string, scope string) (bool, error) {
+func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key models.DatabaseULID, scope models.IdempotencyScope) (bool, error) {
 	ret := _m.Called(ctx, key, scope)
 
 	if len(ret) == 0 {
@@ -136,16 +136,16 @@ func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key string
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (bool, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.DatabaseULID, models.IdempotencyScope) (bool, error)); ok {
 		return rf(ctx, key, scope)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) bool); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, models.DatabaseULID, models.IdempotencyScope) bool); ok {
 		r0 = rf(ctx, key, scope)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, models.DatabaseULID, models.IdempotencyScope) error); ok {
 		r1 = rf(ctx, key, scope)
 	} else {
 		r1 = ret.Error(1)

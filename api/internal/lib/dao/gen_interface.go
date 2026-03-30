@@ -21,7 +21,7 @@ type QueryProvider interface {
 	AllVenues(ctx context.Context) ([]models.Venue, error)
 	// ClaimIdempotencyKey attempts to claim an idempotency key for the given scope.
 	// Returns true if the key was newly claimed, false if it was already claimed.
-	ClaimIdempotencyKey(ctx context.Context, key string, scope string) (bool, error)
+	ClaimIdempotencyKey(ctx context.Context, key models.DatabaseULID, scope models.IdempotencyScope) (bool, error)
 	// CreateAdjustmentTemplate sets the properties for a new adjustment template. If the StageID is not set, the provided eventID will be linked to make the adjustment template apply to all stages.
 	CreateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) (models.AdjustmentTemplateID, error)
 	// CreatePlayer creates a new player.

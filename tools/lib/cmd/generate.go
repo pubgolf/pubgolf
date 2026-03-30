@@ -32,9 +32,7 @@ var generateCmd = &cobra.Command{
 		classifyAndExit(runPar(cmd.Context(), runner,
 			generateProto,
 			generateSQLc,
-			func(ctx context.Context, r Runner) error {
-				return generateEnum(ctx, r, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models"))
-			},
+			generateAllEnums,
 		))
 		classifyAndExit(generateAllMocks(cmd.Context(), runner))
 	},
@@ -116,8 +114,21 @@ var generateEnumCmd = &cobra.Command{
 	Use:   "enum",
 	Short: "Generate enum stringers",
 	Run: func(cmd *cobra.Command, _ []string) {
-		classifyAndExit(generateEnum(cmd.Context(), runner, "ScoringCategory", filepath.FromSlash("./api/internal/lib/models")))
+		classifyAndExit(generateAllEnums(cmd.Context(), runner))
 	},
+}
+
+func generateAllEnums(ctx context.Context, r Runner) error {
+	modelsPkg := filepath.FromSlash("./api/internal/lib/models")
+
+	for _, typ := range []string{"ScoringCategory", "IdempotencyScope"} {
+		err := generateEnum(ctx, r, typ, modelsPkg)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func generateEnum(ctx context.Context, r Runner, typ, pkg string) error {
