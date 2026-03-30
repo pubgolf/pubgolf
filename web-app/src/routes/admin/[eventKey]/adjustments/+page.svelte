@@ -13,10 +13,9 @@
 	import { getAdminServiceClient } from '$lib/rpc/client';
 	import { modalStore, toastStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon, TrophyIcon } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-	import { noop, type ComponentProps } from 'svelte/internal';
+	import { onMount, type ComponentProps } from 'svelte';
 
-	let refreshProgress: Promise<void> = new Promise(noop);
+	let refreshProgress: Promise<void> = Promise.resolve();
 	let lastRefresh: Date;
 
 	let stages: Stage[] = [];
@@ -40,7 +39,7 @@
 	}
 
 	async function refreshData() {
-		refreshProgress = Promise.all([fetchStages(), fetchTemplates()]).then(noop);
+		refreshProgress = Promise.all([fetchStages(), fetchTemplates()]).then(() => undefined);
 		await refreshProgress;
 		lastRefresh = new Date();
 	}
@@ -89,7 +88,7 @@
 	async function showNewTemplateModal() {
 		const props: Omit<ComponentProps<AdjustmentTemplateForm>, 'parent'> = {
 			operation: 'create',
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			stages: await stages,
 			template: null,
 			onSubmit: async (data: AdjustmentTemplateData, id?: string) => {
@@ -119,7 +118,7 @@
 	async function showEditTemplateModal(template: AdjustmentTemplate) {
 		const props: Omit<ComponentProps<AdjustmentTemplateForm>, 'parent'> = {
 			operation: 'edit',
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			stages: await stages,
 			template,
 			onSubmit: async (data: AdjustmentTemplateData, id?: string) => {

@@ -18,9 +18,8 @@
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { RefreshCwIcon, UserPlusIcon } from 'lucide-svelte';
 	import { onMount, type ComponentProps } from 'svelte';
-	import { noop } from 'svelte/internal';
 
-	let refreshProgress: Promise<void> = new Promise(noop);
+	let refreshProgress: Promise<void> = Promise.resolve();
 	let lastRefresh: Date = new Date();
 
 	let players: Player[] = [];
@@ -49,7 +48,7 @@
 		const props: Omit<ComponentProps<PlayerForm>, 'parent'> = {
 			operation,
 			title,
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			player,
 			onSubmit: async (
 				op: FormOperation,
@@ -64,7 +63,7 @@
 							playerData,
 							phoneNumber,
 							registration: {
-								eventKey: $page.params.eventKey,
+								eventKey: $page.params.eventKey!,
 								scoringCategory: scoringCategory
 							}
 						});
@@ -75,7 +74,7 @@
 							playerId: player.id,
 							playerData,
 							registration: {
-								eventKey: $page.params.eventKey,
+								eventKey: $page.params.eventKey!,
 								scoringCategory: scoringCategory
 							}
 						});
