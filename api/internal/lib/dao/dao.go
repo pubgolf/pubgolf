@@ -28,6 +28,13 @@ const fallbackVenueImage = "https://assets.pubgolf.co/images/venues/348x348/serv
 // Clock is a function that returns the current time. Used for dependency injection in tests.
 type Clock func() time.Time
 
+// Options configures the DAO constructor.
+type Options struct {
+	ForcePreparedQueries bool
+	Clock                Clock
+	Querier              dbc.Querier
+}
+
 // Queries holds references to all data stores and provides query methods.
 type Queries struct {
 	db    *sql.DB
@@ -37,23 +44,29 @@ type Queries struct {
 }
 
 // New returns a concrete implementation of `QueryProvider`.
-func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool, clock Clock) (*Queries, error) {
+func New(ctx context.Context, db *sql.DB, opts Options) (*Queries, error) {
+	clock := opts.Clock
 	if clock == nil {
 		clock = time.Now
 	}
 
-	q, err := dbc.Prepare(ctx, db)
-	if err != nil {
-		if forcePreparedQueries {
-			return nil, fmt.Errorf("prepare dbc queries: %w", err)
+	querier := opts.Querier
+	if querier == nil {
+		q, err := dbc.Prepare(ctx, db)
+		if err != nil {
+			if opts.ForcePreparedQueries {
+				return nil, fmt.Errorf("prepare dbc queries: %w", err)
+			}
+
+			log.Printf("Failed to prepare queries, initializing DAO with lazy query parsing: %+v", err)
 		}
 
-		log.Printf("Failed to prepare queries, initializing DAO with lazy query parsing: %+v", err)
+		querier = q
 	}
 
 	return &Queries{
 		db:    db,
-		dbc:   q,
+		dbc:   querier,
 		clock: clock,
 	}, nil
 }
@@ -73,7 +86,13 @@ func (q *Queries) Close() error {
 	return nil
 }
 
-func (q *Queries) now() time.Time { return q.clock() }
+func (q *Queries) now() time.Time {
+	if q.clock == nil {
+		return time.Now()
+	}
+
+	return q.clock()
+}
 
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
 	defer telemetry.FnSpan(&ctx)()

@@ -64,14 +64,16 @@ func TestEventSchedule(t *testing.T) {
 		t.Parallel()
 
 		m := new(dbc.MockQuerier)
-		d := Queries{dbc: m}
+		d, err := New(t.Context(), nil, Options{Querier: m})
+		require.NoError(t, err)
+
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
 
-		_, err := d.EventSchedule(t.Context(), eventID)
+		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -80,7 +82,9 @@ func TestEventSchedule(t *testing.T) {
 		t.Parallel()
 
 		m := new(dbc.MockQuerier)
-		d := Queries{dbc: m}
+		d, err := New(t.Context(), nil, Options{Querier: m})
+		require.NoError(t, err)
+
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
@@ -89,7 +93,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: models.VenueKeyFromUInt32(1)},
 		})
 
-		_, err := d.EventSchedule(t.Context(), eventID)
+		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -98,7 +102,9 @@ func TestEventSchedule(t *testing.T) {
 		t.Parallel()
 
 		m := dbc.NewMockQuerier(t)
-		d := Queries{dbc: m}
+		d, err := New(t.Context(), nil, Options{Querier: m})
+		require.NoError(t, err)
+
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
@@ -112,7 +118,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: models.VenueKeyFromUInt32(1)},
 		})
 
-		_, err := d.EventSchedule(t.Context(), eventID)
+		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
 		m.AssertExpectations(t)
 	})
@@ -121,7 +127,9 @@ func TestEventSchedule(t *testing.T) {
 		t.Parallel()
 
 		m := dbc.NewMockQuerier(t)
-		d := Queries{dbc: m}
+		d, err := New(t.Context(), nil, Options{Querier: m})
+		require.NoError(t, err)
+
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
@@ -135,7 +143,7 @@ func TestEventSchedule(t *testing.T) {
 			{VenueKey: nullVenueKey},
 		})
 
-		_, err := d.EventSchedule(t.Context(), eventID)
+		_, err = d.EventSchedule(t.Context(), eventID)
 		require.Error(t, err)
 		require.ErrorIs(t, err, ErrInvariantViolation)
 		m.AssertExpectations(t)
@@ -145,7 +153,9 @@ func TestEventSchedule(t *testing.T) {
 		t.Parallel()
 
 		m := new(dbc.MockQuerier)
-		d := Queries{dbc: m}
+		d, err := New(t.Context(), nil, Options{Querier: m})
+		require.NoError(t, err)
+
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		numVenues := 5
