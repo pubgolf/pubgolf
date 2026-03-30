@@ -6,10 +6,17 @@ import (
 	ulid "github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
+	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
 )
+
+func TestMain(m *testing.M) {
+	testguard.UnitTest()
+	goleak.VerifyTestMain(m)
+}
 
 func TestParseFormValueNumeric(t *testing.T) {
 	t.Parallel()
