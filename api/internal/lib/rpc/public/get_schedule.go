@@ -57,7 +57,7 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 
 	hashCode, err := hashstructure.Hash(&schedule, hashstructure.FormatV2, nil)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	hash := make([]byte, 8)

@@ -43,7 +43,7 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 
 	up, err := updatedPlayer.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.UpdatePlayerResponse{
