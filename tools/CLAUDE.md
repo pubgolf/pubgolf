@@ -117,28 +117,17 @@ Each function passed to `runPar` must have the signature
 ## Function Signatures
 
 **Rule of thumb: 4 parameters max** (not counting `ctx context.Context`). When a
-function needs more than 4 params, group the extras into an options/args struct:
+function exceeds this, simplify in order of preference:
 
-```go
-// Bad: 6 parameters — hard to read, easy to swap strings
-func startServer(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) error
+1. **Eliminate redundant params** — if every caller passes the same value (e.g.
+   `config.ServerBinName`), read it from the package-level `config` directly.
+   Config is static and doesn't need to be injected for testability.
+2. **Group into an opts struct** — last resort. Structs trade compile-time
+   completeness (missing positional param = compiler error) for readability.
+   Only worth it when params genuinely vary across callers.
 
-// Good: struct groups related config
-type ServerOpts struct {
-    Runner      Runner
-    EnvProvider EnvProvider
-    Project     string
-    EnvCfg      string
-    Bin         string
-    Args        []string
-}
-
-func startServer(ctx context.Context, opts ServerOpts) error
-```
-
-Interfaces (`Runner`, `EnvProvider`) and `context.Context` are fine as direct
-params — they represent cross-cutting concerns, not configuration. The struct
-is for the rest.
+`Runner` and `EnvProvider` stay as direct params — they're swapped in tests
+(`DryRunner`, mock providers) so they must be injectable.
 
 ## nolint Annotations
 
