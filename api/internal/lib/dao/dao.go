@@ -25,8 +25,14 @@ var (
 
 const fallbackVenueImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
 
-// Clock is a function that returns the current time. Used for dependency injection in tests.
-type Clock func() time.Time
+// Clock provides the current time. Defaults to realClock when not specified.
+type Clock interface {
+	Now() time.Time
+}
+
+type realClock struct{}
+
+func (realClock) Now() time.Time { return time.Now() }
 
 // Options configures the DAO constructor.
 type Options struct {
@@ -47,7 +53,7 @@ type Queries struct {
 func New(ctx context.Context, db *sql.DB, opts Options) (*Queries, error) {
 	clock := opts.Clock
 	if clock == nil {
-		clock = time.Now
+		clock = realClock{}
 	}
 
 	querier := opts.Querier
@@ -86,13 +92,7 @@ func (q *Queries) Close() error {
 	return nil
 }
 
-func (q *Queries) now() time.Time {
-	if q.clock == nil {
-		return time.Now()
-	}
-
-	return q.clock()
-}
+func (q *Queries) now() time.Time { return q.clock.Now() }
 
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
 	defer telemetry.FnSpan(&ctx)()

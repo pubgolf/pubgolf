@@ -28,6 +28,10 @@ type mockDBCCall struct {
 	Return     []any
 }
 
+type fixedClock time.Time
+
+func (c fixedClock) Now() time.Time { return time.Time(c) }
+
 func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 	if c.ShouldCall {
 		m.On(name, c.Args...).Return(c.Return...).Once()
@@ -96,7 +100,7 @@ func Test_clockInjection(t *testing.T) {
 
 		fixedTime := time.Date(2025, 1, 15, 10, 30, 0, 0, time.UTC)
 		dao, err := New(t.Context(), nil, Options{
-			Clock:   func() time.Time { return fixedTime },
+			Clock:   fixedClock(fixedTime),
 			Querier: new(dbc.MockQuerier),
 		})
 		require.NoError(t, err)
