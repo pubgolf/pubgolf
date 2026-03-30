@@ -27,14 +27,14 @@ func (s *Server) StartPlayerLogin(ctx context.Context, req *connect.Request[apiv
 	_, err = s.dao.CreatePlayer(ctx, "", num)
 	if err != nil {
 		if !errors.Is(err, dao.ErrAlreadyCreated) {
-			return nil, connect.NewError(connect.CodeUnknown, err)
+			return nil, connect.NewError(connect.CodeUnavailable, err)
 		}
 
 		// Player already exists. Do not return an error, but check and log if we've already verified the phone number.
 
 		isVerified, err := s.dao.PhoneNumberIsVerified(ctx, num)
 		if err != nil {
-			return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("check if phone number is verified: %w", err))
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check if phone number is verified: %w", err))
 		}
 
 		span.SetAttributes(attribute.Bool("player.phone_number_verified", isVerified))
@@ -46,7 +46,7 @@ func (s *Server) StartPlayerLogin(ctx context.Context, req *connect.Request[apiv
 
 	err = s.mes.SendVerification(ctx, num)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	return connect.NewResponse(&apiv1.StartPlayerLoginResponse{}), nil

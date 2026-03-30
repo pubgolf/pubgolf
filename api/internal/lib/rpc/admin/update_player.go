@@ -21,7 +21,7 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 		Name: req.Msg.GetPlayerData().GetName(),
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update player info: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update player info: %w", err))
 	}
 
 	var cat models.ScoringCategory

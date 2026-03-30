@@ -23,7 +23,7 @@ func (s *Server) UpdateRegistration(ctx context.Context, req *connect.Request[ap
 
 	err = s.dao.UpsertRegistration(ctx, playerID, req.Msg.GetRegistration().GetEventKey(), cat)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update registration: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update registration: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.UpdateRegistrationResponse{

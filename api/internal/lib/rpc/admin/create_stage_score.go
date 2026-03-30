@@ -40,17 +40,17 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("insert score: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
 	}
 
 	score, err := s.dao.ScoreByPlayerStage(ctx, playerID, stageID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("retrieve new score: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("retrieve new score: %w", err))
 	}
 
 	dbAdj, err := s.dao.AdjustmentsByPlayerStage(ctx, playerID, stageID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("retrieve new adjustments: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("retrieve new adjustments: %w", err))
 	}
 
 	var adj []*apiv1.Adjustment
