@@ -104,7 +104,7 @@ func Test_clockInjection(t *testing.T) {
 			Querier: new(dbc.MockQuerier),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, fixedTime, dao.now())
+		assert.Equal(t, fixedTime, dao.clock.Now())
 	})
 
 	t.Run("defaults to real time when clock is nil", func(t *testing.T) {
@@ -114,7 +114,7 @@ func Test_clockInjection(t *testing.T) {
 		dao, err := New(t.Context(), nil, Options{Querier: new(dbc.MockQuerier)})
 		require.NoError(t, err)
 
-		got := dao.now()
+		got := dao.clock.Now()
 		assert.False(t, got.Before(before))
 		assert.False(t, got.After(time.Now()))
 	})

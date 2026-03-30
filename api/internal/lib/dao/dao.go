@@ -92,8 +92,6 @@ func (q *Queries) Close() error {
 	return nil
 }
 
-func (q *Queries) now() time.Time { return q.clock.Now() }
-
 func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *Queries) error) error {
 	defer telemetry.FnSpan(&ctx)()
 

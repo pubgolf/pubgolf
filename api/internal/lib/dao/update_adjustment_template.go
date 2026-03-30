@@ -16,7 +16,7 @@ func (q *Queries) UpdateAdjustmentTemplate(ctx context.Context, eventID models.E
 	deletedAt := sql.NullTime{}
 	if !t.IsVisible {
 		deletedAt.Valid = true
-		deletedAt.Time = q.now()
+		deletedAt.Time = q.clock.Now()
 	}
 
 	linkedEventID := models.EventID{}
