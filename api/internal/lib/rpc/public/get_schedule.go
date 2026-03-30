@@ -29,12 +29,12 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 
 	startTime, err := s.dao.EventStartTime(ctx, eventID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	venues, err := s.dao.EventSchedule(ctx, eventID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	currentVenueIdx := currentStopIndex(venues, time.Since(startTime))
@@ -65,7 +65,7 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 
 	version, hashMatched, err := s.dao.EventScheduleCacheVersion(ctx, eventID, hash)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	resp := apiv1.GetScheduleResponse{LatestDataVersion: version}

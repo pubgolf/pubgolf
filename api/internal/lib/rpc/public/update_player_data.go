@@ -21,7 +21,7 @@ func (s *Server) UpdatePlayerData(ctx context.Context, req *connect.Request[apiv
 		Name: req.Msg.GetData().GetName(),
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update registration: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update registration: %w", err))
 	}
 
 	p, err := player.Proto()

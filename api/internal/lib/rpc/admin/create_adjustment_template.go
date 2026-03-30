@@ -41,7 +41,7 @@ func (s *Server) CreateAdjustmentTemplate(ctx context.Context, req *connect.Requ
 		IsVisible: req.Msg.GetData().GetIsVisible(),
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update player info: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update player info: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.CreateAdjustmentTemplateResponse{}), nil

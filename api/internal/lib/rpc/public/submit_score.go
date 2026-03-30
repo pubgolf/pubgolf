@@ -65,7 +65,7 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("insert score: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.SubmitScoreResponse{

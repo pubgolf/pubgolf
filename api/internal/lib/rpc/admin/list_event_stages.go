@@ -18,12 +18,12 @@ func (s *Server) ListEventStages(ctx context.Context, req *connect.Request[apiv1
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	dbStages, err := s.dao.EventScheduleWithDetails(ctx, eventID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, err)
+		return nil, connect.NewError(connect.CodeUnavailable, err)
 	}
 
 	var stages []*apiv1.Stage
