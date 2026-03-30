@@ -1,6 +1,7 @@
 package forms
 
 import (
+	"math/rand/v2"
 	"testing"
 
 	ulid "github.com/oklog/ulid/v2"
@@ -141,16 +142,6 @@ func TestParseFormValueSelectMany(t *testing.T) {
 	}
 }
 
-func makeAdjTemplate(id ulid.ULID, label string, value int32, venueSpecific, active bool) models.AdjustmentTemplate {
-	return models.AdjustmentTemplate{
-		ID:            models.AdjustmentTemplateIDFromULID(id),
-		Label:         label,
-		Value:         value,
-		VenueSpecific: venueSpecific,
-		Active:        active,
-	}
-}
-
 func TestGenerateSubmitScoreForm(t *testing.T) {
 	t.Parallel()
 
@@ -170,7 +161,8 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 	t.Run("nonzero score uses edit labels", func(t *testing.T) {
 		t.Parallel()
 
-		form := GenerateSubmitScoreForm(5, nil)
+		score := uint32(rand.IntN(SubmitScoreSipsMax) + 1) //nolint:gosec // test-only randomness
+		form := GenerateSubmitScoreForm(score, nil)
 
 		assert.Equal(t, "Edit Your Score", form.GetLabel())
 		assert.Equal(t, "Re-Submit", form.GetActionLabel())
@@ -192,11 +184,12 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 	t.Run("nonzero score defaults sips to current score", func(t *testing.T) {
 		t.Parallel()
 
-		form := GenerateSubmitScoreForm(5, nil)
+		score := uint32(rand.IntN(SubmitScoreSipsMax) + 1) //nolint:gosec // test-only randomness
+		form := GenerateSubmitScoreForm(score, nil)
 
 		numVariant, ok := form.GetGroups()[0].GetInputs()[0].GetVariant().(*apiv1.FormInput_Numeric)
 		require.True(t, ok)
-		assert.Equal(t, int64(5), numVariant.Numeric.GetDefaultValue())
+		assert.Equal(t, int64(score), numVariant.Numeric.GetDefaultValue())
 	})
 
 	t.Run("nil adjustments produces only sips group", func(t *testing.T) {
@@ -206,11 +199,17 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		require.Len(t, form.GetGroups(), 1)
 	})
 
-	t.Run("venue specific adjustments only", func(t *testing.T) {
+	t.Run("venue specific adjustments get venue label", func(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
-			makeAdjTemplate(id1, "Bonus", 1, true, false),
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id1),
+				Label:         "Bonus",
+				Value:         1,
+				VenueSpecific: true,
+				Active:        false,
+			},
 		}
 
 		form := GenerateSubmitScoreForm(0, adj)
@@ -218,11 +217,17 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		assert.Equal(t, "Venue-Specific Events", form.GetGroups()[1].GetLabel())
 	})
 
-	t.Run("standard adjustments only", func(t *testing.T) {
+	t.Run("standard adjustments get party fouls label", func(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
-			makeAdjTemplate(id1, "Penalty", -1, false, false),
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id1),
+				Label:         "Penalty",
+				Value:         -1,
+				VenueSpecific: false,
+				Active:        false,
+			},
 		}
 
 		form := GenerateSubmitScoreForm(0, adj)
@@ -230,12 +235,24 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		assert.Equal(t, "Did you commit any party fouls?", form.GetGroups()[1].GetLabel())
 	})
 
-	t.Run("both adjustment types", func(t *testing.T) {
+	t.Run("venue and standard adjustments produce separate groups", func(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
-			makeAdjTemplate(id1, "Venue Bonus", 1, true, false),
-			makeAdjTemplate(id2, "Standard Penalty", -1, false, false),
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id1),
+				Label:         "Venue Bonus",
+				Value:         1,
+				VenueSpecific: true,
+				Active:        false,
+			},
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id2),
+				Label:         "Standard Penalty",
+				Value:         -1,
+				VenueSpecific: false,
+				Active:        false,
+			},
 		}
 
 		form := GenerateSubmitScoreForm(0, adj)
@@ -248,9 +265,27 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		t.Parallel()
 
 		adj := []models.AdjustmentTemplate{
-			makeAdjTemplate(id1, "Active", 1, false, true),
-			makeAdjTemplate(id2, "Inactive", -1, false, false),
-			makeAdjTemplate(id3, "Also Active", 2, false, true),
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id1),
+				Label:         "Active",
+				Value:         1,
+				VenueSpecific: false,
+				Active:        true,
+			},
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id2),
+				Label:         "Inactive",
+				Value:         -1,
+				VenueSpecific: false,
+				Active:        false,
+			},
+			{
+				ID:            models.AdjustmentTemplateIDFromULID(id3),
+				Label:         "Also Active",
+				Value:         2,
+				VenueSpecific: false,
+				Active:        true,
+			},
 		}
 
 		form := GenerateSubmitScoreForm(0, adj)
@@ -259,13 +294,15 @@ func TestGenerateSubmitScoreForm(t *testing.T) {
 		smVariant, ok := form.GetGroups()[1].GetInputs()[0].GetVariant().(*apiv1.FormInput_SelectMany)
 		require.True(t, ok)
 
-		selectMany := smVariant.SelectMany
-		opts := selectMany.GetOptions()
+		opts := smVariant.SelectMany.GetOptions()
 		require.Len(t, opts, 3)
 
-		assert.True(t, opts[0].GetDefaultValue())
-		assert.False(t, opts[1].GetDefaultValue())
-		assert.True(t, opts[2].GetDefaultValue())
+		gotDefaults := make([]bool, len(opts))
+		for i, o := range opts {
+			gotDefaults[i] = o.GetDefaultValue()
+		}
+
+		assert.Equal(t, []bool{true, false, true}, gotDefaults)
 	})
 }
 
@@ -310,9 +347,10 @@ func TestParseSubmitScoreForm(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.Equal(t, uint32(5), score)
-		require.Len(t, adj, 2)
-		assert.Equal(t, models.AdjustmentTemplateIDFromULID(id1), adj[0])
-		assert.Equal(t, models.AdjustmentTemplateIDFromULID(id2), adj[1])
+		assert.Equal(t, []models.AdjustmentTemplateID{
+			models.AdjustmentTemplateIDFromULID(id1),
+			models.AdjustmentTemplateIDFromULID(id2),
+		}, adj)
 	})
 
 	t.Run("score with standard adjustments", func(t *testing.T) {
@@ -324,8 +362,9 @@ func TestParseSubmitScoreForm(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.Equal(t, uint32(2), score)
-		require.Len(t, adj, 1)
-		assert.Equal(t, models.AdjustmentTemplateIDFromULID(id1), adj[0])
+		assert.Equal(t, []models.AdjustmentTemplateID{
+			models.AdjustmentTemplateIDFromULID(id1),
+		}, adj)
 	})
 
 	t.Run("score with both adjustment types", func(t *testing.T) {
@@ -338,23 +377,45 @@ func TestParseSubmitScoreForm(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.Equal(t, uint32(4), score)
-		require.Len(t, adj, 3)
+		assert.Equal(t, []models.AdjustmentTemplateID{
+			models.AdjustmentTemplateIDFromULID(id1),
+			models.AdjustmentTemplateIDFromULID(id2),
+			models.AdjustmentTemplateIDFromULID(id3),
+		}, adj)
 	})
 
-	t.Run("boundary min sips", func(t *testing.T) {
+	t.Run("sips boundary values", func(t *testing.T) {
 		t.Parallel()
 
-		score, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(SubmitScoreSipsMin)})
-		require.NoError(t, err)
-		assert.Equal(t, uint32(SubmitScoreSipsMin), score)
-	})
+		tests := []struct {
+			name    string
+			sips    int64
+			want    uint32
+			wantErr error
+		}{
+			{name: "min", sips: SubmitScoreSipsMin, want: uint32(SubmitScoreSipsMin)},
+			{name: "max", sips: SubmitScoreSipsMax, want: uint32(SubmitScoreSipsMax)},
+			{name: "below min", sips: 0, wantErr: ErrInputOutOfAllowedRange},
+			{name: "above max", sips: 11, wantErr: ErrInputOutOfAllowedRange},
+			{name: "negative", sips: -1, wantErr: ErrInputOutOfAllowedRange},
+		}
 
-	t.Run("boundary max sips", func(t *testing.T) {
-		t.Parallel()
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				t.Parallel()
 
-		score, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(SubmitScoreSipsMax)})
-		require.NoError(t, err)
-		assert.Equal(t, uint32(SubmitScoreSipsMax), score)
+				score, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(tt.sips)})
+				if tt.wantErr != nil {
+					require.Error(t, err)
+					assert.ErrorIs(t, err, tt.wantErr)
+
+					return
+				}
+
+				require.NoError(t, err)
+				assert.Equal(t, tt.want, score)
+			})
+		}
 	})
 
 	t.Run("error missing sips", func(t *testing.T) {
@@ -371,30 +432,6 @@ func TestParseSubmitScoreForm(t *testing.T) {
 		_, _, err := ParseSubmitScoreForm(nil)
 		require.Error(t, err)
 		assert.ErrorIs(t, err, ErrMissingRequiredInput)
-	})
-
-	t.Run("error sips below min", func(t *testing.T) {
-		t.Parallel()
-
-		_, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(0)})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInputOutOfAllowedRange)
-	})
-
-	t.Run("error sips above max", func(t *testing.T) {
-		t.Parallel()
-
-		_, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(11)})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInputOutOfAllowedRange)
-	})
-
-	t.Run("error sips negative", func(t *testing.T) {
-		t.Parallel()
-
-		_, _, err := ParseSubmitScoreForm([]*apiv1.FormValue{numericVal(-1)})
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInputOutOfAllowedRange)
 	})
 
 	t.Run("error sips wrong variant", func(t *testing.T) {
@@ -429,6 +466,7 @@ func TestParseSubmitScoreForm(t *testing.T) {
 			selectManyVal(SubmitScoreInputIDVenueAdj, []string{"not-a-ulid"}),
 		})
 		require.Error(t, err)
+		assert.ErrorContains(t, err, "parse AdjustmentTemplateID from string")
 	})
 
 	t.Run("nil form value in slice returns error", func(t *testing.T) {
