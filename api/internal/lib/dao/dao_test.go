@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/goleak"
 
@@ -27,6 +29,10 @@ type mockDBCCall struct {
 	Args       []any
 	Return     []any
 }
+
+type fixedClock time.Time
+
+func (c fixedClock) Now() time.Time { return time.Time(c) }
 
 func (c mockDBCCall) Bind(m *dbc.MockQuerier, name string) {
 	if c.ShouldCall {
@@ -79,7 +85,7 @@ func Test_txQuerier(t *testing.T) {
 
 		ctx := t.Context()
 
-		dao, err := New(ctx, _sharedDB, false)
+		dao, err := New(ctx, _sharedDB, Options{})
 		require.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(ctx, &sql.TxOptions{})
@@ -100,12 +106,41 @@ func Test_txQuerier(t *testing.T) {
 		dbMock.ExpectBegin()
 
 		m := new(dbc.MockQuerier)
-		dao := Queries{dbc: m, db: db}
+		dao, err := New(t.Context(), db, Options{Querier: m})
+		require.NoError(t, err)
 
 		tx, err := dao.db.BeginTx(t.Context(), &sql.TxOptions{})
 		require.NoError(t, err)
 
 		_, err = dao.txQuerier(tx)
 		require.NoError(t, err)
+	})
+}
+
+func Test_clockInjection(t *testing.T) {
+	t.Parallel()
+
+	t.Run("uses injected clock", func(t *testing.T) {
+		t.Parallel()
+
+		fixedTime := time.Date(2025, 1, 15, 10, 30, 0, 0, time.UTC)
+		dao, err := New(t.Context(), nil, Options{
+			Clock:   fixedClock(fixedTime),
+			Querier: new(dbc.MockQuerier),
+		})
+		require.NoError(t, err)
+		assert.Equal(t, fixedTime, dao.clock.Now())
+	})
+
+	t.Run("defaults to real time when clock is nil", func(t *testing.T) {
+		t.Parallel()
+
+		before := time.Now()
+		dao, err := New(t.Context(), nil, Options{Querier: new(dbc.MockQuerier)})
+		require.NoError(t, err)
+
+		got := dao.clock.Now()
+		assert.False(t, got.Before(before))
+		assert.False(t, got.After(time.Now()))
 	})
 }

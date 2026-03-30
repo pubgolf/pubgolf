@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao/internal/dbc"
 	"github.com/pubgolf/pubgolf/api/internal/lib/telemetry"
@@ -24,27 +25,55 @@ var (
 
 const fallbackVenueImage = "https://assets.pubgolf.co/images/venues/348x348/server-fallback.jpg"
 
+// Clock provides the current time. Defaults to realClock when not specified.
+type Clock interface {
+	Now() time.Time
+}
+
+type realClock struct{}
+
+func (realClock) Now() time.Time { return time.Now() }
+
+// Options configures the DAO constructor.
+type Options struct {
+	ForcePreparedQueries bool
+	Clock                Clock
+	Querier              dbc.Querier
+}
+
 // Queries holds references to all data stores and provides query methods.
 type Queries struct {
-	db  *sql.DB
-	tx  *sql.Tx
-	dbc dbc.Querier
+	db    *sql.DB
+	tx    *sql.Tx
+	dbc   dbc.Querier
+	clock Clock
 }
 
 // New returns a concrete implementation of `QueryProvider`.
-func New(ctx context.Context, db *sql.DB, forcePreparedQueries bool) (*Queries, error) {
-	q, err := dbc.Prepare(ctx, db)
-	if err != nil {
-		if forcePreparedQueries {
-			return nil, fmt.Errorf("prepare dbc queries: %w", err)
+func New(ctx context.Context, db *sql.DB, opts Options) (*Queries, error) {
+	clock := opts.Clock
+	if clock == nil {
+		clock = realClock{}
+	}
+
+	querier := opts.Querier
+	if querier == nil {
+		q, err := dbc.Prepare(ctx, db)
+		if err != nil {
+			if opts.ForcePreparedQueries {
+				return nil, fmt.Errorf("prepare dbc queries: %w", err)
+			}
+
+			log.Printf("Failed to prepare queries, initializing DAO with lazy query parsing: %+v", err)
 		}
 
-		log.Printf("Failed to prepare queries, initializing DAO with lazy query parsing: %+v", err)
+		querier = q
 	}
 
 	return &Queries{
-		db:  db,
-		dbc: q,
+		db:    db,
+		dbc:   querier,
+		clock: clock,
 	}, nil
 }
 
@@ -81,7 +110,7 @@ func (q *Queries) useTx(ctx context.Context, query func(ctx context.Context, q *
 		return fmt.Errorf("acquire transacted DAO: %w", err)
 	}
 
-	err = query(ctx, &Queries{tx: tx, dbc: tDBC})
+	err = query(ctx, &Queries{tx: tx, dbc: tDBC, clock: q.clock})
 	if err != nil {
 		tx.Rollback() //nolint:errcheck // Already recovering from query error.
 
