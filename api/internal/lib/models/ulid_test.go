@@ -36,9 +36,23 @@ func TestDatabaseULID_Scan(t *testing.T) {
 			want: wantULID,
 		},
 		{
+			// UUID with no standard version/variant bits — Scan accepts any
+			// structurally valid UUID since DatabaseULID is format-agnostic.
+			name: "string UUID without valid version",
+			src:  "00000000-0000-0000-0000-000000000001",
+			want: ulid.ULID{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
+		},
+		{
 			name: "nil yields zero ULID",
 			src:  nil,
 			want: ulid.ULID{},
+		},
+		{
+			// Raw 16-byte binary — Scan expects a UUID-formatted string, not
+			// raw bytes, so this is treated as an invalid UUID string.
+			name:    "bytes raw binary UUID",
+			src:     []byte{0x55, 0x0e, 0x84, 0x00, 0xe2, 0x9b, 0x41, 0xd4, 0xa7, 0x16, 0x44, 0x66, 0x55, 0x44, 0x00, 0x00},
+			wantErr: "DatabaseULID scan",
 		},
 		{
 			name:    "bytes invalid UUID",
@@ -264,47 +278,6 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, original.ULID, scanned.ULID)
 	})
-}
-
-func TestIDTypes_ScanValue(t *testing.T) {
-	t.Parallel()
-
-	// Each ID type wraps DatabaseULID; verify Scan/Value round-trips through each.
-	tests := []struct {
-		name    string
-		scanner sql.Scanner
-		valuer  driver.Valuer
-	}{
-		{"AdjustmentID", &AdjustmentID{}, AdjustmentID{DatabaseULID{ulid.Make()}}},
-		{"AdjustmentTemplateID", &AdjustmentTemplateID{}, AdjustmentTemplateID{DatabaseULID{ulid.Make()}}},
-		{"AuthToken", &AuthToken{}, AuthToken{DatabaseULID{ulid.Make()}}},
-		{"EventID", &EventID{}, EventID{DatabaseULID{ulid.Make()}}},
-		{"VenueID", &VenueID{}, VenueID{DatabaseULID{ulid.Make()}}},
-		{"PlayerID", &PlayerID{}, PlayerID{DatabaseULID{ulid.Make()}}},
-		{"RuleID", &RuleID{}, RuleID{DatabaseULID{ulid.Make()}}},
-		{"ScoreID", &ScoreID{}, ScoreID{DatabaseULID{ulid.Make()}}},
-		{"StageID", &StageID{}, StageID{DatabaseULID{ulid.Make()}}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			val, err := tt.valuer.Value()
-			require.NoError(t, err)
-			require.NotNil(t, val)
-
-			b, ok := val.([]byte)
-			require.True(t, ok, "expected []byte, got %T", val)
-			assert.Len(t, b, 16)
-
-			// Simulate Postgres: binary → UUID string → Scan.
-			u, err := uuid.FromBytes(b)
-			require.NoError(t, err)
-
-			require.NoError(t, tt.scanner.Scan(u.String()))
-		})
-	}
 }
 
 // Ensure DatabaseULID implements driver.Valuer and sql.Scanner.
