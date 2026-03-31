@@ -49,7 +49,7 @@ func (db *DatabaseULID) Scan(src any) error {
 	return fmt.Errorf("invalid type %+T: %w", src, ErrCannotScanType)
 }
 
-// Value serializes a ULID into a UUID-formatted string representing the same underlying byte content.
+// Value serializes a ULID into its raw 16-byte binary representation for storage in a UUID column.
 func (db DatabaseULID) Value() (driver.Value, error) {
 	if db.ULID == (ulid.ULID{}) {
 		return nil, nil //nolint:nilnil // Returning nil,nil is the standard way to represent NULL in database/sql
