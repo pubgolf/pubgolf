@@ -167,3 +167,21 @@ func StageIDFromString(s string) (StageID, error) {
 
 	return StageID{DatabaseULID{u}}, nil
 }
+
+// IdempotencyKey uniquely identifies an idempotency claim.
+type IdempotencyKey struct{ DatabaseULID }
+
+// IdempotencyKeyFromULID parses an IdempotencyKey from a ULID.
+func IdempotencyKeyFromULID(u ulid.ULID) IdempotencyKey {
+	return IdempotencyKey{DatabaseULID{u}}
+}
+
+// IdempotencyKeyFromString parses an IdempotencyKey from a string.
+func IdempotencyKeyFromString(s string) (IdempotencyKey, error) {
+	u, err := ulid.Parse(s)
+	if err != nil {
+		return IdempotencyKey{}, fmt.Errorf("parse IdempotencyKey from string: %w", err)
+	}
+
+	return IdempotencyKey{DatabaseULID{u}}, nil
+}

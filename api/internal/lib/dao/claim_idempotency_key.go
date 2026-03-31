@@ -12,7 +12,7 @@ import (
 
 // ClaimIdempotencyKey attempts to claim an idempotency key for the given scope.
 // Returns true if the key was newly claimed, false if it was already claimed.
-func (q *Queries) ClaimIdempotencyKey(ctx context.Context, key models.DatabaseULID, scope models.IdempotencyScope) (bool, error) {
+func (q *Queries) ClaimIdempotencyKey(ctx context.Context, key models.IdempotencyKey, scope models.IdempotencyScope) (bool, error) {
 	defer daoSpan(&ctx)()
 
 	_, err := q.dbc.ClaimIdempotencyKey(ctx, dbc.ClaimIdempotencyKeyParams{

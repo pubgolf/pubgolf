@@ -79,7 +79,7 @@ sql:
             go_type: uint32
           # idempotency_keys
           - column: idempotency_keys.key
-            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.DatabaseULID
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.IdempotencyKey
           - column: idempotency_keys.scope
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.IdempotencyScope
           # venues

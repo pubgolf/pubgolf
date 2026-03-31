@@ -20,13 +20,13 @@ RETURNING key
 `
 
 type ClaimIdempotencyKeyParams struct {
-	Key   models.DatabaseULID
+	Key   models.IdempotencyKey
 	Scope models.IdempotencyScope
 }
 
-func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.DatabaseULID, error) {
+func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.IdempotencyKey, error) {
 	row := q.queryRow(ctx, q.claimIdempotencyKeyStmt, claimIdempotencyKey, arg.Key, arg.Scope)
-	var key models.DatabaseULID
+	var key models.IdempotencyKey
 	err := row.Scan(&key)
 	return key, err
 }

@@ -71,7 +71,7 @@ type EventPlayer struct {
 }
 
 type IdempotencyKey struct {
-	Key       models.DatabaseULID
+	Key       models.IdempotencyKey
 	Scope     models.IdempotencyScope
 	CreatedAt time.Time
 }
