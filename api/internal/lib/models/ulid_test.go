@@ -16,9 +16,8 @@ func TestDatabaseULID_Scan(t *testing.T) {
 
 	const validUUID = "550e8400-e29b-41d4-a716-446655440000"
 
-	// Pre-compute the expected ULID for the valid UUID.
-	var wantULID DatabaseULID
-	require.NoError(t, wantULID.Scan([]byte(validUUID)))
+	// Manually derived from the UUID hex above — no Scan() in the loop.
+	wantULID := ulid.ULID{0x55, 0x0e, 0x84, 0x00, 0xe2, 0x9b, 0x41, 0xd4, 0xa7, 0x16, 0x44, 0x66, 0x55, 0x44, 0x00, 0x00}
 
 	tests := []struct {
 		name    string
@@ -29,12 +28,12 @@ func TestDatabaseULID_Scan(t *testing.T) {
 		{
 			name: "bytes valid UUID",
 			src:  []byte(validUUID),
-			want: wantULID.ULID,
+			want: wantULID,
 		},
 		{
 			name: "string valid UUID",
 			src:  validUUID,
-			want: wantULID.ULID,
+			want: wantULID,
 		},
 		{
 			name: "nil yields zero ULID",
@@ -158,10 +157,8 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 		require.NoError(t, err)
 
 		original := DatabaseULID{ulid.Make()}
-		val, err := original.Value()
-		require.NoError(t, err)
 
-		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid (id) VALUES ($1)", val)
+		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid (id) VALUES ($1)", original)
 		require.NoError(t, err)
 
 		var scanned DatabaseULID
@@ -181,17 +178,16 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 		require.NoError(t, err)
 
 		zero := DatabaseULID{ulid.ULID{}}
-		val, err := zero.Value()
+
+		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_null (id) VALUES ($1)", zero)
 		require.NoError(t, err)
 
-		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_null (id) VALUES ($1)", val)
-		require.NoError(t, err)
+		// Verify Postgres actually stored NULL.
+		var nullCount int
 
-		var raw *string
-
-		err = tx.QueryRowContext(ctx, "SELECT id FROM test_ulid_null").Scan(&raw)
+		err = tx.QueryRowContext(ctx, "SELECT count(*) FROM test_ulid_null WHERE id IS NULL").Scan(&nullCount)
 		require.NoError(t, err)
-		assert.Nil(t, raw, "expected NULL in database")
+		assert.Equal(t, 1, nullCount, "expected row with NULL id in database")
 
 		// Also verify scanning NULL back into DatabaseULID yields zero.
 		var scanned DatabaseULID
@@ -222,10 +218,7 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 		}
 
 		for _, e := range entries {
-			val, vErr := e.id.Value()
-			require.NoError(t, vErr)
-
-			_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_multi (label, id) VALUES ($1, $2)", e.label, val)
+			_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_multi (label, id) VALUES ($1, $2)", e.label, e.id)
 			require.NoError(t, err)
 		}
 
@@ -261,22 +254,57 @@ func TestDatabaseULID_PostgresRoundtrip(t *testing.T) {
 		require.NoError(t, err)
 
 		original := DatabaseULID{ulid.Make()}
-		val, err := original.Value()
-		require.NoError(t, err)
 
-		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_query (id) VALUES ($1)", val)
-		require.NoError(t, err)
-
-		// Query using the same DatabaseULID value.
-		queryVal, err := original.Value()
+		_, err = tx.ExecContext(ctx, "INSERT INTO test_ulid_query (id) VALUES ($1)", original)
 		require.NoError(t, err)
 
 		var scanned DatabaseULID
 
-		err = tx.QueryRowContext(ctx, "SELECT id FROM test_ulid_query WHERE id = $1", queryVal).Scan(&scanned)
+		err = tx.QueryRowContext(ctx, "SELECT id FROM test_ulid_query WHERE id = $1", original).Scan(&scanned)
 		require.NoError(t, err)
 		assert.Equal(t, original.ULID, scanned.ULID)
 	})
+}
+
+func TestIDTypes_ScanValue(t *testing.T) {
+	t.Parallel()
+
+	// Each ID type wraps DatabaseULID; verify Scan/Value round-trips through each.
+	tests := []struct {
+		name    string
+		scanner sql.Scanner
+		valuer  driver.Valuer
+	}{
+		{"AdjustmentID", &AdjustmentID{}, AdjustmentID{DatabaseULID{ulid.Make()}}},
+		{"AdjustmentTemplateID", &AdjustmentTemplateID{}, AdjustmentTemplateID{DatabaseULID{ulid.Make()}}},
+		{"AuthToken", &AuthToken{}, AuthToken{DatabaseULID{ulid.Make()}}},
+		{"EventID", &EventID{}, EventID{DatabaseULID{ulid.Make()}}},
+		{"VenueID", &VenueID{}, VenueID{DatabaseULID{ulid.Make()}}},
+		{"PlayerID", &PlayerID{}, PlayerID{DatabaseULID{ulid.Make()}}},
+		{"RuleID", &RuleID{}, RuleID{DatabaseULID{ulid.Make()}}},
+		{"ScoreID", &ScoreID{}, ScoreID{DatabaseULID{ulid.Make()}}},
+		{"StageID", &StageID{}, StageID{DatabaseULID{ulid.Make()}}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			val, err := tt.valuer.Value()
+			require.NoError(t, err)
+			require.NotNil(t, val)
+
+			b, ok := val.([]byte)
+			require.True(t, ok, "expected []byte, got %T", val)
+			assert.Len(t, b, 16)
+
+			// Simulate Postgres: binary → UUID string → Scan.
+			u, err := uuid.FromBytes(b)
+			require.NoError(t, err)
+
+			require.NoError(t, tt.scanner.Scan(u.String()))
+		})
+	}
 }
 
 // Ensure DatabaseULID implements driver.Valuer and sql.Scanner.
