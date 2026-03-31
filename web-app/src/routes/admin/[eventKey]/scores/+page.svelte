@@ -18,10 +18,9 @@
 	import { BeerIcon, RefreshCwIcon } from 'lucide-svelte';
 	import type { ComponentProps } from 'svelte';
 	import { onMount } from 'svelte';
-	import { noop } from 'svelte/internal';
 	import { writable } from 'svelte/store';
 
-	let refreshProgress: Promise<void> = new Promise(noop);
+	let refreshProgress: Promise<void> = Promise.resolve();
 	let lastRefresh: Date;
 
 	let filterUnverifiedOnly = writable(false);
@@ -54,7 +53,7 @@
 	async function fetchScores() {
 		const rpc = await getAdminServiceClient();
 		const resp = await rpc.listStageScores({
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			verifiedFilter: $filterUnverifiedOnly
 				? StageScoreVerifiedFilter.ONLY_UNVERIFIED
 				: StageScoreVerifiedFilter.ALL
@@ -64,7 +63,9 @@
 	}
 
 	async function refreshData() {
-		refreshProgress = Promise.all([fetchPlayers(), fetchStages(), fetchScores()]).then(noop);
+		refreshProgress = Promise.all([fetchPlayers(), fetchStages(), fetchScores()]).then(
+			() => undefined
+		);
 		await refreshProgress;
 		lastRefresh = new Date();
 	}
@@ -81,7 +82,7 @@
 			return '[Unknown Player]';
 		}
 
-		return playerNameWithLeague(player, $page.params.eventKey);
+		return playerNameWithLeague(player, $page.params.eventKey!);
 	}
 
 	async function deleteScore(score: StageScore) {
@@ -128,7 +129,7 @@
 
 	async function showNewScoreModal() {
 		const props: Omit<ComponentProps<ScoreForm>, 'parent'> = {
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			players: await players,
 			stages: await stages,
 			onSubmit: async (data) => {
@@ -159,7 +160,7 @@
 		const props: Omit<ComponentProps<ScoreForm>, 'parent'> = {
 			title: 'Edit Score',
 			ctaText: 'Save',
-			eventKey: $page.params.eventKey,
+			eventKey: $page.params.eventKey!,
 			players: await players,
 			stages: await stages,
 			score: separateIds(score),

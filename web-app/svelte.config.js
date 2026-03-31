@@ -1,7 +1,7 @@
 import { dirname, join } from 'path';
 
 import adapter from '@sveltejs/adapter-static';
-import { vitePreprocess } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,7 +22,10 @@ const config = {
 			fallback: 'index.html'
 		}),
 		paths: {
-			assets: 'https://assets.pubgolf.co'
+			assets:
+				'SVELTE_ASSETS_PATH' in process.env
+					? process.env.SVELTE_ASSETS_PATH
+					: 'https://assets.pubgolf.co'
 		},
 		prerender: {
 			entries: [

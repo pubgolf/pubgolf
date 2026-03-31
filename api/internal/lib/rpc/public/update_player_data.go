@@ -21,12 +21,12 @@ func (s *Server) UpdatePlayerData(ctx context.Context, req *connect.Request[apiv
 		Name: req.Msg.GetData().GetName(),
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update registration: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update registration: %w", err))
 	}
 
 	p, err := player.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.UpdatePlayerDataResponse{

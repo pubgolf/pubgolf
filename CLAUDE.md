@@ -19,8 +19,9 @@ shorthand for permission grouping, not the actual CLI syntax.
 |------|---------------------|--------|
 | Code gen (proto, SQL, mocks, enums) | `pubgolf-devctrl generate *` | auto-approved |
 | DB migrations | `pubgolf-devctrl migrate *` | auto-approved |
-| Run servers locally | `pubgolf-devctrl run *` | auto-approved |
-| Run full test suite (with Doppler) | `pubgolf-devctrl test [*]` | auto-approved |
+| Run full-stack or individual servers | `pubgolf-devctrl run [api|web|bg|api-db]` | auto-approved |
+| Build targets | `pubgolf-devctrl build [web]` | auto-approved |
+| Run tests (Go + web + e2e) | `pubgolf-devctrl test [web|e2e [api|web]]` | auto-approved |
 | Lint/check all packages | `pubgolf-devctrl check go` | auto-approved |
 | Lint/check proto files | `pubgolf-devctrl check proto` | auto-approved |
 | Check web app (lint + type-check) | `pubgolf-devctrl check web` | auto-approved |

@@ -35,7 +35,7 @@ func (s *Server) GetVenue(ctx context.Context, req *connect.Request[apiv1.GetVen
 				continue
 			}
 
-			return nil, connect.NewError(connect.CodeUnknown, err)
+			return nil, connect.NewError(connect.CodeUnavailable, err)
 		}
 
 		venues[vk] = &apiv1.GetVenueResponse_VenueWrapper{

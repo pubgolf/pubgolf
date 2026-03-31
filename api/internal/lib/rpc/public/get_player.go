@@ -18,12 +18,12 @@ func (s *Server) GetPlayer(ctx context.Context, req *connect.Request[apiv1.GetPl
 
 	player, err := s.dao.PlayerByID(ctx, playerID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("get player from DB: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("get player from DB: %w", err))
 	}
 
 	p, err := player.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.GetPlayerResponse{

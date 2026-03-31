@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -145,6 +146,18 @@ func runDoctorChecks(ctx context.Context) error {
 
 	// Project root check.
 	fmt.Fprintf(w, "  %-16s %-18s %s\n", "Project root:", projectRoot, "\u2713")
+
+	// Web-app npm dependencies check.
+	nodeModulesPath := filepath.Join(projectRoot, "web-app", "node_modules")
+
+	_, statErr := os.Stat(nodeModulesPath)
+	if statErr != nil {
+		missing = append(missing, "web-app npm deps")
+
+		fmt.Fprintf(w, "  %-16s %-18s %s  (run 'pubgolf-devctrl install web')\n", "npm deps:", "not installed", "\u2717")
+	} else {
+		fmt.Fprintf(w, "  %-16s %-18s %s\n", "npm deps:", "installed", "\u2713")
+	}
 
 	if len(missing) > 0 {
 		return fmt.Errorf("%w: %s", errMissingTools, strings.Join(missing, ", "))

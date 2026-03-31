@@ -59,6 +59,7 @@ jobs:
         with:
           version: v2.11.4
           args: ./tools/...
+          skip-cache: true
       - name: Test
         run: go test ./tools/lib/...
       - name: Build
@@ -86,6 +87,7 @@ jobs:
         with:
           version: v2.11.4
           args: ./api/...
+          skip-cache: true
       - name: Test
         run: go test ./api/...
       - name: Build API Server Binary
@@ -125,20 +127,22 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.node-version'
           cache: npm
           cache-dependency-path: web-app/package-lock.json
-      - name: NPM Install
-        working-directory: ./web-app
-        run: npm ci
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install Web Dependencies
+        run: go run ./tools/cmd/pubgolf-devctrl install web
+      - name: Run Web Unit Tests
+        run: go run ./tools/cmd/pubgolf-devctrl test web
       - name: Run Web App Checks
-        working-directory: ./web-app
-        run: |
-          npm run ci:lint
-          npm run check
+        run: go run ./tools/cmd/pubgolf-devctrl check web
       - name: Build Web App
-        working-directory: ./web-app
-        run: npm run build
+        run: go run ./tools/cmd/pubgolf-devctrl build web
       - name: Upload Assets to R2
         if: github.ref == 'refs/heads/main'
         # Repo archived 2025; consider migrating to aws-actions/configure-aws-credentials + aws s3 sync if needed

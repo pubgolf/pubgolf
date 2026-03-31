@@ -1,6 +1,7 @@
 package webapi
 
 import (
+	"crypto/subtle"
 	"errors"
 	"net/http"
 	"time"
@@ -33,7 +34,7 @@ func logIn(cfg *config.App) http.HandlerFunc {
 			return
 		}
 
-		if req.Password != cfg.AdminAuth.Password {
+		if subtle.ConstantTimeCompare([]byte(req.Password), []byte(cfg.AdminAuth.Password)) != 1 {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Incorrect password", errUserAuth).Render(w, r)
 
 			return
@@ -74,7 +75,7 @@ func logOut(cfg *config.App) http.HandlerFunc {
 			return
 		}
 
-		if c.Value != cfg.AdminAuth.CookieToken {
+		if subtle.ConstantTimeCompare([]byte(c.Value), []byte(cfg.AdminAuth.CookieToken)) != 1 {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Invalid auth cookie", errUserAuth).Render(w, r)
 
 			return
@@ -116,7 +117,7 @@ func getAPIToken(cfg *config.App) http.HandlerFunc {
 			return
 		}
 
-		if c.Value != cfg.AdminAuth.CookieToken {
+		if subtle.ConstantTimeCompare([]byte(c.Value), []byte(cfg.AdminAuth.CookieToken)) != 1 {
 			newErrorResponse(ctx, errorCodeNotAuthorized, "Invalid auth cookie", errUserAuth).Render(w, r)
 
 			return

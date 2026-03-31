@@ -2,9 +2,11 @@
 
 ## Setup
 
-Bootstrap the dev tools by [installing the latest version of Go](https://go.dev/dl/) and running the following:
+Bootstrap the dev tools by installing [mise](https://mise.jdx.dev/) and running the following:
 
 ```sh
+brew install mise
+mise install
 go install ./tools/cmd/pubgolf-devctrl && pubgolf-devctrl update
 ```
 

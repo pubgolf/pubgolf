@@ -15,7 +15,7 @@ import (
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
-func mockClaimIdempotencyKeySuccess(m *dao.MockQueryProvider, key string, scope string) {
+func mockClaimIdempotencyKeySuccess(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
 	dao.MockDAOCall{
 		ShouldCall: true,
 		Args: []any{
@@ -30,7 +30,7 @@ func mockClaimIdempotencyKeySuccess(m *dao.MockQueryProvider, key string, scope 
 	}.Bind(m, "ClaimIdempotencyKey")
 }
 
-func mockClaimIdempotencyKeyAlreadyClaimed(m *dao.MockQueryProvider, key string, scope string) {
+func mockClaimIdempotencyKeyAlreadyClaimed(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
 	dao.MockDAOCall{
 		ShouldCall: true,
 		Args: []any{
@@ -45,7 +45,7 @@ func mockClaimIdempotencyKeyAlreadyClaimed(m *dao.MockQueryProvider, key string,
 	}.Bind(m, "ClaimIdempotencyKey")
 }
 
-func mockClaimIdempotencyKeyError(m *dao.MockQueryProvider, key string, scope string) {
+func mockClaimIdempotencyKeyError(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
 	dao.MockDAOCall{
 		ShouldCall: true,
 		Args: []any{
@@ -69,7 +69,9 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 	eventID := models.EventIDFromULID(ulid.Make())
 	stageID := models.StageIDFromULID(ulid.Make())
 	venueKey := models.VenueKeyFromUInt32(1)
-	idempotencyKey := "test-key-123"
+	idemULID := ulid.Make()
+	idempotencyKey := idemULID.String()
+	idemKeyModel := models.IdempotencyKeyFromULID(idemULID)
 
 	testReq := &connect.Request[apiv1.SubmitScoreRequest]{
 		Msg: &apiv1.SubmitScoreRequest{
@@ -239,7 +241,7 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 		s := makeTestServer(mockDAO)
 
 		setupBasicMocks(mockDAO)
-		mockClaimIdempotencyKeySuccess(mockDAO, idempotencyKey, "submit_score")
+		mockClaimIdempotencyKeySuccess(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
 
 		resp, err := s.SubmitScore(gameCtx, testReq)
 
@@ -248,7 +250,7 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 		assert.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE, resp.Msg.GetStatus())
 
 		// Verify ClaimIdempotencyKey was called
-		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idempotencyKey, "submit_score")
+		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idemKeyModel, models.IdempotencyScopeScoreSubmission)
 	})
 
 	t.Run("when idempotency key is set and already claimed, handler returns success without calling UpsertScore", func(t *testing.T) {
@@ -283,7 +285,7 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 			},
 		}.Bind(mockDAO, "PlayerRegisteredForEvent")
 
-		mockClaimIdempotencyKeyAlreadyClaimed(mockDAO, idempotencyKey, "submit_score")
+		mockClaimIdempotencyKeyAlreadyClaimed(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
 
 		resp, err := s.SubmitScore(gameCtx, testReq)
 
@@ -292,7 +294,7 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 		assert.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE, resp.Msg.GetStatus())
 
 		// Verify ClaimIdempotencyKey was called
-		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idempotencyKey, "submit_score")
+		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idemKeyModel, models.IdempotencyScopeScoreSubmission)
 
 		// Verify UpsertScore was NOT called
 		mockDAO.AssertNotCalled(t, "UpsertScore")
@@ -330,7 +332,7 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 			},
 		}.Bind(mockDAO, "PlayerRegisteredForEvent")
 
-		mockClaimIdempotencyKeyError(mockDAO, idempotencyKey, "submit_score")
+		mockClaimIdempotencyKeyError(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
 
 		resp, err := s.SubmitScore(gameCtx, testReq)
 

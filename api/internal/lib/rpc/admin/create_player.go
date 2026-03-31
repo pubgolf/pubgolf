@@ -53,7 +53,7 @@ func (s *Server) CreatePlayer(ctx context.Context, req *connect.Request[apiv1.Ad
 
 	pp, err := player.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("serialize player: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("serialize player: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.AdminServiceCreatePlayerResponse{

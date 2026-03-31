@@ -114,6 +114,21 @@ Each function passed to `runPar` must have the signature
 - Handler functions: `verbNoun` (e.g. `checkGo`, `generateProto`, `dockerRun`).
 - Cobra vars: `{group}Cmd`, `{group}{Sub}Cmd` (e.g. `checkCmd`, `checkGoCmd`).
 
+## Function Signatures
+
+**Rule of thumb: 4 parameters max** (not counting `ctx context.Context`). When a
+function exceeds this, simplify in order of preference:
+
+1. **Eliminate redundant params** — if every caller passes the same value (e.g.
+   `config.ServerBinName`), read it from the package-level `config` directly.
+   Config is static and doesn't need to be injected for testability.
+2. **Group into an opts struct** — last resort. Structs trade compile-time
+   completeness (missing positional param = compiler error) for readability.
+   Only worth it when params genuinely vary across callers.
+
+`Runner` and `EnvProvider` stay as direct params — they're swapped in tests
+(`DryRunner`, mock providers) so they must be injectable.
+
 ## nolint Annotations
 
 - `//nolint:ireturn` — on functions that return an interface by design (Runner, Process, EnvProvider).

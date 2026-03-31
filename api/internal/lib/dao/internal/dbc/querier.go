@@ -15,7 +15,7 @@ type Querier interface {
 	AdjustmentTemplatesByStageID(ctx context.Context, stageID models.StageID) ([]AdjustmentTemplatesByStageIDRow, error)
 	AdjustmentsByPlayerStage(ctx context.Context, arg AdjustmentsByPlayerStageParams) ([]AdjustmentsByPlayerStageRow, error)
 	AllVenues(ctx context.Context) ([]AllVenuesRow, error)
-	ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (string, error)
+	ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.IdempotencyKey, error)
 	CreateAdjustment(ctx context.Context, arg CreateAdjustmentParams) error
 	CreateAdjustmentTemplate(ctx context.Context, arg CreateAdjustmentTemplateParams) (models.AdjustmentTemplateID, error)
 	CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error

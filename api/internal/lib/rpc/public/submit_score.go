@@ -26,7 +26,12 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 	}
 
 	if key := req.Msg.IdempotencyKey; key != nil && *key != "" {
-		isNew, err := s.dao.ClaimIdempotencyKey(ctx, *key, "submit_score")
+		idemKey, err := models.IdempotencyKeyFromString(*key)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse idempotency key: %w", err))
+		}
+
+		isNew, err := s.dao.ClaimIdempotencyKey(ctx, idemKey, models.IdempotencyScopeScoreSubmission)
 		if err != nil {
 			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check idempotency key: %w", err))
 		}
@@ -76,7 +81,7 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("insert score: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.SubmitScoreResponse{

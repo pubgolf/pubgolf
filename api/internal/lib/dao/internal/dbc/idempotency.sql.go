@@ -8,6 +8,8 @@ package dbc
 import (
 	"context"
 	"time"
+
+	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 )
 
 const claimIdempotencyKey = `-- name: ClaimIdempotencyKey :one
@@ -18,13 +20,13 @@ RETURNING key
 `
 
 type ClaimIdempotencyKeyParams struct {
-	Key   string
-	Scope string
+	Key   models.IdempotencyKey
+	Scope models.IdempotencyScope
 }
 
-func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (string, error) {
+func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.IdempotencyKey, error) {
 	row := q.queryRow(ctx, q.claimIdempotencyKeyStmt, claimIdempotencyKey, arg.Key, arg.Scope)
-	var key string
+	var key models.IdempotencyKey
 	err := row.Scan(&key)
 	return key, err
 }

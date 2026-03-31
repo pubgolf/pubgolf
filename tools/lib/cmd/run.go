@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"strconv"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -15,6 +16,7 @@ func init() {
 	runCmd.AddCommand(runAPIBgCmd)
 	runCmd.AddCommand(runAPIDatabaseCmd)
 	// runCmd.AddCommand(runAPIMinioCmd)
+	runCmd.AddCommand(runWebCmd)
 	rootCmd.AddCommand(runCmd)
 
 	runAPIServerCmd.PersistentFlags().Bool("watch", false, "Watch the input directory and automatically restart the server.")
@@ -22,23 +24,71 @@ func init() {
 
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Run all server executables",
+	Short: "Run full-stack development environment",
 	Run: func(cmd *cobra.Command, args []string) {
-		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
-			"api-db",
-		))
-
-		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-		watchableGoRun(cmd, runner, envProvider, config.ServerBinName, config.DopplerEnvName, binPath, args)
+		classifyAndExit(runFullStack(cmd.Context(), runner, envProvider, args))
 	},
+}
+
+func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) error {
+	err := dockerRun(ctx, r, ep, config.ServerBinName, config.DopplerEnvName, "api-db")
+	if err != nil {
+		return err
+	}
+
+	err = buildWeb(ctx, r)
+	if err != nil {
+		return err
+	}
+
+	offset, err := worktreePortOffset(ctx)
+	if err != nil {
+		return fmtErr(err, "compute port offset")
+	}
+
+	previewPort := 4173 + offset
+
+	previewProc, err := r.Start(ctx, Cmd{
+		Name: filepath.FromSlash("./node_modules/.bin/vite"),
+		Args: []string{"preview", "--port", strconv.Itoa(previewPort)},
+		Dir:  "web-app",
+	})
+	if err != nil {
+		return fmtErr(err, "start vite preview server")
+	}
+
+	apiProc, err := startAPIServer(ctx, r, ep, args,
+		fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", previewPort),
+	)
+	if err != nil {
+		previewProc.Stop()
+
+		return err
+	}
+
+	log.Printf("Full-stack environment running (preview: :%d, API: :%d)\n", previewPort, 5000+offset)
+
+	go func() {
+		<-shuttingDown
+		apiProc.Stop()
+		previewProc.Stop()
+	}()
+
+	waitErr := apiProc.Wait()
+	if waitErr != nil {
+		log.Printf("API server exited with error: %v", waitErr)
+	}
+
+	previewProc.Stop()
+
+	return nil
 }
 
 var runAPIServerCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Run API server",
 	Run: func(cmd *cobra.Command, args []string) {
-		binPath := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
-		watchableGoRun(cmd, runner, envProvider, config.ServerBinName, config.DopplerEnvName, binPath, args)
+		watchableGoRun(cmd, runner, envProvider, args)
 	},
 }
 
@@ -58,6 +108,26 @@ var runAPIDatabaseCmd = &cobra.Command{
 	Short: "Run API server's DB instance",
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-db"))
+	},
+}
+
+var runWebCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Run SvelteKit dev server",
+	Run: func(cmd *cobra.Command, _ []string) {
+		env, err := envProvider.Env(cmd.Context(), "web-app", "dev")
+		classifyAndExit(fmtErr(err, "fetch web-app environment"))
+
+		proc, startErr := runner.Start(cmd.Context(), Cmd{
+			Name: filepath.FromSlash("./node_modules/.bin/vite"),
+			Args: []string{"dev"},
+			Dir:  "web-app",
+			Env:  env,
+		})
+		classifyAndExit(fmtErr(startErr, "start vite dev server"))
+
+		<-shuttingDown
+		proc.Stop()
 	},
 }
 
@@ -116,15 +186,13 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	return nil
 }
 
-func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) {
+func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, args []string) {
 	watchFlag, err := cmd.Flags().GetBool("watch")
 	classifyAndExit(fmtErr(err, "check '--watch' flag"))
 
-	// Start initial process
-	proc := startGoRun(cmd.Context(), r, ep, project, envCfg, bin, args)
+	proc := startGoRun(cmd.Context(), r, ep, args)
 
 	if !watchFlag {
-		// Wait for process to exit, then shut down.
 		waitErr := proc.Wait()
 		if waitErr != nil {
 			log.Printf("process exited with error: %v", waitErr)
@@ -133,42 +201,56 @@ func watchableGoRun(cmd *cobra.Command, r Runner, ep EnvProvider, project, envCf
 		return
 	}
 
-	// Launch watcher to restart the process on file changes.
 	go func() {
 		watch("api", "restart API server", func(_ watcher.Event) {
 			proc.Stop()
-			proc = startGoRun(context.Background(), r, ep, project, envCfg, bin, args)
+			proc = startGoRun(context.Background(), r, ep, args)
 		})
 	}()
 
-	// Hold process open until shutdown signal.
 	<-shuttingDown
 	proc.Stop()
 }
 
 //nolint:ireturn // Returns Process interface by design.
-func startGoRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg, bin string, args []string) Process {
-	env, err := ep.Env(ctx, project, envCfg)
-	classifyAndExit(fmtErr(err, "fetch go run environment"))
+func startGoRun(ctx context.Context, r Runner, ep EnvProvider, args []string) Process {
+	proc, err := startAPIServer(ctx, r, ep, args)
+	classifyAndExit(err)
 
-	offset, offsetErr := worktreePortOffset(ctx)
-	classifyAndExit(fmtErr(offsetErr, "compute port offset"))
+	return proc
+}
+
+//nolint:ireturn // Returns Process interface by design.
+func startAPIServer(ctx context.Context, r Runner, ep EnvProvider, args []string, extraEnv ...string) (Process, error) {
+	env, err := ep.Env(ctx, config.ServerBinName, config.DopplerEnvName)
+	if err != nil {
+		return nil, fmtErr(err, "fetch go run environment")
+	}
+
+	offset, err := worktreePortOffset(ctx)
+	if err != nil {
+		return nil, fmtErr(err, "compute port offset")
+	}
 
 	env = append(env,
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
 	)
+	env = append(env, extraEnv...)
 
+	bin := filepath.FromSlash("./api/cmd/" + config.ServerBinName)
 	allArgs := append([]string{"run", bin}, args...)
 
-	log.Printf("Starting '%s'...\n", bin)
+	log.Printf("Starting '%s'...\n", config.ServerBinName)
 
-	proc, startErr := r.Start(ctx, Cmd{
+	proc, err := r.Start(ctx, Cmd{
 		Name: "go",
 		Args: allArgs,
 		Env:  env,
 	})
-	classifyAndExit(fmtErr(startErr, "execute `go run ...` command"))
+	if err != nil {
+		return nil, fmtErr(err, "start API server")
+	}
 
-	return proc
+	return proc, nil
 }

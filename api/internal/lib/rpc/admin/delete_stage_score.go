@@ -24,7 +24,7 @@ func (s *Server) DeleteStageScore(ctx context.Context, req *connect.Request[apiv
 
 	err = s.dao.DeleteScore(ctx, playerID, stageID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("delete score: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("delete score: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.DeleteStageScoreResponse{}), nil

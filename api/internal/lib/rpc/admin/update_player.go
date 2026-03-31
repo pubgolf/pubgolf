@@ -21,7 +21,7 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 		Name: req.Msg.GetPlayerData().GetName(),
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("update player info: %w", err))
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("update player info: %w", err))
 	}
 
 	var cat models.ScoringCategory
@@ -43,7 +43,7 @@ func (s *Server) UpdatePlayer(ctx context.Context, req *connect.Request[apiv1.Up
 
 	up, err := updatedPlayer.Proto()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeUnknown, fmt.Errorf("convert player model to proto: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert player model to proto: %w", err))
 	}
 
 	return connect.NewResponse(&apiv1.UpdatePlayerResponse{
