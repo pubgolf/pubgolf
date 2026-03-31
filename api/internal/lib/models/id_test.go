@@ -29,6 +29,7 @@ func TestIDTypes_ScanValue(t *testing.T) {
 		{"RuleID", &RuleID{}, RuleID{DatabaseULID{ulid.Make()}}},
 		{"ScoreID", &ScoreID{}, ScoreID{DatabaseULID{ulid.Make()}}},
 		{"StageID", &StageID{}, StageID{DatabaseULID{ulid.Make()}}},
+		{"IdempotencyKey", &IdempotencyKey{}, IdempotencyKey{DatabaseULID{ulid.Make()}}},
 	}
 
 	for _, tt := range tests {
