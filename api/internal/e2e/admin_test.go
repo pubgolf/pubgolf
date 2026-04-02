@@ -232,4 +232,70 @@ func Test_AdminPlayerManagement(t *testing.T) {
 	}
 
 	assert.True(t, found, "created player found in ListPlayers")
+
+	// Update the player's name and category via admin.
+	updatedName := "AdminUpdated"
+	updatedCategory := apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE
+
+	updateRes, err := tc.admin.UpdatePlayer(ctx, requestWithAdminAuth(&apiv1.UpdatePlayerRequest{
+		PlayerId: p.id.String(),
+		PlayerData: &apiv1.PlayerData{
+			Name: updatedName,
+		},
+		Registration: &apiv1.EventRegistration{
+			EventKey:        eventKey,
+			ScoringCategory: updatedCategory,
+		},
+	}))
+	require.NoError(t, err, "UpdatePlayer")
+	assert.Equal(t, updatedName, updateRes.Msg.GetPlayer().GetData().GetName(), "updated name returned")
+}
+
+func Test_AdminEventSetup(t *testing.T) {
+	const eventKey = "test-event-key-admin-event"
+
+	ctx := t.Context()
+	tc := newTestClients()
+
+	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '1 day'",
+		NumStages:    3,
+	})
+
+	// ListVenues — verify seeded venues are visible.
+	venueList, err := tc.admin.ListVenues(ctx, requestWithAdminAuth(&apiv1.ListVenuesRequest{}))
+	require.NoError(t, err, "ListVenues")
+	assert.GreaterOrEqual(t, len(venueList.Msg.GetVenues()), 3, "at least 3 venues exist")
+
+	// ListEventStages — verify seeded stages.
+	stageList, err := tc.admin.ListEventStages(ctx, requestWithAdminAuth(&apiv1.ListEventStagesRequest{
+		EventKey: eventKey,
+	}))
+	require.NoError(t, err, "ListEventStages")
+	require.Len(t, stageList.Msg.GetStages(), 3, "3 stages in event")
+
+	firstStage := stageList.Msg.GetStages()[0]
+	assert.EqualValues(t, 10, firstStage.GetRank(), "first stage rank is 10")
+	assert.EqualValues(t, 30, firstStage.GetDurationMin(), "first stage duration is 30min")
+
+	originalVenueID := firstStage.GetVenue().GetId()
+
+	// UpdateStage — change first stage's duration.
+	_, err = tc.admin.UpdateStage(ctx, requestWithAdminAuth(&apiv1.UpdateStageRequest{
+		StageId:     ev.stageIDs[0].String(),
+		VenueId:     originalVenueID,
+		Rank:        10,
+		DurationMin: 45,
+	}))
+	require.NoError(t, err, "UpdateStage")
+
+	// Verify update via ListEventStages.
+	stageList, err = tc.admin.ListEventStages(ctx, requestWithAdminAuth(&apiv1.ListEventStagesRequest{
+		EventKey: eventKey,
+	}))
+	require.NoError(t, err, "ListEventStages after update")
+
+	updatedStage := stageList.Msg.GetStages()[0]
+	assert.EqualValues(t, 45, updatedStage.GetDurationMin(), "stage duration updated to 45min")
 }
