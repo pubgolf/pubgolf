@@ -33,6 +33,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.allVenuesStmt, err = db.PrepareContext(ctx, allVenues); err != nil {
 		return nil, fmt.Errorf("error preparing query AllVenues: %w", err)
 	}
+	if q.claimIdempotencyKeyStmt, err = db.PrepareContext(ctx, claimIdempotencyKey); err != nil {
+		return nil, fmt.Errorf("error preparing query ClaimIdempotencyKey: %w", err)
+	}
 	if q.createAdjustmentStmt, err = db.PrepareContext(ctx, createAdjustment); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateAdjustment: %w", err)
 	}
@@ -53,6 +56,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deleteAdjustmentsForPlayerStageStmt, err = db.PrepareContext(ctx, deleteAdjustmentsForPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteAdjustmentsForPlayerStage: %w", err)
+	}
+	if q.deleteExpiredIdempotencyKeysStmt, err = db.PrepareContext(ctx, deleteExpiredIdempotencyKeys); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteExpiredIdempotencyKeys: %w", err)
 	}
 	if q.deletePlayerStmt, err = db.PrepareContext(ctx, deletePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query DeletePlayer: %w", err)
@@ -179,6 +185,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing allVenuesStmt: %w", cerr)
 		}
 	}
+	if q.claimIdempotencyKeyStmt != nil {
+		if cerr := q.claimIdempotencyKeyStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing claimIdempotencyKeyStmt: %w", cerr)
+		}
+	}
 	if q.createAdjustmentStmt != nil {
 		if cerr := q.createAdjustmentStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createAdjustmentStmt: %w", cerr)
@@ -212,6 +223,11 @@ func (q *Queries) Close() error {
 	if q.deleteAdjustmentsForPlayerStageStmt != nil {
 		if cerr := q.deleteAdjustmentsForPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteAdjustmentsForPlayerStageStmt: %w", cerr)
+		}
+	}
+	if q.deleteExpiredIdempotencyKeysStmt != nil {
+		if cerr := q.deleteExpiredIdempotencyKeysStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteExpiredIdempotencyKeysStmt: %w", cerr)
 		}
 	}
 	if q.deletePlayerStmt != nil {
@@ -431,6 +447,7 @@ type Queries struct {
 	adjustmentTemplatesByStageIDStmt    *sql.Stmt
 	adjustmentsByPlayerStageStmt        *sql.Stmt
 	allVenuesStmt                       *sql.Stmt
+	claimIdempotencyKeyStmt             *sql.Stmt
 	createAdjustmentStmt                *sql.Stmt
 	createAdjustmentTemplateStmt        *sql.Stmt
 	createAdjustmentWithTemplateStmt    *sql.Stmt
@@ -438,6 +455,7 @@ type Queries struct {
 	deactivateAuthTokensStmt            *sql.Stmt
 	deleteAdjustmentStmt                *sql.Stmt
 	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
+	deleteExpiredIdempotencyKeysStmt    *sql.Stmt
 	deletePlayerStmt                    *sql.Stmt
 	deleteScoreForPlayerStageStmt       *sql.Stmt
 	eventAdjustmentTemplatesStmt        *sql.Stmt
@@ -482,6 +500,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		adjustmentTemplatesByStageIDStmt:    q.adjustmentTemplatesByStageIDStmt,
 		adjustmentsByPlayerStageStmt:        q.adjustmentsByPlayerStageStmt,
 		allVenuesStmt:                       q.allVenuesStmt,
+		claimIdempotencyKeyStmt:             q.claimIdempotencyKeyStmt,
 		createAdjustmentStmt:                q.createAdjustmentStmt,
 		createAdjustmentTemplateStmt:        q.createAdjustmentTemplateStmt,
 		createAdjustmentWithTemplateStmt:    q.createAdjustmentWithTemplateStmt,
@@ -489,6 +508,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deactivateAuthTokensStmt:            q.deactivateAuthTokensStmt,
 		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
 		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
+		deleteExpiredIdempotencyKeysStmt:    q.deleteExpiredIdempotencyKeysStmt,
 		deletePlayerStmt:                    q.deletePlayerStmt,
 		deleteScoreForPlayerStageStmt:       q.deleteScoreForPlayerStageStmt,
 		eventAdjustmentTemplatesStmt:        q.eventAdjustmentTemplatesStmt,

@@ -10,8 +10,8 @@ import (
 
 // Messenger describes all of the operations exposed by the SMS client, to allow for testing mocks.
 type Messenger interface {
-	// SendVerification sends an SMS verification message to the given number.
+	// SendVerification sends a verification code to the given phone number.
 	SendVerification(ctx context.Context, to models.PhoneNum) error
-	// CheckVerification validates the auth code matches the last verification sent to the given number.
+	// CheckVerification verifies a code sent to a phone number.
 	CheckVerification(ctx context.Context, to models.PhoneNum, code string) (bool, error)
 }

@@ -42,6 +42,10 @@ type AuthToken struct {
 	DeletedAt sql.NullTime
 }
 
+type EnumIdempotencyScope struct {
+	Value string
+}
+
 type EnumScoringCategory struct {
 	Value string
 }
@@ -64,6 +68,12 @@ type EventPlayer struct {
 	ScoringCategory models.ScoringCategory
 	CreatedAt       time.Time
 	DeletedAt       sql.NullTime
+}
+
+type IdempotencyKey struct {
+	Key       models.IdempotencyKey
+	Scope     models.IdempotencyScope
+	CreatedAt time.Time
 }
 
 type Player struct {
