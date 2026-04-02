@@ -261,18 +261,18 @@ func TestCategoryScoreStatus(t *testing.T) {
 		// These test cases verify the function produces correct results when counts
 		// properly exclude non-scoring hole data.
 		{
-			name:            "non-scoring verified score excluded from finalized check",
+			name:            "non-scoring scores excluded from counts",
 			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 0, LatestScoredStageNumber: 3},
 			required:        3,
 			currentStageNum: 5,
 			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION,
 		},
 		{
-			name:            "non-scoring unverified score excluded from pending check",
-			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 0, LatestScoredStageNumber: 3},
+			name:            "non-scoring unverified score does not bump toward verification",
+			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 0, LatestScoredStageNumber: 5},
 			required:        3,
 			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
 		},
 		{
 			name:            "non-scoring score does not inflate total past required",
