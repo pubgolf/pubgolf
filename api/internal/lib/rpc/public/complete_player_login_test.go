@@ -1,7 +1,6 @@
 package public
 
 import (
-	"errors"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -110,7 +109,7 @@ func TestCompletePlayerLogin(t *testing.T) {
 		mockMes := new(sms.MockMessenger)
 		s := NewServer(mockDAO, mockMes)
 
-		mockMes.On("CheckVerification", mock.Anything, phoneNum, authCode).Return(false, errors.New("twilio down"))
+		mockMes.On("CheckVerification", mock.Anything, phoneNum, authCode).Return(false, sms.ErrUpstreamProviderIssue)
 
 		_, err := s.CompletePlayerLogin(t.Context(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
 			PhoneNumber: string(phoneNum),
