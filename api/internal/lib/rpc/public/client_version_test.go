@@ -25,17 +25,17 @@ func TestClientVersion(t *testing.T) {
 	}{
 		{
 			name:       "current version returns OK",
-			version:    1,
+			version:    currentAPIVersion,
 			wantStatus: apiv1.ClientVersionResponse_VERSION_STATUS_OK,
 		},
 		{
 			name:       "above current returns OK",
-			version:    100,
+			version:    currentAPIVersion + 99,
 			wantStatus: apiv1.ClientVersionResponse_VERSION_STATUS_OK,
 		},
 		{
 			name:       "below minimum returns INCOMPATIBLE",
-			version:    0,
+			version:    minAPIVersion - 1,
 			wantStatus: apiv1.ClientVersionResponse_VERSION_STATUS_INCOMPATIBLE,
 		},
 	}

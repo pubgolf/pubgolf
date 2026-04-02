@@ -236,6 +236,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			assert.Zero(t, s.NumScoresVerified, "no verified scores")
 			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+			assert.Zero(t, s.LatestScoredStageNumber, "no scored stages")
 		}
 	})
 
@@ -291,6 +292,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 			assert.Zero(t, s.NumScoresVerified, "no verified scores")
 			assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 			assert.Zero(t, s.PointsFromPenalties, "no penalties")
+			assert.EqualValues(t, numVenues, s.LatestScoredStageNumber, "latest scored stage is last venue")
 		}
 	})
 
@@ -612,6 +614,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 				assert.Zero(t, s.NumScoresVerified, "no verified scores")
 				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 				assert.Zero(t, s.PointsFromPenalties, "no penalties")
+				assert.Zero(t, s.LatestScoredStageNumber, "no scored stages")
 			}
 		})
 
@@ -672,6 +675,7 @@ func TestScoringCriteria(t *testing.T) { //nolint:gocyclo
 				assert.Zero(t, s.NumScoresVerified, "no verified scores")
 				assert.Zero(t, s.PointsFromBonuses, "no bonuses")
 				assert.Zero(t, s.PointsFromPenalties, "no penalties")
+				assert.EqualValues(t, numVenues, s.LatestScoredStageNumber, "latest scored stage is last eligible venue")
 			}
 		})
 

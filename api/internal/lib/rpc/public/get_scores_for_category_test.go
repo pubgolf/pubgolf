@@ -54,7 +54,7 @@ func TestGetScoresForCategory(t *testing.T) {
 		}}.Bind(mockDAO, "EventScheduleAsync")
 	}
 
-	t.Run("leaderboard with scores returns ranked entries", func(t *testing.T) {
+	t.Run("leaderboard with scores returns ranked entries matching input", func(t *testing.T) {
 		t.Parallel()
 
 		mockDAO := new(dao.MockQueryProvider)
@@ -73,7 +73,17 @@ func TestGetScoresForCategory(t *testing.T) {
 		}))
 
 		require.NoError(t, err)
-		assert.Len(t, resp.Msg.GetScoreBoard().GetScores(), 2)
+
+		scores := resp.Msg.GetScoreBoard().GetScores()
+		require.Len(t, scores, 2)
+
+		assert.Equal(t, player1ID.String(), scores[0].GetEntityId())
+		assert.Equal(t, "Alice", scores[0].GetLabel())
+		assert.Equal(t, int32(10), scores[0].GetScore())
+
+		assert.Equal(t, player2ID.String(), scores[1].GetEntityId())
+		assert.Equal(t, "Bob", scores[1].GetLabel())
+		assert.Equal(t, int32(15), scores[1].GetScore())
 	})
 
 	t.Run("empty leaderboard returns no entries", func(t *testing.T) {
@@ -95,7 +105,7 @@ func TestGetScoresForCategory(t *testing.T) {
 		assert.Empty(t, resp.Msg.GetScoreBoard().GetScores())
 	})
 
-	t.Run("guard error cases", func(t *testing.T) {
+	t.Run("access and validation errors", func(t *testing.T) {
 		t.Parallel()
 
 		testCases := []struct {
@@ -105,7 +115,7 @@ func TestGetScoresForCategory(t *testing.T) {
 			wantCode   connect.Code
 		}{
 			{
-				name: "guard rejects invalid category",
+				name: "invalid category returns InvalidArgument",
 				setupMocks: func(m *dao.MockQueryProvider) {
 					mockEventIDByKey(m, eventKey, eventID)
 					mockPlayerRegisteredForEvent(m, playerID, eventID)
@@ -114,7 +124,7 @@ func TestGetScoresForCategory(t *testing.T) {
 				wantCode: connect.CodeInvalidArgument,
 			},
 			{
-				name: "guard rejects unregistered player",
+				name: "unregistered player returns PermissionDenied",
 				setupMocks: func(m *dao.MockQueryProvider) {
 					dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, eventKey}, Return: []any{eventID, nil}}.Bind(m, "EventIDByKey")
 					dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, playerID, eventID}, Return: []any{false, nil}}.Bind(m, "PlayerRegisteredForEvent")
@@ -141,6 +151,35 @@ func TestGetScoresForCategory(t *testing.T) {
 				assert.Equal(t, tc.wantCode, connect.CodeOf(err))
 			})
 		}
+	})
+
+	t.Run("registered player can view other scoring categories", func(t *testing.T) {
+		t.Parallel()
+
+		mockDAO := new(dao.MockQueryProvider)
+		s := makeTestServer(mockDAO)
+
+		mockEventIDByKey(mockDAO, eventKey, eventID)
+		mockPlayerRegisteredForEvent(mockDAO, playerID, eventID)
+
+		// Player is registered for nine-hole but requests five-hole leaderboard.
+		dao.MockDAOCall{ShouldCall: true, Args: []any{eventID, models.ScoringCategoryPubGolfFiveHole}, Return: []any{
+			dao.MockScoringCriteriaAsyncResult([]models.ScoringInput{}, nil),
+		}}.Bind(mockDAO, "ScoringCriteriaAsync")
+		dao.MockDAOCall{ShouldCall: true, Args: []any{eventID}, Return: []any{
+			dao.MockEventStartTimeAsyncResult(time.Now().Add(-30*time.Minute), nil),
+		}}.Bind(mockDAO, "EventStartTimeAsync")
+		dao.MockDAOCall{ShouldCall: true, Args: []any{eventID}, Return: []any{
+			dao.MockEventScheduleAsyncResult(schedule, nil),
+		}}.Bind(mockDAO, "EventScheduleAsync")
+
+		resp, err := s.GetScoresForCategory(gameCtx, connect.NewRequest(&apiv1.GetScoresForCategoryRequest{
+			EventKey: eventKey,
+			Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
+		}))
+
+		require.NoError(t, err)
+		assert.NotNil(t, resp.Msg.GetScoreBoard())
 	})
 }
 
@@ -177,11 +216,11 @@ func TestCategoryScoreStatus(t *testing.T) {
 			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION,
 		},
 		{
-			name:            "enough total but skipped current venue",
-			input:           models.ScoringInput{VerifiedScores: 3, UnverifiedScores: 2, LatestScoredStageNumber: 4},
+			name:            "all submitted with multiple unverified",
+			input:           models.ScoringInput{VerifiedScores: 1, UnverifiedScores: 4, LatestScoredStageNumber: 5},
 			required:        5,
 			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION,
 		},
 		{
 			name:            "missing current venue only",
@@ -256,45 +295,9 @@ func TestCategoryScoreStatus(t *testing.T) {
 			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
 		},
 
-		// Non-scoring hole cases (five-hole, required=3, currentScoringStageNumber=5)
-		// ScoringInput counts reflect only scoring holes (DAO filters non-scoring holes).
-		// These test cases verify the function produces correct results when counts
-		// properly exclude non-scoring hole data.
-		{
-			name:            "non-scoring scores excluded from counts",
-			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 0, LatestScoredStageNumber: 3},
-			required:        3,
-			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION,
-		},
-		{
-			name:            "non-scoring unverified score does not bump toward verification",
-			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 0, LatestScoredStageNumber: 5},
-			required:        3,
-			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
-		},
-		{
-			name:            "non-scoring score does not inflate total past required",
-			input:           models.ScoringInput{VerifiedScores: 2, UnverifiedScores: 1, LatestScoredStageNumber: 5},
-			required:        3,
-			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION,
-		},
-		{
-			name:            "non-scoring scores do not mask incomplete status",
-			input:           models.ScoringInput{VerifiedScores: 1, UnverifiedScores: 0, LatestScoredStageNumber: 1},
-			required:        3,
-			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
-		},
-		{
-			name:            "all scoring holes verified despite non-scoring gaps",
-			input:           models.ScoringInput{VerifiedScores: 3, UnverifiedScores: 0, LatestScoredStageNumber: 5},
-			required:        3,
-			currentStageNum: 5,
-			want:            apiv1.ScoreBoard_SCORE_STATUS_FINALIZED,
-		},
+		// NOTE: ScoringInput counts reflect only scoring holes — the DAO filters
+		// non-scoring holes via the EveryOther parameter in the SQL query. That
+		// property is tested at the dbc level in leaderboard_test.go ("best of five").
 	}
 
 	for _, tc := range testCases {

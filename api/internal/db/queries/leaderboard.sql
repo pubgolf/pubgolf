@@ -26,7 +26,7 @@ separated AS ((
       coalesce(sum(s.value), 0)::bigint AS total_points,
       0 AS points_from_penalties,
       0 AS points_from_bonuses,
-      coalesce(MAX(st.stage_number), 0)::bigint AS latest_scored_stage_number
+      coalesce(MAX(CASE WHEN s.id IS NOT NULL THEN st.stage_number END), 0)::bigint AS latest_scored_stage_number
     FROM
       players p
     LEFT JOIN event_players ep ON p.id = ep.player_id
