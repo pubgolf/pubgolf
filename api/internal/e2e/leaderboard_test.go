@@ -31,19 +31,16 @@ func Test_LeaderboardRanking(t *testing.T) {
 		Phone:    "+15559380001",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
-		Name:     "",
 	})
 	player2 := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
 		Phone:    "+15559380002",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
-		Name:     "",
 	})
 	player3 := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
 		Phone:    "+15559380003",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
-		Name:     "",
 	})
 
 	// Get current venue key from schedule.

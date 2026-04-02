@@ -72,7 +72,6 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 		Phone:    "+15559284019",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
-		Name:     "",
 	})
 
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
@@ -224,7 +223,6 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 		Phone:    "+15555284015",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
-		Name:     "",
 	})
 
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{

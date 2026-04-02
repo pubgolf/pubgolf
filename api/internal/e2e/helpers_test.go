@@ -40,11 +40,7 @@ type seedEventOpts struct {
 	NumStages    int
 }
 
-// seedEvent inserts an event with the given key and startsAtExpr (a SQL expression
-// relative to NOW(), e.g. "NOW() + '30 minutes'" or "NOW() + '-45 minutes'"),
-// then inserts numStages venues+stages with 30-minute durations and ranks 10,20,...
-//
-// It purges all caches after seeding.
+// seedEvent inserts an event with venues and stages, then purges all caches.
 func seedEvent(ctx context.Context, t *testing.T, db *sql.DB, tc testClients, opts seedEventOpts) seededEvent {
 	t.Helper()
 

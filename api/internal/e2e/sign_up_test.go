@@ -21,12 +21,14 @@ func Test_SignUpFlow(t *testing.T) {
 	ctx := t.Context()
 	tc := newTestClients()
 
-	_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", eventKey)
-	require.NoError(t, err, "seed DB: insert future event")
+	seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '1 day'",
+	})
 
 	// Log in.
 	phoneNum := "+15551231234"
-	_, err = tc.pub.StartPlayerLogin(ctx, connect.NewRequest(&apiv1.StartPlayerLoginRequest{
+	_, err := tc.pub.StartPlayerLogin(ctx, connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 		PhoneNumber: phoneNum,
 	}))
 	require.NoError(t, err)
@@ -129,9 +131,10 @@ func Test_DeleteAccount(t *testing.T) {
 	ctx := t.Context()
 	tc := newTestClients()
 
-	// Insert bare event (no stages needed).
-	_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", eventKey)
-	require.NoError(t, err, "seed DB: insert future event")
+	seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '1 day'",
+	})
 
 	// Create player via admin with auth token.
 	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
@@ -141,11 +144,8 @@ func Test_DeleteAccount(t *testing.T) {
 		Name:     "DeleteMe",
 	})
 
-	_, err = tc.admin.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
-	require.NoError(t, err)
-
 	// Verify player exists before deletion.
-	_, err = tc.pub.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, p.token))
+	_, err := tc.pub.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, p.token))
 	require.NoError(t, err, "GetMyPlayer before delete")
 
 	// Delete account.

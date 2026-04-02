@@ -29,7 +29,6 @@ func Test_ScheduleProgression(t *testing.T) {
 		Phone:    "+15559380101",
 		EventKey: eventKey,
 		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
-		Name:     "",
 	})
 
 	// Pre-event: 0 visited venues, no current venue.

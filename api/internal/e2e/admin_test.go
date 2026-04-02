@@ -198,12 +198,10 @@ func Test_AdminPlayerManagement(t *testing.T) {
 	ctx := t.Context()
 	tc := newTestClients()
 
-	// Insert bare event (no stages needed for player management).
-	_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", eventKey)
-	require.NoError(t, err, "seed DB: insert future event")
-
-	_, err = tc.admin.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
-	require.NoError(t, err)
+	seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '1 day'",
+	})
 
 	// CreatePlayer via admin with registration.
 	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
