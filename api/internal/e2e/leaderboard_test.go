@@ -52,17 +52,8 @@ func Test_LeaderboardRanking(t *testing.T) {
 	currentVenueKey := schedule.Msg.GetSchedule().GetCurrentVenueKey()
 	require.NotZero(t, currentVenueKey, "has current venue key")
 
-	// Get score input ID from submit form.
-	form, err := tc.pub.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
-		EventKey: eventKey,
-		VenueKey: currentVenueKey,
-		PlayerId: player1.id.String(),
-	}, player1.token))
-	require.NoError(t, err, "GetSubmitScoreForm()")
-
-	scoreInputID := form.Msg.GetForm().GetGroups()[0].GetInputs()[0].GetId()
-
 	// Submit scores for each player at current venue.
+	// Each player fetches their own form since form IDs aren't guaranteed consistent across players.
 	for _, tt := range []struct {
 		player seededPlayer
 		score  int64
@@ -71,7 +62,16 @@ func Test_LeaderboardRanking(t *testing.T) {
 		{player2, 5},
 		{player3, 4},
 	} {
-		_, err := tc.pub.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
+		form, err := tc.pub.GetSubmitScoreForm(ctx, requestWithAuth(&apiv1.GetSubmitScoreFormRequest{
+			EventKey: eventKey,
+			VenueKey: currentVenueKey,
+			PlayerId: tt.player.id.String(),
+		}, tt.player.token))
+		require.NoError(t, err, "GetSubmitScoreForm() for player %s", tt.player.id.String())
+
+		scoreInputID := form.Msg.GetForm().GetGroups()[0].GetInputs()[0].GetId()
+
+		_, err = tc.pub.SubmitScore(ctx, requestWithAuth(&apiv1.SubmitScoreRequest{
 			EventKey: eventKey,
 			VenueKey: currentVenueKey,
 			PlayerId: tt.player.id.String(),
@@ -104,22 +104,19 @@ func Test_LeaderboardRanking(t *testing.T) {
 		}
 	}
 
-	assert.Len(t, nineHolePlayers, 2, "nine-hole leaderboard has 2 player entries")
+	require.Len(t, nineHolePlayers, 2, "nine-hole leaderboard has 2 player entries")
+	assert.Equal(t, player1.id.String(), nineHolePlayers[0].GetEntityId(), "player 1 is ranked first (lower score)")
+	assert.Less(t, nineHolePlayers[0].GetScore(), nineHolePlayers[1].GetScore(), "first entry has lower score")
 
-	if len(nineHolePlayers) >= 2 {
-		assert.Equal(t, player1.id.String(), nineHolePlayers[0].GetEntityId(), "player 1 is ranked first (lower score)")
-		assert.Less(t, nineHolePlayers[0].GetScore(), nineHolePlayers[1].GetScore(), "first entry has lower score")
-
-		// TODO: GetPlayer is currently self-only (guardPlayerIDMatchesSelf).
-		// Once implemented to allow viewing other players from the leaderboard,
-		// uncomment this to verify fetching another player's public profile.
-		//
-		// playerRes, err := tc.pub.GetPlayer(ctx, requestWithAuth(&apiv1.GetPlayerRequest{
-		// 	PlayerId: nineHolePlayers[1].GetEntityId(),
-		// }, player1.token))
-		// require.NoError(t, err, "GetPlayer() for leaderboard entry")
-		// assert.Equal(t, nineHolePlayers[1].GetEntityId(), playerRes.Msg.GetPlayer().GetId())
-	}
+	// TODO: GetPlayer is currently self-only (guardPlayerIDMatchesSelf).
+	// Once implemented to allow viewing other players from the leaderboard,
+	// uncomment this to verify fetching another player's public profile.
+	//
+	// playerRes, err := tc.pub.GetPlayer(ctx, requestWithAuth(&apiv1.GetPlayerRequest{
+	// 	PlayerId: nineHolePlayers[1].GetEntityId(),
+	// }, player1.token))
+	// require.NoError(t, err, "GetPlayer() for leaderboard entry")
+	// assert.Equal(t, nineHolePlayers[1].GetEntityId(), playerRes.Msg.GetPlayer().GetId())
 
 	// Verify five-hole leaderboard: 1 entry for the five-hole player.
 	fiveHoleScores, err := tc.pub.GetScoresForCategory(ctx, requestWithAuth(&apiv1.GetScoresForCategoryRequest{
@@ -136,9 +133,6 @@ func Test_LeaderboardRanking(t *testing.T) {
 		}
 	}
 
-	assert.Len(t, fiveHolePlayers, 1, "five-hole leaderboard has 1 player entry")
-
-	if len(fiveHolePlayers) >= 1 {
-		assert.Equal(t, player3.id.String(), fiveHolePlayers[0].GetEntityId(), "five-hole player is present")
-	}
+	require.Len(t, fiveHolePlayers, 1, "five-hole leaderboard has 1 player entry")
+	assert.Equal(t, player3.id.String(), fiveHolePlayers[0].GetEntityId(), "five-hole player is present")
 }

@@ -5,6 +5,7 @@
 package e2e
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -137,7 +138,7 @@ func Test_AdminScoreManagement(t *testing.T) {
 	require.NoError(t, err, "CreateStageScore")
 	assert.NotNil(t, createRes.Msg.GetScore(), "created score is returned")
 
-	// Verify via GetScoresForPlayer.
+	// Verify score value via GetScoresForPlayer.
 	scores, err := tc.pub.GetScoresForPlayer(ctx, requestWithAuth(&apiv1.GetScoresForPlayerRequest{
 		EventKey: eventKey,
 		PlayerId: p.id.String(),
@@ -146,6 +147,11 @@ func Test_AdminScoreManagement(t *testing.T) {
 
 	scoreEntries := scores.Msg.GetScoreBoard().GetScores()
 	require.NotEmpty(t, scoreEntries, "has score entries after create")
+
+	hasScore5 := slices.ContainsFunc(scoreEntries, func(e *apiv1.ScoreBoard_ScoreBoardEntry) bool {
+		return e.GetScore() == 5
+	})
+	assert.True(t, hasScore5, "score of 5 appears in player scoreboard after create")
 
 	// UpdateStageScore via admin.
 	updateRes, err := tc.admin.UpdateStageScore(ctx, requestWithAdminAuth(&apiv1.UpdateStageScoreRequest{
@@ -163,13 +169,20 @@ func Test_AdminScoreManagement(t *testing.T) {
 	require.NoError(t, err, "UpdateStageScore")
 	assert.NotNil(t, updateRes.Msg.GetScore(), "updated score is returned")
 
-	// Verify updated score.
+	// Verify updated score value.
 	scores, err = tc.pub.GetScoresForPlayer(ctx, requestWithAuth(&apiv1.GetScoresForPlayerRequest{
 		EventKey: eventKey,
 		PlayerId: p.id.String(),
 	}, p.token))
 	require.NoError(t, err, "GetScoresForPlayer after update")
-	require.NotEmpty(t, scores.Msg.GetScoreBoard().GetScores(), "has score entries after update")
+
+	scoreEntries = scores.Msg.GetScoreBoard().GetScores()
+	require.NotEmpty(t, scoreEntries, "has score entries after update")
+
+	hasScore7 := slices.ContainsFunc(scoreEntries, func(e *apiv1.ScoreBoard_ScoreBoardEntry) bool {
+		return e.GetScore() == 7
+	})
+	assert.True(t, hasScore7, "score of 7 appears in player scoreboard after update")
 
 	// DeleteStageScore via admin.
 	_, err = tc.admin.DeleteStageScore(ctx, requestWithAdminAuth(&apiv1.DeleteStageScoreRequest{
@@ -217,19 +230,10 @@ func Test_AdminPlayerManagement(t *testing.T) {
 	}))
 	require.NoError(t, err, "ListPlayers")
 
-	var found bool
-
-	for _, pl := range list.Msg.GetPlayers() {
-		if pl.GetId() == p.id.String() {
-			found = true
-
-			assert.Equal(t, "AdminCreated", pl.GetData().GetName(), "player name matches")
-
-			break
-		}
-	}
-
-	assert.True(t, found, "created player found in ListPlayers")
+	playerInList := slices.ContainsFunc(list.Msg.GetPlayers(), func(pl *apiv1.Player) bool {
+		return pl.GetId() == p.id.String() && pl.GetData().GetName() == "AdminCreated"
+	})
+	assert.True(t, playerInList, "created player found in ListPlayers with correct name")
 
 	// Update the player's name and category via admin.
 	updatedName := "AdminUpdated"
@@ -257,8 +261,15 @@ func Test_AdminEventSetup(t *testing.T) {
 
 	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
 		EventKey:     eventKey,
-		StartsAtExpr: "NOW() + '1 day'",
+		StartsAtExpr: "NOW() + '-45 minutes'",
 		NumStages:    3,
+	})
+
+	// Register a player so we can verify schedule propagation after stage updates.
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380401",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
 	})
 
 	// ListVenues — verify seeded venues are visible.
@@ -266,34 +277,67 @@ func Test_AdminEventSetup(t *testing.T) {
 	require.NoError(t, err, "ListVenues")
 	assert.GreaterOrEqual(t, len(venueList.Msg.GetVenues()), 3, "at least 3 venues exist")
 
-	// ListEventStages — verify seeded stages.
+	// ListEventStages — capture existing stage state.
 	stageList, err := tc.admin.ListEventStages(ctx, requestWithAdminAuth(&apiv1.ListEventStagesRequest{
 		EventKey: eventKey,
 	}))
 	require.NoError(t, err, "ListEventStages")
 	require.Len(t, stageList.Msg.GetStages(), 3, "3 stages in event")
 
-	firstStage := stageList.Msg.GetStages()[0]
-	assert.EqualValues(t, 10, firstStage.GetRank(), "first stage rank is 10")
-	assert.EqualValues(t, 30, firstStage.GetDurationMin(), "first stage duration is 30min")
+	// Use the second stage (current stage at -45min) for the update test,
+	// so we can verify the venue key change propagates to GetSchedule's currentVenueKey.
+	currentStage := stageList.Msg.GetStages()[1]
+	originalDuration := currentStage.GetDurationMin()
+	currentVenueID := currentStage.GetVenue().GetId()
 
-	originalVenueID := firstStage.GetVenue().GetId()
+	// Get schedule before update to capture venue key (a cache key that changes on stage updates).
+	scheduleBefore, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
+		EventKey: eventKey,
+	}, p.token))
+	require.NoError(t, err, "GetSchedule before UpdateStage")
 
-	// UpdateStage — change first stage's duration.
+	venueKeyBefore := scheduleBefore.Msg.GetSchedule().GetCurrentVenueKey()
+	require.NotZero(t, venueKeyBefore, "has current venue key before update")
+
+	visitedKeysBefore := scheduleBefore.Msg.GetSchedule().GetVisitedVenueKeys()
+	require.NotEmpty(t, visitedKeysBefore, "has visited venue keys before update")
+
+	// UpdateStage — change current stage's duration to a different value.
+	// This also sets venue_key = NULL, which forces reassignment on next schedule fetch.
+	newDuration := originalDuration + 15
+
 	_, err = tc.admin.UpdateStage(ctx, requestWithAdminAuth(&apiv1.UpdateStageRequest{
-		StageId:     ev.stageIDs[0].String(),
-		VenueId:     originalVenueID,
-		Rank:        10,
-		DurationMin: 45,
+		StageId:     ev.stageIDs[1].String(),
+		VenueId:     currentVenueID,
+		Rank:        currentStage.GetRank(),
+		DurationMin: newDuration,
 	}))
 	require.NoError(t, err, "UpdateStage")
 
-	// Verify update via ListEventStages.
+	// Verify duration updated via ListEventStages.
 	stageList, err = tc.admin.ListEventStages(ctx, requestWithAdminAuth(&apiv1.ListEventStagesRequest{
 		EventKey: eventKey,
 	}))
 	require.NoError(t, err, "ListEventStages after update")
 
-	updatedStage := stageList.Msg.GetStages()[0]
-	assert.EqualValues(t, 45, updatedStage.GetDurationMin(), "stage duration updated to 45min")
+	updatedStage := stageList.Msg.GetStages()[1]
+	assert.Equal(t, newDuration, updatedStage.GetDurationMin(), "stage duration updated")
+	assert.NotEqual(t, originalDuration, updatedStage.GetDurationMin(), "duration changed from original")
+
+	// Verify venue key changed (cache invalidation propagated to schedule).
+	_, err = tc.admin.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
+	require.NoError(t, err)
+
+	scheduleAfter, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
+		EventKey: eventKey,
+	}, p.token))
+	require.NoError(t, err, "GetSchedule after UpdateStage")
+
+	venueKeyAfter := scheduleAfter.Msg.GetSchedule().GetCurrentVenueKey()
+	require.NotZero(t, venueKeyAfter, "has current venue key after update")
+	assert.NotEqual(t, venueKeyBefore, venueKeyAfter, "updated stage's venue key changed (cache invalidation)")
+
+	// Non-updated stages should retain their venue keys.
+	visitedKeysAfter := scheduleAfter.Msg.GetSchedule().GetVisitedVenueKeys()
+	assert.Equal(t, visitedKeysBefore, visitedKeysAfter, "non-updated stage venue keys unchanged")
 }
