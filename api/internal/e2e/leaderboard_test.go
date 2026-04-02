@@ -112,6 +112,16 @@ func Test_LeaderboardRanking(t *testing.T) {
 	if len(nineHolePlayers) >= 2 {
 		assert.Equal(t, player1.id.String(), nineHolePlayers[0].GetEntityId(), "player 1 is ranked first (lower score)")
 		assert.Less(t, nineHolePlayers[0].GetScore(), nineHolePlayers[1].GetScore(), "first entry has lower score")
+
+		// TODO: GetPlayer is currently self-only (guardPlayerIDMatchesSelf).
+		// Once implemented to allow viewing other players from the leaderboard,
+		// uncomment this to verify fetching another player's public profile.
+		//
+		// playerRes, err := tc.pub.GetPlayer(ctx, requestWithAuth(&apiv1.GetPlayerRequest{
+		// 	PlayerId: nineHolePlayers[1].GetEntityId(),
+		// }, player1.token))
+		// require.NoError(t, err, "GetPlayer() for leaderboard entry")
+		// assert.Equal(t, nineHolePlayers[1].GetEntityId(), playerRes.Msg.GetPlayer().GetId())
 	}
 
 	// Verify five-hole leaderboard: 1 entry for the five-hole player.
