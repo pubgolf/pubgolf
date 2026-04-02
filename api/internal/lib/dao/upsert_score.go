@@ -15,11 +15,30 @@ type AdjustmentParams struct {
 	TemplateID *models.AdjustmentTemplateID
 }
 
-// UpsertScore creates score and adjustment records for a given stage.
-func (q *Queries) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error {
+// IdempotencyParams specify an idempotency key to claim atomically with the guarded operation.
+type IdempotencyParams struct {
+	Key   models.IdempotencyKey
+	Scope models.IdempotencyScope
+}
+
+// UpsertScore creates score and adjustment records for a given stage. If idem is non-nil, the
+// idempotency key is claimed within the same transaction as the score upsert; ErrAlreadyClaimed
+// is returned if the key was previously claimed.
+func (q *Queries) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool, idem *IdempotencyParams) error {
 	defer daoSpan(&ctx)()
 
 	return q.useTx(ctx, func(ctx context.Context, q *Queries) error {
+		if idem != nil {
+			isNew, err := q.ClaimIdempotencyKey(ctx, idem.Key, idem.Scope)
+			if err != nil {
+				return fmt.Errorf("claim idempotency key: %w", err)
+			}
+
+			if !isNew {
+				return ErrAlreadyClaimed
+			}
+		}
+
 		err := q.dbc.UpsertScore(ctx, dbc.UpsertScoreParams{
 			StageID:    stageID,
 			PlayerID:   playerID,

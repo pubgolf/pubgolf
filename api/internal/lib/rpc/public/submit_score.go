@@ -25,22 +25,15 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, err
 	}
 
-	if key := req.Msg.IdempotencyKey; key != nil && *key != "" {
-		idemKey, err := models.IdempotencyKeyFromString(*key)
+	var idem *dao.IdempotencyParams
+
+	if key := req.Msg.GetIdempotencyKey(); key != "" {
+		idemKey, err := models.IdempotencyKeyFromString(key)
 		if err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse idempotency key: %w", err))
 		}
 
-		isNew, err := s.dao.ClaimIdempotencyKey(ctx, idemKey, models.IdempotencyScopeScoreSubmission)
-		if err != nil {
-			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check idempotency key: %w", err))
-		}
-
-		if !isNew {
-			return connect.NewResponse(&apiv1.SubmitScoreResponse{
-				Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE,
-			}), nil
-		}
+		idem = &dao.IdempotencyParams{Key: idemKey, Scope: models.IdempotencyScopeScoreSubmission}
 	}
 
 	stageID, err := s.guardStageID(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
@@ -75,8 +68,14 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		})
 	}
 
-	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false, idem)
 	if err != nil {
+		if errors.Is(err, dao.ErrAlreadyClaimed) {
+			return connect.NewResponse(&apiv1.SubmitScoreResponse{
+				Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE,
+			}), nil
+		}
+
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}

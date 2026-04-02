@@ -14,51 +14,6 @@ import (
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
 
-func mockClaimIdempotencyKeySuccess(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			key,
-			scope,
-		},
-		Return: []any{
-			true, // isNew
-			nil,  // err
-		},
-	}.Bind(m, "ClaimIdempotencyKey")
-}
-
-func mockClaimIdempotencyKeyAlreadyClaimed(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			key,
-			scope,
-		},
-		Return: []any{
-			false, // isNew (already claimed)
-			nil,   // err
-		},
-	}.Bind(m, "ClaimIdempotencyKey")
-}
-
-func mockClaimIdempotencyKeyError(m *dao.MockQueryProvider, key models.IdempotencyKey, scope models.IdempotencyScope) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			key,
-			scope,
-		},
-		Return: []any{
-			false,
-			assert.AnError,
-		},
-	}.Bind(m, "ClaimIdempotencyKey")
-}
-
 func TestCreateStageScoreIdempotency(t *testing.T) {
 	t.Parallel()
 
@@ -68,7 +23,6 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 	adjustmentID := models.AdjustmentIDFromULID(ulid.Make())
 	idemULID := ulid.Make()
 	idempotencyKey := idemULID.String()
-	idemKeyModel := models.IdempotencyKeyFromULID(idemULID)
 
 	testReq := &connect.Request[apiv1.CreateStageScoreRequest]{
 		Msg: &apiv1.CreateStageScoreRequest{
@@ -89,27 +43,7 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		},
 	}
 
-	setupBasicMocks := func(mockDAO *dao.MockQueryProvider) {
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
-				mock.Anything,
-				playerID,
-				stageID,
-				uint32(42),
-				[]dao.AdjustmentParams{
-					{
-						Label: "bonus",
-						Value: 5,
-					},
-				},
-				true,
-			},
-			Return: []any{
-				nil,
-			},
-		}.Bind(mockDAO, "UpsertScore")
-
+	setupFetchMocks := func(mockDAO *dao.MockQueryProvider) {
 		dao.MockDAOCall{
 			ShouldCall: true,
 			Args: []any{
@@ -146,7 +80,30 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		}.Bind(mockDAO, "AdjustmentsByPlayerStage")
 	}
 
-	t.Run("when idempotency key is nil, ClaimIdempotencyKey is NOT called", func(t *testing.T) {
+	mockUpsertScoreSuccess := func(mockDAO *dao.MockQueryProvider) {
+		dao.MockDAOCall{
+			ShouldCall: true,
+			Args: []any{
+				mock.Anything,
+				playerID,
+				stageID,
+				uint32(42),
+				[]dao.AdjustmentParams{
+					{
+						Label: "bonus",
+						Value: 5,
+					},
+				},
+				true,
+				mock.Anything, // idempotency params
+			},
+			Return: []any{
+				nil,
+			},
+		}.Bind(mockDAO, "UpsertScore")
+	}
+
+	t.Run("when idempotency key is nil, UpsertScore is called with nil idem params", func(t *testing.T) {
 		t.Parallel()
 
 		mockDAO := new(dao.MockQueryProvider)
@@ -171,7 +128,8 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 			},
 		}
 
-		setupBasicMocks(mockDAO)
+		mockUpsertScoreSuccess(mockDAO)
+		setupFetchMocks(mockDAO)
 
 		resp, err := s.CreateStageScore(t.Context(), reqNoKey)
 
@@ -179,11 +137,11 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		assert.NotNil(t, resp.Msg)
 		assert.NotNil(t, resp.Msg.GetScore())
 
-		// Verify ClaimIdempotencyKey was not called
-		mockDAO.AssertNotCalled(t, "ClaimIdempotencyKey")
+		// Verify UpsertScore was called with nil idem params
+		mockDAO.AssertCalled(t, "UpsertScore", mock.Anything, playerID, stageID, uint32(42), mock.Anything, true, (*dao.IdempotencyParams)(nil))
 	})
 
-	t.Run("when idempotency key is empty, ClaimIdempotencyKey is NOT called", func(t *testing.T) {
+	t.Run("when idempotency key is empty, UpsertScore is called with nil idem params", func(t *testing.T) {
 		t.Parallel()
 
 		mockDAO := new(dao.MockQueryProvider)
@@ -209,7 +167,8 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 			},
 		}
 
-		setupBasicMocks(mockDAO)
+		mockUpsertScoreSuccess(mockDAO)
+		setupFetchMocks(mockDAO)
 
 		resp, err := s.CreateStageScore(t.Context(), reqEmptyKey)
 
@@ -217,8 +176,8 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		assert.NotNil(t, resp.Msg)
 		assert.NotNil(t, resp.Msg.GetScore())
 
-		// Verify ClaimIdempotencyKey was not called
-		mockDAO.AssertNotCalled(t, "ClaimIdempotencyKey")
+		// Verify UpsertScore was called with nil idem params
+		mockDAO.AssertCalled(t, "UpsertScore", mock.Anything, playerID, stageID, uint32(42), mock.Anything, true, (*dao.IdempotencyParams)(nil))
 	})
 
 	t.Run("when idempotency key is set and new, handler proceeds with UpsertScore", func(t *testing.T) {
@@ -227,8 +186,8 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		mockDAO := new(dao.MockQueryProvider)
 		s := makeTestServer(mockDAO)
 
-		setupBasicMocks(mockDAO)
-		mockClaimIdempotencyKeySuccess(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
+		mockUpsertScoreSuccess(mockDAO)
+		setupFetchMocks(mockDAO)
 
 		resp, err := s.CreateStageScore(t.Context(), testReq)
 
@@ -236,56 +195,33 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		assert.NotNil(t, resp.Msg)
 		assert.NotNil(t, resp.Msg.GetScore())
 
-		// Verify ClaimIdempotencyKey was called
-		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idemKeyModel, models.IdempotencyScopeScoreSubmission)
-
-		// Verify UpsertScore was called
-		mockDAO.AssertCalled(t, "UpsertScore", mock.Anything, playerID, stageID, uint32(42), mock.Anything, true)
+		// Verify UpsertScore was called with idem params
+		mockDAO.AssertCalled(t, "UpsertScore", mock.Anything, playerID, stageID, uint32(42), mock.Anything, true, mock.AnythingOfType("*dao.IdempotencyParams"))
 	})
 
-	t.Run("when idempotency key is set and already claimed, handler skips UpsertScore and fetches existing", func(t *testing.T) {
+	t.Run("when idempotency key is already claimed, handler skips upsert and fetches existing", func(t *testing.T) {
 		t.Parallel()
 
 		mockDAO := new(dao.MockQueryProvider)
 		s := makeTestServer(mockDAO)
 
-		// Setup only fetch mocks, not upsert
-		mockClaimIdempotencyKeyAlreadyClaimed(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
-
 		dao.MockDAOCall{
 			ShouldCall: true,
 			Args: []any{
 				mock.Anything,
 				playerID,
 				stageID,
-			},
-			Return: []any{
-				models.Score{
-					ID:    scoreID,
-					Value: 42,
-				},
-				nil,
-			},
-		}.Bind(mockDAO, "ScoreByPlayerStage")
-
-		dao.MockDAOCall{
-			ShouldCall: true,
-			Args: []any{
+				uint32(42),
 				mock.Anything,
-				playerID,
-				stageID,
+				true,
+				mock.Anything,
 			},
 			Return: []any{
-				[]models.Adjustment{
-					{
-						ID:    adjustmentID,
-						Label: "bonus",
-						Value: 5,
-					},
-				},
-				nil,
+				dao.ErrAlreadyClaimed,
 			},
-		}.Bind(mockDAO, "AdjustmentsByPlayerStage")
+		}.Bind(mockDAO, "UpsertScore")
+
+		setupFetchMocks(mockDAO)
 
 		resp, err := s.CreateStageScore(t.Context(), testReq)
 
@@ -293,23 +229,31 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		assert.NotNil(t, resp.Msg)
 		assert.NotNil(t, resp.Msg.GetScore())
 
-		// Verify ClaimIdempotencyKey was called
-		mockDAO.AssertCalled(t, "ClaimIdempotencyKey", mock.Anything, idemKeyModel, models.IdempotencyScopeScoreSubmission)
-
-		// Verify UpsertScore was NOT called
-		mockDAO.AssertNotCalled(t, "UpsertScore")
-
-		// But we should have fetched the score
+		// Verify we still fetched the score
 		mockDAO.AssertCalled(t, "ScoreByPlayerStage", mock.Anything, playerID, stageID)
 	})
 
-	t.Run("when idempotency key claim returns error, handler returns CodeUnavailable", func(t *testing.T) {
+	t.Run("when UpsertScore returns error, handler returns CodeUnavailable", func(t *testing.T) {
 		t.Parallel()
 
 		mockDAO := new(dao.MockQueryProvider)
 		s := makeTestServer(mockDAO)
 
-		mockClaimIdempotencyKeyError(mockDAO, idemKeyModel, models.IdempotencyScopeScoreSubmission)
+		dao.MockDAOCall{
+			ShouldCall: true,
+			Args: []any{
+				mock.Anything,
+				playerID,
+				stageID,
+				uint32(42),
+				mock.Anything,
+				true,
+				mock.Anything,
+			},
+			Return: []any{
+				assert.AnError,
+			},
+		}.Bind(mockDAO, "UpsertScore")
 
 		resp, err := s.CreateStageScore(t.Context(), testReq)
 

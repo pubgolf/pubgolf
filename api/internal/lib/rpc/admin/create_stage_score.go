@@ -34,27 +34,19 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 		})
 	}
 
-	shouldUpsert := true
+	var idem *dao.IdempotencyParams
 
-	if key := req.Msg.IdempotencyKey; key != nil && *key != "" {
-		idemKey, err := models.IdempotencyKeyFromString(*key)
+	if key := req.Msg.GetIdempotencyKey(); key != "" {
+		idemKey, err := models.IdempotencyKeyFromString(key)
 		if err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse idempotency key: %w", err))
 		}
 
-		isNew, err := s.dao.ClaimIdempotencyKey(ctx, idemKey, models.IdempotencyScopeScoreSubmission)
-		if err != nil {
-			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("check idempotency key: %w", err))
-		}
-
-		shouldUpsert = isNew
+		idem = &dao.IdempotencyParams{Key: idemKey, Scope: models.IdempotencyScopeScoreSubmission}
 	}
 
-	if shouldUpsert {
-		err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true)
-	}
-
-	if err != nil {
+	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true, idem)
+	if err != nil && !errors.Is(err, dao.ErrAlreadyClaimed) {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}

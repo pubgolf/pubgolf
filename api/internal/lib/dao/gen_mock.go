@@ -1049,17 +1049,17 @@ func (_m *MockQueryProvider) UpsertRegistration(ctx context.Context, playerID mo
 	return r0
 }
 
-// UpsertScore provides a mock function with given fields: ctx, playerID, stageID, score, adjustments, isVerified
-func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error {
-	ret := _m.Called(ctx, playerID, stageID, score, adjustments, isVerified)
+// UpsertScore provides a mock function with given fields: ctx, playerID, stageID, score, adjustments, isVerified, idem
+func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool, idem *IdempotencyParams) error {
+	ret := _m.Called(ctx, playerID, stageID, score, adjustments, isVerified, idem)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpsertScore")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []AdjustmentParams, bool) error); ok {
-		r0 = rf(ctx, playerID, stageID, score, adjustments, isVerified)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []AdjustmentParams, bool, *IdempotencyParams) error); ok {
+		r0 = rf(ctx, playerID, stageID, score, adjustments, isVerified, idem)
 	} else {
 		r0 = ret.Error(0)
 	}
