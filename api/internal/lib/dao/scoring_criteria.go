@@ -46,13 +46,14 @@ func (q *Queries) ScoringCriteria(ctx context.Context, eventID models.EventID, c
 		playerID := models.PlayerID{DatabaseULID: d.PlayerID}
 
 		scores = append(scores, models.ScoringInput{
-			PlayerID:            playerID,
-			Name:                d.Name,
-			VerifiedScores:      d.NumScoresVerified,
-			UnverifiedScores:    d.NumScores - d.NumScoresVerified,
-			TotalPoints:         d.TotalPoints,
-			PointsFromPenalties: d.PointsFromPenalties,
-			PointsFromBonuses:   d.PointsFromBonuses,
+			PlayerID:                playerID,
+			Name:                    d.Name,
+			VerifiedScores:          d.NumScoresVerified,
+			UnverifiedScores:        d.NumScores - d.NumScoresVerified,
+			TotalPoints:             d.TotalPoints,
+			PointsFromPenalties:     d.PointsFromPenalties,
+			PointsFromBonuses:       d.PointsFromBonuses,
+			LatestScoredStageNumber: d.LatestScoredStageNumber,
 		})
 	}
 
