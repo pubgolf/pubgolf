@@ -56,6 +56,20 @@ func Test_ScheduleProgression(t *testing.T) {
 	assert.Empty(t, schedule.Msg.GetSchedule().GetVisitedVenueKeys(), "mid first stage: 0 visited venues")
 	assert.NotZero(t, schedule.Msg.GetSchedule().GetCurrentVenueKey(), "mid first stage: has current venue")
 
+	// Fetch venue details for the current venue.
+	currentVenueKey := schedule.Msg.GetSchedule().GetCurrentVenueKey()
+
+	venueRes, err := tc.pub.GetVenue(ctx, requestWithAuth(&apiv1.GetVenueRequest{
+		EventKey:  eventKey,
+		VenueKeys: []uint32{currentVenueKey},
+	}, p.token))
+	require.NoError(t, err, "GetVenue()")
+
+	venueWrapper := venueRes.Msg.GetVenues()[currentVenueKey]
+	require.NotNil(t, venueWrapper, "venue wrapper exists for current venue key")
+	assert.NotEmpty(t, venueWrapper.GetVenue().GetName(), "venue has a name")
+	assert.NotEmpty(t, venueWrapper.GetVenue().GetAddress(), "venue has an address")
+
 	// Advance to mid second stage (event started 45min ago).
 	_, err = sharedTestDB.ExecContext(ctx, "UPDATE events SET starts_at = NOW() - INTERVAL '45 minutes' WHERE id = $1", ev.eventID)
 	require.NoError(t, err, "advance to mid second stage")
