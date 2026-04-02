@@ -1,3 +1,6 @@
+// admin_test.go — admin management flow: CRUD operations for players, stages,
+// venues, scores, and adjustment templates.
+
 //nolint:paralleltest
 package e2e
 

@@ -1,3 +1,6 @@
+// schedule_test.go — event progression flow: view schedule as event advances
+// through stages, verify visited/current venues and venue details.
+
 //nolint:paralleltest
 package e2e
 

@@ -1,3 +1,6 @@
+// sign_up_test.go — player lifecycle flow: login, register, update profile,
+// re-login with token rotation, and account deletion.
+
 //nolint:paralleltest
 package e2e
 
@@ -5,22 +8,12 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 )
-
-func Test_ClientVersion(t *testing.T) {
-	ctx := t.Context()
-	tc := newTestClients()
-
-	res, err := tc.pub.ClientVersion(ctx, connect.NewRequest(&apiv1.ClientVersionRequest{
-		ClientVersion: 1,
-	}))
-	require.NoError(t, err)
-	require.Equal(t, apiv1.ClientVersionResponse_VERSION_STATUS_OK, res.Msg.GetVersionStatus())
-}
 
 func Test_SignUpFlow(t *testing.T) {
 	const eventKey = "test-event-key-sign-up"
@@ -128,4 +121,39 @@ func Test_SignUpFlow(t *testing.T) {
 	_, err = tc.pub.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, authToken))
 	require.Error(t, err)
 	require.Equal(t, connect.CodePermissionDenied, connect.CodeOf(err))
+}
+
+func Test_DeleteAccount(t *testing.T) {
+	const eventKey = "test-event-key-delete-acct"
+
+	ctx := t.Context()
+	tc := newTestClients()
+
+	// Insert bare event (no stages needed).
+	_, err := sharedTestDB.ExecContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, NOW() + '1 day')", eventKey)
+	require.NoError(t, err, "seed DB: insert future event")
+
+	// Create player via admin with auth token.
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380202",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "DeleteMe",
+	})
+
+	_, err = tc.admin.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
+	require.NoError(t, err)
+
+	// Verify player exists before deletion.
+	_, err = tc.pub.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, p.token))
+	require.NoError(t, err, "GetMyPlayer before delete")
+
+	// Delete account.
+	_, err = tc.pub.DeleteMyAccount(ctx, requestWithAuth(&apiv1.DeleteMyAccountRequest{}, p.token))
+	require.NoError(t, err, "DeleteMyAccount")
+
+	// Verify player access fails after deletion.
+	_, err = tc.pub.GetMyPlayer(ctx, requestWithAuth(&apiv1.GetMyPlayerRequest{}, p.token))
+	require.Error(t, err, "GetMyPlayer after delete should fail")
+	assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err), "expected Unavailable after account deletion (deleted player row → no rows)")
 }

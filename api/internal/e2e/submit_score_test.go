@@ -1,3 +1,6 @@
+// submit_score_test.go — score submission flow: get form, submit scores,
+// verify scoreboard updates for both 9-hole and 5-hole categories.
+
 //nolint:paralleltest
 package e2e
 

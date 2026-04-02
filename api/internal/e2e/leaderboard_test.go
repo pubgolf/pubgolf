@@ -1,3 +1,6 @@
+// leaderboard_test.go — leaderboard flow: submit scores for multiple players,
+// verify category-based rankings and player separation.
+
 //nolint:paralleltest
 package e2e
 
