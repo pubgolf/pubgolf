@@ -78,7 +78,12 @@ func Test_DeleteAccount(t *testing.T) {
 	require.NoError(t, err, "seed DB: insert future event")
 
 	// Create player via admin with auth token.
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380202", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "DeleteMe")
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380202",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "DeleteMe",
+	})
 
 	_, err = tc.admin.PurgeAllCaches(ctx, requestWithAdminAuth(&apiv1.PurgeAllCachesRequest{}))
 	require.NoError(t, err)

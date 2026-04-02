@@ -17,8 +17,17 @@ func Test_ScheduleProgression(t *testing.T) {
 	tc := newTestClients()
 
 	// Seed event starting 30min from now (pre-event) with 9 stages.
-	ev := seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '30 minutes'", 9)
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380101", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
+	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '30 minutes'",
+		NumStages:    9,
+	})
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380101",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "",
+	})
 
 	// Pre-event: 0 visited venues, no current venue.
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{

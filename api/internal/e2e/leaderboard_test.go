@@ -17,12 +17,31 @@ func Test_LeaderboardRanking(t *testing.T) {
 	tc := newTestClients()
 
 	// Event started 45min ago, currently on stage 2 of 9.
-	seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
+	seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '-45 minutes'",
+		NumStages:    9,
+	})
 
 	// Create 3 players: 2 nine-hole, 1 five-hole.
-	player1 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380001", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
-	player2 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380002", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
-	player3 := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380003", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE, "")
+	player1 := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380001",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "",
+	})
+	player2 := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380002",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "",
+	})
+	player3 := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380003",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
+		Name:     "",
+	})
 
 	// Get current venue key from schedule.
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{

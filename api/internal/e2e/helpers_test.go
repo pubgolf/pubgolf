@@ -33,23 +33,30 @@ type seededEvent struct {
 	stageIDs []models.StageID // len == numStages, ordered by rank
 }
 
+// seedEventOpts holds parameters for seeding an event.
+type seedEventOpts struct {
+	EventKey     string
+	StartsAtExpr string // SQL expression relative to NOW(), e.g. "NOW() + '30 minutes'"
+	NumStages    int
+}
+
 // seedEvent inserts an event with the given key and startsAtExpr (a SQL expression
 // relative to NOW(), e.g. "NOW() + '30 minutes'" or "NOW() + '-45 minutes'"),
 // then inserts numStages venues+stages with 30-minute durations and ranks 10,20,...
 //
 // It purges all caches after seeding.
-func seedEvent(ctx context.Context, t *testing.T, db *sql.DB, tc testClients, eventKey string, startsAtExpr string, numStages int) seededEvent {
+func seedEvent(ctx context.Context, t *testing.T, db *sql.DB, tc testClients, opts seedEventOpts) seededEvent {
 	t.Helper()
 
-	row := db.QueryRowContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, "+startsAtExpr+") RETURNING id", eventKey) //nolint:gosec // startsAtExpr is always a SQL literal from test code, not user input
+	row := db.QueryRowContext(ctx, "INSERT INTO events (key, starts_at) VALUES ($1, "+opts.StartsAtExpr+") RETURNING id", opts.EventKey) //nolint:gosec // startsAtExpr is always a SQL literal from test code, not user input
 	require.NoError(t, row.Err(), "seed DB: insert event")
 
 	var eventID models.EventID
 	require.NoError(t, row.Scan(&eventID), "scan returned event ID")
 
-	stageIDs := make([]models.StageID, numStages)
+	stageIDs := make([]models.StageID, opts.NumStages)
 
-	for i := range numStages {
+	for i := range opts.NumStages {
 		row := db.QueryRowContext(ctx, "INSERT INTO venues (name, address) VALUES ($1, $2) RETURNING id",
 			fmt.Sprintf("Venue %d", i+1), fmt.Sprintf("%d Test St", i+1))
 		require.NoError(t, row.Err(), "seed DB: insert venue %d", i)
@@ -76,33 +83,41 @@ type seededPlayer struct {
 	token string
 }
 
+// seedPlayerOpts holds parameters for seeding a player.
+type seedPlayerOpts struct {
+	Phone    string
+	EventKey string
+	Category apiv1.ScoringCategory
+	Name     string
+}
+
 // seedPlayer creates a player via the admin API and inserts an auth token row.
 // Returns the player ID and auth token string ready for use with requestWithAuth.
 // Note: does not purge caches. Callers that did not use seedEvent should call
 // PurgeAllCaches before making public API requests.
-func seedPlayer(ctx context.Context, t *testing.T, db *sql.DB, tc testClients, phone string, eventKey string, category apiv1.ScoringCategory, name string) seededPlayer {
+func seedPlayer(ctx context.Context, t *testing.T, db *sql.DB, tc testClients, opts seedPlayerOpts) seededPlayer {
 	t.Helper()
 
 	playerResp, err := tc.admin.CreatePlayer(ctx, requestWithAdminAuth(&apiv1.AdminServiceCreatePlayerRequest{
 		PlayerData: &apiv1.PlayerData{
-			Name: name,
+			Name: opts.Name,
 		},
-		PhoneNumber: phone,
+		PhoneNumber: opts.Phone,
 		Registration: &apiv1.EventRegistration{
-			EventKey:        eventKey,
-			ScoringCategory: category,
+			EventKey:        opts.EventKey,
+			ScoringCategory: opts.Category,
 		},
 	}))
-	require.NoError(t, err, "create player %s", phone)
+	require.NoError(t, err, "create player %s", opts.Phone)
 
 	playerID, err := models.PlayerIDFromString(playerResp.Msg.GetPlayer().GetId())
-	require.NoError(t, err, "convert player ID %s", phone)
+	require.NoError(t, err, "convert player ID %s", opts.Phone)
 
 	row := db.QueryRowContext(ctx, "INSERT INTO auth_tokens (player_id) VALUES ($1) RETURNING id", playerID)
-	require.NoError(t, row.Err(), "insert auth token for %s", phone)
+	require.NoError(t, row.Err(), "insert auth token for %s", opts.Phone)
 
 	var tok models.AuthToken
-	require.NoError(t, row.Scan(&tok), "scan auth token for %s", phone)
+	require.NoError(t, row.Scan(&tok), "scan auth token for %s", opts.Phone)
 
 	return seededPlayer{id: playerID, token: tok.String()}
 }

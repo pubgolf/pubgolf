@@ -16,7 +16,11 @@ func Test_AdminAdjustmentTemplates(t *testing.T) {
 	ctx := t.Context()
 	tc := newTestClients()
 
-	seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
+	seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '-45 minutes'",
+		NumStages:    9,
+	})
 
 	// Create an adjustment template.
 	_, err := tc.admin.CreateAdjustmentTemplate(ctx, requestWithAdminAuth(&apiv1.CreateAdjustmentTemplateRequest{
@@ -103,10 +107,19 @@ func Test_AdminScoreManagement(t *testing.T) {
 	tc := newTestClients()
 
 	// Event started 45min ago — need stage IDs for score operations.
-	ev := seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
+	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '-45 minutes'",
+		NumStages:    9,
+	})
 	secondStageID := ev.stageIDs[1]
 
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380301", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "ScoreTestPlayer")
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380301",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "ScoreTestPlayer",
+	})
 
 	// CreateStageScore via admin.
 	createRes, err := tc.admin.CreateStageScore(ctx, requestWithAdminAuth(&apiv1.CreateStageScoreRequest{
@@ -190,7 +203,12 @@ func Test_AdminPlayerManagement(t *testing.T) {
 	require.NoError(t, err)
 
 	// CreatePlayer via admin with registration.
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15559380302", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "AdminCreated")
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559380302",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "AdminCreated",
+	})
 
 	// ListPlayers and verify the created player is present.
 	list, err := tc.admin.ListPlayers(ctx, requestWithAdminAuth(&apiv1.ListPlayersRequest{

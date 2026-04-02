@@ -16,7 +16,11 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	tc := newTestClients()
 
 	// Event started 45min ago, currently on stage 2 of 9.
-	ev := seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
+	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '-45 minutes'",
+		NumStages:    9,
+	})
 	stageID := ev.stageIDs[1]
 
 	// Create adjustment templates.
@@ -61,7 +65,12 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.NoError(t, err, "create venue-specific template")
 
 	// Set up 9-hole player.
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15559284019", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE, "")
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15559284019",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_NINE_HOLE,
+		Name:     "",
+	})
 
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: eventKey,
@@ -201,10 +210,19 @@ func Test_SubmitScore_FiveHole(t *testing.T) {
 	tc := newTestClients()
 
 	// Event started 45min ago, currently on stage 2 of 9.
-	ev := seedEvent(ctx, t, sharedTestDB, tc, eventKey, "NOW() + '-45 minutes'", 9)
+	ev := seedEvent(ctx, t, sharedTestDB, tc, seedEventOpts{
+		EventKey:     eventKey,
+		StartsAtExpr: "NOW() + '-45 minutes'",
+		NumStages:    9,
+	})
 
 	// Set up 5-hole player.
-	p := seedPlayer(ctx, t, sharedTestDB, tc, "+15555284015", eventKey, apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE, "")
+	p := seedPlayer(ctx, t, sharedTestDB, tc, seedPlayerOpts{
+		Phone:    "+15555284015",
+		EventKey: eventKey,
+		Category: apiv1.ScoringCategory_SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE,
+		Name:     "",
+	})
 
 	schedule, err := tc.pub.GetSchedule(ctx, requestWithAuth(&apiv1.GetScheduleRequest{
 		EventKey: eventKey,
