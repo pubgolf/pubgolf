@@ -135,14 +135,33 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Cache devctrl binary
+        id: devctrl-cache
+        uses: actions/cache@v4
+        with:
+          path: pubgolf-devctrl
+          key: devctrl-${{ runner.os }}-${{ hashFiles('go.sum', 'tools/**') }}
+      - name: Build devctrl
+        if: steps.devctrl-cache.outputs.cache-hit != 'true'
+        run: go build -o pubgolf-devctrl ./tools/cmd/pubgolf-devctrl
+      - name: Get cache week key
+        id: cache-date
+        run: echo "week=$(date +%Y-%W)" >> "$GITHUB_OUTPUT"
+      - name: Cache node_modules
+        id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: web-app/node_modules
+          key: node-modules-${{ runner.os }}-${{ steps.cache-date.outputs.week }}-${{ hashFiles('web-app/package-lock.json') }}
       - name: Install Web Dependencies
-        run: go run ./tools/cmd/pubgolf-devctrl install web
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: ./pubgolf-devctrl install web
       - name: Run Web Unit Tests
-        run: go run ./tools/cmd/pubgolf-devctrl test web
+        run: ./pubgolf-devctrl test web
       - name: Run Web App Checks
-        run: go run ./tools/cmd/pubgolf-devctrl check web
+        run: ./pubgolf-devctrl check web
       - name: Build Web App
-        run: go run ./tools/cmd/pubgolf-devctrl build web
+        run: ./pubgolf-devctrl build web
       - name: Upload Assets to R2
         if: github.ref == 'refs/heads/main'
         # Repo archived 2025; consider migrating to aws-actions/configure-aws-credentials + aws s3 sync if needed
