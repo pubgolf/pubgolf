@@ -34,19 +34,17 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 		})
 	}
 
-	var idem *dao.IdempotencyParams
+	var idempotencyKey models.IdempotencyKey
 
 	if key := req.Msg.GetIdempotencyKey(); key != "" {
-		idemKey, err := models.IdempotencyKeyFromString(key)
+		idempotencyKey, err = models.IdempotencyKeyFromString(key)
 		if err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse idempotency key: %w", err))
 		}
-
-		idem = &dao.IdempotencyParams{Key: idemKey, Scope: models.IdempotencyScopeScoreSubmission}
 	}
 
-	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true, idem)
-	if err != nil && !errors.Is(err, dao.ErrAlreadyClaimed) {
+	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true, idempotencyKey)
+	if err != nil && !errors.Is(err, dao.ErrDuplicateRequest) {
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}

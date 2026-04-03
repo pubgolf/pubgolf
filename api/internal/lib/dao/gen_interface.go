@@ -92,10 +92,10 @@ type QueryProvider interface {
 	UpdateStage(ctx context.Context, stage models.StageConfig) error
 	// UpsertRegistration creates a new player and adds them to the given event.
 	UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error
-	// UpsertScore creates score and adjustment records for a given stage. If idem is non-nil, the
-	// idempotency key is claimed within the same transaction as the score upsert; ErrAlreadyClaimed
-	// is returned if the key was previously claimed.
-	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool, idem *IdempotencyParams) error
+	// UpsertScore creates score and adjustment records for a given stage. If idempotencyKey is
+	// non-zero, the key is claimed within the same transaction as the score upsert;
+	// ErrDuplicateRequest is returned if the key was previously claimed.
+	UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool, idempotencyKey models.IdempotencyKey) error
 	// VenueByKey returns venue info for the venue key and event id.
 	VenueByKey(ctx context.Context, eventID models.EventID, venueKey models.VenueKey) (models.Venue, error)
 	// VerifyPhoneNumber sets the player's phone number as verified, returning a boolean to indicate whether the phone number was previously unverified (i.e. false means the DB row was not updated).

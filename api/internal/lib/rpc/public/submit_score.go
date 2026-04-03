@@ -25,15 +25,13 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		return nil, err
 	}
 
-	var idem *dao.IdempotencyParams
+	var idempotencyKey models.IdempotencyKey
 
 	if key := req.Msg.GetIdempotencyKey(); key != "" {
-		idemKey, err := models.IdempotencyKeyFromString(key)
+		idempotencyKey, err = models.IdempotencyKeyFromString(key)
 		if err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse idempotency key: %w", err))
 		}
-
-		idem = &dao.IdempotencyParams{Key: idemKey, Scope: models.IdempotencyScopeScoreSubmission}
 	}
 
 	stageID, err := s.guardStageID(ctx, eventID, models.VenueKeyFromUInt32(req.Msg.GetVenueKey()))
@@ -68,9 +66,9 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 		})
 	}
 
-	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false, idem)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, score, adjP, false, idempotencyKey)
 	if err != nil {
-		if errors.Is(err, dao.ErrAlreadyClaimed) {
+		if errors.Is(err, dao.ErrDuplicateRequest) {
 			return connect.NewResponse(&apiv1.SubmitScoreResponse{
 				Status: apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE,
 			}), nil
