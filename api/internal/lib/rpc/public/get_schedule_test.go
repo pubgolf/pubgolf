@@ -7,7 +7,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
@@ -15,79 +14,6 @@ import (
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
 )
-
-func mockEventIDByKey(m *dao.MockQueryProvider, eventKey string, eventID models.EventID) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			eventKey,
-		},
-		Return: []any{
-			eventID,
-			nil,
-		},
-	}.Bind(m, "EventIDByKey")
-}
-
-func mockPlayerRegisteredForEvent(m *dao.MockQueryProvider, playerID models.PlayerID, eventID models.EventID) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			playerID,
-			eventID,
-		},
-		Return: []any{
-			true,
-			nil,
-		},
-	}.Bind(m, "PlayerRegisteredForEvent")
-}
-
-func mockEventStartTime(m *dao.MockQueryProvider, eventID models.EventID, startTime time.Time) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			eventID,
-		},
-		Return: []any{
-			startTime,
-			nil,
-		},
-	}.Bind(m, "EventStartTime")
-}
-
-func mockEventSchedule(m *dao.MockQueryProvider, eventID models.EventID, schedule []dao.VenueStop) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			eventID,
-		},
-		Return: []any{
-			schedule,
-			nil,
-		},
-	}.Bind(m, "EventSchedule")
-}
-
-func mockEventScheduleCacheVersion(m *dao.MockQueryProvider, eventID models.EventID, version uint32, matched bool) {
-	dao.MockDAOCall{
-		ShouldCall: true,
-		Args: []any{
-			mock.Anything,
-			eventID,
-			mock.Anything,
-		},
-		Return: []any{
-			version,
-			matched,
-			nil,
-		},
-	}.Bind(m, "EventScheduleCacheVersion")
-}
 
 func assertTimestampsMatch(t *testing.T, expected, actual time.Time) {
 	t.Helper()
