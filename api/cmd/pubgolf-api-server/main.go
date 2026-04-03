@@ -103,6 +103,16 @@ func main() {
 	bs, err := blobstore.New(cfg.BlobStore)
 	guard(err, "init blob store")
 
+	bsCtx, bsCancel := context.WithTimeout(ctx, 2*time.Second)
+	defer bsCancel()
+
+	bsExists, bsErr := bs.BucketExists(bsCtx)
+	if bsErr != nil {
+		log.Printf("Warning: blob store not reachable at startup: %v — will retry on first request", bsErr)
+	} else if !bsExists {
+		log.Printf("Warning: blob store bucket %q does not exist — create it before uploading", cfg.BlobStore.Bucket)
+	}
+
 	server := makeServer(cfg, daoInstance, mes, dbConn, bs)
 	makeShutdownWatcher(server)
 
@@ -169,7 +179,7 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *s
 
 	// Mount routes.
 	r.Get("/health-check", healthCheck(cfg))
-	r.Get("/status", status(db))
+	r.Get("/status", status(db, bs))
 	r.Get("/robots.txt", robots(cfg))
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {

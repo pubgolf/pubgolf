@@ -21,6 +21,7 @@ require (
 	github.com/honeycombio/otel-config-go v1.17.0
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/minio/minio-go/v7 v7.0.99
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/oklog/ulid/v2 v2.1.1
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
@@ -67,7 +68,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.34 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.99 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

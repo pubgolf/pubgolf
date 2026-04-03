@@ -24,6 +24,17 @@ var stopCmd = &cobra.Command{
 		allFlag, _ := cmd.Flags().GetBool("all")
 		removeDataFlag, _ := cmd.Flags().GetBool("remove-data")
 
+		// Delete the worktree's blob bucket while Minio is still running.
+		if removeDataFlag {
+			slug, _ := worktreeSlug(cmd.Context())
+			bucket := blobBucketForSlug(slug)
+
+			bucketErr := deleteBucket(cmd.Context(), envProvider, bucket)
+			if bucketErr != nil {
+				log.Printf("Warning: could not delete blob bucket %q: %v", bucket, bucketErr)
+			}
+		}
+
 		if allFlag {
 			classifyAndExit(stopAllWorktrees(cmd.Context(), runner))
 		} else {
@@ -92,7 +103,7 @@ func removeWorktreeData(ctx context.Context) error {
 		return fmtErr(err, "determine worktree slug")
 	}
 
-	for _, base := range []string{"data/postgres", "data/minio", "data/go-test-coverage"} {
+	for _, base := range []string{"data/postgres", "data/go-test-coverage"} {
 		dir := filepath.Join(projectRoot, dataDirForSlug(base, slug))
 
 		info, statErr := os.Stat(dir)

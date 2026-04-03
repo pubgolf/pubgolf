@@ -153,9 +153,7 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 	env = append(env,
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
-		fmt.Sprintf("PUBGOLF_BLOB_STORE_PORT=%d", 9000+offset),
 		"PUBGOLF_DB_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/postgres")),
-		"PUBGOLF_BLOB_STORE_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/minio")),
 	)
 
 	projectName := worktreeDockerProject(ctx)
@@ -179,10 +177,24 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 		return fmtErr(runErr, "run docker-compose up cmd")
 	}
 
+	slug, _ := worktreeSlug(ctx)
+
+	// Create per-worktree blob storage bucket if Minio was started.
+	for _, svc := range services {
+		if svc == "api-blob-storage" {
+			bucketErr := ensureBucket(ctx, ep, slug)
+			if bucketErr != nil {
+				return fmtErr(bucketErr, "ensure blob storage bucket")
+			}
+
+			break
+		}
+	}
+
 	// Post-start reminder for worktree users.
-	if slug, _ := worktreeSlug(ctx); slug != "" {
-		log.Printf("Started services for worktree %q (DB: port %d, Minio: port %d).\n"+
-			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset, 9000+offset)
+	if slug != "" {
+		log.Printf("Started services for worktree %q (DB: port %d, blob bucket: %s).\n"+
+			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset, blobBucketForSlug(slug))
 	}
 
 	return nil
@@ -234,9 +246,12 @@ func startAPIServer(ctx context.Context, r Runner, ep EnvProvider, args []string
 		return nil, fmtErr(err, "compute port offset")
 	}
 
+	slug, _ := worktreeSlug(ctx)
+
 	env = append(env,
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
+		"PUBGOLF_BLOB_STORE_BUCKET="+blobBucketForSlug(slug),
 	)
 	env = append(env, extraEnv...)
 

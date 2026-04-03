@@ -56,9 +56,9 @@ func printCurrentStatus(ctx context.Context) error {
 	fmt.Fprintf(w, "Docker project:  %s\n", project)
 	fmt.Fprintf(w, "DB port:         %d\n", 5432+offset)
 	fmt.Fprintf(w, "API port:        %d\n", 5000+offset)
-	fmt.Fprintf(w, "Minio port:      %d\n", 9000+offset)
 	fmt.Fprintf(w, "DB volume:       %s\n", dataDirForSlug("./data/postgres", slug))
-	fmt.Fprintf(w, "Minio volume:    %s\n", dataDirForSlug("./data/minio", slug))
+	fmt.Fprintf(w, "Blob bucket:     %s\n", blobBucketForSlug(slug))
+	fmt.Fprintf(w, "Minio volume:    ./data/minio\n")
 	fmt.Fprintf(w, "Coverage dir:    %s\n", dataDirForSlug("./data/go-test-coverage", slug))
 
 	status := queryDockerStatus(ctx, project)

@@ -14,6 +14,34 @@ type MockBlobStore struct {
 	mock.Mock
 }
 
+// BucketExists provides a mock function with given fields: ctx
+func (_m *MockBlobStore) BucketExists(ctx context.Context) (bool, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BucketExists")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (bool, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) bool); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DeleteObject provides a mock function with given fields: ctx, objectKey
 func (_m *MockBlobStore) DeleteObject(ctx context.Context, objectKey string) error {
 	ret := _m.Called(ctx, objectKey)
@@ -60,9 +88,9 @@ func (_m *MockBlobStore) PresignedGetURL(ctx context.Context, objectKey string, 
 	return r0, r1
 }
 
-// PresignedPutURL provides a mock function with given fields: ctx, objectKey, contentType, expiry
-func (_m *MockBlobStore) PresignedPutURL(ctx context.Context, objectKey, contentType string, expiry time.Duration) (string, error) {
-	ret := _m.Called(ctx, objectKey, contentType, expiry)
+// PresignedPutURL provides a mock function with given fields: ctx, objectKey, expiry
+func (_m *MockBlobStore) PresignedPutURL(ctx context.Context, objectKey string, expiry time.Duration) (string, error) {
+	ret := _m.Called(ctx, objectKey, expiry)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PresignedPutURL")
@@ -70,17 +98,17 @@ func (_m *MockBlobStore) PresignedPutURL(ctx context.Context, objectKey, content
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, time.Duration) (string, error)); ok {
-		return rf(ctx, objectKey, contentType, expiry)
+	if rf, ok := ret.Get(0).(func(context.Context, string, time.Duration) (string, error)); ok {
+		return rf(ctx, objectKey, expiry)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, time.Duration) string); ok {
-		r0 = rf(ctx, objectKey, contentType, expiry)
+	if rf, ok := ret.Get(0).(func(context.Context, string, time.Duration) string); ok {
+		r0 = rf(ctx, objectKey, expiry)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, time.Duration) error); ok {
-		r1 = rf(ctx, objectKey, contentType, expiry)
+	if rf, ok := ret.Get(1).(func(context.Context, string, time.Duration) error); ok {
+		r1 = rf(ctx, objectKey, expiry)
 	} else {
 		r1 = ret.Error(1)
 	}

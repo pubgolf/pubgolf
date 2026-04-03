@@ -9,7 +9,6 @@ package blobstore
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -41,15 +40,22 @@ func New(cfg config.BlobStoreAuth) (*Client, error) {
 	}, nil
 }
 
-// PresignedPutURL returns a short-lived pre-signed URL that allows the caller to upload
-// an object directly to blob storage without server-side proxying.
-func (c *Client) PresignedPutURL(ctx context.Context, objectKey, contentType string, expiry time.Duration) (string, error) {
+// BucketExists checks whether the configured bucket is reachable.
+func (c *Client) BucketExists(ctx context.Context) (bool, error) {
 	defer telemetry.FnSpan(&ctx)()
 
-	params := url.Values{}
-	if contentType != "" {
-		params.Set("response-content-type", contentType)
+	exists, err := c.mc.BucketExists(ctx, c.bucket)
+	if err != nil {
+		return false, fmt.Errorf("check bucket %q: %w", c.bucket, err)
 	}
+
+	return exists, nil
+}
+
+// PresignedPutURL returns a short-lived pre-signed URL that allows the caller to upload
+// an object directly to blob storage without server-side proxying.
+func (c *Client) PresignedPutURL(ctx context.Context, objectKey string, expiry time.Duration) (string, error) {
+	defer telemetry.FnSpan(&ctx)()
 
 	u, err := c.mc.PresignedPutObject(ctx, c.bucket, objectKey, expiry)
 	if err != nil {

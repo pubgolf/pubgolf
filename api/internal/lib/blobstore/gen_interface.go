@@ -9,9 +9,11 @@ import (
 
 // BlobStore describes all of the operations exposed by the blob storage client, to allow for testing mocks.
 type BlobStore interface {
+	// BucketExists checks whether the configured bucket is reachable.
+	BucketExists(ctx context.Context) (bool, error)
 	// PresignedPutURL returns a short-lived pre-signed URL that allows the caller to upload
 	// an object directly to blob storage without server-side proxying.
-	PresignedPutURL(ctx context.Context, objectKey, contentType string, expiry time.Duration) (string, error)
+	PresignedPutURL(ctx context.Context, objectKey string, expiry time.Duration) (string, error)
 	// PresignedGetURL returns a short-lived pre-signed URL that allows the caller to download
 	// or display an object directly from blob storage without server-side proxying.
 	PresignedGetURL(ctx context.Context, objectKey string, expiry time.Duration) (string, error)
