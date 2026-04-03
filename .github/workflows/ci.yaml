@@ -130,17 +130,18 @@ jobs:
           node-version-file: '.node-version'
           cache: npm
           cache-dependency-path: web-app/package-lock.json
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
       - name: Cache devctrl binary
         id: devctrl-cache
         uses: actions/cache@v4
         with:
           path: pubgolf-devctrl
           key: devctrl-${{ runner.os }}-${{ hashFiles('go.sum', 'tools/**') }}
+      - name: Set up Go
+        if: steps.devctrl-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - name: Build devctrl
         if: steps.devctrl-cache.outputs.cache-hit != 'true'
         run: go build -o pubgolf-devctrl ./tools/cmd/pubgolf-devctrl
