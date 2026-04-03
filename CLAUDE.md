@@ -79,6 +79,9 @@ Always run generate before check — check will fail on stale generated output.
 Before declaring any task complete, run the relevant verification commands.
 Do not use "equivalent" alternatives — use the canonical command.
 
+**Before submitting or non-trivially updating a PR**, run `/simplify` to review
+changed code for reuse, quality, and efficiency.
+
 | Change type | Verification command |
 |-------------|---------------------|
 | Go code changes | `pubgolf-devctrl check go` then `go test ./affected/pkg/...` |

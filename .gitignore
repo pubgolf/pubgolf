@@ -1,3 +1,6 @@
 .vscode
 data/
 .worktrees/
+.agents/
+.claude/skills/
+.claude/worktrees/

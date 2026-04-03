@@ -16,6 +16,7 @@ WITH st AS (
   -- Replaces the stages table in the later section with only the odd numbered stages.
   SELECT
     st.event_id, st.venue_id, st.venue_key, st.rank, st.duration_minutes, st.created_at, st.updated_at, st.deleted_at, st.rule_id, st.id,
+    row_number() OVER (ORDER BY st.rank ASC) AS stage_number,
     mod(row_number() OVER (ORDER BY st.rank ASC), 2) = 1 AS is_odd
   FROM
     stages st
@@ -37,7 +38,8 @@ separated AS ((
         END) AS num_scores_verified,
       coalesce(sum(s.value), 0)::bigint AS total_points,
       0 AS points_from_penalties,
-      0 AS points_from_bonuses
+      0 AS points_from_bonuses,
+      coalesce(MAX(CASE WHEN s.id IS NOT NULL THEN st.stage_number END), 0)::bigint AS latest_scored_stage_number
     FROM
       players p
     LEFT JOIN event_players ep ON p.id = ep.player_id
@@ -75,7 +77,8 @@ UNION (
         a.value
       ELSE
         0
-      END) AS points_from_bonuses
+      END) AS points_from_bonuses,
+    0 AS latest_scored_stage_number
   FROM
     players p
     LEFT JOIN event_players ep ON p.id = ep.player_id
@@ -104,7 +107,8 @@ SELECT
   SUM(num_scores_verified) AS num_scores_verified,
   SUM(total_points) AS total_points,
   SUM(points_from_penalties) AS points_from_penalties,
-  SUM(points_from_bonuses) AS points_from_bonuses
+  SUM(points_from_bonuses) AS points_from_bonuses,
+  MAX(latest_scored_stage_number)::bigint AS latest_scored_stage_number
 FROM
   separated
 GROUP BY
@@ -124,13 +128,14 @@ type ScoringCriteriaParams struct {
 }
 
 type ScoringCriteriaRow struct {
-	PlayerID            models.DatabaseULID
-	Name                string
-	NumScores           int64
-	NumScoresVerified   int64
-	TotalPoints         int64
-	PointsFromPenalties int64
-	PointsFromBonuses   int64
+	PlayerID                models.DatabaseULID
+	Name                    string
+	NumScores               int64
+	NumScoresVerified       int64
+	TotalPoints             int64
+	PointsFromPenalties     int64
+	PointsFromBonuses       int64
+	LatestScoredStageNumber int64
 }
 
 func (q *Queries) ScoringCriteria(ctx context.Context, arg ScoringCriteriaParams) ([]ScoringCriteriaRow, error) {
@@ -150,6 +155,7 @@ func (q *Queries) ScoringCriteria(ctx context.Context, arg ScoringCriteriaParams
 			&i.TotalPoints,
 			&i.PointsFromPenalties,
 			&i.PointsFromBonuses,
+			&i.LatestScoredStageNumber,
 		); err != nil {
 			return nil, err
 		}
