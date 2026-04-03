@@ -47,5 +47,10 @@
 		"@connectrpc/connect": "^2.0.2",
 		"@connectrpc/connect-web": "^2.0.2",
 		"lucide-svelte": "^0.503.0"
+	},
+	"overrides": {
+		"@skeletonlabs/skeleton": {
+			"svelte": "$svelte"
+		}
 	}
 }
