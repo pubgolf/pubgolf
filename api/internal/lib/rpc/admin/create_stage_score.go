@@ -48,10 +48,8 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 	switch {
 	case errors.Is(err, dao.ErrRequestMismatch):
 		return nil, connect.NewError(connect.CodeAborted, err)
-	case errors.Is(err, dao.ErrDuplicateRequest):
-		// Valid retry with matching params — fall through to fetch existing score
-	case errors.Is(err, dao.ErrAlreadyCreated):
-		return nil, connect.NewError(connect.CodeAlreadyExists, err)
+	case errors.Is(err, dao.ErrDuplicateRequest), errors.Is(err, dao.ErrAlreadyCreated):
+		// Fall through to fetch existing score
 	case err != nil:
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
 	}

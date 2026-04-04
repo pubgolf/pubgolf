@@ -61,30 +61,5 @@ func TestClaimIdempotencyKey(t *testing.T) {
 		assert.Equal(t, originalHash, gotHash)
 	})
 
-	t.Run("same key with different scope is independent", func(t *testing.T) {
-		t.Parallel()
-
-		ctx, tx, cleanup := initDB(t)
-		defer cleanup()
-
-		key := models.IdempotencyKeyFromULID(ulid.Make())
-		hash := []byte("hash-1")
-
-		_, err := _sharedDBC.WithTx(tx).ClaimIdempotencyKey(ctx, dbc.ClaimIdempotencyKeyParams{
-			Key:        key,
-			Scope:      scope,
-			ParamsHash: hash,
-		})
-		require.ErrorIs(t, err, sql.ErrNoRows)
-
-		// Same key claimed again in same scope returns the existing hash
-		gotHash, err := _sharedDBC.WithTx(tx).ClaimIdempotencyKey(ctx, dbc.ClaimIdempotencyKeyParams{
-			Key:        key,
-			Scope:      scope,
-			ParamsHash: hash,
-		})
-
-		require.NoError(t, err)
-		assert.Equal(t, hash, gotHash)
-	})
+	// TODO: Add "same key with different scope is independent" test when a second IdempotencyScope is added.
 }
