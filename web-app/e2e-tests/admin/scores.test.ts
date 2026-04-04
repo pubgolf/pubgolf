@@ -3,9 +3,17 @@ import { makePlayer, makeStage, makeStageScore, makeVenue } from '../helpers/fix
 import { ADMIN_BASE, captureRPC, EVENT_KEY, mockRPC, setupAuth } from '../helpers/mock-api';
 
 const player1 = makePlayer();
-const player2 = makePlayer({ id: 'player-2', data: { name: 'Bob Test' }, events: [{ eventKey: EVENT_KEY, scoringCategory: 2 }] });
+const player2 = makePlayer({
+	id: 'player-2',
+	data: { name: 'Bob Test' },
+	events: [{ eventKey: EVENT_KEY, scoringCategory: 2 }]
+});
 const stage1 = makeStage();
-const stage2 = makeStage({ id: 'stage-2', venue: makeVenue({ id: 'venue-2', name: 'The Brewery', address: '456 Oak Ave' }), rank: 2 });
+const stage2 = makeStage({
+	id: 'stage-2',
+	venue: makeVenue({ id: 'venue-2', name: 'The Brewery', address: '456 Oak Ave' }),
+	rank: 2
+});
 
 const score1 = makeStageScore();
 const score2 = makeStageScore({

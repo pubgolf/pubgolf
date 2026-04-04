@@ -18,7 +18,11 @@ test.describe('drawer navigation', () => {
 		await page.goto(`${ADMIN_BASE}/scores/`);
 		await expect(page.getByRole('heading', { name: 'Scores' })).toBeVisible();
 
-		await page.locator('button').filter({ has: page.locator('svg') }).first().click();
+		await page
+			.locator('button')
+			.filter({ has: page.locator('svg') })
+			.first()
+			.click();
 
 		const drawer = page.locator('.drawer-backdrop');
 		await expect(drawer).toBeVisible();

@@ -47,13 +47,18 @@ test.describe('adjustments page', () => {
 
 		await page.getByRole('button', { name: 'Create Adjustment' }).click();
 
-		await expect(page.getByTestId('modal-component').locator('span.text-2xl')).toContainText('Create Adjustment');
+		await expect(page.getByTestId('modal-component').locator('span.text-2xl')).toContainText(
+			'Create Adjustment'
+		);
 
 		await page.getByPlaceholder('Enter label...').fill('Penalty: Spill');
 		await page.getByPlaceholder('Enter value...').fill('2');
 		await page.getByPlaceholder('Enter rank...').fill('3');
 
-		await page.getByTestId('modal-component').getByRole('button', { name: 'Create Adjustment' }).click();
+		await page
+			.getByTestId('modal-component')
+			.getByRole('button', { name: 'Create Adjustment' })
+			.click();
 
 		expect(requests).toHaveLength(1);
 		const req = requests[0] as {
