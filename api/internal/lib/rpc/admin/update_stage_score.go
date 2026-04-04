@@ -34,7 +34,7 @@ func (s *Server) UpdateStageScore(ctx context.Context, req *connect.Request[apiv
 
 	newScore := req.Msg.GetScore().GetScore().GetData().GetValue()
 
-	err = s.dao.UpsertScore(ctx, playerID, stageID, newScore, newAdj, true)
+	err = s.dao.UpsertScore(ctx, playerID, stageID, newScore, newAdj, true, models.IdempotencyKey{})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("retrieve new score: %w", err))
 	}

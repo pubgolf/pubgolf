@@ -1,8 +1,12 @@
 -- name: ClaimIdempotencyKey :one
-INSERT INTO idempotency_keys (key, scope)
-VALUES ($1, $2)
-ON CONFLICT DO NOTHING
-RETURNING key;
+WITH ins AS (
+  INSERT INTO idempotency_keys (key, scope, params_hash)
+  VALUES ($1, $2, $3)
+  ON CONFLICT (scope, key) DO NOTHING
+  RETURNING key
+)
+SELECT idempotency_keys.params_hash FROM idempotency_keys
+WHERE idempotency_keys.scope = $2 AND idempotency_keys.key = $1 AND NOT EXISTS (SELECT 1 FROM ins);
 
 -- name: DeleteExpiredIdempotencyKeys :execrows
 DELETE FROM idempotency_keys

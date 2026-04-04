@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"errors"
@@ -11,22 +12,27 @@ import (
 )
 
 // ClaimIdempotencyKey attempts to claim an idempotency key for the given scope.
-// Returns true if the key was newly claimed, false if it was already claimed.
-func (q *Queries) ClaimIdempotencyKey(ctx context.Context, key models.IdempotencyKey, scope models.IdempotencyScope) (bool, error) {
+// Returns true if the key was newly claimed, false if it was already claimed with matching params.
+// Returns ErrRequestMismatch if the key was already claimed with different params.
+func (q *Queries) ClaimIdempotencyKey(ctx context.Context, key models.IdempotencyKey, scope models.IdempotencyScope, paramsHash []byte) (bool, error) {
 	defer daoSpan(&ctx)()
 
-	_, err := q.dbc.ClaimIdempotencyKey(ctx, dbc.ClaimIdempotencyKeyParams{
-		Key:   key,
-		Scope: scope,
+	existingHash, err := q.dbc.ClaimIdempotencyKey(ctx, dbc.ClaimIdempotencyKeyParams{
+		Key:        key,
+		Scope:      scope,
+		ParamsHash: paramsHash,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// ON CONFLICT DO NOTHING means no row returned = already claimed
-			return false, nil
+			return true, nil
 		}
 
 		return false, fmt.Errorf("claim idempotency key: %w", err)
 	}
 
-	return true, nil
+	if !bytes.Equal(existingHash, paramsHash) {
+		return false, ErrRequestMismatch
+	}
+
+	return false, nil
 }

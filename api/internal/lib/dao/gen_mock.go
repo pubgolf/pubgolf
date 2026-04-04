@@ -126,9 +126,9 @@ func (_m *MockQueryProvider) AllVenues(ctx context.Context) ([]models.Venue, err
 	return r0, r1
 }
 
-// ClaimIdempotencyKey provides a mock function with given fields: ctx, key, scope
-func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key models.IdempotencyKey, scope models.IdempotencyScope) (bool, error) {
-	ret := _m.Called(ctx, key, scope)
+// ClaimIdempotencyKey provides a mock function with given fields: ctx, key, scope, paramsHash
+func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key models.IdempotencyKey, scope models.IdempotencyScope, paramsHash []byte) (bool, error) {
+	ret := _m.Called(ctx, key, scope, paramsHash)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ClaimIdempotencyKey")
@@ -136,17 +136,17 @@ func (_m *MockQueryProvider) ClaimIdempotencyKey(ctx context.Context, key models
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope) (bool, error)); ok {
-		return rf(ctx, key, scope)
+	if rf, ok := ret.Get(0).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope, []byte) (bool, error)); ok {
+		return rf(ctx, key, scope, paramsHash)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope) bool); ok {
-		r0 = rf(ctx, key, scope)
+	if rf, ok := ret.Get(0).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope, []byte) bool); ok {
+		r0 = rf(ctx, key, scope, paramsHash)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope) error); ok {
-		r1 = rf(ctx, key, scope)
+	if rf, ok := ret.Get(1).(func(context.Context, models.IdempotencyKey, models.IdempotencyScope, []byte) error); ok {
+		r1 = rf(ctx, key, scope, paramsHash)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1049,17 +1049,17 @@ func (_m *MockQueryProvider) UpsertRegistration(ctx context.Context, playerID mo
 	return r0
 }
 
-// UpsertScore provides a mock function with given fields: ctx, playerID, stageID, score, adjustments, isVerified
-func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool) error {
-	ret := _m.Called(ctx, playerID, stageID, score, adjustments, isVerified)
+// UpsertScore provides a mock function with given fields: ctx, playerID, stageID, score, adjustments, isVerified, idempotencyKey
+func (_m *MockQueryProvider) UpsertScore(ctx context.Context, playerID models.PlayerID, stageID models.StageID, score uint32, adjustments []AdjustmentParams, isVerified bool, idempotencyKey models.IdempotencyKey) error {
+	ret := _m.Called(ctx, playerID, stageID, score, adjustments, isVerified, idempotencyKey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpsertScore")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []AdjustmentParams, bool) error); ok {
-		r0 = rf(ctx, playerID, stageID, score, adjustments, isVerified)
+	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID, models.StageID, uint32, []AdjustmentParams, bool, models.IdempotencyKey) error); ok {
+		r0 = rf(ctx, playerID, stageID, score, adjustments, isVerified, idempotencyKey)
 	} else {
 		r0 = ret.Error(0)
 	}

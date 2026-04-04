@@ -13,22 +13,27 @@ import (
 )
 
 const claimIdempotencyKey = `-- name: ClaimIdempotencyKey :one
-INSERT INTO idempotency_keys (key, scope)
-VALUES ($1, $2)
-ON CONFLICT DO NOTHING
-RETURNING key
+WITH ins AS (
+  INSERT INTO idempotency_keys (key, scope, params_hash)
+  VALUES ($1, $2, $3)
+  ON CONFLICT (scope, key) DO NOTHING
+  RETURNING key
+)
+SELECT idempotency_keys.params_hash FROM idempotency_keys
+WHERE idempotency_keys.scope = $2 AND idempotency_keys.key = $1 AND NOT EXISTS (SELECT 1 FROM ins)
 `
 
 type ClaimIdempotencyKeyParams struct {
-	Key   models.IdempotencyKey
-	Scope models.IdempotencyScope
+	Key        models.IdempotencyKey
+	Scope      models.IdempotencyScope
+	ParamsHash []byte
 }
 
-func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.IdempotencyKey, error) {
-	row := q.queryRow(ctx, q.claimIdempotencyKeyStmt, claimIdempotencyKey, arg.Key, arg.Scope)
-	var key models.IdempotencyKey
-	err := row.Scan(&key)
-	return key, err
+func (q *Queries) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) ([]byte, error) {
+	row := q.queryRow(ctx, q.claimIdempotencyKeyStmt, claimIdempotencyKey, arg.Key, arg.Scope, arg.ParamsHash)
+	var params_hash []byte
+	err := row.Scan(&params_hash)
+	return params_hash, err
 }
 
 const deleteExpiredIdempotencyKeys = `-- name: DeleteExpiredIdempotencyKeys :execrows
