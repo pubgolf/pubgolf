@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strconv"
 
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/cobra"
@@ -36,7 +35,7 @@ func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) 
 		return err
 	}
 
-	err = buildWeb(ctx, r)
+	err = buildWeb(ctx, r, "SVELTE_ASSETS_PATH=")
 	if err != nil {
 		return err
 	}
@@ -46,40 +45,27 @@ func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) 
 		return fmtErr(err, "compute port offset")
 	}
 
-	previewPort := 4173 + offset
-
-	previewProc, err := r.Start(ctx, Cmd{
-		Name: filepath.FromSlash("./node_modules/.bin/vite"),
-		Args: []string{"preview", "--port", strconv.Itoa(previewPort)},
-		Dir:  "web-app",
-	})
-	if err != nil {
-		return fmtErr(err, "start vite preview server")
-	}
+	apiPort := 5000 + offset
 
 	apiProc, err := startAPIServer(ctx, r, ep, args,
-		fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", previewPort),
+		"PUBGOLF_WEB_APP_UPSTREAM_HOST=file://web-app/build",
+		fmt.Sprintf("PUBGOLF_HOST_ORIGIN=http://localhost:%d", apiPort),
 	)
 	if err != nil {
-		previewProc.Stop()
-
 		return err
 	}
 
-	log.Printf("Full-stack environment running (preview: :%d, API: :%d)\n", previewPort, 5000+offset)
+	log.Printf("Full-stack environment running (API: :%d, serving web-app/build)\n", apiPort)
 
 	go func() {
 		<-shuttingDown
 		apiProc.Stop()
-		previewProc.Stop()
 	}()
 
 	waitErr := apiProc.Wait()
 	if waitErr != nil {
 		log.Printf("API server exited with error: %v", waitErr)
 	}
-
-	previewProc.Stop()
 
 	return nil
 }

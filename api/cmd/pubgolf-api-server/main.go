@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -186,8 +187,10 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *s
 		r.Mount("/", http.StripPrefix("/rpc", rpcMux))
 	})
 
-	// Reverse proxy the web-app's static deployment.
-	if cfg.WebAppUpstreamHost != "" {
+	// Serve the web-app's static deployment.
+	if dir, ok := strings.CutPrefix(cfg.WebAppUpstreamHost, "file://"); ok {
+		r.HandleFunc("/*", http.FileServer(http.Dir(dir)).ServeHTTP)
+	} else if cfg.WebAppUpstreamHost != "" {
 		upstream, err := url.Parse(cfg.WebAppUpstreamHost)
 		guard(err, "parse upstream for web-app reverse proxy")
 		r.HandleFunc("/*", httputil.NewSingleHostReverseProxy(upstream).ServeHTTP)
