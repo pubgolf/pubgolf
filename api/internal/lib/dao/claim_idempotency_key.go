@@ -24,14 +24,12 @@ func (q *Queries) ClaimIdempotencyKey(ctx context.Context, key models.Idempotenc
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// No row returned = insert succeeded = new claim
 			return true, nil
 		}
 
 		return false, fmt.Errorf("claim idempotency key: %w", err)
 	}
 
-	// Row returned = key already existed; compare hashes
 	if !bytes.Equal(existingHash, paramsHash) {
 		return false, ErrRequestMismatch
 	}
