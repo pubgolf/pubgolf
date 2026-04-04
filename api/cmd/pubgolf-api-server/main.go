@@ -28,6 +28,7 @@ import (
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/pubgolf/pubgolf/api/internal/db"
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/config"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/middleware"
@@ -98,7 +99,21 @@ func main() {
 	}()
 
 	mes := sms.New(cfg.Twilio, cfg.SMSAllowList)
-	server := makeServer(cfg, daoInstance, mes, dbConn)
+
+	bs, err := blobstore.New(cfg.BlobStore)
+	guard(err, "init blob store")
+
+	bsCtx, bsCancel := context.WithTimeout(ctx, 2*time.Second)
+	defer bsCancel()
+
+	bsExists, bsErr := bs.BucketExists(bsCtx)
+	if bsErr != nil {
+		log.Printf("Warning: blob store not reachable at startup: %v — will retry on first request", bsErr)
+	} else if !bsExists {
+		log.Printf("Warning: blob store bucket %q does not exist — create it before uploading", cfg.BlobStore.Bucket)
+	}
+
+	server := makeServer(cfg, daoInstance, mes, dbConn, bs)
 	makeShutdownWatcher(server)
 
 	// Run server.
@@ -158,13 +173,13 @@ func makeDB(ctx context.Context, cfg *config.App) *sql.DB {
 }
 
 // makeServer initializes an HTTP server with settings and the router.
-func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *sql.DB) *http.Server {
+func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *sql.DB, bs blobstore.BlobStore) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.ChiMiddleware(r)...)
 
 	// Mount routes.
 	r.Get("/health-check", healthCheck(cfg))
-	r.Get("/status", status(db))
+	r.Get("/status", status(db, bs))
 	r.Get("/robots.txt", robots(cfg))
 	r.Route("/web-api/", webapi.Router(cfg))
 	r.Route("/rpc/", func(r chi.Router) {
@@ -175,11 +190,11 @@ func makeServer(cfg *config.App, dao dao.QueryProvider, mes sms.Messenger, db *s
 		stdInterceptors, err := middleware.ConnectInterceptors()
 		guard(err, "construct interceptors")
 
-		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes),
+		rpcMux.Handle(apiv1connect.NewPubGolfServiceHandler(public.NewServer(dao, mes, bs),
 			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAuthInterceptor(dao)),
 		))
-		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao),
+		rpcMux.Handle(apiv1connect.NewAdminServiceHandler(admin.NewServer(dao, bs),
 			connect.WithInterceptors(stdInterceptors...),
 			connect.WithInterceptors(middleware.NewAdminAuthInterceptor(cfg)),
 		))

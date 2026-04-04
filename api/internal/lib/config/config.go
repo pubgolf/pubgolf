@@ -39,9 +39,10 @@ type App struct {
 	SMSAllowList PhoneNumSet `split_words:"true"`
 
 	// Credentials
-	HoneycombKey   string     `split_words:"true"`
-	AppDatabaseURL string     `required:"true" split_words:"true"`
-	Twilio         TwilioAuth `required:"true" split_words:"true"`
+	HoneycombKey   string        `split_words:"true"`
+	AppDatabaseURL string        `required:"true" split_words:"true"`
+	Twilio         TwilioAuth    `required:"true" split_words:"true"`
+	BlobStore      BlobStoreAuth `required:"true" split_words:"true"`
 
 	// 1st party credentials and entropy
 	AdminAuth WebAppAuth `required:"true" split_words:"true"`
@@ -52,6 +53,15 @@ type TwilioAuth struct {
 	AccountSID      string `required:"true" split_words:"true"`
 	AuthToken       string `required:"true" split_words:"true"`
 	VerificationSID string `required:"true" split_words:"true"`
+}
+
+// BlobStoreAuth contains credentials for the S3-compatible blob storage client.
+type BlobStoreAuth struct {
+	Endpoint  string `split_words:"true" required:"true"`
+	AccessKey string `split_words:"true" required:"true"`
+	SecretKey string `split_words:"true" required:"true"`
+	Bucket    string `split_words:"true" required:"true"`
+	UseSSL    bool   `split_words:"true" default:"false"`
 }
 
 // WebAppAuth contains auth params for the admin user.

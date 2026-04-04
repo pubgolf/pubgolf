@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
@@ -27,7 +28,7 @@ func TestStartPlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, "", phoneNum}, Return: []any{models.Player{ID: playerID}, nil}}.Bind(mockDAO, "CreatePlayer")
 		mockMes.On("SendVerification", mock.Anything, phoneNum).Return(nil)
@@ -44,7 +45,7 @@ func TestStartPlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, "", phoneNum}, Return: []any{models.Player{}, dao.ErrAlreadyCreated}}.Bind(mockDAO, "CreatePlayer")
 		dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, phoneNum}, Return: []any{false, nil}}.Bind(mockDAO, "PhoneNumberIsVerified")
@@ -76,7 +77,7 @@ func TestStartPlayerLogin(t *testing.T) {
 
 				mockDAO := new(dao.MockQueryProvider)
 				mockMes := new(sms.MockMessenger)
-				s := NewServer(mockDAO, mockMes)
+				s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 				_, err := s.StartPlayerLogin(t.Context(), connect.NewRequest(&apiv1.StartPlayerLoginRequest{
 					PhoneNumber: tc.phone,
@@ -93,7 +94,7 @@ func TestStartPlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		dao.MockDAOCall{ShouldCall: true, Args: []any{mock.Anything, "", phoneNum}, Return: []any{models.Player{ID: playerID}, nil}}.Bind(mockDAO, "CreatePlayer")
 		mockMes.On("SendVerification", mock.Anything, phoneNum).Return(sms.ErrUpstreamProviderIssue)

@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/goleak"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/sms"
 	"github.com/pubgolf/pubgolf/api/internal/lib/testguard"
@@ -21,6 +22,7 @@ func TestMain(m *testing.M) {
 
 func makeTestServer(dao dao.QueryProvider) *Server {
 	mockMessenger := new(sms.MockMessenger)
+	mockBlobStore := new(blobstore.MockBlobStore)
 
-	return NewServer(dao, mockMessenger)
+	return NewServer(dao, mockMessenger, mockBlobStore)
 }
