@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -24,7 +25,9 @@ func status(db *sql.DB, bs blobstore.BlobStore) http.HandlerFunc {
 
 		pingErr := db.PingContext(ctx)
 		if pingErr != nil {
-			dbStatus = pingErr.Error()
+			log.Printf("status: DB ping failed: %v", pingErr)
+
+			dbStatus = "unreachable"
 			code = http.StatusServiceUnavailable
 		}
 
@@ -32,7 +35,9 @@ func status(db *sql.DB, bs blobstore.BlobStore) http.HandlerFunc {
 
 		exists, bsErr := bs.BucketExists(ctx)
 		if bsErr != nil {
-			bsStatus = bsErr.Error()
+			log.Printf("status: blob store check failed: %v", bsErr)
+
+			bsStatus = "unreachable"
 			code = http.StatusServiceUnavailable
 		} else if !exists {
 			bsStatus = "bucket not found"

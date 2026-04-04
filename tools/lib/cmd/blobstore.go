@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net"
 	"strings"
 	"time"
 
@@ -16,6 +17,27 @@ import (
 var errBlobStoreNotReady = errors.New("blob storage not ready after retries")
 
 const blobBucketPrefix = "pubgolf-dev"
+
+// minioReachable checks if the Minio endpoint is accepting TCP connections.
+// Used to detect if another worktree's Minio is already running on the shared port.
+func minioReachable(ctx context.Context, ep EnvProvider) bool {
+	vars := readEnvVars(ctx, ep, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, []string{
+		"BLOB_STORE_ENDPOINT",
+	})
+
+	endpoint := getStr(vars, "BLOB_STORE_ENDPOINT", "localhost:9000")
+
+	dialer := net.Dialer{Timeout: 1 * time.Second}
+
+	conn, err := dialer.DialContext(ctx, "tcp", endpoint)
+	if err != nil {
+		return false
+	}
+
+	conn.Close()
+
+	return true
+}
 
 // minioClient constructs a minio-go client pointing at the shared Minio instance
 // with credentials from the env provider.
@@ -61,6 +83,13 @@ func ensureBucket(ctx context.Context, ep EnvProvider, slug string) error {
 
 			mkErr := mc.MakeBucket(ctx, bucket, minio.MakeBucketOptions{})
 			if mkErr != nil {
+				// Another process may have created the bucket between our
+				// BucketExists check and MakeBucket call.
+				resp := minio.ToErrorResponse(mkErr)
+				if resp.Code == "BucketAlreadyOwnedByYou" || resp.Code == "BucketAlreadyExists" {
+					return nil
+				}
+
 				return fmt.Errorf("create bucket %q: %w", bucket, mkErr)
 			}
 
@@ -94,25 +123,16 @@ func deleteBucket(ctx context.Context, ep EnvProvider, bucket string) error {
 		return nil
 	}
 
-	// Remove all objects before deleting the bucket (batch API).
-	objectsCh := make(chan minio.ObjectInfo)
-
-	go func() {
-		defer close(objectsCh)
-
-		for obj := range mc.ListObjects(ctx, bucket, minio.ListObjectsOptions{Recursive: true}) {
-			if obj.Err != nil {
-				log.Printf("Warning: error listing objects in %q: %v", bucket, obj.Err)
-
-				return
-			}
-
-			objectsCh <- obj
+	// Remove all objects before deleting the bucket.
+	for obj := range mc.ListObjects(ctx, bucket, minio.ListObjectsOptions{Recursive: true}) {
+		if obj.Err != nil {
+			return fmt.Errorf("list objects in %q: %w", bucket, obj.Err)
 		}
-	}()
 
-	for err := range mc.RemoveObjects(ctx, bucket, objectsCh, minio.RemoveObjectsOptions{}) {
-		return fmt.Errorf("remove objects from %q: %w", bucket, err.Err)
+		rmErr := mc.RemoveObject(ctx, bucket, obj.Key, minio.RemoveObjectOptions{})
+		if rmErr != nil {
+			return fmt.Errorf("remove object %q from %q: %w", obj.Key, bucket, rmErr)
+		}
 	}
 
 	err = mc.RemoveBucket(ctx, bucket)
