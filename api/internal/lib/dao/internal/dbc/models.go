@@ -71,9 +71,10 @@ type EventPlayer struct {
 }
 
 type IdempotencyKey struct {
-	Key       models.IdempotencyKey
-	Scope     models.IdempotencyScope
-	CreatedAt time.Time
+	Key        models.IdempotencyKey
+	Scope      models.IdempotencyScope
+	CreatedAt  time.Time
+	ParamsHash []byte
 }
 
 type Player struct {

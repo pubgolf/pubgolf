@@ -229,6 +229,38 @@ func TestCreateStageScoreIdempotency(t *testing.T) {
 		mockDAO.AssertCalled(t, "ScoreByPlayerStage", mock.Anything, playerID, stageID)
 	})
 
+	t.Run("when idempotency key params mismatch, handler returns CodeAborted", func(t *testing.T) {
+		t.Parallel()
+
+		mockDAO := new(dao.MockQueryProvider)
+		s := makeTestServer(mockDAO)
+
+		dao.MockDAOCall{
+			ShouldCall: true,
+			Args: []any{
+				mock.Anything,
+				playerID,
+				stageID,
+				uint32(42),
+				mock.Anything,
+				true,
+				mock.Anything,
+			},
+			Return: []any{
+				dao.ErrRequestMismatch,
+			},
+		}.Bind(mockDAO, "UpsertScore")
+
+		resp, err := s.CreateStageScore(t.Context(), testReq)
+
+		require.Error(t, err)
+		assert.Nil(t, resp)
+
+		var connErr *connect.Error
+		require.ErrorAs(t, err, &connErr)
+		assert.Equal(t, connect.CodeAborted, connErr.Code())
+	})
+
 	t.Run("when UpsertScore returns error, handler returns CodeUnavailable", func(t *testing.T) {
 		t.Parallel()
 

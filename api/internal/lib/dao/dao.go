@@ -19,6 +19,8 @@ var (
 	ErrAlreadyCreated = errors.New("entity already exists")
 	// ErrDuplicateRequest indicates that an idempotency key was already claimed, so the guarded operation was skipped.
 	ErrDuplicateRequest = errors.New("duplicate request")
+	// ErrRequestMismatch indicates that an idempotency key was reused with different request parameters.
+	ErrRequestMismatch = errors.New("request parameters do not match original")
 	// ErrTransactedQuerier indicates that the underlying DBC.Querier could not be used to create a transaction-compatible version of itself.
 	ErrTransactedQuerier = errors.New("cannot construct transacted querier")
 	// ErrInvariantViolation indicates an unexpected modeling condition within the database.

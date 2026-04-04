@@ -206,6 +206,40 @@ func TestSubmitScoreIdempotency(t *testing.T) {
 		assert.Equal(t, apiv1.ScoreStatus_SCORE_STATUS_SUBMITTED_EDITABLE, resp.Msg.GetStatus())
 	})
 
+	t.Run("when idempotency key params mismatch, handler returns CodeAborted", func(t *testing.T) {
+		t.Parallel()
+
+		mockDAO := new(dao.MockQueryProvider)
+		s := makeTestServer(mockDAO)
+
+		setupPreUpsertMocks(mockDAO)
+
+		dao.MockDAOCall{
+			ShouldCall: true,
+			Args: []any{
+				mock.Anything,
+				playerID,
+				stageID,
+				uint32(5),
+				mock.Anything,
+				false,
+				mock.Anything,
+			},
+			Return: []any{
+				dao.ErrRequestMismatch,
+			},
+		}.Bind(mockDAO, "UpsertScore")
+
+		resp, err := s.SubmitScore(gameCtx, testReq)
+
+		require.Error(t, err)
+		assert.Nil(t, resp)
+
+		var connErr *connect.Error
+		require.ErrorAs(t, err, &connErr)
+		assert.Equal(t, connect.CodeAborted, connErr.Code())
+	})
+
 	t.Run("when UpsertScore returns error, handler returns CodeUnavailable", func(t *testing.T) {
 		t.Parallel()
 

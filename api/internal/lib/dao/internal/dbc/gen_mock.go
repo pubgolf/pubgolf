@@ -107,22 +107,24 @@ func (_m *MockQuerier) AllVenues(ctx context.Context) ([]AllVenuesRow, error) {
 }
 
 // ClaimIdempotencyKey provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) (models.IdempotencyKey, error) {
+func (_m *MockQuerier) ClaimIdempotencyKey(ctx context.Context, arg ClaimIdempotencyKeyParams) ([]byte, error) {
 	ret := _m.Called(ctx, arg)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ClaimIdempotencyKey")
 	}
 
-	var r0 models.IdempotencyKey
+	var r0 []byte
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, ClaimIdempotencyKeyParams) (models.IdempotencyKey, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, ClaimIdempotencyKeyParams) ([]byte, error)); ok {
 		return rf(ctx, arg)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, ClaimIdempotencyKeyParams) models.IdempotencyKey); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, ClaimIdempotencyKeyParams) []byte); ok {
 		r0 = rf(ctx, arg)
 	} else {
-		r0 = ret.Get(0).(models.IdempotencyKey)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]byte)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, ClaimIdempotencyKeyParams) error); ok {

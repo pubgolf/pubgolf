@@ -74,6 +74,10 @@ func (s *Server) SubmitScore(ctx context.Context, req *connect.Request[apiv1.Sub
 			}), nil
 		}
 
+		if errors.Is(err, dao.ErrRequestMismatch) {
+			return nil, connect.NewError(connect.CodeAborted, err)
+		}
+
 		if errors.Is(err, dao.ErrAlreadyCreated) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}

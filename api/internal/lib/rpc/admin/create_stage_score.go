@@ -44,12 +44,18 @@ func (s *Server) CreateStageScore(ctx context.Context, req *connect.Request[apiv
 	}
 
 	err = s.dao.UpsertScore(ctx, playerID, stageID, reqData.GetScore().GetValue(), adjP, true, idempotencyKey)
-	if err != nil && !errors.Is(err, dao.ErrDuplicateRequest) {
-		if errors.Is(err, dao.ErrAlreadyCreated) {
-			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+	if err != nil {
+		if errors.Is(err, dao.ErrRequestMismatch) {
+			return nil, connect.NewError(connect.CodeAborted, err)
 		}
 
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
+		if !errors.Is(err, dao.ErrDuplicateRequest) {
+			if errors.Is(err, dao.ErrAlreadyCreated) {
+				return nil, connect.NewError(connect.CodeAlreadyExists, err)
+			}
+
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("insert score: %w", err))
+		}
 	}
 
 	score, err := s.dao.ScoreByPlayerStage(ctx, playerID, stageID)
