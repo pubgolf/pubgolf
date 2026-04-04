@@ -268,13 +268,9 @@
 				</table>
 			</div>
 		{:else if $filterUnverifiedOnly}
-			<NoDataCard text="No Unverified Scores to Display" ctaText="Refresh" on:click={refreshData} />
+			<NoDataCard text="No Unverified Scores to Display" ctaText="Refresh" onclick={refreshData} />
 		{:else}
-			<NoDataCard
-				text="No Scores to Display"
-				ctaText="Enter a Score"
-				on:click={showNewScoreModal}
-			/>
+			<NoDataCard text="No Scores to Display" ctaText="Enter a Score" onclick={showNewScoreModal} />
 		{/if}
 	{:catch error}
 		<ErrorBanner

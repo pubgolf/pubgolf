@@ -1,6 +1,6 @@
 <script lang="ts">
-	export let title: string;
-	let pageTitle = title ? `${title} | PubGolf.co` : 'PubGolf.co';
+	let { title }: { title: string } = $props();
+	let pageTitle = $derived(title ? `${title} | PubGolf.co` : 'PubGolf.co');
 </script>
 
 <svelte:head>
