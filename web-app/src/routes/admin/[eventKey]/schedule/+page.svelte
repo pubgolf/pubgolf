@@ -53,7 +53,8 @@
 				venueId: stage.venue?.id,
 				rank: stage.rank,
 				durationMin: stage.durationMin,
-				venueDescription: stage.rule?.venueDescription
+				venueDescription: stage.rule?.venueDescription,
+				venueDescriptions: stage.rule?.venueDescriptions ?? []
 			}),
 			onSubmit: async (data: UpdateStageRequest) => {
 				const rpc = await getAdminServiceClient();
@@ -110,7 +111,13 @@
 							<tr>
 								<td>{stage.venue?.name}</td>
 								<td>{stage.durationMin}</td>
-								<td class="long-text-col">{stage.rule?.venueDescription}</td>
+								<td class="long-text-col"
+									>{#if (stage.rule?.venueDescriptions?.length ?? 0) > 0}{stage.rule
+											?.venueDescriptions?.length} item{(stage.rule?.venueDescriptions?.length ??
+											0) !== 1
+											? 's'
+											: ''}{:else}{stage.rule?.venueDescription || '—'}{/if}</td
+								>
 								<td class="table-cell-fit action-btns text-right">
 									<button
 										type="button"
