@@ -28,12 +28,11 @@ var buildWebCmd = &cobra.Command{
 	},
 }
 
-func buildWeb(ctx context.Context, r Runner, extraEnv ...string) error {
+func buildWeb(ctx context.Context, r Runner) error {
 	err := r.Run(ctx, Cmd{
 		Name: filepath.FromSlash("./node_modules/.bin/vite"),
 		Args: []string{"build"},
 		Dir:  "web-app",
-		Env:  extraEnv,
 	})
 	if err != nil {
 		return fmtErr(err, "build web-app")
