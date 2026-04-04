@@ -20,6 +20,23 @@ enum ScoringCategory {
   SCORING_CATEGORY_PUB_GOLF_CHALLENGES = 3;
 }
 
+enum VenueDescriptionItemType {
+  VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED = 0;
+  VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT = 1;
+  VENUE_DESCRIPTION_ITEM_TYPE_WARNING = 2;
+  VENUE_DESCRIPTION_ITEM_TYPE_RULE = 3;
+}
+
+message VenueDescriptionItem {
+  // content is the text body for this item.
+  string content = 1;
+  // item_type drives the visual treatment on the client.
+  VenueDescriptionItemType item_type = 2;
+  // audiences specifies which scoring categories this item applies to.
+  // An empty list means the item applies to all players.
+  repeated ScoringCategory audiences = 3;
+}
+
 message Venue {
   // Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
   string id = 1;

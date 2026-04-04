@@ -451,11 +451,12 @@ func (x *ListPlayersResponse) GetPlayers() []*Player {
 }
 
 type Rule struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	VenueDescription string                 `protobuf:"bytes,2,opt,name=venue_description,json=venueDescription,proto3" json:"venue_description,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state             protoimpl.MessageState  `protogen:"open.v1"`
+	Id                string                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	VenueDescription  string                  `protobuf:"bytes,2,opt,name=venue_description,json=venueDescription,proto3" json:"venue_description,omitempty"`
+	VenueDescriptions []*VenueDescriptionItem `protobuf:"bytes,3,rep,name=venue_descriptions,json=venueDescriptions,proto3" json:"venue_descriptions,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Rule) Reset() {
@@ -500,6 +501,13 @@ func (x *Rule) GetVenueDescription() string {
 		return x.VenueDescription
 	}
 	return ""
+}
+
+func (x *Rule) GetVenueDescriptions() []*VenueDescriptionItem {
+	if x != nil {
+		return x.VenueDescriptions
+	}
+	return nil
 }
 
 type Stage struct {
@@ -659,14 +667,15 @@ func (x *ListVenuesResponse) GetVenues() []*Venue {
 }
 
 type UpdateStageRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	StageId          string                 `protobuf:"bytes,1,opt,name=stage_id,json=stageId,proto3" json:"stage_id,omitempty"`
-	VenueId          string                 `protobuf:"bytes,2,opt,name=venue_id,json=venueId,proto3" json:"venue_id,omitempty"`
-	VenueDescription string                 `protobuf:"bytes,3,opt,name=venue_description,json=venueDescription,proto3" json:"venue_description,omitempty"`
-	Rank             int32                  `protobuf:"varint,4,opt,name=rank,proto3" json:"rank,omitempty"`
-	DurationMin      int32                  `protobuf:"varint,5,opt,name=duration_min,json=durationMin,proto3" json:"duration_min,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state             protoimpl.MessageState  `protogen:"open.v1"`
+	StageId           string                  `protobuf:"bytes,1,opt,name=stage_id,json=stageId,proto3" json:"stage_id,omitempty"`
+	VenueId           string                  `protobuf:"bytes,2,opt,name=venue_id,json=venueId,proto3" json:"venue_id,omitempty"`
+	VenueDescription  string                  `protobuf:"bytes,3,opt,name=venue_description,json=venueDescription,proto3" json:"venue_description,omitempty"`
+	Rank              int32                   `protobuf:"varint,4,opt,name=rank,proto3" json:"rank,omitempty"`
+	DurationMin       int32                   `protobuf:"varint,5,opt,name=duration_min,json=durationMin,proto3" json:"duration_min,omitempty"`
+	VenueDescriptions []*VenueDescriptionItem `protobuf:"bytes,6,rep,name=venue_descriptions,json=venueDescriptions,proto3" json:"venue_descriptions,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *UpdateStageRequest) Reset() {
@@ -732,6 +741,13 @@ func (x *UpdateStageRequest) GetDurationMin() int32 {
 		return x.DurationMin
 	}
 	return 0
+}
+
+func (x *UpdateStageRequest) GetVenueDescriptions() []*VenueDescriptionItem {
+	if x != nil {
+		return x.VenueDescriptions
+	}
+	return nil
 }
 
 type UpdateStageResponse struct {
@@ -1972,10 +1988,11 @@ const file_api_v1_admin_proto_rawDesc = "" +
 	"\x12ListPlayersRequest\x12\x1b\n" +
 	"\tevent_key\x18\x01 \x01(\tR\beventKey\"?\n" +
 	"\x13ListPlayersResponse\x12(\n" +
-	"\aplayers\x18\x01 \x03(\v2\x0e.api.v1.PlayerR\aplayers\"C\n" +
+	"\aplayers\x18\x01 \x03(\v2\x0e.api.v1.PlayerR\aplayers\"\x90\x01\n" +
 	"\x04Rule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12+\n" +
-	"\x11venue_description\x18\x02 \x01(\tR\x10venueDescription\"\x95\x01\n" +
+	"\x11venue_description\x18\x02 \x01(\tR\x10venueDescription\x12K\n" +
+	"\x12venue_descriptions\x18\x03 \x03(\v2\x1c.api.v1.VenueDescriptionItemR\x11venueDescriptions\"\x95\x01\n" +
 	"\x05Stage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\x05venue\x18\x02 \x01(\v2\r.api.v1.VenueR\x05venue\x12 \n" +
@@ -1984,13 +2001,14 @@ const file_api_v1_admin_proto_rawDesc = "" +
 	"\fduration_min\x18\x05 \x01(\x05R\vdurationMin\"\x13\n" +
 	"\x11ListVenuesRequest\";\n" +
 	"\x12ListVenuesResponse\x12%\n" +
-	"\x06venues\x18\x01 \x03(\v2\r.api.v1.VenueR\x06venues\"\xae\x01\n" +
+	"\x06venues\x18\x01 \x03(\v2\r.api.v1.VenueR\x06venues\"\xfb\x01\n" +
 	"\x12UpdateStageRequest\x12\x19\n" +
 	"\bstage_id\x18\x01 \x01(\tR\astageId\x12\x19\n" +
 	"\bvenue_id\x18\x02 \x01(\tR\avenueId\x12+\n" +
 	"\x11venue_description\x18\x03 \x01(\tR\x10venueDescription\x12\x12\n" +
 	"\x04rank\x18\x04 \x01(\x05R\x04rank\x12!\n" +
-	"\fduration_min\x18\x05 \x01(\x05R\vdurationMin\"\x15\n" +
+	"\fduration_min\x18\x05 \x01(\x05R\vdurationMin\x12K\n" +
+	"\x12venue_descriptions\x18\x06 \x03(\v2\x1c.api.v1.VenueDescriptionItemR\x11venueDescriptions\"\x15\n" +
 	"\x13UpdateStageResponse\"5\n" +
 	"\x16ListEventStagesRequest\x12\x1b\n" +
 	"\tevent_key\x18\x01 \x01(\tR\beventKey\"@\n" +
@@ -2142,7 +2160,8 @@ var file_api_v1_admin_proto_goTypes = []any{
 	(*PlayerData)(nil),                       // 39: api.v1.PlayerData
 	(*EventRegistration)(nil),                // 40: api.v1.EventRegistration
 	(*Player)(nil),                           // 41: api.v1.Player
-	(*Venue)(nil),                            // 42: api.v1.Venue
+	(*VenueDescriptionItem)(nil),             // 42: api.v1.VenueDescriptionItem
+	(*Venue)(nil),                            // 43: api.v1.Venue
 }
 var file_api_v1_admin_proto_depIdxs = []int32{
 	39, // 0: api.v1.AdminServiceCreatePlayerRequest.player_data:type_name -> api.v1.PlayerData
@@ -2152,60 +2171,62 @@ var file_api_v1_admin_proto_depIdxs = []int32{
 	40, // 4: api.v1.UpdatePlayerRequest.registration:type_name -> api.v1.EventRegistration
 	41, // 5: api.v1.UpdatePlayerResponse.player:type_name -> api.v1.Player
 	41, // 6: api.v1.ListPlayersResponse.players:type_name -> api.v1.Player
-	42, // 7: api.v1.Stage.venue:type_name -> api.v1.Venue
-	9,  // 8: api.v1.Stage.rule:type_name -> api.v1.Rule
-	42, // 9: api.v1.ListVenuesResponse.venues:type_name -> api.v1.Venue
-	10, // 10: api.v1.ListEventStagesResponse.stages:type_name -> api.v1.Stage
-	28, // 11: api.v1.AdjustmentTemplateData.adjustment:type_name -> api.v1.AdjustmentData
-	17, // 12: api.v1.AdjustmentTemplate.data:type_name -> api.v1.AdjustmentTemplateData
-	17, // 13: api.v1.CreateAdjustmentTemplateRequest.data:type_name -> api.v1.AdjustmentTemplateData
-	18, // 14: api.v1.UpdateAdjustmentTemplateRequest.template:type_name -> api.v1.AdjustmentTemplate
-	18, // 15: api.v1.ListAdjustmentTemplatesResponse.templates:type_name -> api.v1.AdjustmentTemplate
-	26, // 16: api.v1.Score.data:type_name -> api.v1.ScoreData
-	28, // 17: api.v1.Adjustment.data:type_name -> api.v1.AdjustmentData
-	25, // 18: api.v1.StageScore.score:type_name -> api.v1.Score
-	27, // 19: api.v1.StageScore.adjustments:type_name -> api.v1.Adjustment
-	26, // 20: api.v1.StageScoreData.score:type_name -> api.v1.ScoreData
-	28, // 21: api.v1.StageScoreData.adjustments:type_name -> api.v1.AdjustmentData
-	30, // 22: api.v1.CreateStageScoreRequest.data:type_name -> api.v1.StageScoreData
-	29, // 23: api.v1.CreateStageScoreResponse.score:type_name -> api.v1.StageScore
-	29, // 24: api.v1.UpdateStageScoreRequest.score:type_name -> api.v1.StageScore
-	29, // 25: api.v1.UpdateStageScoreResponse.score:type_name -> api.v1.StageScore
-	0,  // 26: api.v1.ListStageScoresRequest.verified_filter:type_name -> api.v1.StageScoreVerifiedFilter
-	29, // 27: api.v1.ListStageScoresResponse.scores:type_name -> api.v1.StageScore
-	1,  // 28: api.v1.AdminService.PurgeAllCaches:input_type -> api.v1.PurgeAllCachesRequest
-	3,  // 29: api.v1.AdminService.CreatePlayer:input_type -> api.v1.AdminServiceCreatePlayerRequest
-	5,  // 30: api.v1.AdminService.UpdatePlayer:input_type -> api.v1.UpdatePlayerRequest
-	7,  // 31: api.v1.AdminService.ListPlayers:input_type -> api.v1.ListPlayersRequest
-	11, // 32: api.v1.AdminService.ListVenues:input_type -> api.v1.ListVenuesRequest
-	13, // 33: api.v1.AdminService.UpdateStage:input_type -> api.v1.UpdateStageRequest
-	15, // 34: api.v1.AdminService.ListEventStages:input_type -> api.v1.ListEventStagesRequest
-	19, // 35: api.v1.AdminService.CreateAdjustmentTemplate:input_type -> api.v1.CreateAdjustmentTemplateRequest
-	21, // 36: api.v1.AdminService.UpdateAdjustmentTemplate:input_type -> api.v1.UpdateAdjustmentTemplateRequest
-	23, // 37: api.v1.AdminService.ListAdjustmentTemplates:input_type -> api.v1.ListAdjustmentTemplatesRequest
-	31, // 38: api.v1.AdminService.CreateStageScore:input_type -> api.v1.CreateStageScoreRequest
-	33, // 39: api.v1.AdminService.UpdateStageScore:input_type -> api.v1.UpdateStageScoreRequest
-	35, // 40: api.v1.AdminService.ListStageScores:input_type -> api.v1.ListStageScoresRequest
-	37, // 41: api.v1.AdminService.DeleteStageScore:input_type -> api.v1.DeleteStageScoreRequest
-	2,  // 42: api.v1.AdminService.PurgeAllCaches:output_type -> api.v1.PurgeAllCachesResponse
-	4,  // 43: api.v1.AdminService.CreatePlayer:output_type -> api.v1.AdminServiceCreatePlayerResponse
-	6,  // 44: api.v1.AdminService.UpdatePlayer:output_type -> api.v1.UpdatePlayerResponse
-	8,  // 45: api.v1.AdminService.ListPlayers:output_type -> api.v1.ListPlayersResponse
-	12, // 46: api.v1.AdminService.ListVenues:output_type -> api.v1.ListVenuesResponse
-	14, // 47: api.v1.AdminService.UpdateStage:output_type -> api.v1.UpdateStageResponse
-	16, // 48: api.v1.AdminService.ListEventStages:output_type -> api.v1.ListEventStagesResponse
-	20, // 49: api.v1.AdminService.CreateAdjustmentTemplate:output_type -> api.v1.CreateAdjustmentTemplateResponse
-	22, // 50: api.v1.AdminService.UpdateAdjustmentTemplate:output_type -> api.v1.UpdateAdjustmentTemplateResponse
-	24, // 51: api.v1.AdminService.ListAdjustmentTemplates:output_type -> api.v1.ListAdjustmentTemplatesResponse
-	32, // 52: api.v1.AdminService.CreateStageScore:output_type -> api.v1.CreateStageScoreResponse
-	34, // 53: api.v1.AdminService.UpdateStageScore:output_type -> api.v1.UpdateStageScoreResponse
-	36, // 54: api.v1.AdminService.ListStageScores:output_type -> api.v1.ListStageScoresResponse
-	38, // 55: api.v1.AdminService.DeleteStageScore:output_type -> api.v1.DeleteStageScoreResponse
-	42, // [42:56] is the sub-list for method output_type
-	28, // [28:42] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	42, // 7: api.v1.Rule.venue_descriptions:type_name -> api.v1.VenueDescriptionItem
+	43, // 8: api.v1.Stage.venue:type_name -> api.v1.Venue
+	9,  // 9: api.v1.Stage.rule:type_name -> api.v1.Rule
+	43, // 10: api.v1.ListVenuesResponse.venues:type_name -> api.v1.Venue
+	42, // 11: api.v1.UpdateStageRequest.venue_descriptions:type_name -> api.v1.VenueDescriptionItem
+	10, // 12: api.v1.ListEventStagesResponse.stages:type_name -> api.v1.Stage
+	28, // 13: api.v1.AdjustmentTemplateData.adjustment:type_name -> api.v1.AdjustmentData
+	17, // 14: api.v1.AdjustmentTemplate.data:type_name -> api.v1.AdjustmentTemplateData
+	17, // 15: api.v1.CreateAdjustmentTemplateRequest.data:type_name -> api.v1.AdjustmentTemplateData
+	18, // 16: api.v1.UpdateAdjustmentTemplateRequest.template:type_name -> api.v1.AdjustmentTemplate
+	18, // 17: api.v1.ListAdjustmentTemplatesResponse.templates:type_name -> api.v1.AdjustmentTemplate
+	26, // 18: api.v1.Score.data:type_name -> api.v1.ScoreData
+	28, // 19: api.v1.Adjustment.data:type_name -> api.v1.AdjustmentData
+	25, // 20: api.v1.StageScore.score:type_name -> api.v1.Score
+	27, // 21: api.v1.StageScore.adjustments:type_name -> api.v1.Adjustment
+	26, // 22: api.v1.StageScoreData.score:type_name -> api.v1.ScoreData
+	28, // 23: api.v1.StageScoreData.adjustments:type_name -> api.v1.AdjustmentData
+	30, // 24: api.v1.CreateStageScoreRequest.data:type_name -> api.v1.StageScoreData
+	29, // 25: api.v1.CreateStageScoreResponse.score:type_name -> api.v1.StageScore
+	29, // 26: api.v1.UpdateStageScoreRequest.score:type_name -> api.v1.StageScore
+	29, // 27: api.v1.UpdateStageScoreResponse.score:type_name -> api.v1.StageScore
+	0,  // 28: api.v1.ListStageScoresRequest.verified_filter:type_name -> api.v1.StageScoreVerifiedFilter
+	29, // 29: api.v1.ListStageScoresResponse.scores:type_name -> api.v1.StageScore
+	1,  // 30: api.v1.AdminService.PurgeAllCaches:input_type -> api.v1.PurgeAllCachesRequest
+	3,  // 31: api.v1.AdminService.CreatePlayer:input_type -> api.v1.AdminServiceCreatePlayerRequest
+	5,  // 32: api.v1.AdminService.UpdatePlayer:input_type -> api.v1.UpdatePlayerRequest
+	7,  // 33: api.v1.AdminService.ListPlayers:input_type -> api.v1.ListPlayersRequest
+	11, // 34: api.v1.AdminService.ListVenues:input_type -> api.v1.ListVenuesRequest
+	13, // 35: api.v1.AdminService.UpdateStage:input_type -> api.v1.UpdateStageRequest
+	15, // 36: api.v1.AdminService.ListEventStages:input_type -> api.v1.ListEventStagesRequest
+	19, // 37: api.v1.AdminService.CreateAdjustmentTemplate:input_type -> api.v1.CreateAdjustmentTemplateRequest
+	21, // 38: api.v1.AdminService.UpdateAdjustmentTemplate:input_type -> api.v1.UpdateAdjustmentTemplateRequest
+	23, // 39: api.v1.AdminService.ListAdjustmentTemplates:input_type -> api.v1.ListAdjustmentTemplatesRequest
+	31, // 40: api.v1.AdminService.CreateStageScore:input_type -> api.v1.CreateStageScoreRequest
+	33, // 41: api.v1.AdminService.UpdateStageScore:input_type -> api.v1.UpdateStageScoreRequest
+	35, // 42: api.v1.AdminService.ListStageScores:input_type -> api.v1.ListStageScoresRequest
+	37, // 43: api.v1.AdminService.DeleteStageScore:input_type -> api.v1.DeleteStageScoreRequest
+	2,  // 44: api.v1.AdminService.PurgeAllCaches:output_type -> api.v1.PurgeAllCachesResponse
+	4,  // 45: api.v1.AdminService.CreatePlayer:output_type -> api.v1.AdminServiceCreatePlayerResponse
+	6,  // 46: api.v1.AdminService.UpdatePlayer:output_type -> api.v1.UpdatePlayerResponse
+	8,  // 47: api.v1.AdminService.ListPlayers:output_type -> api.v1.ListPlayersResponse
+	12, // 48: api.v1.AdminService.ListVenues:output_type -> api.v1.ListVenuesResponse
+	14, // 49: api.v1.AdminService.UpdateStage:output_type -> api.v1.UpdateStageResponse
+	16, // 50: api.v1.AdminService.ListEventStages:output_type -> api.v1.ListEventStagesResponse
+	20, // 51: api.v1.AdminService.CreateAdjustmentTemplate:output_type -> api.v1.CreateAdjustmentTemplateResponse
+	22, // 52: api.v1.AdminService.UpdateAdjustmentTemplate:output_type -> api.v1.UpdateAdjustmentTemplateResponse
+	24, // 53: api.v1.AdminService.ListAdjustmentTemplates:output_type -> api.v1.ListAdjustmentTemplatesResponse
+	32, // 54: api.v1.AdminService.CreateStageScore:output_type -> api.v1.CreateStageScoreResponse
+	34, // 55: api.v1.AdminService.UpdateStageScore:output_type -> api.v1.UpdateStageScoreResponse
+	36, // 56: api.v1.AdminService.ListStageScores:output_type -> api.v1.ListStageScoresResponse
+	38, // 57: api.v1.AdminService.DeleteStageScore:output_type -> api.v1.DeleteStageScoreResponse
+	44, // [44:58] is the sub-list for method output_type
+	30, // [30:44] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_admin_proto_init() }

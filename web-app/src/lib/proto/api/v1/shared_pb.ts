@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file api/v1/shared.proto.
  */
 export const file_api_v1_shared: GenFile = /*@__PURE__*/
-  fileDesc("ChNhcGkvdjEvc2hhcmVkLnByb3RvEgZhcGkudjEiMwoFQ29sb3ISCQoBchgBIAEoAhIJCgFnGAIgASgCEgkKAWIYAyABKAISCQoBYRgEIAEoAiJFCgVWZW51ZRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEg8KB2FkZHJlc3MYAyABKAkSEQoJaW1hZ2VfdXJsGAQgASgJIlkKEUV2ZW50UmVnaXN0cmF0aW9uEhEKCWV2ZW50X2tleRgBIAEoCRIxChBzY29yaW5nX2NhdGVnb3J5GAIgASgOMhcuYXBpLnYxLlNjb3JpbmdDYXRlZ29yeSJhCgZQbGF5ZXISCgoCaWQYASABKAkSIAoEZGF0YRgCIAEoCzISLmFwaS52MS5QbGF5ZXJEYXRhEikKBmV2ZW50cxgDIAMoCzIZLmFwaS52MS5FdmVudFJlZ2lzdHJhdGlvbiJRCgpQbGF5ZXJEYXRhEgwKBG5hbWUYASABKAkSNQoQc2NvcmluZ19jYXRlZ29yeRgCIAEoDjIXLmFwaS52MS5TY29yaW5nQ2F0ZWdvcnlCAhgBIvwECgpTY29yZUJvYXJkEjIKBnNjb3JlcxgBIAMoCzIiLmFwaS52MS5TY29yZUJvYXJkLlNjb3JlQm9hcmRFbnRyeRrKAgoPU2NvcmVCb2FyZEVudHJ5EhYKCWVudGl0eV9pZBgBIAEoCUgAiAEBEg0KBWxhYmVsGAIgASgJEg0KBXNjb3JlGAMgASgFEhwKFGRpc3BsYXlfc2NvcmVfc2lnbmVkGAQgASgIEhEKBHJhbmsYBSABKA1IAYgBARIVCghpY29uX2tleRgGIAEoCUgCiAEBEiYKCmljb25fY29sb3IYByABKAsyDS5hcGkudjEuQ29sb3JIA4gBARIuCgZzdGF0dXMYCCABKA4yHi5hcGkudjEuU2NvcmVCb2FyZC5TY29yZVN0YXR1cxIbCg5zdGF0dXNfZGV0YWlscxgJIAEoCUgEiAEBQgwKCl9lbnRpdHlfaWRCBwoFX3JhbmtCCwoJX2ljb25fa2V5Qg0KC19pY29uX2NvbG9yQhEKD19zdGF0dXNfZGV0YWlscyLsAQoLU2NvcmVTdGF0dXMSHAoYU0NPUkVfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHAoUU0NPUkVfU1RBVFVTX1BFTkRJTkcQARoCCAESGgoWU0NPUkVfU1RBVFVTX0ZJTkFMSVpFRBACEhsKF1NDT1JFX1NUQVRVU19JTkNPTVBMRVRFEAMSHAoYU0NPUkVfU1RBVFVTX05PTl9TQ09SSU5HEAQSIwofU0NPUkVfU1RBVFVTX1BFTkRJTkdfU1VCTUlTU0lPThAFEiUKIVNDT1JFX1NUQVRVU19QRU5ESU5HX1ZFUklGSUNBVElPThAGIrcBCglUZXh0SW5wdXQSGgoNZGVmYXVsdF92YWx1ZRgBIAEoCUgAiAEBEhcKCm1pbl9sZW5ndGgYAiABKANIAYgBARIXCgptYXhfbGVuZ3RoGAMgASgDSAKIAQESGgoNbWF0Y2hfcGF0dGVybhgEIAEoCUgDiAEBQhAKDl9kZWZhdWx0X3ZhbHVlQg0KC19taW5fbGVuZ3RoQg0KC19tYXhfbGVuZ3RoQhAKDl9tYXRjaF9wYXR0ZXJuIogBCgxOdW1lcmljSW5wdXQSGgoNZGVmYXVsdF92YWx1ZRgBIAEoA0gAiAEBEhYKCW1pbl92YWx1ZRgCIAEoA0gBiAEBEhYKCW1heF92YWx1ZRgDIAEoA0gCiAEBQhAKDl9kZWZhdWx0X3ZhbHVlQgwKCl9taW5fdmFsdWVCDAoKX21heF92YWx1ZSJgChVTZWxlY3RNYW55SW5wdXRPcHRpb24SCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkSGgoNZGVmYXVsdF92YWx1ZRgDIAEoCEgAiAEBQhAKDl9kZWZhdWx0X3ZhbHVlInIKD1NlbGVjdE1hbnlJbnB1dBIuCgdvcHRpb25zGAEgAygLMh0uYXBpLnYxLlNlbGVjdE1hbnlJbnB1dE9wdGlvbhIvCgd2YXJpYW50GAIgASgOMh4uYXBpLnYxLlNlbGVjdE1hbnlJbnB1dFZhcmlhbnQiMQoUU2VsZWN0T25lSW5wdXRPcHRpb24SCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkisQEKDlNlbGVjdE9uZUlucHV0Ei0KB29wdGlvbnMYASADKAsyHC5hcGkudjEuU2VsZWN0T25lSW5wdXRPcHRpb24SJAoXZGVmYXVsdF92YWx1ZV9vcHRpb25faWQYAiABKAlIAIgBARIuCgd2YXJpYW50GAMgASgOMh0uYXBpLnYxLlNlbGVjdE9uZUlucHV0VmFyaWFudEIaChhfZGVmYXVsdF92YWx1ZV9vcHRpb25faWQi/AEKCUZvcm1JbnB1dBIKCgJpZBgBIAEoCRISCgVsYWJlbBgCIAEoCUgBiAEBEhAKCHJlcXVpcmVkGAMgASgIEiEKBHRleHQYBCABKAsyES5hcGkudjEuVGV4dElucHV0SAASJwoHbnVtZXJpYxgFIAEoCzIULmFwaS52MS5OdW1lcmljSW5wdXRIABIuCgtzZWxlY3RfbWFueRgGIAEoCzIXLmFwaS52MS5TZWxlY3RNYW55SW5wdXRIABIsCgpzZWxlY3Rfb25lGAcgASgLMhYuYXBpLnYxLlNlbGVjdE9uZUlucHV0SABCCQoHdmFyaWFudEIICgZfbGFiZWwiggEKCUZvcm1Hcm91cBISCgVsYWJlbBgBIAEoCUgAiAEBEiEKBmlucHV0cxgCIAMoCzIRLmFwaS52MS5Gb3JtSW5wdXQSHgoRY2xpZW50X3N0eWxlX2hvb2sYAyABKAlIAYgBAUIICgZfbGFiZWxCFAoSX2NsaWVudF9zdHlsZV9ob29rIqkBCgRGb3JtEiEKBmdyb3VwcxgBIAMoCzIRLmFwaS52MS5Gb3JtR3JvdXASEgoFbGFiZWwYAiABKAlIAIgBARIZCgxhY3Rpb25fbGFiZWwYAyABKAlIAYgBARIeChFjbGllbnRfc3R5bGVfaG9vaxgEIAEoCUgCiAEBQggKBl9sYWJlbEIPCg1fYWN0aW9uX2xhYmVsQhQKEl9jbGllbnRfc3R5bGVfaG9vayInCg9TZWxlY3RNYW55VmFsdWUSFAoMc2VsZWN0ZWRfaWRzGAEgAygJIpUBCglGb3JtVmFsdWUSCgoCaWQYASABKAkSDgoEdGV4dBgCIAEoCUgAEhEKB251bWVyaWMYAyABKANIABIuCgtzZWxlY3RfbWFueRgEIAEoCzIXLmFwaS52MS5TZWxlY3RNYW55VmFsdWVIABIgChZzZWxlY3Rfb25lX3NlbGVjdGVkX2lkGAUgASgJSABCBwoFdmFsdWUiMwoORm9ybVN1Ym1pc3Npb24SIQoGdmFsdWVzGAEgAygLMhEuYXBpLnYxLkZvcm1WYWx1ZSqvAQoPU2NvcmluZ0NhdGVnb3J5EiAKHFNDT1JJTkdfQ0FURUdPUllfVU5TUEVDSUZJRUQQABInCiNTQ09SSU5HX0NBVEVHT1JZX1BVQl9HT0xGX05JTkVfSE9MRRABEicKI1NDT1JJTkdfQ0FURUdPUllfUFVCX0dPTEZfRklWRV9IT0xFEAISKAokU0NPUklOR19DQVRFR09SWV9QVUJfR09MRl9DSEFMTEVOR0VTEAMqawoWU2VsZWN0TWFueUlucHV0VmFyaWFudBIpCiVTRUxFQ1RfTUFOWV9JTlBVVF9WQVJJQU5UX1VOU1BFQ0lGSUVEEAASJgoiU0VMRUNUX01BTllfSU5QVVRfVkFSSUFOVF9DSEVDS0JPWBABKpQBChVTZWxlY3RPbmVJbnB1dFZhcmlhbnQSKAokU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX1VOU1BFQ0lGSUVEEAASJQohU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX0RST1BET1dOEAESKgomU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX1JBRElPX0JVVFRPTlMQAkJAWj5naXRodWIuY29tL3B1YmdvbGYvcHViZ29sZi9hcGkvaW50ZXJuYWwvbGliL3Byb3RvL2FwaS92MTthcGl2MWIGcHJvdG8z");
+  fileDesc("ChNhcGkvdjEvc2hhcmVkLnByb3RvEgZhcGkudjEiMwoFQ29sb3ISCQoBchgBIAEoAhIJCgFnGAIgASgCEgkKAWIYAyABKAISCQoBYRgEIAEoAiKIAQoUVmVudWVEZXNjcmlwdGlvbkl0ZW0SDwoHY29udGVudBgBIAEoCRIzCglpdGVtX3R5cGUYAiABKA4yIC5hcGkudjEuVmVudWVEZXNjcmlwdGlvbkl0ZW1UeXBlEioKCWF1ZGllbmNlcxgDIAMoDjIXLmFwaS52MS5TY29yaW5nQ2F0ZWdvcnkiRQoFVmVudWUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIPCgdhZGRyZXNzGAMgASgJEhEKCWltYWdlX3VybBgEIAEoCSJZChFFdmVudFJlZ2lzdHJhdGlvbhIRCglldmVudF9rZXkYASABKAkSMQoQc2NvcmluZ19jYXRlZ29yeRgCIAEoDjIXLmFwaS52MS5TY29yaW5nQ2F0ZWdvcnkiYQoGUGxheWVyEgoKAmlkGAEgASgJEiAKBGRhdGEYAiABKAsyEi5hcGkudjEuUGxheWVyRGF0YRIpCgZldmVudHMYAyADKAsyGS5hcGkudjEuRXZlbnRSZWdpc3RyYXRpb24iUQoKUGxheWVyRGF0YRIMCgRuYW1lGAEgASgJEjUKEHNjb3JpbmdfY2F0ZWdvcnkYAiABKA4yFy5hcGkudjEuU2NvcmluZ0NhdGVnb3J5QgIYASL8BAoKU2NvcmVCb2FyZBIyCgZzY29yZXMYASADKAsyIi5hcGkudjEuU2NvcmVCb2FyZC5TY29yZUJvYXJkRW50cnkaygIKD1Njb3JlQm9hcmRFbnRyeRIWCgllbnRpdHlfaWQYASABKAlIAIgBARINCgVsYWJlbBgCIAEoCRINCgVzY29yZRgDIAEoBRIcChRkaXNwbGF5X3Njb3JlX3NpZ25lZBgEIAEoCBIRCgRyYW5rGAUgASgNSAGIAQESFQoIaWNvbl9rZXkYBiABKAlIAogBARImCgppY29uX2NvbG9yGAcgASgLMg0uYXBpLnYxLkNvbG9ySAOIAQESLgoGc3RhdHVzGAggASgOMh4uYXBpLnYxLlNjb3JlQm9hcmQuU2NvcmVTdGF0dXMSGwoOc3RhdHVzX2RldGFpbHMYCSABKAlIBIgBAUIMCgpfZW50aXR5X2lkQgcKBV9yYW5rQgsKCV9pY29uX2tleUINCgtfaWNvbl9jb2xvckIRCg9fc3RhdHVzX2RldGFpbHMi7AEKC1Njb3JlU3RhdHVzEhwKGFNDT1JFX1NUQVRVU19VTlNQRUNJRklFRBAAEhwKFFNDT1JFX1NUQVRVU19QRU5ESU5HEAEaAggBEhoKFlNDT1JFX1NUQVRVU19GSU5BTElaRUQQAhIbChdTQ09SRV9TVEFUVVNfSU5DT01QTEVURRADEhwKGFNDT1JFX1NUQVRVU19OT05fU0NPUklORxAEEiMKH1NDT1JFX1NUQVRVU19QRU5ESU5HX1NVQk1JU1NJT04QBRIlCiFTQ09SRV9TVEFUVVNfUEVORElOR19WRVJJRklDQVRJT04QBiK3AQoJVGV4dElucHV0EhoKDWRlZmF1bHRfdmFsdWUYASABKAlIAIgBARIXCgptaW5fbGVuZ3RoGAIgASgDSAGIAQESFwoKbWF4X2xlbmd0aBgDIAEoA0gCiAEBEhoKDW1hdGNoX3BhdHRlcm4YBCABKAlIA4gBAUIQCg5fZGVmYXVsdF92YWx1ZUINCgtfbWluX2xlbmd0aEINCgtfbWF4X2xlbmd0aEIQCg5fbWF0Y2hfcGF0dGVybiKIAQoMTnVtZXJpY0lucHV0EhoKDWRlZmF1bHRfdmFsdWUYASABKANIAIgBARIWCgltaW5fdmFsdWUYAiABKANIAYgBARIWCgltYXhfdmFsdWUYAyABKANIAogBAUIQCg5fZGVmYXVsdF92YWx1ZUIMCgpfbWluX3ZhbHVlQgwKCl9tYXhfdmFsdWUiYAoVU2VsZWN0TWFueUlucHV0T3B0aW9uEgoKAmlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhoKDWRlZmF1bHRfdmFsdWUYAyABKAhIAIgBAUIQCg5fZGVmYXVsdF92YWx1ZSJyCg9TZWxlY3RNYW55SW5wdXQSLgoHb3B0aW9ucxgBIAMoCzIdLmFwaS52MS5TZWxlY3RNYW55SW5wdXRPcHRpb24SLwoHdmFyaWFudBgCIAEoDjIeLmFwaS52MS5TZWxlY3RNYW55SW5wdXRWYXJpYW50IjEKFFNlbGVjdE9uZUlucHV0T3B0aW9uEgoKAmlkGAEgASgJEg0KBWxhYmVsGAIgASgJIrEBCg5TZWxlY3RPbmVJbnB1dBItCgdvcHRpb25zGAEgAygLMhwuYXBpLnYxLlNlbGVjdE9uZUlucHV0T3B0aW9uEiQKF2RlZmF1bHRfdmFsdWVfb3B0aW9uX2lkGAIgASgJSACIAQESLgoHdmFyaWFudBgDIAEoDjIdLmFwaS52MS5TZWxlY3RPbmVJbnB1dFZhcmlhbnRCGgoYX2RlZmF1bHRfdmFsdWVfb3B0aW9uX2lkIvwBCglGb3JtSW5wdXQSCgoCaWQYASABKAkSEgoFbGFiZWwYAiABKAlIAYgBARIQCghyZXF1aXJlZBgDIAEoCBIhCgR0ZXh0GAQgASgLMhEuYXBpLnYxLlRleHRJbnB1dEgAEicKB251bWVyaWMYBSABKAsyFC5hcGkudjEuTnVtZXJpY0lucHV0SAASLgoLc2VsZWN0X21hbnkYBiABKAsyFy5hcGkudjEuU2VsZWN0TWFueUlucHV0SAASLAoKc2VsZWN0X29uZRgHIAEoCzIWLmFwaS52MS5TZWxlY3RPbmVJbnB1dEgAQgkKB3ZhcmlhbnRCCAoGX2xhYmVsIoIBCglGb3JtR3JvdXASEgoFbGFiZWwYASABKAlIAIgBARIhCgZpbnB1dHMYAiADKAsyES5hcGkudjEuRm9ybUlucHV0Eh4KEWNsaWVudF9zdHlsZV9ob29rGAMgASgJSAGIAQFCCAoGX2xhYmVsQhQKEl9jbGllbnRfc3R5bGVfaG9vayKpAQoERm9ybRIhCgZncm91cHMYASADKAsyES5hcGkudjEuRm9ybUdyb3VwEhIKBWxhYmVsGAIgASgJSACIAQESGQoMYWN0aW9uX2xhYmVsGAMgASgJSAGIAQESHgoRY2xpZW50X3N0eWxlX2hvb2sYBCABKAlIAogBAUIICgZfbGFiZWxCDwoNX2FjdGlvbl9sYWJlbEIUChJfY2xpZW50X3N0eWxlX2hvb2siJwoPU2VsZWN0TWFueVZhbHVlEhQKDHNlbGVjdGVkX2lkcxgBIAMoCSKVAQoJRm9ybVZhbHVlEgoKAmlkGAEgASgJEg4KBHRleHQYAiABKAlIABIRCgdudW1lcmljGAMgASgDSAASLgoLc2VsZWN0X21hbnkYBCABKAsyFy5hcGkudjEuU2VsZWN0TWFueVZhbHVlSAASIAoWc2VsZWN0X29uZV9zZWxlY3RlZF9pZBgFIAEoCUgAQgcKBXZhbHVlIjMKDkZvcm1TdWJtaXNzaW9uEiEKBnZhbHVlcxgBIAMoCzIRLmFwaS52MS5Gb3JtVmFsdWUqrwEKD1Njb3JpbmdDYXRlZ29yeRIgChxTQ09SSU5HX0NBVEVHT1JZX1VOU1BFQ0lGSUVEEAASJwojU0NPUklOR19DQVRFR09SWV9QVUJfR09MRl9OSU5FX0hPTEUQARInCiNTQ09SSU5HX0NBVEVHT1JZX1BVQl9HT0xGX0ZJVkVfSE9MRRACEigKJFNDT1JJTkdfQ0FURUdPUllfUFVCX0dPTEZfQ0hBTExFTkdFUxADKr8BChhWZW51ZURlc2NyaXB0aW9uSXRlbVR5cGUSKwonVkVOVUVfREVTQ1JJUFRJT05fSVRFTV9UWVBFX1VOU1BFQ0lGSUVEEAASJwojVkVOVUVfREVTQ1JJUFRJT05fSVRFTV9UWVBFX0RFRkFVTFQQARInCiNWRU5VRV9ERVNDUklQVElPTl9JVEVNX1RZUEVfV0FSTklORxACEiQKIFZFTlVFX0RFU0NSSVBUSU9OX0lURU1fVFlQRV9SVUxFEAMqawoWU2VsZWN0TWFueUlucHV0VmFyaWFudBIpCiVTRUxFQ1RfTUFOWV9JTlBVVF9WQVJJQU5UX1VOU1BFQ0lGSUVEEAASJgoiU0VMRUNUX01BTllfSU5QVVRfVkFSSUFOVF9DSEVDS0JPWBABKpQBChVTZWxlY3RPbmVJbnB1dFZhcmlhbnQSKAokU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX1VOU1BFQ0lGSUVEEAASJQohU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX0RST1BET1dOEAESKgomU0VMRUNUX09ORV9JTlBVVF9WQVJJQU5UX1JBRElPX0JVVFRPTlMQAkJAWj5naXRodWIuY29tL3B1YmdvbGYvcHViZ29sZi9hcGkvaW50ZXJuYWwvbGliL3Byb3RvL2FwaS92MTthcGl2MWIGcHJvdG8z");
 
 /**
  * @generated from message api.v1.Color
@@ -45,6 +45,40 @@ export type Color = Message<"api.v1.Color"> & {
  */
 export const ColorSchema: GenMessage<Color> = /*@__PURE__*/
   messageDesc(file_api_v1_shared, 0);
+
+/**
+ * @generated from message api.v1.VenueDescriptionItem
+ */
+export type VenueDescriptionItem = Message<"api.v1.VenueDescriptionItem"> & {
+  /**
+   * content is the text body for this item.
+   *
+   * @generated from field: string content = 1;
+   */
+  content: string;
+
+  /**
+   * item_type drives the visual treatment on the client.
+   *
+   * @generated from field: api.v1.VenueDescriptionItemType item_type = 2;
+   */
+  itemType: VenueDescriptionItemType;
+
+  /**
+   * audiences specifies which scoring categories this item applies to.
+   * An empty list means the item applies to all players.
+   *
+   * @generated from field: repeated api.v1.ScoringCategory audiences = 3;
+   */
+  audiences: ScoringCategory[];
+};
+
+/**
+ * Describes the message api.v1.VenueDescriptionItem.
+ * Use `create(VenueDescriptionItemSchema)` to create a new message.
+ */
+export const VenueDescriptionItemSchema: GenMessage<VenueDescriptionItem> = /*@__PURE__*/
+  messageDesc(file_api_v1_shared, 1);
 
 /**
  * @generated from message api.v1.Venue
@@ -80,7 +114,7 @@ export type Venue = Message<"api.v1.Venue"> & {
  * Use `create(VenueSchema)` to create a new message.
  */
 export const VenueSchema: GenMessage<Venue> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 1);
+  messageDesc(file_api_v1_shared, 2);
 
 /**
  * @generated from message api.v1.EventRegistration
@@ -102,7 +136,7 @@ export type EventRegistration = Message<"api.v1.EventRegistration"> & {
  * Use `create(EventRegistrationSchema)` to create a new message.
  */
 export const EventRegistrationSchema: GenMessage<EventRegistration> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 2);
+  messageDesc(file_api_v1_shared, 3);
 
 /**
  * @generated from message api.v1.Player
@@ -131,7 +165,7 @@ export type Player = Message<"api.v1.Player"> & {
  * Use `create(PlayerSchema)` to create a new message.
  */
 export const PlayerSchema: GenMessage<Player> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 3);
+  messageDesc(file_api_v1_shared, 4);
 
 /**
  * PlayerData contains the user-editable fields for a player.
@@ -156,7 +190,7 @@ export type PlayerData = Message<"api.v1.PlayerData"> & {
  * Use `create(PlayerDataSchema)` to create a new message.
  */
 export const PlayerDataSchema: GenMessage<PlayerData> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 4);
+  messageDesc(file_api_v1_shared, 5);
 
 /**
  * @generated from message api.v1.ScoreBoard
@@ -173,7 +207,7 @@ export type ScoreBoard = Message<"api.v1.ScoreBoard"> & {
  * Use `create(ScoreBoardSchema)` to create a new message.
  */
 export const ScoreBoardSchema: GenMessage<ScoreBoard> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 5);
+  messageDesc(file_api_v1_shared, 6);
 
 /**
  * @generated from message api.v1.ScoreBoard.ScoreBoardEntry
@@ -236,7 +270,7 @@ export type ScoreBoard_ScoreBoardEntry = Message<"api.v1.ScoreBoard.ScoreBoardEn
  * Use `create(ScoreBoard_ScoreBoardEntrySchema)` to create a new message.
  */
 export const ScoreBoard_ScoreBoardEntrySchema: GenMessage<ScoreBoard_ScoreBoardEntry> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 5, 0);
+  messageDesc(file_api_v1_shared, 6, 0);
 
 /**
  * @generated from enum api.v1.ScoreBoard.ScoreStatus
@@ -295,7 +329,7 @@ export enum ScoreBoard_ScoreStatus {
  * Describes the enum api.v1.ScoreBoard.ScoreStatus.
  */
 export const ScoreBoard_ScoreStatusSchema: GenEnum<ScoreBoard_ScoreStatus> = /*@__PURE__*/
-  enumDesc(file_api_v1_shared, 5, 0);
+  enumDesc(file_api_v1_shared, 6, 0);
 
 /**
  * @generated from message api.v1.TextInput
@@ -327,7 +361,7 @@ export type TextInput = Message<"api.v1.TextInput"> & {
  * Use `create(TextInputSchema)` to create a new message.
  */
 export const TextInputSchema: GenMessage<TextInput> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 6);
+  messageDesc(file_api_v1_shared, 7);
 
 /**
  * @generated from message api.v1.NumericInput
@@ -354,7 +388,7 @@ export type NumericInput = Message<"api.v1.NumericInput"> & {
  * Use `create(NumericInputSchema)` to create a new message.
  */
 export const NumericInputSchema: GenMessage<NumericInput> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 7);
+  messageDesc(file_api_v1_shared, 8);
 
 /**
  * @generated from message api.v1.SelectManyInputOption
@@ -381,7 +415,7 @@ export type SelectManyInputOption = Message<"api.v1.SelectManyInputOption"> & {
  * Use `create(SelectManyInputOptionSchema)` to create a new message.
  */
 export const SelectManyInputOptionSchema: GenMessage<SelectManyInputOption> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 8);
+  messageDesc(file_api_v1_shared, 9);
 
 /**
  * @generated from message api.v1.SelectManyInput
@@ -403,7 +437,7 @@ export type SelectManyInput = Message<"api.v1.SelectManyInput"> & {
  * Use `create(SelectManyInputSchema)` to create a new message.
  */
 export const SelectManyInputSchema: GenMessage<SelectManyInput> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 9);
+  messageDesc(file_api_v1_shared, 10);
 
 /**
  * @generated from message api.v1.SelectOneInputOption
@@ -425,7 +459,7 @@ export type SelectOneInputOption = Message<"api.v1.SelectOneInputOption"> & {
  * Use `create(SelectOneInputOptionSchema)` to create a new message.
  */
 export const SelectOneInputOptionSchema: GenMessage<SelectOneInputOption> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 10);
+  messageDesc(file_api_v1_shared, 11);
 
 /**
  * @generated from message api.v1.SelectOneInput
@@ -452,7 +486,7 @@ export type SelectOneInput = Message<"api.v1.SelectOneInput"> & {
  * Use `create(SelectOneInputSchema)` to create a new message.
  */
 export const SelectOneInputSchema: GenMessage<SelectOneInput> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 11);
+  messageDesc(file_api_v1_shared, 12);
 
 /**
  * @generated from message api.v1.FormInput
@@ -508,7 +542,7 @@ export type FormInput = Message<"api.v1.FormInput"> & {
  * Use `create(FormInputSchema)` to create a new message.
  */
 export const FormInputSchema: GenMessage<FormInput> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 12);
+  messageDesc(file_api_v1_shared, 13);
 
 /**
  * @generated from message api.v1.FormGroup
@@ -535,7 +569,7 @@ export type FormGroup = Message<"api.v1.FormGroup"> & {
  * Use `create(FormGroupSchema)` to create a new message.
  */
 export const FormGroupSchema: GenMessage<FormGroup> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 13);
+  messageDesc(file_api_v1_shared, 14);
 
 /**
  * @generated from message api.v1.Form
@@ -567,7 +601,7 @@ export type Form = Message<"api.v1.Form"> & {
  * Use `create(FormSchema)` to create a new message.
  */
 export const FormSchema: GenMessage<Form> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 14);
+  messageDesc(file_api_v1_shared, 15);
 
 /**
  * @generated from message api.v1.SelectManyValue
@@ -584,7 +618,7 @@ export type SelectManyValue = Message<"api.v1.SelectManyValue"> & {
  * Use `create(SelectManyValueSchema)` to create a new message.
  */
 export const SelectManyValueSchema: GenMessage<SelectManyValue> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 15);
+  messageDesc(file_api_v1_shared, 16);
 
 /**
  * @generated from message api.v1.FormValue
@@ -630,7 +664,7 @@ export type FormValue = Message<"api.v1.FormValue"> & {
  * Use `create(FormValueSchema)` to create a new message.
  */
 export const FormValueSchema: GenMessage<FormValue> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 16);
+  messageDesc(file_api_v1_shared, 17);
 
 /**
  * @generated from message api.v1.FormSubmission
@@ -647,7 +681,7 @@ export type FormSubmission = Message<"api.v1.FormSubmission"> & {
  * Use `create(FormSubmissionSchema)` to create a new message.
  */
 export const FormSubmissionSchema: GenMessage<FormSubmission> = /*@__PURE__*/
-  messageDesc(file_api_v1_shared, 17);
+  messageDesc(file_api_v1_shared, 18);
 
 /**
  * @generated from enum api.v1.ScoringCategory
@@ -681,6 +715,37 @@ export const ScoringCategorySchema: GenEnum<ScoringCategory> = /*@__PURE__*/
   enumDesc(file_api_v1_shared, 0);
 
 /**
+ * @generated from enum api.v1.VenueDescriptionItemType
+ */
+export enum VenueDescriptionItemType {
+  /**
+   * @generated from enum value: VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT = 1;
+   */
+  DEFAULT = 1,
+
+  /**
+   * @generated from enum value: VENUE_DESCRIPTION_ITEM_TYPE_WARNING = 2;
+   */
+  WARNING = 2,
+
+  /**
+   * @generated from enum value: VENUE_DESCRIPTION_ITEM_TYPE_RULE = 3;
+   */
+  RULE = 3,
+}
+
+/**
+ * Describes the enum api.v1.VenueDescriptionItemType.
+ */
+export const VenueDescriptionItemTypeSchema: GenEnum<VenueDescriptionItemType> = /*@__PURE__*/
+  enumDesc(file_api_v1_shared, 1);
+
+/**
  * @generated from enum api.v1.SelectManyInputVariant
  */
 export enum SelectManyInputVariant {
@@ -699,7 +764,7 @@ export enum SelectManyInputVariant {
  * Describes the enum api.v1.SelectManyInputVariant.
  */
 export const SelectManyInputVariantSchema: GenEnum<SelectManyInputVariant> = /*@__PURE__*/
-  enumDesc(file_api_v1_shared, 1);
+  enumDesc(file_api_v1_shared, 2);
 
 /**
  * @generated from enum api.v1.SelectOneInputVariant
@@ -725,5 +790,5 @@ export enum SelectOneInputVariant {
  * Describes the enum api.v1.SelectOneInputVariant.
  */
 export const SelectOneInputVariantSchema: GenEnum<SelectOneInputVariant> = /*@__PURE__*/
-  enumDesc(file_api_v1_shared, 2);
+  enumDesc(file_api_v1_shared, 3);
 

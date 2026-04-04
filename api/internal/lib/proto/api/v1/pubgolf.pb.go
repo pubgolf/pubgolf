@@ -1847,9 +1847,10 @@ type GetScheduleResponse_Schedule struct {
 	NextVenueStart *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=next_venue_start,json=nextVenueStart,proto3,oneof" json:"next_venue_start,omitempty"`
 	EventEnd       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=event_end,json=eventEnd,proto3" json:"event_end,omitempty"`
 	// current_venue_description contains rules specific to the current venue, in markdown format.
-	CurrentVenueDescription *string `protobuf:"bytes,6,opt,name=current_venue_description,json=currentVenueDescription,proto3,oneof" json:"current_venue_description,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	CurrentVenueDescription  *string                 `protobuf:"bytes,6,opt,name=current_venue_description,json=currentVenueDescription,proto3,oneof" json:"current_venue_description,omitempty"`
+	CurrentVenueDescriptions []*VenueDescriptionItem `protobuf:"bytes,7,rep,name=current_venue_descriptions,json=currentVenueDescriptions,proto3" json:"current_venue_descriptions,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *GetScheduleResponse_Schedule) Reset() {
@@ -1922,6 +1923,13 @@ func (x *GetScheduleResponse_Schedule) GetCurrentVenueDescription() string {
 		return *x.CurrentVenueDescription
 	}
 	return ""
+}
+
+func (x *GetScheduleResponse_Schedule) GetCurrentVenueDescriptions() []*VenueDescriptionItem {
+	if x != nil {
+		return x.CurrentVenueDescriptions
+	}
+	return nil
 }
 
 // VenueWrapper allows us to return an empty wrapper in the case of an invalid or unauthorized venue ID.
@@ -2159,17 +2167,18 @@ const file_api_v1_pubgolf_proto_rawDesc = "" +
 	"\x12GetScheduleRequest\x12\x1b\n" +
 	"\tevent_key\x18\x01 \x01(\tR\beventKey\x123\n" +
 	"\x13cached_data_version\x18\x02 \x01(\rH\x00R\x11cachedDataVersion\x88\x01\x01B\x16\n" +
-	"\x14_cached_data_version\"\xd1\x04\n" +
+	"\x14_cached_data_version\"\xad\x05\n" +
 	"\x13GetScheduleResponse\x12.\n" +
 	"\x13latest_data_version\x18\x01 \x01(\rR\x11latestDataVersion\x12E\n" +
-	"\bschedule\x18\x02 \x01(\v2$.api.v1.GetScheduleResponse.ScheduleH\x00R\bschedule\x88\x01\x01\x1a\xb5\x03\n" +
+	"\bschedule\x18\x02 \x01(\v2$.api.v1.GetScheduleResponse.ScheduleH\x00R\bschedule\x88\x01\x01\x1a\x91\x04\n" +
 	"\bSchedule\x12,\n" +
 	"\x12visited_venue_keys\x18\x01 \x03(\rR\x10visitedVenueKeys\x12/\n" +
 	"\x11current_venue_key\x18\x02 \x01(\rH\x00R\x0fcurrentVenueKey\x88\x01\x01\x12)\n" +
 	"\x0enext_venue_key\x18\x03 \x01(\rH\x01R\fnextVenueKey\x88\x01\x01\x12I\n" +
 	"\x10next_venue_start\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x02R\x0enextVenueStart\x88\x01\x01\x127\n" +
 	"\tevent_end\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\beventEnd\x12?\n" +
-	"\x19current_venue_description\x18\x06 \x01(\tH\x03R\x17currentVenueDescription\x88\x01\x01B\x14\n" +
+	"\x19current_venue_description\x18\x06 \x01(\tH\x03R\x17currentVenueDescription\x88\x01\x01\x12Z\n" +
+	"\x1acurrent_venue_descriptions\x18\a \x03(\v2\x1c.api.v1.VenueDescriptionItemR\x18currentVenueDescriptionsB\x14\n" +
 	"\x12_current_venue_keyB\x11\n" +
 	"\x0f_next_venue_keyB\x13\n" +
 	"\x11_next_venue_startB\x1c\n" +
@@ -2334,8 +2343,9 @@ var file_api_v1_pubgolf_proto_goTypes = []any{
 	(ScoringCategory)(0),                                 // 48: api.v1.ScoringCategory
 	(*ScoreBoard)(nil),                                   // 49: api.v1.ScoreBoard
 	(*timestamppb.Timestamp)(nil),                        // 50: google.protobuf.Timestamp
-	(*Venue)(nil),                                        // 51: api.v1.Venue
-	(*Color)(nil),                                        // 52: api.v1.Color
+	(*VenueDescriptionItem)(nil),                         // 51: api.v1.VenueDescriptionItem
+	(*Venue)(nil),                                        // 52: api.v1.Venue
+	(*Color)(nil),                                        // 53: api.v1.Color
 }
 var file_api_v1_pubgolf_proto_depIdxs = []int32{
 	1,  // 0: api.v1.ClientVersionResponse.version_status:type_name -> api.v1.ClientVersionResponse.VersionStatus
@@ -2361,52 +2371,53 @@ var file_api_v1_pubgolf_proto_depIdxs = []int32{
 	49, // 20: api.v1.GetScoresForVenueResponse.score_board:type_name -> api.v1.ScoreBoard
 	50, // 21: api.v1.GetScheduleResponse.Schedule.next_venue_start:type_name -> google.protobuf.Timestamp
 	50, // 22: api.v1.GetScheduleResponse.Schedule.event_end:type_name -> google.protobuf.Timestamp
-	51, // 23: api.v1.GetVenueResponse.VenueWrapper.venue:type_name -> api.v1.Venue
-	39, // 24: api.v1.GetVenueResponse.VenuesEntry.value:type_name -> api.v1.GetVenueResponse.VenueWrapper
-	52, // 25: api.v1.ListContentItemsResponse.ContentItemMetaData.icon_color:type_name -> api.v1.Color
-	41, // 26: api.v1.ListContentItemsResponse.Section.content_sections:type_name -> api.v1.ListContentItemsResponse.ContentItemMetaData
-	52, // 27: api.v1.ListContentItemsResponse.Section.icon_color:type_name -> api.v1.Color
-	2,  // 28: api.v1.PubGolfService.ClientVersion:input_type -> api.v1.ClientVersionRequest
-	4,  // 29: api.v1.PubGolfService.CreatePlayer:input_type -> api.v1.PubGolfServiceCreatePlayerRequest
-	6,  // 30: api.v1.PubGolfService.StartPlayerLogin:input_type -> api.v1.StartPlayerLoginRequest
-	8,  // 31: api.v1.PubGolfService.CompletePlayerLogin:input_type -> api.v1.CompletePlayerLoginRequest
-	10, // 32: api.v1.PubGolfService.GetMyPlayer:input_type -> api.v1.GetMyPlayerRequest
-	12, // 33: api.v1.PubGolfService.DeleteMyAccount:input_type -> api.v1.DeleteMyAccountRequest
-	14, // 34: api.v1.PubGolfService.GetPlayer:input_type -> api.v1.GetPlayerRequest
-	16, // 35: api.v1.PubGolfService.UpdateRegistration:input_type -> api.v1.UpdateRegistrationRequest
-	18, // 36: api.v1.PubGolfService.UpdatePlayerData:input_type -> api.v1.UpdatePlayerDataRequest
-	20, // 37: api.v1.PubGolfService.GetSchedule:input_type -> api.v1.GetScheduleRequest
-	22, // 38: api.v1.PubGolfService.GetVenue:input_type -> api.v1.GetVenueRequest
-	24, // 39: api.v1.PubGolfService.ListContentItems:input_type -> api.v1.ListContentItemsRequest
-	26, // 40: api.v1.PubGolfService.GetContentItem:input_type -> api.v1.GetContentItemRequest
-	28, // 41: api.v1.PubGolfService.GetSubmitScoreForm:input_type -> api.v1.GetSubmitScoreFormRequest
-	30, // 42: api.v1.PubGolfService.SubmitScore:input_type -> api.v1.SubmitScoreRequest
-	32, // 43: api.v1.PubGolfService.GetScoresForCategory:input_type -> api.v1.GetScoresForCategoryRequest
-	34, // 44: api.v1.PubGolfService.GetScoresForPlayer:input_type -> api.v1.GetScoresForPlayerRequest
-	36, // 45: api.v1.PubGolfService.GetScoresForVenue:input_type -> api.v1.GetScoresForVenueRequest
-	3,  // 46: api.v1.PubGolfService.ClientVersion:output_type -> api.v1.ClientVersionResponse
-	5,  // 47: api.v1.PubGolfService.CreatePlayer:output_type -> api.v1.PubGolfServiceCreatePlayerResponse
-	7,  // 48: api.v1.PubGolfService.StartPlayerLogin:output_type -> api.v1.StartPlayerLoginResponse
-	9,  // 49: api.v1.PubGolfService.CompletePlayerLogin:output_type -> api.v1.CompletePlayerLoginResponse
-	11, // 50: api.v1.PubGolfService.GetMyPlayer:output_type -> api.v1.GetMyPlayerResponse
-	13, // 51: api.v1.PubGolfService.DeleteMyAccount:output_type -> api.v1.DeleteMyAccountResponse
-	15, // 52: api.v1.PubGolfService.GetPlayer:output_type -> api.v1.GetPlayerResponse
-	17, // 53: api.v1.PubGolfService.UpdateRegistration:output_type -> api.v1.UpdateRegistrationResponse
-	19, // 54: api.v1.PubGolfService.UpdatePlayerData:output_type -> api.v1.UpdatePlayerDataResponse
-	21, // 55: api.v1.PubGolfService.GetSchedule:output_type -> api.v1.GetScheduleResponse
-	23, // 56: api.v1.PubGolfService.GetVenue:output_type -> api.v1.GetVenueResponse
-	25, // 57: api.v1.PubGolfService.ListContentItems:output_type -> api.v1.ListContentItemsResponse
-	27, // 58: api.v1.PubGolfService.GetContentItem:output_type -> api.v1.GetContentItemResponse
-	29, // 59: api.v1.PubGolfService.GetSubmitScoreForm:output_type -> api.v1.GetSubmitScoreFormResponse
-	31, // 60: api.v1.PubGolfService.SubmitScore:output_type -> api.v1.SubmitScoreResponse
-	33, // 61: api.v1.PubGolfService.GetScoresForCategory:output_type -> api.v1.GetScoresForCategoryResponse
-	35, // 62: api.v1.PubGolfService.GetScoresForPlayer:output_type -> api.v1.GetScoresForPlayerResponse
-	37, // 63: api.v1.PubGolfService.GetScoresForVenue:output_type -> api.v1.GetScoresForVenueResponse
-	46, // [46:64] is the sub-list for method output_type
-	28, // [28:46] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	51, // 23: api.v1.GetScheduleResponse.Schedule.current_venue_descriptions:type_name -> api.v1.VenueDescriptionItem
+	52, // 24: api.v1.GetVenueResponse.VenueWrapper.venue:type_name -> api.v1.Venue
+	39, // 25: api.v1.GetVenueResponse.VenuesEntry.value:type_name -> api.v1.GetVenueResponse.VenueWrapper
+	53, // 26: api.v1.ListContentItemsResponse.ContentItemMetaData.icon_color:type_name -> api.v1.Color
+	41, // 27: api.v1.ListContentItemsResponse.Section.content_sections:type_name -> api.v1.ListContentItemsResponse.ContentItemMetaData
+	53, // 28: api.v1.ListContentItemsResponse.Section.icon_color:type_name -> api.v1.Color
+	2,  // 29: api.v1.PubGolfService.ClientVersion:input_type -> api.v1.ClientVersionRequest
+	4,  // 30: api.v1.PubGolfService.CreatePlayer:input_type -> api.v1.PubGolfServiceCreatePlayerRequest
+	6,  // 31: api.v1.PubGolfService.StartPlayerLogin:input_type -> api.v1.StartPlayerLoginRequest
+	8,  // 32: api.v1.PubGolfService.CompletePlayerLogin:input_type -> api.v1.CompletePlayerLoginRequest
+	10, // 33: api.v1.PubGolfService.GetMyPlayer:input_type -> api.v1.GetMyPlayerRequest
+	12, // 34: api.v1.PubGolfService.DeleteMyAccount:input_type -> api.v1.DeleteMyAccountRequest
+	14, // 35: api.v1.PubGolfService.GetPlayer:input_type -> api.v1.GetPlayerRequest
+	16, // 36: api.v1.PubGolfService.UpdateRegistration:input_type -> api.v1.UpdateRegistrationRequest
+	18, // 37: api.v1.PubGolfService.UpdatePlayerData:input_type -> api.v1.UpdatePlayerDataRequest
+	20, // 38: api.v1.PubGolfService.GetSchedule:input_type -> api.v1.GetScheduleRequest
+	22, // 39: api.v1.PubGolfService.GetVenue:input_type -> api.v1.GetVenueRequest
+	24, // 40: api.v1.PubGolfService.ListContentItems:input_type -> api.v1.ListContentItemsRequest
+	26, // 41: api.v1.PubGolfService.GetContentItem:input_type -> api.v1.GetContentItemRequest
+	28, // 42: api.v1.PubGolfService.GetSubmitScoreForm:input_type -> api.v1.GetSubmitScoreFormRequest
+	30, // 43: api.v1.PubGolfService.SubmitScore:input_type -> api.v1.SubmitScoreRequest
+	32, // 44: api.v1.PubGolfService.GetScoresForCategory:input_type -> api.v1.GetScoresForCategoryRequest
+	34, // 45: api.v1.PubGolfService.GetScoresForPlayer:input_type -> api.v1.GetScoresForPlayerRequest
+	36, // 46: api.v1.PubGolfService.GetScoresForVenue:input_type -> api.v1.GetScoresForVenueRequest
+	3,  // 47: api.v1.PubGolfService.ClientVersion:output_type -> api.v1.ClientVersionResponse
+	5,  // 48: api.v1.PubGolfService.CreatePlayer:output_type -> api.v1.PubGolfServiceCreatePlayerResponse
+	7,  // 49: api.v1.PubGolfService.StartPlayerLogin:output_type -> api.v1.StartPlayerLoginResponse
+	9,  // 50: api.v1.PubGolfService.CompletePlayerLogin:output_type -> api.v1.CompletePlayerLoginResponse
+	11, // 51: api.v1.PubGolfService.GetMyPlayer:output_type -> api.v1.GetMyPlayerResponse
+	13, // 52: api.v1.PubGolfService.DeleteMyAccount:output_type -> api.v1.DeleteMyAccountResponse
+	15, // 53: api.v1.PubGolfService.GetPlayer:output_type -> api.v1.GetPlayerResponse
+	17, // 54: api.v1.PubGolfService.UpdateRegistration:output_type -> api.v1.UpdateRegistrationResponse
+	19, // 55: api.v1.PubGolfService.UpdatePlayerData:output_type -> api.v1.UpdatePlayerDataResponse
+	21, // 56: api.v1.PubGolfService.GetSchedule:output_type -> api.v1.GetScheduleResponse
+	23, // 57: api.v1.PubGolfService.GetVenue:output_type -> api.v1.GetVenueResponse
+	25, // 58: api.v1.PubGolfService.ListContentItems:output_type -> api.v1.ListContentItemsResponse
+	27, // 59: api.v1.PubGolfService.GetContentItem:output_type -> api.v1.GetContentItemResponse
+	29, // 60: api.v1.PubGolfService.GetSubmitScoreForm:output_type -> api.v1.GetSubmitScoreFormResponse
+	31, // 61: api.v1.PubGolfService.SubmitScore:output_type -> api.v1.SubmitScoreResponse
+	33, // 62: api.v1.PubGolfService.GetScoresForCategory:output_type -> api.v1.GetScoresForCategoryResponse
+	35, // 63: api.v1.PubGolfService.GetScoresForPlayer:output_type -> api.v1.GetScoresForPlayerResponse
+	37, // 64: api.v1.PubGolfService.GetScoresForVenue:output_type -> api.v1.GetScoresForVenueResponse
+	47, // [47:65] is the sub-list for method output_type
+	29, // [29:47] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_pubgolf_proto_init() }
