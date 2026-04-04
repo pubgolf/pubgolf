@@ -15,23 +15,22 @@ import (
 // errBlobStoreNotReady is returned when Minio does not become available after retries.
 var errBlobStoreNotReady = errors.New("blob storage not ready after retries")
 
-const (
-	blobBucketPrefix = "pubgolf-dev"
-	minioDevEndpoint = "localhost:9000"
-)
+const blobBucketPrefix = "pubgolf-dev"
 
 // minioClient constructs a minio-go client pointing at the shared Minio instance
 // with credentials from the env provider.
 func minioClient(ctx context.Context, ep EnvProvider) (*minio.Client, error) {
 	vars := readEnvVars(ctx, ep, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, []string{
+		"BLOB_STORE_ENDPOINT",
 		"BLOB_STORE_ACCESS_KEY",
 		"BLOB_STORE_SECRET_KEY",
 	})
 
+	endpoint := getStr(vars, "BLOB_STORE_ENDPOINT", "localhost:9000")
 	accessKey := getStr(vars, "BLOB_STORE_ACCESS_KEY", "pubgolf_dev")
 	secretKey := getStr(vars, "BLOB_STORE_SECRET_KEY", "pubgolf_dev")
 
-	mc, err := minio.New(minioDevEndpoint, &minio.Options{
+	mc, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: false,
 	})
