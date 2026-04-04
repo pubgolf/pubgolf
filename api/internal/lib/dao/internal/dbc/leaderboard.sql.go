@@ -15,7 +15,7 @@ const scoringCriteria = `-- name: ScoringCriteria :many
 WITH st AS (
   -- Replaces the stages table in the later section with only the odd numbered stages.
   SELECT
-    st.event_id, st.venue_id, st.venue_key, st.rank, st.duration_minutes, st.created_at, st.updated_at, st.deleted_at, st.rule_id, st.id,
+    st.event_id, st.venue_id, st.venue_key, st.rank, st.duration_minutes, st.created_at, st.updated_at, st.deleted_at, st.id,
     row_number() OVER (ORDER BY st.rank ASC) AS stage_number,
     mod(row_number() OVER (ORDER BY st.rank ASC), 2) = 1 AS is_odd
   FROM

@@ -20,11 +20,13 @@ type Querier interface {
 	CreateAdjustmentTemplate(ctx context.Context, arg CreateAdjustmentTemplateParams) (models.AdjustmentTemplateID, error)
 	CreateAdjustmentWithTemplate(ctx context.Context, arg CreateAdjustmentWithTemplateParams) error
 	CreatePlayer(ctx context.Context, arg CreatePlayerParams) (models.PlayerID, error)
+	CreateRuleItem(ctx context.Context, arg CreateRuleItemParams) error
 	DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error)
 	DeleteAdjustment(ctx context.Context, id models.AdjustmentID) error
 	DeleteAdjustmentsForPlayerStage(ctx context.Context, arg DeleteAdjustmentsForPlayerStageParams) error
 	DeleteExpiredIdempotencyKeys(ctx context.Context, createdAt time.Time) (int64, error)
 	DeletePlayer(ctx context.Context, id models.PlayerID) error
+	DeleteRuleItemsByStageID(ctx context.Context, stagesID models.StageID) error
 	DeleteScoreForPlayerStage(ctx context.Context, arg DeleteScoreForPlayerStageParams) error
 	EventAdjustmentTemplates(ctx context.Context, eventID models.EventID) ([]EventAdjustmentTemplatesRow, error)
 	EventAdjustments(ctx context.Context, eventID models.EventID) ([]EventAdjustmentsRow, error)
@@ -45,6 +47,7 @@ type Querier interface {
 	PlayerRegisteredForEvent(ctx context.Context, arg PlayerRegisteredForEventParams) (bool, error)
 	PlayerRegistrationsByID(ctx context.Context, id models.PlayerID) ([]PlayerRegistrationsByIDRow, error)
 	PlayerScores(ctx context.Context, arg PlayerScoresParams) ([]PlayerScoresRow, error)
+	RuleItemsByStageIDs(ctx context.Context, stageIds []models.DatabaseULID) ([]RuleItemsByStageIDsRow, error)
 	ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error)
 	ScoringCriteria(ctx context.Context, arg ScoringCriteriaParams) ([]ScoringCriteriaRow, error)
 	SetEventCacheKeys(ctx context.Context, arg SetEventCacheKeysParams) (uint32, error)
@@ -53,7 +56,6 @@ type Querier interface {
 	StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyParams) (models.StageID, error)
 	UpdateAdjustmentTemplate(ctx context.Context, arg UpdateAdjustmentTemplateParams) error
 	UpdatePlayer(ctx context.Context, arg UpdatePlayerParams) error
-	UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error
 	UpdateStage(ctx context.Context, arg UpdateStageParams) error
 	UpsertRegistration(ctx context.Context, arg UpsertRegistrationParams) error
 	UpsertScore(ctx context.Context, arg UpsertScoreParams) error

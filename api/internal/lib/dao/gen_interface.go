@@ -89,7 +89,7 @@ type QueryProvider interface {
 	UpdateAdjustmentTemplate(ctx context.Context, eventID models.EventID, t models.AdjustmentTemplateConfig) error
 	// UpdatePlayer creates a new player and adds them to the given event.
 	UpdatePlayer(ctx context.Context, playerID models.PlayerID, player models.PlayerParams) (models.Player, error)
-	// UpdateStage updates the stage's properties and the description of its linked rule.
+	// UpdateStage updates the stage's properties and its linked rule items.
 	UpdateStage(ctx context.Context, stage models.StageConfig) error
 	// UpsertRegistration creates a new player and adds them to the given event.
 	UpsertRegistration(ctx context.Context, playerID models.PlayerID, eventKey string, cat models.ScoringCategory) error

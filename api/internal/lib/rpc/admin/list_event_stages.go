@@ -37,7 +37,6 @@ func (s *Server) ListEventStages(ctx context.Context, req *connect.Request[apiv1
 				ImageUrl: s.Venue.ImageURL,
 			},
 			Rule: &apiv1.Rule{
-				Id:               s.Rule.ID.String(),
 				VenueDescription: s.Rule.Description,
 			},
 			Rank:        s.Rank,

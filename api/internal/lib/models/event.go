@@ -4,11 +4,11 @@ import "time"
 
 // StageConfig allows modifying the properties of a stage.
 type StageConfig struct {
-	ID              StageID
-	VenueID         VenueID
-	RuleDescription string
-	Rank            int32
-	Duration        time.Duration
+	ID        StageID
+	VenueID   VenueID
+	RuleItems []RuleItem
+	Rank      int32
+	Duration  time.Duration
 }
 
 // Stage models a venue stop and rule set.
@@ -30,6 +30,16 @@ type Venue struct {
 
 // Rule contains data about a "logical" stop (e.g. stage-specific instructions).
 type Rule struct {
-	ID          RuleID
 	Description string
+	Items       []RuleItem
+}
+
+// RuleItem contains a single structured description item for a stage.
+type RuleItem struct {
+	ID        RuleItemID
+	StageID   StageID
+	Content   string
+	ItemType  VenueDescriptionItemType
+	Audiences []ScoringCategory
+	Rank      uint32
 }

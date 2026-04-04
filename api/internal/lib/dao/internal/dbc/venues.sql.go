@@ -84,28 +84,6 @@ func (q *Queries) StageIDByVenueKey(ctx context.Context, arg StageIDByVenueKeyPa
 	return id, err
 }
 
-const updateRuleByStage = `-- name: UpdateRuleByStage :exec
-UPDATE
-  rules r
-SET
-  description = $1
-FROM
-  stages s
-WHERE
-  r.id = s.rule_id
-  AND s.id = $2
-`
-
-type UpdateRuleByStageParams struct {
-	Description string
-	StageID     models.StageID
-}
-
-func (q *Queries) UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error {
-	_, err := q.exec(ctx, q.updateRuleByStageStmt, updateRuleByStage, arg.Description, arg.StageID)
-	return err
-}
-
 const updateStage = `-- name: UpdateStage :exec
 UPDATE
   stages s

@@ -11,9 +11,11 @@ import (
 
 // VenueStop contains a venue lookup key and a duration in minutes spent at the venue.
 type VenueStop struct {
+	StageID     models.StageID
 	VenueKey    models.VenueKey
 	Duration    time.Duration
 	Description string
+	Items       []models.RuleItem
 }
 
 // EventScheduleAsyncResult holds the result of a EventSchedule call.
@@ -67,6 +69,23 @@ func (q *Queries) EventSchedule(ctx context.Context, id models.EventID) ([]Venue
 		}
 	}
 
+	// Batch-fetch rule items after the retry loop to avoid stale data.
+	stageIDs := make([]models.StageID, 0, len(venueStops))
+	for _, vs := range venueStops {
+		stageIDs = append(stageIDs, vs.StageID)
+	}
+
+	itemsByStage, err := q.ruleItemsByStageIDs(ctx, stageIDs)
+	if err != nil {
+		return nil, fmt.Errorf("fetch rule items: %w", err)
+	}
+
+	for i := range venueStops {
+		items := itemsByStage[venueStops[i].StageID]
+		venueStops[i].Items = items
+		venueStops[i].Description = ConcatRuleItems(items)
+	}
+
 	return venueStops, nil
 }
 
@@ -78,15 +97,10 @@ func buildVenueStops(schedule []dbc.EventScheduleRow) ([]VenueStop, bool) {
 			return nil, false
 		}
 
-		desc := ""
-		if v.Description.Valid {
-			desc = v.Description.String
-		}
-
 		venueStops = append(venueStops, VenueStop{
-			VenueKey:    v.VenueKey,
-			Duration:    time.Duration(v.DurationMinutes) * time.Minute,
-			Description: desc,
+			StageID:  v.StageID,
+			VenueKey: v.VenueKey,
+			Duration: time.Duration(v.DurationMinutes) * time.Minute,
 		})
 	}
 
