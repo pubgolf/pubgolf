@@ -132,7 +132,7 @@
 		<ErrorBanner
 			error={{ type: 'Server Error', message: error }}
 			dismissLabel="Retry"
-			on:dismiss={refreshData}
+			ondismiss={refreshData}
 		/>
 	{/await}
 </div>

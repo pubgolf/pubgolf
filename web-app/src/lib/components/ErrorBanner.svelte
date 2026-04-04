@@ -1,15 +1,17 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type DisplayError = { type: string; message: string } | null;
 </script>
 
 <script lang="ts">
 	import { AlertTriangleIcon, XIcon } from 'lucide-svelte';
-	import { createEventDispatcher } from 'svelte';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		error: DisplayError;
+		dismissLabel?: string;
+		ondismiss?: (error: DisplayError) => void;
+	}
 
-	export let error: DisplayError;
-	export let dismissLabel = '';
+	let { error, dismissLabel = '', ondismiss }: Props = $props();
 </script>
 
 {#if error}
@@ -23,7 +25,7 @@
 			<button
 				type="button"
 				class="{dismissLabel ? 'btn' : 'btn-icon'} variant-filled"
-				on:click={() => dispatch('dismiss', error)}
+				onclick={() => ondismiss?.(error)}
 			>
 				{#if dismissLabel}{dismissLabel}{:else}<XIcon />{/if}
 			</button>

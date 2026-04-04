@@ -198,10 +198,12 @@
 
 <div class="max-w-3xl mx-auto mb-4">
 	<RefreshHeader title="Scores" refresh={refreshData} loadingStatus={refreshProgress} {lastRefresh}>
-		<label slot="filters" class="flex items-center space-x-2">
-			<input type="checkbox" class="checkbox" bind:checked={$filterUnverifiedOnly} />
-			<p>Only Show Unverified</p>
-		</label>
+		{#snippet filters()}
+			<label class="flex items-center space-x-2">
+				<input type="checkbox" class="checkbox" bind:checked={$filterUnverifiedOnly} />
+				<p>Only Show Unverified</p>
+			</label>
+		{/snippet}
 	</RefreshHeader>
 
 	{#await refreshProgress}
@@ -276,7 +278,7 @@
 		<ErrorBanner
 			error={{ type: 'Server Error', message: error }}
 			dismissLabel="Retry"
-			on:dismiss={refreshData}
+			ondismiss={refreshData}
 		/>
 	{/await}
 
