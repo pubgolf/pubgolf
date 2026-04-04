@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
@@ -19,11 +20,32 @@ func status(db *sql.DB, bs blobstore.BlobStore) http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 
-		code := http.StatusOK
+		var (
+			pingErr error
+			bsErr   error
+			exists  bool
+			wg      sync.WaitGroup
+		)
 
+		wg.Add(2) //nolint:mnd // Two concurrent health checks: DB + blob store.
+
+		go func() {
+			defer wg.Done()
+
+			pingErr = db.PingContext(ctx)
+		}()
+
+		go func() {
+			defer wg.Done()
+
+			exists, bsErr = bs.BucketExists(ctx)
+		}()
+
+		wg.Wait()
+
+		code := http.StatusOK
 		dbStatus := "ok"
 
-		pingErr := db.PingContext(ctx)
 		if pingErr != nil {
 			log.Printf("status: DB ping failed: %v", pingErr)
 
@@ -33,7 +55,6 @@ func status(db *sql.DB, bs blobstore.BlobStore) http.HandlerFunc {
 
 		bsStatus := "ok"
 
-		exists, bsErr := bs.BucketExists(ctx)
 		if bsErr != nil {
 			log.Printf("status: blob store check failed: %v", bsErr)
 
