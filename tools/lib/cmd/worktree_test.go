@@ -162,6 +162,27 @@ func TestDockerProjectForSlug(t *testing.T) {
 	}
 }
 
+func TestBlobBucketForSlug(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		slug string
+		want string
+	}{
+		{slug: "", want: "pubgolf-dev"},
+		{slug: "fix-auth", want: "pubgolf-dev-fix-auth"},
+		{slug: "minio-s3-support", want: "pubgolf-dev-minio-s3-support"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.slug, func(t *testing.T) {
+			t.Parallel()
+
+			assert.Equal(t, tt.want, blobBucketForSlug(tt.slug))
+		})
+	}
+}
+
 func TestDataDirForSlug(t *testing.T) {
 	t.Parallel()
 

@@ -4,6 +4,7 @@ package public
 import (
 	"errors"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1/apiv1connect"
 	"github.com/pubgolf/pubgolf/api/internal/lib/rpc/shared"
@@ -28,14 +29,16 @@ type Server struct {
 	shared *shared.Server
 	dao    dao.QueryProvider
 	mes    sms.Messenger
+	bs     blobstore.BlobStore
 }
 
 // NewServer constructs a gRPC server implementation with data access dependencies injected.
-func NewServer(q dao.QueryProvider, mes sms.Messenger) *Server {
+func NewServer(q dao.QueryProvider, mes sms.Messenger, bs blobstore.BlobStore) *Server {
 	return &Server{
 		shared: shared.NewServer(q),
 		dao:    q,
 		mes:    mes,
+		bs:     bs,
 	}
 }
 

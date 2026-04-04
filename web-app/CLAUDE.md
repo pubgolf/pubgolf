@@ -1,6 +1,6 @@
 # web-app/ — SvelteKit Frontend
 
-SvelteKit SPA using adapter-static, Svelte 3, Skeleton UI 1.x, and Tailwind CSS.
+SvelteKit SPA using adapter-static, Svelte 5 (compat mode), Skeleton UI 1.x, and Tailwind CSS.
 Connects to the Go API server via Connect-RPC (web transport).
 
 ## Dev Workflow
@@ -18,11 +18,24 @@ All commands go through `pubgolf-devctrl` (run from project root, not `web-app/`
 | Lint + type-check | `pubgolf-devctrl check web` |
 
 **Full-stack mode** (`pubgolf-devctrl run` with no subcommand): starts the DB via
-Docker, builds the web app, serves it via `vite preview` (port 4173), and starts
-the API server with `PUBGOLF_WEB_APP_UPSTREAM_HOST` pointing at the preview server.
+Docker, starts `vite dev` (with HMR), and starts the API server reverse-proxying
+to the dev server. Access the app through the API server port. Can be backgrounded:
+
+    pubgolf-devctrl run &  # save the PID from $!
+    kill -INT <pid>        # clean shutdown (stops all child processes)
+
+`pubgolf-devctrl stop` only tears down Docker — use SIGINT on the `run` process
+to stop everything.
+
+**Fresh worktree**: Run `pubgolf-devctrl migrate up` before the first `run` —
+the DB starts empty and the API server will panic without tables.
 
 **Do not use `npm run` directly** — devctrl is the single source of truth.
 The CI pipeline also runs through devctrl (`go run ./tools/cmd/pubgolf-devctrl`).
+
+**Dependency conflicts**: Use `overrides` in `package.json` to resolve peer dep
+conflicts (e.g., Skeleton v1 + Svelte 5). Do not use `--legacy-peer-deps` —
+CI runs `npm ci` which doesn't honor it.
 
 ## Key Directories
 

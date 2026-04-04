@@ -137,6 +137,16 @@ func worktreeDockerProject(ctx context.Context) string {
 	return dockerProjectForSlug(slug)
 }
 
+// blobBucketForSlug returns the Minio bucket name for a given worktree slug.
+// Returns "pubgolf-dev" for the main tree, "pubgolf-dev-<slug>" for worktrees.
+func blobBucketForSlug(slug string) string {
+	if slug == "" {
+		return "pubgolf-dev"
+	}
+
+	return "pubgolf-dev-" + slug
+}
+
 // dataDirForSlug returns the data directory path for a given slug.
 // Returns base for empty slug (main tree), "base-<slug>" for worktrees.
 func dataDirForSlug(base, slug string) string {

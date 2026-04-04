@@ -46,10 +46,14 @@ func cleanOrphans(ctx context.Context, force bool) error {
 		return fmtErr(err, "enumerate worktrees")
 	}
 
-	// Pass 2: Docker orphans.
+	// Pass 2: Blob storage bucket orphans (must run before Docker pass,
+	// which may stop the shared Minio instance).
+	found = cleanBucketOrphans(ctx, activeSlugs, force) || found
+
+	// Pass 3: Docker orphans.
 	found = cleanDockerOrphans(ctx, activeSlugs, force) || found
 
-	// Pass 3: Filesystem orphans.
+	// Pass 4: Filesystem orphans.
 	found = cleanFilesystemOrphans(activeSlugs, force) || found
 
 	if !found {
@@ -162,6 +166,48 @@ func cleanMergedWorktrees(ctx context.Context, force bool) bool {
 			}
 		} else {
 			fmt.Fprintf(os.Stdout, "  [merged] worktree: %s (branch %s)\n", wt.path, wt.branch)
+		}
+	}
+
+	return found
+}
+
+// cleanBucketOrphans finds and removes Minio buckets matching pubgolf-dev-*
+// that don't correspond to active worktrees. Returns true if any orphans were found.
+func cleanBucketOrphans(ctx context.Context, activeSlugs map[string]bool, force bool) bool {
+	buckets, err := listDevBuckets(ctx, envProvider)
+	if err != nil {
+		log.Println("WARNING: Minio is not available. Skipping bucket cleanup.")
+		log.Println("  Start Minio and re-run to clean up orphaned buckets.")
+
+		return false
+	}
+
+	found := false
+
+	for _, bucket := range buckets {
+		slug := slugFromBucket(bucket)
+
+		if activeSlugs[slug] {
+			continue // Active worktree.
+		}
+
+		// Never remove the main bucket.
+		if bucket == blobBucketPrefix {
+			continue
+		}
+
+		found = true
+
+		if force {
+			log.Printf("Removing blob bucket: %s", bucket)
+
+			rmErr := deleteBucket(ctx, envProvider, bucket)
+			if rmErr != nil {
+				log.Printf("WARNING: failed to remove bucket %s: %v", bucket, rmErr)
+			}
+		} else {
+			fmt.Fprintf(os.Stdout, "  [orphan] blob bucket: %s\n", bucket)
 		}
 	}
 

@@ -78,7 +78,7 @@
 				required
 				placeholder="Enter rule text..."
 				bind:value={stage.venueDescription}
-			/>
+			></textarea>
 		</label>
 	</form>
 

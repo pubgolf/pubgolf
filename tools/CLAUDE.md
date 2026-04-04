@@ -4,6 +4,13 @@ All devctrl source lives under `tools/lib/cmd/`. Each file maps to a top-level
 command group (`check.go` → `devctrl check`, `generate.go` → `devctrl generate`, etc.).
 The entry point in `tools/cmd/pubgolf-devctrl/main.go` just calls `cmd.Execute()`.
 
+## Testing Source Changes
+
+`pubgolf-devctrl` on PATH is a compiled binary — editing source files in a
+worktree has no effect until you recompile with `pubgolf-devctrl update`.
+The update output includes a content hash; a changed hash confirms new source
+was compiled.
+
 ## Adding a New Command
 
 1. Create a file named after the command group (e.g. `deploy.go`).

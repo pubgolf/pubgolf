@@ -15,7 +15,7 @@ func init() {
 	runCmd.AddCommand(runAPIServerCmd)
 	runCmd.AddCommand(runAPIBgCmd)
 	runCmd.AddCommand(runAPIDatabaseCmd)
-	// runCmd.AddCommand(runAPIMinioCmd)
+	runCmd.AddCommand(runAPIMinioCmd)
 	runCmd.AddCommand(runWebCmd)
 	rootCmd.AddCommand(runCmd)
 
@@ -36,42 +36,39 @@ func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) 
 		return err
 	}
 
-	err = buildWeb(ctx, r)
-	if err != nil {
-		return err
-	}
-
 	offset, err := worktreePortOffset(ctx)
 	if err != nil {
 		return fmtErr(err, "compute port offset")
 	}
 
-	previewPort := 4173 + offset
+	devPort := 5173 + offset
+	apiPort := 5000 + offset
 
-	previewProc, err := r.Start(ctx, Cmd{
+	devProc, err := r.Start(ctx, Cmd{
 		Name: filepath.FromSlash("./node_modules/.bin/vite"),
-		Args: []string{"preview", "--port", strconv.Itoa(previewPort)},
+		Args: []string{"dev", "--port", strconv.Itoa(devPort)},
 		Dir:  "web-app",
 	})
 	if err != nil {
-		return fmtErr(err, "start vite preview server")
+		return fmtErr(err, "start vite dev server")
 	}
 
 	apiProc, err := startAPIServer(ctx, r, ep, args,
-		fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", previewPort),
+		fmt.Sprintf("PUBGOLF_WEB_APP_UPSTREAM_HOST=http://localhost:%d", devPort),
+		fmt.Sprintf("PUBGOLF_HOST_ORIGIN=http://localhost:%d", apiPort),
 	)
 	if err != nil {
-		previewProc.Stop()
+		devProc.Stop()
 
 		return err
 	}
 
-	log.Printf("Full-stack environment running (preview: :%d, API: :%d)\n", previewPort, 5000+offset)
+	log.Printf("Full-stack environment running (dev: :%d, API: :%d)\n", devPort, apiPort)
 
 	go func() {
 		<-shuttingDown
 		apiProc.Stop()
-		previewProc.Stop()
+		devProc.Stop()
 	}()
 
 	waitErr := apiProc.Wait()
@@ -79,7 +76,7 @@ func runFullStack(ctx context.Context, r Runner, ep EnvProvider, args []string) 
 		log.Printf("API server exited with error: %v", waitErr)
 	}
 
-	previewProc.Stop()
+	devProc.Stop()
 
 	return nil
 }
@@ -98,7 +95,7 @@ var runAPIBgCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, _ []string) {
 		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName,
 			"api-db",
-			// "api-blob-storage",
+			"api-blob-storage",
 		))
 	},
 }
@@ -131,13 +128,13 @@ var runWebCmd = &cobra.Command{
 	},
 }
 
-// var runAPIMinioCmd = &cobra.Command{
-// 	Use:   "api-minio",
-// 	Short: "Run API server's blob storage (Minio) instance",
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		dockerRun(runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-blob-storage")
-// 	},
-// }
+var runAPIMinioCmd = &cobra.Command{
+	Use:   "api-minio",
+	Short: "Run API server's blob storage (Minio) instance",
+	Run: func(cmd *cobra.Command, _ []string) {
+		classifyAndExit(dockerRun(cmd.Context(), runner, envProvider, config.ServerBinName, config.DopplerEnvName, "api-blob-storage"))
+	},
+}
 
 func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg string, services ...string) error {
 	env, err := ep.Env(ctx, project, envCfg)
@@ -156,31 +153,61 @@ func dockerRun(ctx context.Context, r Runner, ep EnvProvider, project, envCfg st
 		"PUBGOLF_DB_HOST_DATA_PATH="+filepath.Join(projectRoot, worktreeDataDir(ctx, "data/postgres")),
 	)
 
+	slug, _ := worktreeSlug(ctx)
 	projectName := worktreeDockerProject(ctx)
 
-	args := []string{
-		"compose",
-		"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
-		"--project-name", projectName,
-		"up",
-		"--detach",
-		"--",
-	}
-	args = append(args, services...)
+	// If Minio is already running (from another worktree or the main tree),
+	// skip starting api-blob-storage to avoid a port collision on the shared port.
+	wantsBlobStorage := false
+	dockerServices := make([]string, 0, len(services))
 
-	runErr := r.Run(ctx, Cmd{
-		Name: "docker",
-		Args: args,
-		Env:  env,
-	})
-	if runErr != nil {
-		return fmtErr(runErr, "run docker-compose up cmd")
+	for _, svc := range services {
+		if svc == "api-blob-storage" {
+			wantsBlobStorage = true
+
+			if !minioReachable(ctx, ep) {
+				dockerServices = append(dockerServices, svc)
+			} else {
+				log.Println("Minio already running — skipping api-blob-storage container start.")
+			}
+		} else {
+			dockerServices = append(dockerServices, svc)
+		}
+	}
+
+	if len(dockerServices) > 0 {
+		args := []string{
+			"compose",
+			"--file", filepath.FromSlash("./infra/docker-compose.dev.yaml"),
+			"--project-name", projectName,
+			"up",
+			"--detach",
+			"--",
+		}
+		args = append(args, dockerServices...)
+
+		runErr := r.Run(ctx, Cmd{
+			Name: "docker",
+			Args: args,
+			Env:  env,
+		})
+		if runErr != nil {
+			return fmtErr(runErr, "run docker-compose up cmd")
+		}
+	}
+
+	// Create per-worktree blob storage bucket (whether we started Minio or it was already running).
+	if wantsBlobStorage {
+		bucketErr := ensureBucket(ctx, ep, slug)
+		if bucketErr != nil {
+			return fmtErr(bucketErr, "ensure blob storage bucket")
+		}
 	}
 
 	// Post-start reminder for worktree users.
-	if slug, _ := worktreeSlug(ctx); slug != "" {
-		log.Printf("Started services for worktree %q (DB: port %d).\n"+
-			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset)
+	if slug != "" {
+		log.Printf("Started services for worktree %q (DB: port %d, blob bucket: %s).\n"+
+			"  Run 'pubgolf-devctrl stop' before removing this worktree.", slug, 5432+offset, blobBucketForSlug(slug))
 	}
 
 	return nil
@@ -232,9 +259,12 @@ func startAPIServer(ctx context.Context, r Runner, ep EnvProvider, args []string
 		return nil, fmtErr(err, "compute port offset")
 	}
 
+	slug, _ := worktreeSlug(ctx)
+
 	env = append(env,
 		fmt.Sprintf("PUBGOLF_DB_PORT=%d", 5432+offset),
 		fmt.Sprintf("PUBGOLF_PORT=%d", 5000+offset),
+		"PUBGOLF_BLOB_STORE_BUCKET="+blobBucketForSlug(slug),
 	)
 	env = append(env, extraEnv...)
 

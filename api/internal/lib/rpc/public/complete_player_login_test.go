@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/pubgolf/pubgolf/api/internal/lib/blobstore"
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
@@ -27,7 +28,7 @@ func TestCompletePlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		playerID := models.PlayerIDFromULID(ulid.Make())
 		authToken := models.AuthTokenFromULID(ulid.Make())
@@ -71,7 +72,7 @@ func TestCompletePlayerLogin(t *testing.T) {
 
 				mockDAO := new(dao.MockQueryProvider)
 				mockMes := new(sms.MockMessenger)
-				s := NewServer(mockDAO, mockMes)
+				s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 				_, err := s.CompletePlayerLogin(t.Context(), connect.NewRequest(&apiv1.CompletePlayerLoginRequest{
 					PhoneNumber: tc.phone,
@@ -89,7 +90,7 @@ func TestCompletePlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		mockMes.On("CheckVerification", mock.Anything, phoneNum, authCode).Return(false, nil)
 
@@ -107,7 +108,7 @@ func TestCompletePlayerLogin(t *testing.T) {
 
 		mockDAO := new(dao.MockQueryProvider)
 		mockMes := new(sms.MockMessenger)
-		s := NewServer(mockDAO, mockMes)
+		s := NewServer(mockDAO, mockMes, new(blobstore.MockBlobStore))
 
 		mockMes.On("CheckVerification", mock.Anything, phoneNum, authCode).Return(false, sms.ErrUpstreamProviderIssue)
 

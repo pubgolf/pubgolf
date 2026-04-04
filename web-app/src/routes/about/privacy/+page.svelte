@@ -94,8 +94,8 @@
 
 <p>
 	<strong>How do you exercise your rights?</strong> The easiest way to exercise your rights is by contacting
-	us at pubgolf+legal@thedeerchild.com. We will consider and act upon any request in accordance with
-	applicable data protection laws.
+	us at pubgolf+legal@thedeerchild.com. We will consider and act upon any request in accordance with applicable
+	data protection laws.
 </p>
 
 <p>
@@ -202,8 +202,8 @@
 		account in working order.
 	</li>
 	<li>
-		<strong>To deliver and facilitate delivery of services to the user.</strong> We may process your
-		information to provide you with the requested service.
+		<strong>To deliver and facilitate delivery of services to the user.</strong> We may process your information
+		to provide you with the requested service.
 	</li>
 	<li>
 		<strong>To respond to user inquiries/offer support to users.</strong> We may process your information
@@ -225,8 +225,8 @@
 		information, see <a href="#privacyrights">"what are your privacy rights?"</a> below).
 	</li>
 	<li>
-		<strong>To protect our Services.</strong> We may process your information as part of our efforts
-		to keep our Services safe and secure, including fraud monitoring and prevention.
+		<strong>To protect our Services.</strong> We may process your information as part of our efforts to
+		keep our Services safe and secure, including fraud monitoring and prevention.
 	</li>
 	<li>
 		<strong>To administer prize draws and competitions.</strong> We may process your information to administer
@@ -362,8 +362,8 @@
 	our marketing and promotional communications at any time by clicking on the unsubscribe link in
 	the emails that we send, replying "STOP" or "UNSUBSCRIBE" to the SMS messages that we send, or by
 	contacting us using the details provided in the section
-	<a href="#contact">"how can you contact us about this notice?"</a> below. You will then be removed
-	from the marketing lists. However, we may still communicate with you — for example, to send you service-related
+	<a href="#contact">"how can you contact us about this notice?"</a> below. You will then be removed from
+	the marketing lists. However, we may still communicate with you — for example, to send you service-related
 	messages that are necessary for the administration and use of your account, to respond to service requests,
 	or for other non-marketing purposes.
 </p>
@@ -462,9 +462,11 @@
 <div class="table-container mb-8">
 	<table class="table table-compact">
 		<thead>
-			<th>Category</th>
-			<th>Examples</th>
-			<th>Collected</th>
+			<tr>
+				<th>Category</th>
+				<th>Examples</th>
+				<th>Collected</th>
+			</tr>
 		</thead>
 		<tbody>
 			<tr>
@@ -546,7 +548,7 @@
 			</tr>
 			<tr>
 				<td>L. Sensitive Personal Information</td>
-				<td />
+				<td></td>
 				<td>No</td>
 			</tr>
 		</tbody>
