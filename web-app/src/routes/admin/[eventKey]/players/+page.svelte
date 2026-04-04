@@ -157,7 +157,7 @@
 			<NoDataCard
 				text="No Players to Display"
 				ctaText="Register a New Player"
-				on:click={showNewPlayerModal}
+				onclick={showNewPlayerModal}
 			/>
 		{/if}
 	{:catch error}

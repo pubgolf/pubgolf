@@ -218,7 +218,7 @@
 			<NoDataCard
 				text="No Adjustments to Display"
 				ctaText="Create an Adjustment"
-				on:click={showNewTemplateModal}
+				onclick={showNewTemplateModal}
 			/>
 		{/if}
 	{:catch error}
