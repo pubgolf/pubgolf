@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -18,15 +19,32 @@ var errBlobStoreNotReady = errors.New("blob storage not ready after retries")
 
 const blobBucketPrefix = "pubgolf-dev"
 
-// minioReachable checks if the Minio endpoint is accepting TCP connections.
-// Used to detect if another worktree's Minio is already running on the shared port.
-func minioReachable(ctx context.Context, ep EnvProvider) bool {
+// minioEndpoint resolves the Minio endpoint from Doppler, then applies the
+// PUBGOLF_BLOB_STORE_PORT override if set (used when the default port 9000
+// conflicts with another local service).
+func minioEndpoint(ctx context.Context, ep EnvProvider) string {
 	vars := readEnvVars(ctx, ep, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, []string{
 		"BLOB_STORE_ENDPOINT",
 	})
 
 	endpoint := getStr(vars, "BLOB_STORE_ENDPOINT", "localhost:9000")
 
+	if portOverride := os.Getenv(config.EnvVarPrefix + "BLOB_STORE_PORT"); portOverride != "" {
+		host, _, err := net.SplitHostPort(endpoint)
+		if err != nil {
+			host = "localhost"
+		}
+
+		endpoint = net.JoinHostPort(host, portOverride)
+	}
+
+	return endpoint
+}
+
+// minioReachable checks if the Minio endpoint is accepting TCP connections.
+// Used to detect if another worktree's Minio is already running on the shared port.
+func minioReachable(ctx context.Context, ep EnvProvider) bool {
+	endpoint := minioEndpoint(ctx, ep)
 	dialer := net.Dialer{Timeout: 1 * time.Second}
 
 	conn, err := dialer.DialContext(ctx, "tcp", endpoint)
@@ -43,12 +61,11 @@ func minioReachable(ctx context.Context, ep EnvProvider) bool {
 // with credentials from the env provider.
 func minioClient(ctx context.Context, ep EnvProvider) (*minio.Client, error) {
 	vars := readEnvVars(ctx, ep, config.ServerBinName, config.DopplerEnvName, config.EnvVarPrefix, []string{
-		"BLOB_STORE_ENDPOINT",
 		"BLOB_STORE_ACCESS_KEY",
 		"BLOB_STORE_SECRET_KEY",
 	})
 
-	endpoint := getStr(vars, "BLOB_STORE_ENDPOINT", "localhost:9000")
+	endpoint := minioEndpoint(ctx, ep)
 	accessKey := getStr(vars, "BLOB_STORE_ACCESS_KEY", "pubgolf_dev")
 	secretKey := getStr(vars, "BLOB_STORE_SECRET_KEY", "pubgolf_dev")
 
