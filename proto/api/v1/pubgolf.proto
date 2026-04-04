@@ -196,6 +196,7 @@ message GetScheduleResponse {
     google.protobuf.Timestamp event_end = 5;
     // current_venue_description contains rules specific to the current venue, in markdown format.
     optional string current_venue_description = 6;
+    repeated VenueDescriptionItem current_venue_descriptions = 7;
   }
 
   uint32 latest_data_version = 1;

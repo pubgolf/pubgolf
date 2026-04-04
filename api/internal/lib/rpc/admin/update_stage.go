@@ -9,6 +9,7 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/models"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
 )
 
 // UpdateStage records the score and any adjustments (i.e. bonuses or penalties) for a (player, stage) pair.
@@ -23,15 +24,17 @@ func (s *Server) UpdateStage(ctx context.Context, req *connect.Request[apiv1.Upd
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parse stageID as ULID: %w", err))
 	}
 
-	// Create a single DEFAULT rule item from the venue_description string.
-	// PR 2 will add support for the repeated venue_descriptions field.
-	var ruleItems []models.RuleItem
-	if desc := req.Msg.GetVenueDescription(); desc != "" {
-		ruleItems = append(ruleItems, models.RuleItem{
-			Content:  desc,
-			ItemType: models.VenueDescriptionItemTypeDefault,
-			Rank:     0,
-		})
+	// Prefer the structured venue_descriptions field (new clients).
+	// Fall back to creating a single DEFAULT item from the old string field (old clients).
+	ruleItems := rpc.ProtoToRuleItems(req.Msg.GetVenueDescriptions())
+	if len(ruleItems) == 0 {
+		if desc := req.Msg.GetVenueDescription(); desc != "" {
+			ruleItems = append(ruleItems, models.RuleItem{
+				Content:  desc,
+				ItemType: models.VenueDescriptionItemTypeDefault,
+				Rank:     0,
+			})
+		}
 	}
 
 	err = s.dao.UpdateStage(ctx, models.StageConfig{

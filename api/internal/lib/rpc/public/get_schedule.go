@@ -11,6 +11,7 @@ import (
 
 	"github.com/pubgolf/pubgolf/api/internal/lib/dao"
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
 )
 
 const nextVenueVisibilityDuration = time.Duration(10) * time.Minute
@@ -47,12 +48,13 @@ func (s *Server) GetSchedule(ctx context.Context, req *connect.Request[apiv1.Get
 	}
 
 	schedule := apiv1.GetScheduleResponse_Schedule{
-		VisitedVenueKeys:        venueKeysUntilIndex(venues, currentVenueIdx),
-		CurrentVenueKey:         venueKeyAtIndex(venues, currentVenueIdx),
-		NextVenueKey:            nextVenue(venues, currentVenueIdx, nextVenueStart),
-		NextVenueStart:          nextVenueStartPB,
-		EventEnd:                timestamppb.New(startTime.Add(totalDuration(venues))),
-		CurrentVenueDescription: descriptionAtIndex(venues, currentVenueIdx),
+		VisitedVenueKeys:         venueKeysUntilIndex(venues, currentVenueIdx),
+		CurrentVenueKey:          venueKeyAtIndex(venues, currentVenueIdx),
+		NextVenueKey:             nextVenue(venues, currentVenueIdx, nextVenueStart),
+		NextVenueStart:           nextVenueStartPB,
+		EventEnd:                 timestamppb.New(startTime.Add(totalDuration(venues))),
+		CurrentVenueDescription:  descriptionAtIndex(venues, currentVenueIdx),
+		CurrentVenueDescriptions: descriptionItemsAtIndex(venues, currentVenueIdx),
 	}
 
 	hashCode, err := hashstructure.Hash(&schedule, hashstructure.FormatV2, nil)
@@ -110,6 +112,15 @@ func descriptionAtIndex(venues []dao.VenueStop, idx int) *string {
 		}
 
 		return &v
+	}
+
+	return nil
+}
+
+// descriptionItemsAtIndex returns the structured venue description items for the given venue stop, or nil if the index is out of range or there are no items.
+func descriptionItemsAtIndex(venues []dao.VenueStop, idx int) []*apiv1.VenueDescriptionItem {
+	if idx >= 0 && idx < len(venues) && len(venues[idx].Items) > 0 {
+		return rpc.RuleItemsToProto(venues[idx].Items)
 	}
 
 	return nil

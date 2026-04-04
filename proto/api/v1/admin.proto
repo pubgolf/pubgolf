@@ -116,6 +116,7 @@ message ListPlayersResponse {
 message Rule {
   string id = 1;
   string venue_description = 2;
+  repeated VenueDescriptionItem venue_descriptions = 3;
 }
 
 message Stage {
@@ -137,6 +138,7 @@ message UpdateStageRequest {
   string venue_description = 3;
   int32 rank = 4;
   int32 duration_min = 5;
+  repeated VenueDescriptionItem venue_descriptions = 6;
 }
 message UpdateStageResponse {}
 

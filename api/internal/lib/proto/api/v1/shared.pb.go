@@ -75,6 +75,58 @@ func (ScoringCategory) EnumDescriptor() ([]byte, []int) {
 	return file_api_v1_shared_proto_rawDescGZIP(), []int{0}
 }
 
+type VenueDescriptionItemType int32
+
+const (
+	VenueDescriptionItemType_VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED VenueDescriptionItemType = 0
+	VenueDescriptionItemType_VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT     VenueDescriptionItemType = 1
+	VenueDescriptionItemType_VENUE_DESCRIPTION_ITEM_TYPE_WARNING     VenueDescriptionItemType = 2
+	VenueDescriptionItemType_VENUE_DESCRIPTION_ITEM_TYPE_RULE        VenueDescriptionItemType = 3
+)
+
+// Enum value maps for VenueDescriptionItemType.
+var (
+	VenueDescriptionItemType_name = map[int32]string{
+		0: "VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED",
+		1: "VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT",
+		2: "VENUE_DESCRIPTION_ITEM_TYPE_WARNING",
+		3: "VENUE_DESCRIPTION_ITEM_TYPE_RULE",
+	}
+	VenueDescriptionItemType_value = map[string]int32{
+		"VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED": 0,
+		"VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT":     1,
+		"VENUE_DESCRIPTION_ITEM_TYPE_WARNING":     2,
+		"VENUE_DESCRIPTION_ITEM_TYPE_RULE":        3,
+	}
+)
+
+func (x VenueDescriptionItemType) Enum() *VenueDescriptionItemType {
+	p := new(VenueDescriptionItemType)
+	*p = x
+	return p
+}
+
+func (x VenueDescriptionItemType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (VenueDescriptionItemType) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_v1_shared_proto_enumTypes[1].Descriptor()
+}
+
+func (VenueDescriptionItemType) Type() protoreflect.EnumType {
+	return &file_api_v1_shared_proto_enumTypes[1]
+}
+
+func (x VenueDescriptionItemType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use VenueDescriptionItemType.Descriptor instead.
+func (VenueDescriptionItemType) EnumDescriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{1}
+}
+
 type SelectManyInputVariant int32
 
 const (
@@ -105,11 +157,11 @@ func (x SelectManyInputVariant) String() string {
 }
 
 func (SelectManyInputVariant) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_v1_shared_proto_enumTypes[1].Descriptor()
+	return file_api_v1_shared_proto_enumTypes[2].Descriptor()
 }
 
 func (SelectManyInputVariant) Type() protoreflect.EnumType {
-	return &file_api_v1_shared_proto_enumTypes[1]
+	return &file_api_v1_shared_proto_enumTypes[2]
 }
 
 func (x SelectManyInputVariant) Number() protoreflect.EnumNumber {
@@ -118,7 +170,7 @@ func (x SelectManyInputVariant) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SelectManyInputVariant.Descriptor instead.
 func (SelectManyInputVariant) EnumDescriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{1}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{2}
 }
 
 type SelectOneInputVariant int32
@@ -154,11 +206,11 @@ func (x SelectOneInputVariant) String() string {
 }
 
 func (SelectOneInputVariant) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_v1_shared_proto_enumTypes[2].Descriptor()
+	return file_api_v1_shared_proto_enumTypes[3].Descriptor()
 }
 
 func (SelectOneInputVariant) Type() protoreflect.EnumType {
-	return &file_api_v1_shared_proto_enumTypes[2]
+	return &file_api_v1_shared_proto_enumTypes[3]
 }
 
 func (x SelectOneInputVariant) Number() protoreflect.EnumNumber {
@@ -167,7 +219,7 @@ func (x SelectOneInputVariant) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SelectOneInputVariant.Descriptor instead.
 func (SelectOneInputVariant) EnumDescriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{2}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{3}
 }
 
 type ScoreBoard_ScoreStatus int32
@@ -223,11 +275,11 @@ func (x ScoreBoard_ScoreStatus) String() string {
 }
 
 func (ScoreBoard_ScoreStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_v1_shared_proto_enumTypes[3].Descriptor()
+	return file_api_v1_shared_proto_enumTypes[4].Descriptor()
 }
 
 func (ScoreBoard_ScoreStatus) Type() protoreflect.EnumType {
-	return &file_api_v1_shared_proto_enumTypes[3]
+	return &file_api_v1_shared_proto_enumTypes[4]
 }
 
 func (x ScoreBoard_ScoreStatus) Number() protoreflect.EnumNumber {
@@ -236,7 +288,7 @@ func (x ScoreBoard_ScoreStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ScoreBoard_ScoreStatus.Descriptor instead.
 func (ScoreBoard_ScoreStatus) EnumDescriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{5, 0}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{6, 0}
 }
 
 type Color struct {
@@ -307,6 +359,70 @@ func (x *Color) GetA() float32 {
 	return 0
 }
 
+type VenueDescriptionItem struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// content is the text body for this item.
+	Content string `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	// item_type drives the visual treatment on the client.
+	ItemType VenueDescriptionItemType `protobuf:"varint,2,opt,name=item_type,json=itemType,proto3,enum=api.v1.VenueDescriptionItemType" json:"item_type,omitempty"`
+	// audiences specifies which scoring categories this item applies to.
+	// An empty list means the item applies to all players.
+	Audiences     []ScoringCategory `protobuf:"varint,3,rep,packed,name=audiences,proto3,enum=api.v1.ScoringCategory" json:"audiences,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VenueDescriptionItem) Reset() {
+	*x = VenueDescriptionItem{}
+	mi := &file_api_v1_shared_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VenueDescriptionItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VenueDescriptionItem) ProtoMessage() {}
+
+func (x *VenueDescriptionItem) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_shared_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VenueDescriptionItem.ProtoReflect.Descriptor instead.
+func (*VenueDescriptionItem) Descriptor() ([]byte, []int) {
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *VenueDescriptionItem) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *VenueDescriptionItem) GetItemType() VenueDescriptionItemType {
+	if x != nil {
+		return x.ItemType
+	}
+	return VenueDescriptionItemType_VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED
+}
+
+func (x *VenueDescriptionItem) GetAudiences() []ScoringCategory {
+	if x != nil {
+		return x.Audiences
+	}
+	return nil
+}
+
 type Venue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Global ID for the venue in ULID format (26 characters, base32), not to be confused with the venue key.
@@ -321,7 +437,7 @@ type Venue struct {
 
 func (x *Venue) Reset() {
 	*x = Venue{}
-	mi := &file_api_v1_shared_proto_msgTypes[1]
+	mi := &file_api_v1_shared_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +449,7 @@ func (x *Venue) String() string {
 func (*Venue) ProtoMessage() {}
 
 func (x *Venue) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[1]
+	mi := &file_api_v1_shared_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +462,7 @@ func (x *Venue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Venue.ProtoReflect.Descriptor instead.
 func (*Venue) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{1}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Venue) GetId() string {
@@ -387,7 +503,7 @@ type EventRegistration struct {
 
 func (x *EventRegistration) Reset() {
 	*x = EventRegistration{}
-	mi := &file_api_v1_shared_proto_msgTypes[2]
+	mi := &file_api_v1_shared_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -399,7 +515,7 @@ func (x *EventRegistration) String() string {
 func (*EventRegistration) ProtoMessage() {}
 
 func (x *EventRegistration) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[2]
+	mi := &file_api_v1_shared_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -412,7 +528,7 @@ func (x *EventRegistration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EventRegistration.ProtoReflect.Descriptor instead.
 func (*EventRegistration) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{2}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *EventRegistration) GetEventKey() string {
@@ -441,7 +557,7 @@ type Player struct {
 
 func (x *Player) Reset() {
 	*x = Player{}
-	mi := &file_api_v1_shared_proto_msgTypes[3]
+	mi := &file_api_v1_shared_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -453,7 +569,7 @@ func (x *Player) String() string {
 func (*Player) ProtoMessage() {}
 
 func (x *Player) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[3]
+	mi := &file_api_v1_shared_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -466,7 +582,7 @@ func (x *Player) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Player.ProtoReflect.Descriptor instead.
 func (*Player) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{3}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Player) GetId() string {
@@ -502,7 +618,7 @@ type PlayerData struct {
 
 func (x *PlayerData) Reset() {
 	*x = PlayerData{}
-	mi := &file_api_v1_shared_proto_msgTypes[4]
+	mi := &file_api_v1_shared_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -514,7 +630,7 @@ func (x *PlayerData) String() string {
 func (*PlayerData) ProtoMessage() {}
 
 func (x *PlayerData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[4]
+	mi := &file_api_v1_shared_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -527,7 +643,7 @@ func (x *PlayerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayerData.ProtoReflect.Descriptor instead.
 func (*PlayerData) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{4}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *PlayerData) GetName() string {
@@ -554,7 +670,7 @@ type ScoreBoard struct {
 
 func (x *ScoreBoard) Reset() {
 	*x = ScoreBoard{}
-	mi := &file_api_v1_shared_proto_msgTypes[5]
+	mi := &file_api_v1_shared_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -566,7 +682,7 @@ func (x *ScoreBoard) String() string {
 func (*ScoreBoard) ProtoMessage() {}
 
 func (x *ScoreBoard) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[5]
+	mi := &file_api_v1_shared_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +695,7 @@ func (x *ScoreBoard) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScoreBoard.ProtoReflect.Descriptor instead.
 func (*ScoreBoard) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{5}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ScoreBoard) GetScores() []*ScoreBoard_ScoreBoardEntry {
@@ -601,7 +717,7 @@ type TextInput struct {
 
 func (x *TextInput) Reset() {
 	*x = TextInput{}
-	mi := &file_api_v1_shared_proto_msgTypes[6]
+	mi := &file_api_v1_shared_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -613,7 +729,7 @@ func (x *TextInput) String() string {
 func (*TextInput) ProtoMessage() {}
 
 func (x *TextInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[6]
+	mi := &file_api_v1_shared_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -626,7 +742,7 @@ func (x *TextInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TextInput.ProtoReflect.Descriptor instead.
 func (*TextInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{6}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *TextInput) GetDefaultValue() string {
@@ -668,7 +784,7 @@ type NumericInput struct {
 
 func (x *NumericInput) Reset() {
 	*x = NumericInput{}
-	mi := &file_api_v1_shared_proto_msgTypes[7]
+	mi := &file_api_v1_shared_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -680,7 +796,7 @@ func (x *NumericInput) String() string {
 func (*NumericInput) ProtoMessage() {}
 
 func (x *NumericInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[7]
+	mi := &file_api_v1_shared_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -693,7 +809,7 @@ func (x *NumericInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NumericInput.ProtoReflect.Descriptor instead.
 func (*NumericInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{7}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *NumericInput) GetDefaultValue() int64 {
@@ -728,7 +844,7 @@ type SelectManyInputOption struct {
 
 func (x *SelectManyInputOption) Reset() {
 	*x = SelectManyInputOption{}
-	mi := &file_api_v1_shared_proto_msgTypes[8]
+	mi := &file_api_v1_shared_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -740,7 +856,7 @@ func (x *SelectManyInputOption) String() string {
 func (*SelectManyInputOption) ProtoMessage() {}
 
 func (x *SelectManyInputOption) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[8]
+	mi := &file_api_v1_shared_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -753,7 +869,7 @@ func (x *SelectManyInputOption) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectManyInputOption.ProtoReflect.Descriptor instead.
 func (*SelectManyInputOption) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{8}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SelectManyInputOption) GetId() string {
@@ -787,7 +903,7 @@ type SelectManyInput struct {
 
 func (x *SelectManyInput) Reset() {
 	*x = SelectManyInput{}
-	mi := &file_api_v1_shared_proto_msgTypes[9]
+	mi := &file_api_v1_shared_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -799,7 +915,7 @@ func (x *SelectManyInput) String() string {
 func (*SelectManyInput) ProtoMessage() {}
 
 func (x *SelectManyInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[9]
+	mi := &file_api_v1_shared_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -812,7 +928,7 @@ func (x *SelectManyInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectManyInput.ProtoReflect.Descriptor instead.
 func (*SelectManyInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{9}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SelectManyInput) GetOptions() []*SelectManyInputOption {
@@ -839,7 +955,7 @@ type SelectOneInputOption struct {
 
 func (x *SelectOneInputOption) Reset() {
 	*x = SelectOneInputOption{}
-	mi := &file_api_v1_shared_proto_msgTypes[10]
+	mi := &file_api_v1_shared_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -851,7 +967,7 @@ func (x *SelectOneInputOption) String() string {
 func (*SelectOneInputOption) ProtoMessage() {}
 
 func (x *SelectOneInputOption) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[10]
+	mi := &file_api_v1_shared_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -864,7 +980,7 @@ func (x *SelectOneInputOption) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectOneInputOption.ProtoReflect.Descriptor instead.
 func (*SelectOneInputOption) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{10}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SelectOneInputOption) GetId() string {
@@ -892,7 +1008,7 @@ type SelectOneInput struct {
 
 func (x *SelectOneInput) Reset() {
 	*x = SelectOneInput{}
-	mi := &file_api_v1_shared_proto_msgTypes[11]
+	mi := &file_api_v1_shared_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -904,7 +1020,7 @@ func (x *SelectOneInput) String() string {
 func (*SelectOneInput) ProtoMessage() {}
 
 func (x *SelectOneInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[11]
+	mi := &file_api_v1_shared_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -917,7 +1033,7 @@ func (x *SelectOneInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectOneInput.ProtoReflect.Descriptor instead.
 func (*SelectOneInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{11}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SelectOneInput) GetOptions() []*SelectOneInputOption {
@@ -959,7 +1075,7 @@ type FormInput struct {
 
 func (x *FormInput) Reset() {
 	*x = FormInput{}
-	mi := &file_api_v1_shared_proto_msgTypes[12]
+	mi := &file_api_v1_shared_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -971,7 +1087,7 @@ func (x *FormInput) String() string {
 func (*FormInput) ProtoMessage() {}
 
 func (x *FormInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[12]
+	mi := &file_api_v1_shared_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -984,7 +1100,7 @@ func (x *FormInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FormInput.ProtoReflect.Descriptor instead.
 func (*FormInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{12}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *FormInput) GetId() string {
@@ -1090,7 +1206,7 @@ type FormGroup struct {
 
 func (x *FormGroup) Reset() {
 	*x = FormGroup{}
-	mi := &file_api_v1_shared_proto_msgTypes[13]
+	mi := &file_api_v1_shared_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1102,7 +1218,7 @@ func (x *FormGroup) String() string {
 func (*FormGroup) ProtoMessage() {}
 
 func (x *FormGroup) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[13]
+	mi := &file_api_v1_shared_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1115,7 +1231,7 @@ func (x *FormGroup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FormGroup.ProtoReflect.Descriptor instead.
 func (*FormGroup) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{13}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *FormGroup) GetLabel() string {
@@ -1151,7 +1267,7 @@ type Form struct {
 
 func (x *Form) Reset() {
 	*x = Form{}
-	mi := &file_api_v1_shared_proto_msgTypes[14]
+	mi := &file_api_v1_shared_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1163,7 +1279,7 @@ func (x *Form) String() string {
 func (*Form) ProtoMessage() {}
 
 func (x *Form) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[14]
+	mi := &file_api_v1_shared_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1176,7 +1292,7 @@ func (x *Form) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Form.ProtoReflect.Descriptor instead.
 func (*Form) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{14}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *Form) GetGroups() []*FormGroup {
@@ -1216,7 +1332,7 @@ type SelectManyValue struct {
 
 func (x *SelectManyValue) Reset() {
 	*x = SelectManyValue{}
-	mi := &file_api_v1_shared_proto_msgTypes[15]
+	mi := &file_api_v1_shared_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1228,7 +1344,7 @@ func (x *SelectManyValue) String() string {
 func (*SelectManyValue) ProtoMessage() {}
 
 func (x *SelectManyValue) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[15]
+	mi := &file_api_v1_shared_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1241,7 +1357,7 @@ func (x *SelectManyValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SelectManyValue.ProtoReflect.Descriptor instead.
 func (*SelectManyValue) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{15}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *SelectManyValue) GetSelectedIds() []string {
@@ -1267,7 +1383,7 @@ type FormValue struct {
 
 func (x *FormValue) Reset() {
 	*x = FormValue{}
-	mi := &file_api_v1_shared_proto_msgTypes[16]
+	mi := &file_api_v1_shared_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1279,7 +1395,7 @@ func (x *FormValue) String() string {
 func (*FormValue) ProtoMessage() {}
 
 func (x *FormValue) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[16]
+	mi := &file_api_v1_shared_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1292,7 +1408,7 @@ func (x *FormValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FormValue.ProtoReflect.Descriptor instead.
 func (*FormValue) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{16}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *FormValue) GetId() string {
@@ -1382,7 +1498,7 @@ type FormSubmission struct {
 
 func (x *FormSubmission) Reset() {
 	*x = FormSubmission{}
-	mi := &file_api_v1_shared_proto_msgTypes[17]
+	mi := &file_api_v1_shared_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1394,7 +1510,7 @@ func (x *FormSubmission) String() string {
 func (*FormSubmission) ProtoMessage() {}
 
 func (x *FormSubmission) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[17]
+	mi := &file_api_v1_shared_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1407,7 +1523,7 @@ func (x *FormSubmission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FormSubmission.ProtoReflect.Descriptor instead.
 func (*FormSubmission) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{17}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *FormSubmission) GetValues() []*FormValue {
@@ -1437,7 +1553,7 @@ type ScoreBoard_ScoreBoardEntry struct {
 
 func (x *ScoreBoard_ScoreBoardEntry) Reset() {
 	*x = ScoreBoard_ScoreBoardEntry{}
-	mi := &file_api_v1_shared_proto_msgTypes[18]
+	mi := &file_api_v1_shared_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1449,7 +1565,7 @@ func (x *ScoreBoard_ScoreBoardEntry) String() string {
 func (*ScoreBoard_ScoreBoardEntry) ProtoMessage() {}
 
 func (x *ScoreBoard_ScoreBoardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_shared_proto_msgTypes[18]
+	mi := &file_api_v1_shared_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1462,7 +1578,7 @@ func (x *ScoreBoard_ScoreBoardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScoreBoard_ScoreBoardEntry.ProtoReflect.Descriptor instead.
 func (*ScoreBoard_ScoreBoardEntry) Descriptor() ([]byte, []int) {
-	return file_api_v1_shared_proto_rawDescGZIP(), []int{5, 0}
+	return file_api_v1_shared_proto_rawDescGZIP(), []int{6, 0}
 }
 
 func (x *ScoreBoard_ScoreBoardEntry) GetEntityId() string {
@@ -1537,7 +1653,11 @@ const file_api_v1_shared_proto_rawDesc = "" +
 	"\x01r\x18\x01 \x01(\x02R\x01r\x12\f\n" +
 	"\x01g\x18\x02 \x01(\x02R\x01g\x12\f\n" +
 	"\x01b\x18\x03 \x01(\x02R\x01b\x12\f\n" +
-	"\x01a\x18\x04 \x01(\x02R\x01a\"b\n" +
+	"\x01a\x18\x04 \x01(\x02R\x01a\"\xa6\x01\n" +
+	"\x14VenueDescriptionItem\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\x12=\n" +
+	"\titem_type\x18\x02 \x01(\x0e2 .api.v1.VenueDescriptionItemTypeR\bitemType\x125\n" +
+	"\taudiences\x18\x03 \x03(\x0e2\x17.api.v1.ScoringCategoryR\taudiences\"b\n" +
 	"\x05Venue\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
@@ -1660,7 +1780,12 @@ const file_api_v1_shared_proto_rawDesc = "" +
 	"\x1cSCORING_CATEGORY_UNSPECIFIED\x10\x00\x12'\n" +
 	"#SCORING_CATEGORY_PUB_GOLF_NINE_HOLE\x10\x01\x12'\n" +
 	"#SCORING_CATEGORY_PUB_GOLF_FIVE_HOLE\x10\x02\x12(\n" +
-	"$SCORING_CATEGORY_PUB_GOLF_CHALLENGES\x10\x03*k\n" +
+	"$SCORING_CATEGORY_PUB_GOLF_CHALLENGES\x10\x03*\xbf\x01\n" +
+	"\x18VenueDescriptionItemType\x12+\n" +
+	"'VENUE_DESCRIPTION_ITEM_TYPE_UNSPECIFIED\x10\x00\x12'\n" +
+	"#VENUE_DESCRIPTION_ITEM_TYPE_DEFAULT\x10\x01\x12'\n" +
+	"#VENUE_DESCRIPTION_ITEM_TYPE_WARNING\x10\x02\x12$\n" +
+	" VENUE_DESCRIPTION_ITEM_TYPE_RULE\x10\x03*k\n" +
 	"\x16SelectManyInputVariant\x12)\n" +
 	"%SELECT_MANY_INPUT_VARIANT_UNSPECIFIED\x10\x00\x12&\n" +
 	"\"SELECT_MANY_INPUT_VARIANT_CHECKBOX\x10\x01*\x94\x01\n" +
@@ -1681,58 +1806,62 @@ func file_api_v1_shared_proto_rawDescGZIP() []byte {
 	return file_api_v1_shared_proto_rawDescData
 }
 
-var file_api_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_api_v1_shared_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_api_v1_shared_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_api_v1_shared_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_api_v1_shared_proto_goTypes = []any{
 	(ScoringCategory)(0),               // 0: api.v1.ScoringCategory
-	(SelectManyInputVariant)(0),        // 1: api.v1.SelectManyInputVariant
-	(SelectOneInputVariant)(0),         // 2: api.v1.SelectOneInputVariant
-	(ScoreBoard_ScoreStatus)(0),        // 3: api.v1.ScoreBoard.ScoreStatus
-	(*Color)(nil),                      // 4: api.v1.Color
-	(*Venue)(nil),                      // 5: api.v1.Venue
-	(*EventRegistration)(nil),          // 6: api.v1.EventRegistration
-	(*Player)(nil),                     // 7: api.v1.Player
-	(*PlayerData)(nil),                 // 8: api.v1.PlayerData
-	(*ScoreBoard)(nil),                 // 9: api.v1.ScoreBoard
-	(*TextInput)(nil),                  // 10: api.v1.TextInput
-	(*NumericInput)(nil),               // 11: api.v1.NumericInput
-	(*SelectManyInputOption)(nil),      // 12: api.v1.SelectManyInputOption
-	(*SelectManyInput)(nil),            // 13: api.v1.SelectManyInput
-	(*SelectOneInputOption)(nil),       // 14: api.v1.SelectOneInputOption
-	(*SelectOneInput)(nil),             // 15: api.v1.SelectOneInput
-	(*FormInput)(nil),                  // 16: api.v1.FormInput
-	(*FormGroup)(nil),                  // 17: api.v1.FormGroup
-	(*Form)(nil),                       // 18: api.v1.Form
-	(*SelectManyValue)(nil),            // 19: api.v1.SelectManyValue
-	(*FormValue)(nil),                  // 20: api.v1.FormValue
-	(*FormSubmission)(nil),             // 21: api.v1.FormSubmission
-	(*ScoreBoard_ScoreBoardEntry)(nil), // 22: api.v1.ScoreBoard.ScoreBoardEntry
+	(VenueDescriptionItemType)(0),      // 1: api.v1.VenueDescriptionItemType
+	(SelectManyInputVariant)(0),        // 2: api.v1.SelectManyInputVariant
+	(SelectOneInputVariant)(0),         // 3: api.v1.SelectOneInputVariant
+	(ScoreBoard_ScoreStatus)(0),        // 4: api.v1.ScoreBoard.ScoreStatus
+	(*Color)(nil),                      // 5: api.v1.Color
+	(*VenueDescriptionItem)(nil),       // 6: api.v1.VenueDescriptionItem
+	(*Venue)(nil),                      // 7: api.v1.Venue
+	(*EventRegistration)(nil),          // 8: api.v1.EventRegistration
+	(*Player)(nil),                     // 9: api.v1.Player
+	(*PlayerData)(nil),                 // 10: api.v1.PlayerData
+	(*ScoreBoard)(nil),                 // 11: api.v1.ScoreBoard
+	(*TextInput)(nil),                  // 12: api.v1.TextInput
+	(*NumericInput)(nil),               // 13: api.v1.NumericInput
+	(*SelectManyInputOption)(nil),      // 14: api.v1.SelectManyInputOption
+	(*SelectManyInput)(nil),            // 15: api.v1.SelectManyInput
+	(*SelectOneInputOption)(nil),       // 16: api.v1.SelectOneInputOption
+	(*SelectOneInput)(nil),             // 17: api.v1.SelectOneInput
+	(*FormInput)(nil),                  // 18: api.v1.FormInput
+	(*FormGroup)(nil),                  // 19: api.v1.FormGroup
+	(*Form)(nil),                       // 20: api.v1.Form
+	(*SelectManyValue)(nil),            // 21: api.v1.SelectManyValue
+	(*FormValue)(nil),                  // 22: api.v1.FormValue
+	(*FormSubmission)(nil),             // 23: api.v1.FormSubmission
+	(*ScoreBoard_ScoreBoardEntry)(nil), // 24: api.v1.ScoreBoard.ScoreBoardEntry
 }
 var file_api_v1_shared_proto_depIdxs = []int32{
-	0,  // 0: api.v1.EventRegistration.scoring_category:type_name -> api.v1.ScoringCategory
-	8,  // 1: api.v1.Player.data:type_name -> api.v1.PlayerData
-	6,  // 2: api.v1.Player.events:type_name -> api.v1.EventRegistration
-	0,  // 3: api.v1.PlayerData.scoring_category:type_name -> api.v1.ScoringCategory
-	22, // 4: api.v1.ScoreBoard.scores:type_name -> api.v1.ScoreBoard.ScoreBoardEntry
-	12, // 5: api.v1.SelectManyInput.options:type_name -> api.v1.SelectManyInputOption
-	1,  // 6: api.v1.SelectManyInput.variant:type_name -> api.v1.SelectManyInputVariant
-	14, // 7: api.v1.SelectOneInput.options:type_name -> api.v1.SelectOneInputOption
-	2,  // 8: api.v1.SelectOneInput.variant:type_name -> api.v1.SelectOneInputVariant
-	10, // 9: api.v1.FormInput.text:type_name -> api.v1.TextInput
-	11, // 10: api.v1.FormInput.numeric:type_name -> api.v1.NumericInput
-	13, // 11: api.v1.FormInput.select_many:type_name -> api.v1.SelectManyInput
-	15, // 12: api.v1.FormInput.select_one:type_name -> api.v1.SelectOneInput
-	16, // 13: api.v1.FormGroup.inputs:type_name -> api.v1.FormInput
-	17, // 14: api.v1.Form.groups:type_name -> api.v1.FormGroup
-	19, // 15: api.v1.FormValue.select_many:type_name -> api.v1.SelectManyValue
-	20, // 16: api.v1.FormSubmission.values:type_name -> api.v1.FormValue
-	4,  // 17: api.v1.ScoreBoard.ScoreBoardEntry.icon_color:type_name -> api.v1.Color
-	3,  // 18: api.v1.ScoreBoard.ScoreBoardEntry.status:type_name -> api.v1.ScoreBoard.ScoreStatus
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	1,  // 0: api.v1.VenueDescriptionItem.item_type:type_name -> api.v1.VenueDescriptionItemType
+	0,  // 1: api.v1.VenueDescriptionItem.audiences:type_name -> api.v1.ScoringCategory
+	0,  // 2: api.v1.EventRegistration.scoring_category:type_name -> api.v1.ScoringCategory
+	10, // 3: api.v1.Player.data:type_name -> api.v1.PlayerData
+	8,  // 4: api.v1.Player.events:type_name -> api.v1.EventRegistration
+	0,  // 5: api.v1.PlayerData.scoring_category:type_name -> api.v1.ScoringCategory
+	24, // 6: api.v1.ScoreBoard.scores:type_name -> api.v1.ScoreBoard.ScoreBoardEntry
+	14, // 7: api.v1.SelectManyInput.options:type_name -> api.v1.SelectManyInputOption
+	2,  // 8: api.v1.SelectManyInput.variant:type_name -> api.v1.SelectManyInputVariant
+	16, // 9: api.v1.SelectOneInput.options:type_name -> api.v1.SelectOneInputOption
+	3,  // 10: api.v1.SelectOneInput.variant:type_name -> api.v1.SelectOneInputVariant
+	12, // 11: api.v1.FormInput.text:type_name -> api.v1.TextInput
+	13, // 12: api.v1.FormInput.numeric:type_name -> api.v1.NumericInput
+	15, // 13: api.v1.FormInput.select_many:type_name -> api.v1.SelectManyInput
+	17, // 14: api.v1.FormInput.select_one:type_name -> api.v1.SelectOneInput
+	18, // 15: api.v1.FormGroup.inputs:type_name -> api.v1.FormInput
+	19, // 16: api.v1.Form.groups:type_name -> api.v1.FormGroup
+	21, // 17: api.v1.FormValue.select_many:type_name -> api.v1.SelectManyValue
+	22, // 18: api.v1.FormSubmission.values:type_name -> api.v1.FormValue
+	5,  // 19: api.v1.ScoreBoard.ScoreBoardEntry.icon_color:type_name -> api.v1.Color
+	4,  // 20: api.v1.ScoreBoard.ScoreBoardEntry.status:type_name -> api.v1.ScoreBoard.ScoreStatus
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_shared_proto_init() }
@@ -1740,32 +1869,32 @@ func file_api_v1_shared_proto_init() {
 	if File_api_v1_shared_proto != nil {
 		return
 	}
-	file_api_v1_shared_proto_msgTypes[6].OneofWrappers = []any{}
 	file_api_v1_shared_proto_msgTypes[7].OneofWrappers = []any{}
 	file_api_v1_shared_proto_msgTypes[8].OneofWrappers = []any{}
-	file_api_v1_shared_proto_msgTypes[11].OneofWrappers = []any{}
-	file_api_v1_shared_proto_msgTypes[12].OneofWrappers = []any{
+	file_api_v1_shared_proto_msgTypes[9].OneofWrappers = []any{}
+	file_api_v1_shared_proto_msgTypes[12].OneofWrappers = []any{}
+	file_api_v1_shared_proto_msgTypes[13].OneofWrappers = []any{
 		(*FormInput_Text)(nil),
 		(*FormInput_Numeric)(nil),
 		(*FormInput_SelectMany)(nil),
 		(*FormInput_SelectOne)(nil),
 	}
-	file_api_v1_shared_proto_msgTypes[13].OneofWrappers = []any{}
 	file_api_v1_shared_proto_msgTypes[14].OneofWrappers = []any{}
-	file_api_v1_shared_proto_msgTypes[16].OneofWrappers = []any{
+	file_api_v1_shared_proto_msgTypes[15].OneofWrappers = []any{}
+	file_api_v1_shared_proto_msgTypes[17].OneofWrappers = []any{
 		(*FormValue_Text)(nil),
 		(*FormValue_Numeric)(nil),
 		(*FormValue_SelectMany)(nil),
 		(*FormValue_SelectOneSelectedId)(nil),
 	}
-	file_api_v1_shared_proto_msgTypes[18].OneofWrappers = []any{}
+	file_api_v1_shared_proto_msgTypes[19].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_shared_proto_rawDesc), len(file_api_v1_shared_proto_rawDesc)),
-			NumEnums:      4,
-			NumMessages:   19,
+			NumEnums:      5,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

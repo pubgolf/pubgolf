@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/pubgolf/pubgolf/api/internal/lib/proto/api/v1"
+	"github.com/pubgolf/pubgolf/api/internal/lib/rpc"
 )
 
 // ListEventStages returns stage IDs (and the associated venue) for an entire event.
@@ -37,7 +38,8 @@ func (s *Server) ListEventStages(ctx context.Context, req *connect.Request[apiv1
 				ImageUrl: s.Venue.ImageURL,
 			},
 			Rule: &apiv1.Rule{
-				VenueDescription: s.Rule.Description,
+				VenueDescription:  s.Rule.Description,
+				VenueDescriptions: rpc.RuleItemsToProto(s.Rule.Items),
 			},
 			Rank:        s.Rank,
 			DurationMin: int32(s.Duration.Minutes()),
