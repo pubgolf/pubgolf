@@ -2,13 +2,17 @@
 	import { page } from '$app/stores';
 	import { drawerStore } from '@skeletonlabs/skeleton';
 
-	export let title: string;
-	export let items: {
-		slug: string;
-		icon: string;
-		title?: string;
-	}[];
-	export let floatOnDesktop = false;
+	interface Props {
+		title: string;
+		items: {
+			slug: string;
+			icon: string;
+			title?: string;
+		}[];
+		floatOnDesktop?: boolean;
+	}
+
+	let { title, items, floatOnDesktop = false }: Props = $props();
 
 	function slugToTitle(s: string) {
 		return s
@@ -26,7 +30,7 @@
 				<li>
 					<a
 						class:bg-primary-500={$page.route.id?.endsWith(item.slug)}
-						on:click={() => drawerStore.close()}
+						onclick={() => drawerStore.close()}
 						href="../{item.slug}/"
 					>
 						<span class="badge-icon shadow-none">{item.icon}</span>

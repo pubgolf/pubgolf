@@ -38,7 +38,7 @@
 		</header>
 
 		<div class="m-4 mt-0" class:hidden={!error}>
-			<ErrorBanner {error} on:dismiss={clearError} />
+			<ErrorBanner {error} ondismiss={clearError} />
 		</div>
 
 		<section class="p-4 pt-0">

@@ -362,7 +362,7 @@
 	</form>
 
 	<div class="px-4">
-		<ErrorBanner {error} on:dismiss={clearError} />
+		<ErrorBanner {error} ondismiss={clearError} />
 	</div>
 
 	<footer class="card-footer {parent.regionFooter} pt-4">

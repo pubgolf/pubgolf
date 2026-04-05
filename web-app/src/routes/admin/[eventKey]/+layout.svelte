@@ -48,7 +48,7 @@
 		</AppBar>
 	</svelte:fragment>
 	<div class="container mx-auto p-4">
-		<ErrorBanner error={authError} dismissLabel="Retry" on:dismiss={retryAuth} />
+		<ErrorBanner error={authError} dismissLabel="Retry" ondismiss={retryAuth} />
 		{#if authInit}
 			<slot />
 		{:else}

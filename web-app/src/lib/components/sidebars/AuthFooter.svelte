@@ -32,7 +32,7 @@
 </script>
 
 <footer class="absolute bottom-4 left-8">
-	<button type="button" class="btn variant-filled" on:click={handleLogOut}>
+	<button type="button" class="btn variant-filled" onclick={handleLogOut}>
 		<span>Log Out</span>
 	</button>
 </footer>

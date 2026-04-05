@@ -49,7 +49,7 @@
 	</header>
 
 	<div class="px-4">
-		<ErrorBanner {error} on:dismiss={clearError} />
+		<ErrorBanner {error} ondismiss={clearError} />
 	</div>
 
 	<form class="space-y-4 p-4 pt-0">
