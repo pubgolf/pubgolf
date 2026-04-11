@@ -153,7 +153,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 3)
 	require.Equal(t, "Venue 1", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
 	require.Zero(t, scores.Msg.GetScoreBoard().GetScores()[0].GetScore(), "no score for first venue")
-	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.Equal(t, "Venue 2", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
 	require.EqualValues(t, expectedNumSips, scores.Msg.GetScoreBoard().GetScores()[1].GetScore(), "score reflected for submitted venue")
 	require.Equal(t, "\t😇 Event Bonus", scores.Msg.GetScoreBoard().GetScores()[2].GetLabel())
 
@@ -201,7 +201,7 @@ func Test_SubmitScore_NineHole(t *testing.T) {
 	require.Len(t, scores.Msg.GetScoreBoard().GetScores(), 2)
 	require.Equal(t, "Venue 1", scores.Msg.GetScoreBoard().GetScores()[0].GetLabel())
 	require.Zero(t, scores.Msg.GetScoreBoard().GetScores()[0].GetScore(), "no score for first venue")
-	require.Equal(t, "Venue 2 (Unverified)", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
+	require.Equal(t, "Venue 2", scores.Msg.GetScoreBoard().GetScores()[1].GetLabel())
 	require.EqualValues(t, expectedNumSips, scores.Msg.GetScoreBoard().GetScores()[1].GetScore(), "score reflected for submitted venue")
 }
 
