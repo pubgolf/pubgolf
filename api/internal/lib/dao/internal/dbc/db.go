@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createPlayerStmt, err = db.PrepareContext(ctx, createPlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreatePlayer: %w", err)
 	}
+	if q.createRuleItemStmt, err = db.PrepareContext(ctx, createRuleItem); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateRuleItem: %w", err)
+	}
 	if q.deactivateAuthTokensStmt, err = db.PrepareContext(ctx, deactivateAuthTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeactivateAuthTokens: %w", err)
 	}
@@ -62,6 +65,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deletePlayerStmt, err = db.PrepareContext(ctx, deletePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query DeletePlayer: %w", err)
+	}
+	if q.deleteRuleItemsByStageIDStmt, err = db.PrepareContext(ctx, deleteRuleItemsByStageID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteRuleItemsByStageID: %w", err)
 	}
 	if q.deleteScoreForPlayerStageStmt, err = db.PrepareContext(ctx, deleteScoreForPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteScoreForPlayerStage: %w", err)
@@ -123,6 +129,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.playerScoresStmt, err = db.PrepareContext(ctx, playerScores); err != nil {
 		return nil, fmt.Errorf("error preparing query PlayerScores: %w", err)
 	}
+	if q.ruleItemsByStageIDsStmt, err = db.PrepareContext(ctx, ruleItemsByStageIDs); err != nil {
+		return nil, fmt.Errorf("error preparing query RuleItemsByStageIDs: %w", err)
+	}
 	if q.scoreByPlayerStageStmt, err = db.PrepareContext(ctx, scoreByPlayerStage); err != nil {
 		return nil, fmt.Errorf("error preparing query ScoreByPlayerStage: %w", err)
 	}
@@ -146,9 +155,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updatePlayerStmt, err = db.PrepareContext(ctx, updatePlayer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdatePlayer: %w", err)
-	}
-	if q.updateRuleByStageStmt, err = db.PrepareContext(ctx, updateRuleByStage); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateRuleByStage: %w", err)
 	}
 	if q.updateStageStmt, err = db.PrepareContext(ctx, updateStage); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateStage: %w", err)
@@ -210,6 +216,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createPlayerStmt: %w", cerr)
 		}
 	}
+	if q.createRuleItemStmt != nil {
+		if cerr := q.createRuleItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createRuleItemStmt: %w", cerr)
+		}
+	}
 	if q.deactivateAuthTokensStmt != nil {
 		if cerr := q.deactivateAuthTokensStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deactivateAuthTokensStmt: %w", cerr)
@@ -233,6 +244,11 @@ func (q *Queries) Close() error {
 	if q.deletePlayerStmt != nil {
 		if cerr := q.deletePlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deletePlayerStmt: %w", cerr)
+		}
+	}
+	if q.deleteRuleItemsByStageIDStmt != nil {
+		if cerr := q.deleteRuleItemsByStageIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteRuleItemsByStageIDStmt: %w", cerr)
 		}
 	}
 	if q.deleteScoreForPlayerStageStmt != nil {
@@ -335,6 +351,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing playerScoresStmt: %w", cerr)
 		}
 	}
+	if q.ruleItemsByStageIDsStmt != nil {
+		if cerr := q.ruleItemsByStageIDsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing ruleItemsByStageIDsStmt: %w", cerr)
+		}
+	}
 	if q.scoreByPlayerStageStmt != nil {
 		if cerr := q.scoreByPlayerStageStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing scoreByPlayerStageStmt: %w", cerr)
@@ -373,11 +394,6 @@ func (q *Queries) Close() error {
 	if q.updatePlayerStmt != nil {
 		if cerr := q.updatePlayerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updatePlayerStmt: %w", cerr)
-		}
-	}
-	if q.updateRuleByStageStmt != nil {
-		if cerr := q.updateRuleByStageStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateRuleByStageStmt: %w", cerr)
 		}
 	}
 	if q.updateStageStmt != nil {
@@ -452,11 +468,13 @@ type Queries struct {
 	createAdjustmentTemplateStmt        *sql.Stmt
 	createAdjustmentWithTemplateStmt    *sql.Stmt
 	createPlayerStmt                    *sql.Stmt
+	createRuleItemStmt                  *sql.Stmt
 	deactivateAuthTokensStmt            *sql.Stmt
 	deleteAdjustmentStmt                *sql.Stmt
 	deleteAdjustmentsForPlayerStageStmt *sql.Stmt
 	deleteExpiredIdempotencyKeysStmt    *sql.Stmt
 	deletePlayerStmt                    *sql.Stmt
+	deleteRuleItemsByStageIDStmt        *sql.Stmt
 	deleteScoreForPlayerStageStmt       *sql.Stmt
 	eventAdjustmentTemplatesStmt        *sql.Stmt
 	eventAdjustmentsStmt                *sql.Stmt
@@ -477,6 +495,7 @@ type Queries struct {
 	playerRegisteredForEventStmt        *sql.Stmt
 	playerRegistrationsByIDStmt         *sql.Stmt
 	playerScoresStmt                    *sql.Stmt
+	ruleItemsByStageIDsStmt             *sql.Stmt
 	scoreByPlayerStageStmt              *sql.Stmt
 	scoringCriteriaStmt                 *sql.Stmt
 	setEventCacheKeysStmt               *sql.Stmt
@@ -485,7 +504,6 @@ type Queries struct {
 	stageIDByVenueKeyStmt               *sql.Stmt
 	updateAdjustmentTemplateStmt        *sql.Stmt
 	updatePlayerStmt                    *sql.Stmt
-	updateRuleByStageStmt               *sql.Stmt
 	updateStageStmt                     *sql.Stmt
 	upsertRegistrationStmt              *sql.Stmt
 	upsertScoreStmt                     *sql.Stmt
@@ -505,11 +523,13 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createAdjustmentTemplateStmt:        q.createAdjustmentTemplateStmt,
 		createAdjustmentWithTemplateStmt:    q.createAdjustmentWithTemplateStmt,
 		createPlayerStmt:                    q.createPlayerStmt,
+		createRuleItemStmt:                  q.createRuleItemStmt,
 		deactivateAuthTokensStmt:            q.deactivateAuthTokensStmt,
 		deleteAdjustmentStmt:                q.deleteAdjustmentStmt,
 		deleteAdjustmentsForPlayerStageStmt: q.deleteAdjustmentsForPlayerStageStmt,
 		deleteExpiredIdempotencyKeysStmt:    q.deleteExpiredIdempotencyKeysStmt,
 		deletePlayerStmt:                    q.deletePlayerStmt,
+		deleteRuleItemsByStageIDStmt:        q.deleteRuleItemsByStageIDStmt,
 		deleteScoreForPlayerStageStmt:       q.deleteScoreForPlayerStageStmt,
 		eventAdjustmentTemplatesStmt:        q.eventAdjustmentTemplatesStmt,
 		eventAdjustmentsStmt:                q.eventAdjustmentsStmt,
@@ -530,6 +550,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		playerRegisteredForEventStmt:        q.playerRegisteredForEventStmt,
 		playerRegistrationsByIDStmt:         q.playerRegistrationsByIDStmt,
 		playerScoresStmt:                    q.playerScoresStmt,
+		ruleItemsByStageIDsStmt:             q.ruleItemsByStageIDsStmt,
 		scoreByPlayerStageStmt:              q.scoreByPlayerStageStmt,
 		scoringCriteriaStmt:                 q.scoringCriteriaStmt,
 		setEventCacheKeysStmt:               q.setEventCacheKeysStmt,
@@ -538,7 +559,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		stageIDByVenueKeyStmt:               q.stageIDByVenueKeyStmt,
 		updateAdjustmentTemplateStmt:        q.updateAdjustmentTemplateStmt,
 		updatePlayerStmt:                    q.updatePlayerStmt,
-		updateRuleByStageStmt:               q.updateRuleByStageStmt,
 		updateStageStmt:                     q.updateStageStmt,
 		upsertRegistrationStmt:              q.upsertRegistrationStmt,
 		upsertScoreStmt:                     q.upsertScoreStmt,

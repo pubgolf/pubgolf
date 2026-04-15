@@ -17,6 +17,16 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 		return nil, fmt.Errorf("fetch event schedule data: %w", err)
 	}
 
+	stageIDs := make([]models.StageID, 0, len(rows))
+	for _, row := range rows {
+		stageIDs = append(stageIDs, row.ID)
+	}
+
+	itemsByStage, err := q.ruleItemsByStageIDs(ctx, stageIDs)
+	if err != nil {
+		return nil, fmt.Errorf("fetch rule items: %w", err)
+	}
+
 	var stages []models.Stage
 
 	for _, row := range rows {
@@ -24,6 +34,8 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 		if row.ImageUrl.Valid {
 			imageURL = row.ImageUrl.String
 		}
+
+		items := itemsByStage[row.ID]
 
 		stages = append(stages, models.Stage{
 			ID: row.ID,
@@ -34,8 +46,8 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 				ImageURL: imageURL,
 			},
 			Rule: models.Rule{
-				ID:          models.RuleIDFromULID(row.RuleID.ULID),
-				Description: row.Description.String,
+				Description: ConcatRuleItems(items),
+				Items:       items,
 			},
 			Rank:     row.Rank,
 			Duration: time.Duration(row.DurationMinutes) * time.Minute,

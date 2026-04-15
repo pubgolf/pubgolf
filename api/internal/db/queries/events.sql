@@ -18,24 +18,20 @@ WHERE
 
 -- name: EventSchedule :many
 SELECT
+  s.id AS stage_id,
   s.venue_key,
-  s.duration_minutes,
-  r.description
+  s.duration_minutes
 FROM
   stages s
-  LEFT JOIN rules r ON s.rule_id = r.id
 WHERE
   s.event_id = $1
   AND s.deleted_at IS NULL
-  AND r.deleted_at IS NULL
 ORDER BY
   s.rank ASC;
 
 -- name: EventScheduleWithDetails :many
 SELECT
   s.id,
-  r.id AS rule_id,
-  r.description,
   v.id AS venue_id,
   v.name,
   v.address,
@@ -44,12 +40,10 @@ SELECT
   s.duration_minutes
 FROM
   stages s
-  LEFT JOIN rules r ON s.rule_id = r.id
   LEFT JOIN venues v ON s.venue_id = v.id
 WHERE
   s.event_id = $1
   AND s.deleted_at IS NULL
-  AND r.deleted_at IS NULL
   AND v.deleted_at IS NULL
 ORDER BY
   s.rank ASC;

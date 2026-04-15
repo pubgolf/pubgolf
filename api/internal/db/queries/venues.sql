@@ -47,14 +47,4 @@ SET
 WHERE
   s.id = @id;
 
--- name: UpdateRuleByStage :exec
-UPDATE
-  rules r
-SET
-  description = @description
-FROM
-  stages s
-WHERE
-  r.id = s.rule_id
-  AND s.id = @stage_id;
 

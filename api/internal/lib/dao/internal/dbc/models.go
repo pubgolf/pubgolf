@@ -50,6 +50,10 @@ type EnumScoringCategory struct {
 	Value string
 }
 
+type EnumVenueDescriptionItemType struct {
+	Value string
+}
+
 type Event struct {
 	ID                          models.EventID
 	Key                         string
@@ -87,12 +91,16 @@ type Player struct {
 	PhoneNumberVerified bool
 }
 
-type Rule struct {
-	ID          models.DatabaseULID
-	Description string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   sql.NullTime
+type RuleItem struct {
+	ID        models.RuleItemID
+	StagesID  models.StageID
+	Content   string
+	ItemType  string
+	Audiences []string
+	Rank      int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime
 }
 
 type Score struct {
@@ -115,7 +123,6 @@ type Stage struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       sql.NullTime
-	RuleID          models.DatabaseULID
 	ID              models.StageID
 }
 

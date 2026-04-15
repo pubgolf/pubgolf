@@ -122,7 +122,7 @@ var generateEnumCmd = &cobra.Command{
 func generateAllEnums(ctx context.Context, r Runner) error {
 	modelsPkg := filepath.FromSlash("./api/internal/lib/models")
 
-	for _, typ := range []string{"ScoringCategory", "IdempotencyScope"} {
+	for _, typ := range []string{"ScoringCategory", "IdempotencyScope", "VenueDescriptionItemType"} {
 		err := generateEnum(ctx, r, typ, modelsPkg)
 		if err != nil {
 			return err

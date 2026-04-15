@@ -60,34 +60,21 @@ func setupVenue(ctx context.Context, t *testing.T, tx *sql.Tx) models.Venue {
 	}
 }
 
-func setupRule(ctx context.Context, t *testing.T, tx *sql.Tx) models.RuleID {
-	t.Helper()
-
-	row := tx.QueryRowContext(ctx, `INSERT INTO rules (description) VALUES ($1) RETURNING id`, faker.Sentence())
-	require.NoError(t, row.Err())
-
-	var id models.RuleID
-	require.NoError(t, row.Scan(&id))
-
-	return id
-}
-
 type setupStageParams struct {
 	eventID  models.EventID
 	venueID  models.VenueID
-	ruleID   models.RuleID
 	rank     int32
 	venueKey int32
 }
 
-func setupStageWithRule(ctx context.Context, t *testing.T, tx *sql.Tx, p setupStageParams) models.StageID {
+func setupStageForSchedule(ctx context.Context, t *testing.T, tx *sql.Tx, p setupStageParams) models.StageID {
 	t.Helper()
 
 	row := tx.QueryRowContext(ctx, `
-		INSERT INTO stages (event_id, venue_id, rule_id, rank, duration_minutes, venue_key)
-		VALUES ($1, $2, $3, $4, 30, $5)
+		INSERT INTO stages (event_id, venue_id, rank, duration_minutes, venue_key)
+		VALUES ($1, $2, $3, 30, $4)
 		RETURNING id;
-	`, p.eventID, p.venueID, p.ruleID, p.rank, p.venueKey)
+	`, p.eventID, p.venueID, p.rank, p.venueKey)
 	require.NoError(t, row.Err())
 
 	var id models.StageID
@@ -399,13 +386,10 @@ func TestEventSchedule(t *testing.T) {
 		v1 := setupVenue(ctx, t, tx)
 		v2 := setupVenue(ctx, t, tx)
 		v3 := setupVenue(ctx, t, tx)
-		r1 := setupRule(ctx, t, tx)
-		r2 := setupRule(ctx, t, tx)
-		r3 := setupRule(ctx, t, tx)
 
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: r1, rank: 30, venueKey: 1})
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, ruleID: r2, rank: 10, venueKey: 2})
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, ruleID: r3, rank: 20, venueKey: 3})
+		setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, rank: 30, venueKey: 1})
+		setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, rank: 10, venueKey: 2})
+		setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, rank: 20, venueKey: 3})
 
 		rows, err := _sharedDBC.WithTx(tx).EventSchedule(ctx, eventID)
 		require.NoError(t, err)
@@ -427,13 +411,10 @@ func TestEventSchedule(t *testing.T) {
 		v1 := setupVenue(ctx, t, tx)
 		v2 := setupVenue(ctx, t, tx)
 		v3 := setupVenue(ctx, t, tx)
-		r1 := setupRule(ctx, t, tx)
-		r2 := setupRule(ctx, t, tx)
-		r3 := setupRule(ctx, t, tx)
 
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: r1, rank: 10, venueKey: 1})
-		deletedStageID := setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, ruleID: r2, rank: 20, venueKey: 2})
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, ruleID: r3, rank: 30, venueKey: 3})
+		setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, rank: 10, venueKey: 1})
+		deletedStageID := setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v2.ID, rank: 20, venueKey: 2})
+		setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v3.ID, rank: 30, venueKey: 3})
 
 		// Soft-delete one stage.
 		_, err := tx.ExecContext(ctx, `UPDATE stages SET deleted_at = now() WHERE id = $1`, deletedStageID)
@@ -444,7 +425,7 @@ func TestEventSchedule(t *testing.T) {
 		assert.Len(t, rows, 2, "deleted stage should be excluded")
 	})
 
-	t.Run("Includes rule descriptions", func(t *testing.T) {
+	t.Run("Returns stage IDs", func(t *testing.T) {
 		t.Parallel()
 
 		ctx, tx, cleanup := initDB(t)
@@ -453,20 +434,11 @@ func TestEventSchedule(t *testing.T) {
 		eventID := setupEvent(ctx, t, tx)
 		v1 := setupVenue(ctx, t, tx)
 
-		// Insert a rule with a known description.
-		description := "Must drink with pinky out"
-		row := tx.QueryRowContext(ctx, `INSERT INTO rules (description) VALUES ($1) RETURNING id`, description)
-		require.NoError(t, row.Err())
-
-		var ruleID models.RuleID
-		require.NoError(t, row.Scan(&ruleID))
-
-		setupStageWithRule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, ruleID: ruleID, rank: 1, venueKey: 1})
+		stageID := setupStageForSchedule(ctx, t, tx, setupStageParams{eventID: eventID, venueID: v1.ID, rank: 1, venueKey: 1})
 
 		rows, err := _sharedDBC.WithTx(tx).EventSchedule(ctx, eventID)
 		require.NoError(t, err)
 		require.Len(t, rows, 1)
-		assert.True(t, rows[0].Description.Valid, "description should be present")
-		assert.Equal(t, description, rows[0].Description.String)
+		assert.Equal(t, stageID, rows[0].StageID)
 	})
 }

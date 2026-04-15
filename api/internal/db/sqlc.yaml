@@ -71,8 +71,6 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.EventID
           - column: stages.venue_id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID
-          - column: stages.rules_id
-            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.RuleID
           - column: stages.venue_key
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueKey
           - column: stages.duration_minutes
@@ -82,6 +80,11 @@ sql:
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.IdempotencyKey
           - column: idempotency_keys.scope
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.IdempotencyScope
+          # rule_items
+          - column: rule_items.id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.RuleItemID
+          - column: rule_items.stages_id
+            go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.StageID
           # venues
           - column: venues.id
             go_type: github.com/pubgolf/pubgolf/api/internal/lib/models.VenueID

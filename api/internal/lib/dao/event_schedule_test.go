@@ -55,6 +55,20 @@ func mockEventSchedule(m *dbc.MockQuerier, eventID models.EventID, schedule []db
 	}.Bind(m, "EventSchedule")
 }
 
+func mockRuleItemsByStageIDs(m *dbc.MockQuerier) {
+	mockDBCCall{
+		ShouldCall: true,
+		Args: []any{
+			mock.Anything,
+			mock.Anything,
+		},
+		Return: []any{
+			([]dbc.RuleItemsByStageIDsRow)(nil),
+			nil,
+		},
+	}.Bind(m, "RuleItemsByStageIDs")
+}
+
 func TestEventSchedule(t *testing.T) {
 	t.Parallel()
 
@@ -72,6 +86,7 @@ func TestEventSchedule(t *testing.T) {
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{})
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
+		mockRuleItemsByStageIDs(m)
 
 		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
@@ -90,8 +105,9 @@ func TestEventSchedule(t *testing.T) {
 		mockSetEventVenueKeys(m, eventID, false /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, false /* = shouldCall */)
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
-			{VenueKey: models.VenueKeyFromUInt32(1)},
+			{StageID: models.StageIDFromULID(ulid.Make()), VenueKey: models.VenueKeyFromUInt32(1)},
 		})
+		mockRuleItemsByStageIDs(m)
 
 		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
@@ -108,15 +124,16 @@ func TestEventSchedule(t *testing.T) {
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
-			{VenueKey: nullVenueKey},
+			{StageID: models.StageIDFromULID(ulid.Make()), VenueKey: nullVenueKey},
 		})
 
 		mockSetEventVenueKeys(m, eventID, true /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, true /* = shouldCall */)
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
-			{VenueKey: models.VenueKeyFromUInt32(1)},
+			{StageID: models.StageIDFromULID(ulid.Make()), VenueKey: models.VenueKeyFromUInt32(1)},
 		})
+		mockRuleItemsByStageIDs(m)
 
 		_, err = d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
@@ -133,14 +150,14 @@ func TestEventSchedule(t *testing.T) {
 		eventID := models.EventIDFromULID(ulid.Make())
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
-			{VenueKey: nullVenueKey},
+			{StageID: models.StageIDFromULID(ulid.Make()), VenueKey: nullVenueKey},
 		})
 
 		mockSetEventVenueKeys(m, eventID, true /* = shouldCall */)
 		mockSetNextEventVenueKey(m, eventID, true /* = shouldCall */)
 
 		mockEventSchedule(m, eventID, []dbc.EventScheduleRow{
-			{VenueKey: nullVenueKey},
+			{StageID: models.StageIDFromULID(ulid.Make()), VenueKey: nullVenueKey},
 		})
 
 		_, err = d.EventSchedule(t.Context(), eventID)
@@ -163,12 +180,14 @@ func TestEventSchedule(t *testing.T) {
 		var scheduleRows []dbc.EventScheduleRow
 		for range numVenues {
 			scheduleRows = append(scheduleRows, dbc.EventScheduleRow{
+				StageID:         models.StageIDFromULID(ulid.Make()),
 				VenueKey:        models.VenueKeyFromUInt32(uint32(rand.Int31n(9999) + 1)),
 				DurationMinutes: uint32(rand.Int31n(90) + 1),
 			})
 		}
 
 		mockEventSchedule(m, eventID, scheduleRows)
+		mockRuleItemsByStageIDs(m)
 
 		venues, err := d.EventSchedule(t.Context(), eventID)
 		require.NoError(t, err)
