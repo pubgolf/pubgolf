@@ -57,16 +57,17 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 	venueIdx := currentStopIndex(es.Schedule, time.Since(est.StartTime))
 	fiveHole := cat == models.ScoringCategoryPubGolfFiveHole
 	required := scoredStages(venueIdx, len(es.Schedule), fiveHole)
-	currentStageNum := currentScoringStageNumber(venueIdx, fiveHole)
+	currentStageNum := currentScoringStageNumber(venueIdx, len(es.Schedule), fiveHole)
+	eventEnded := venueIdx >= len(es.Schedule)
 
 	return connect.NewResponse(&apiv1.GetScoresForCategoryResponse{
 		ScoreBoard: &apiv1.ScoreBoard{
-			Scores: buildCategoryScoreBoard(sc.Scores, required, currentStageNum),
+			Scores: buildCategoryScoreBoard(sc.Scores, required, currentStageNum, eventEnded),
 		},
 	}), nil
 }
 
-func buildCategoryScoreBoard(scores []models.ScoringInput, required int, currentStageNum int64) []*apiv1.ScoreBoard_ScoreBoardEntry {
+func buildCategoryScoreBoard(scores []models.ScoringInput, required int, currentStageNum int64, eventEnded bool) []*apiv1.ScoreBoard_ScoreBoardEntry {
 	sb := make([]*apiv1.ScoreBoard_ScoreBoardEntry, 0, len(scores))
 	rank := uint32(1)
 
@@ -82,14 +83,14 @@ func buildCategoryScoreBoard(scores []models.ScoringInput, required int, current
 			Score:              models.ClampInt32(int(s.TotalPoints)),
 			DisplayScoreSigned: false,
 			Rank:               new(rank),
-			Status:             categoryScoreStatus(s, required, currentStageNum),
+			Status:             categoryScoreStatus(s, required, currentStageNum, eventEnded),
 		})
 	}
 
 	return sb
 }
 
-func categoryScoreStatus(s models.ScoringInput, required int, currentStageNum int64) apiv1.ScoreBoard_ScoreStatus {
+func categoryScoreStatus(s models.ScoringInput, required int, currentStageNum int64, eventEnded bool) apiv1.ScoreBoard_ScoreStatus {
 	req := int64(required)
 	total := s.VerifiedScores + s.UnverifiedScores
 
@@ -101,7 +102,10 @@ func categoryScoreStatus(s models.ScoringInput, required int, currentStageNum in
 		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION
 	}
 
-	if total == req-1 && s.LatestScoredStageNumber < currentStageNum {
+	// PENDING_SUBMISSION only makes sense mid-event when the player is currently at a
+	// venue and just hasn't submitted that score yet. Once the event has ended any gap
+	// is a permanent INCOMPLETE.
+	if !eventEnded && total == req-1 && s.LatestScoredStageNumber < currentStageNum {
 		return apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION
 	}
 
@@ -111,10 +115,15 @@ func categoryScoreStatus(s models.ScoringInput, required int, currentStageNum in
 // currentScoringStageNumber returns the 1-based stage number of the current scoring stage.
 // For nine-hole, every stage is scoring so this is venueIdx+1.
 // For five-hole, only odd-numbered stages are scoring, so this is the latest odd stage number
-// at or before the current venue.
-func currentScoringStageNumber(venueIdx int, fiveHole bool) int64 {
+// at or before the current venue. Once the event has ended (venueIdx >= numVenues) the
+// number is capped at the last real stage so callers don't compare against a phantom stage.
+func currentScoringStageNumber(venueIdx, numVenues int, fiveHole bool) int64 {
 	if venueIdx < 0 {
 		return 0
+	}
+
+	if venueIdx >= numVenues {
+		venueIdx = numVenues - 1
 	}
 
 	if fiveHole {
@@ -129,7 +138,11 @@ func scoredStages(venueIdx, numVenues int, everyOther bool) int {
 		return 0
 	}
 
-	if venueIdx == numVenues {
+	if venueIdx >= numVenues {
+		if everyOther {
+			return (numVenues + 1) / 2
+		}
+
 		return numVenues
 	}
 
