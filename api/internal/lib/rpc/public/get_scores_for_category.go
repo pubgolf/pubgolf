@@ -68,21 +68,20 @@ func (s *Server) GetScoresForCategory(ctx context.Context, req *connect.Request[
 
 func buildCategoryScoreBoard(scores []models.ScoringInput, required int, currentStageNum int64) []*apiv1.ScoreBoard_ScoreBoardEntry {
 	sb := make([]*apiv1.ScoreBoard_ScoreBoardEntry, 0, len(scores))
+	rank := uint32(1)
 
 	for i, s := range scores {
-		rank := uint32(1)
-
 		// Increase the rank when we've stopped tying, but when we do we jump up to the 1-index of the leaderboard.
 		if i > 0 && s.TotalPoints > scores[i-1].TotalPoints { //nolint:gosec // i > 0 guards the access
 			rank = models.ClampUInt32(i + 1)
 		}
 
 		sb = append(sb, &apiv1.ScoreBoard_ScoreBoardEntry{
-			EntityId:           p(s.PlayerID.String()),
+			EntityId:           new(s.PlayerID.String()),
 			Label:              s.Name,
 			Score:              models.ClampInt32(int(s.TotalPoints)),
 			DisplayScoreSigned: false,
-			Rank:               &rank,
+			Rank:               new(rank),
 			Status:             categoryScoreStatus(s, required, currentStageNum),
 		})
 	}
