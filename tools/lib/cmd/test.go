@@ -18,95 +18,151 @@ import (
 )
 
 func init() {
+	testCmd.AddCommand(testGoCmd)
+	testCmd.AddCommand(testWebCmd)
 	testCmd.AddCommand(testE2ECmd)
 	testE2ECmd.AddCommand(testE2EAPICmd)
 	testE2ECmd.AddCommand(testE2EWebCmd)
 
-	testCmd.AddCommand(testWebCmd)
-
 	rootCmd.AddCommand(testCmd)
 
-	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile")
-	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output")
-	testCmd.PersistentFlags().Bool("local", false, "Run tests in a mode that disables external network dependencies")
+	testCmd.PersistentFlags().BoolP("coverage", "c", false, "Generate and display a coverage profile (Go tests only)")
+	testCmd.PersistentFlags().BoolP("verbose", "v", false, "Display verbose test output (Go tests only)")
+	testCmd.PersistentFlags().Bool("local", false, "Run tests in a mode that disables external network dependencies (Go tests only)")
 }
 
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Run all automated unit/integration tests",
+	Short: "Run all automated unit/integration tests (Go + web)",
 	Run: func(cmd *cobra.Command, _ []string) {
-		coverageDir := filepath.Join(projectRoot, worktreeDataDir(cmd.Context(), "data/go-test-coverage"))
-		coverageFile := filepath.Join(coverageDir, "api.cover")
+		opts, err := readTestGoFlags(cmd)
+		classifyAndExit(err)
 
-		coverageFlag, err := cmd.Flags().GetBool("coverage")
-		classifyAndExit(fmtErr(err, "check '--coverage' flag"))
+		classifyAndExit(runPar(cmd.Context(), runner,
+			func(ctx context.Context, r Runner) error {
+				return testGo(ctx, r, envProvider, opts)
+			},
+			testWeb,
+		))
+	},
+}
 
-		verboseFlag, err := cmd.Flags().GetBool("verbose")
-		classifyAndExit(fmtErr(err, "check '--verbose' flag"))
+type testGoOpts struct {
+	coverage bool
+	verbose  bool
+	local    bool
+}
 
-		localFlag, err := cmd.Flags().GetBool("local")
-		classifyAndExit(fmtErr(err, "check '--local' flag"))
+var testGoCmd = &cobra.Command{
+	Use:   "go",
+	Short: "Run Go API unit/integration tests",
+	Run: func(cmd *cobra.Command, _ []string) {
+		opts, err := readTestGoFlags(cmd)
+		classifyAndExit(err)
+		classifyAndExit(testGo(cmd.Context(), runner, envProvider, opts))
+	},
+}
 
-		env, envErr := envProvider.Env(cmd.Context(), config.ServerBinName, "test")
-		classifyAndExit(fmtErr(envErr, "fetch test environment"))
+func readTestGoFlags(cmd *cobra.Command) (testGoOpts, error) {
+	coverage, err := cmd.Flags().GetBool("coverage")
+	if err != nil {
+		return testGoOpts{}, fmtErr(err, "check '--coverage' flag")
+	}
 
-		// Inject worktree isolation env vars.
-		slug, slugErr := worktreeSlug(cmd.Context())
-		classifyAndExit(fmtErr(slugErr, "determine worktree slug"))
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		return testGoOpts{}, fmtErr(err, "check '--verbose' flag")
+	}
 
-		if slug != "" {
-			env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+	local, err := cmd.Flags().GetBool("local")
+	if err != nil {
+		return testGoOpts{}, fmtErr(err, "check '--local' flag")
+	}
+
+	return testGoOpts{coverage: coverage, verbose: verbose, local: local}, nil
+}
+
+func testGo(ctx context.Context, r Runner, ep EnvProvider, opts testGoOpts) error {
+	coverageDir := filepath.Join(projectRoot, worktreeDataDir(ctx, "data/go-test-coverage"))
+	coverageFile := filepath.Join(coverageDir, "api.cover")
+
+	env, err := ep.Env(ctx, config.ServerBinName, "test")
+	if err != nil {
+		return fmtErr(err, "fetch test environment")
+	}
+
+	slug, err := worktreeSlug(ctx)
+	if err != nil {
+		return fmtErr(err, "determine worktree slug")
+	}
+
+	if slug != "" {
+		env = append(env, "PUBGOLF_WORKTREE_SLUG="+slug)
+	}
+
+	offset, err := worktreePortOffset(ctx)
+	if err != nil {
+		return fmtErr(err, "compute port offset")
+	}
+
+	if opts.local && offset > 0 {
+		env = replaceSharedDBPort(env, offset)
+	}
+
+	if opts.local {
+		err := preflight(ctx, offset)
+		if err != nil {
+			return err
+		}
+	}
+
+	args := []string{"test", filepath.FromSlash("./api/...")}
+
+	if opts.local {
+		args = append(args, "-shared-postgres=true")
+	}
+
+	if opts.verbose {
+		args = append(args, "-v")
+	}
+
+	if opts.coverage {
+		args = append(args, "-coverprofile", coverageFile)
+
+		err := os.RemoveAll(coverageDir)
+		if err != nil {
+			return fmtErr(err, "clean old output dir")
 		}
 
-		offset, offsetErr := worktreePortOffset(cmd.Context())
-		classifyAndExit(fmtErr(offsetErr, "compute port offset"))
-
-		if localFlag && offset > 0 {
-			env = replaceSharedDBPort(env, offset)
+		err = os.MkdirAll(coverageDir, 0o755)
+		if err != nil {
+			return fmtErr(err, "make new output dir")
 		}
+	}
 
-		// Pre-flight infrastructure check for shared-postgres mode.
-		if localFlag {
-			classifyAndExit(preflight(cmd.Context(), offset))
-		}
+	err = r.Run(ctx, Cmd{
+		Name: "go",
+		Args: args,
+		Env:  env,
+	})
+	if err != nil {
+		// Surface all errors including exit-code-1 test failures —
+		// classifyAndExit routes infra vs test via stderr substring matching,
+		// not exit code.
+		return fmtErr(err, "execute `go test ...` command")
+	}
 
-		args := []string{"test", filepath.FromSlash("./api/...")}
-
-		if localFlag {
-			args = append(args, "-shared-postgres=true")
-		}
-
-		if verboseFlag {
-			args = append(args, "-v")
-		}
-
-		if coverageFlag {
-			args = append(args, "-coverprofile", coverageFile)
-
-			classifyAndExit(fmtErr(os.RemoveAll(coverageDir), "clean old output dir"))
-			classifyAndExit(fmtErr(os.MkdirAll(coverageDir, 0o755), "make new output dir"))
-		}
-
-		err = runner.Run(cmd.Context(), Cmd{
+	if opts.coverage {
+		err := r.Run(ctx, Cmd{
 			Name: "go",
-			Args: args,
-			Env:  env,
+			Args: []string{"tool", "cover", "-html", coverageFile},
 		})
 		if err != nil {
-			// Allow exit code 1 through — it means the test suite failed (not infrastructure).
-			exitErr, ok := err.(*exec.ExitError) //nolint:errorlint // Casting to extract data.
-			if !ok || exitErr.ExitCode() != 1 {
-				classifyAndExit(fmtErr(err, "execute `go test ...` command"))
-			}
+			return fmtErr(err, "execute `go tool cover ...` command")
 		}
+	}
 
-		if coverageFlag {
-			classifyAndExit(fmtErr(runner.Run(cmd.Context(), Cmd{
-				Name: "go",
-				Args: []string{"tool", "cover", "-html", coverageFile},
-			}), "execute `go tool cover ...` command"))
-		}
-	},
+	return nil
 }
 
 var testWebCmd = &cobra.Command{
