@@ -191,6 +191,7 @@ func TestCategoryScoreStatus(t *testing.T) {
 		input           models.ScoringInput
 		required        int
 		currentStageNum int64
+		eventEnded      bool
 		want            apiv1.ScoreBoard_ScoreStatus
 	}{
 		// Nine-hole scenarios (required=5, currentScoringStageNumber=5)
@@ -298,13 +299,115 @@ func TestCategoryScoreStatus(t *testing.T) {
 		// NOTE: ScoringInput counts reflect only scoring holes — the DAO filters
 		// non-scoring holes via the EveryOther parameter in the SQL query. That
 		// property is tested at the dbc level in leaderboard_test.go ("best of five").
+
+		// Post-event nine-hole scenarios (eventEnded=true; required=9, currentStageNum=9)
+		{
+			name:            "nine-hole post-event all verified is finalized",
+			input:           models.ScoringInput{VerifiedScores: 9, UnverifiedScores: 0, LatestScoredStageNumber: 9},
+			required:        9,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_FINALIZED,
+		},
+		{
+			name:            "nine-hole post-event missing middle stage is incomplete",
+			input:           models.ScoringInput{VerifiedScores: 8, UnverifiedScores: 0, LatestScoredStageNumber: 9},
+			required:        9,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
+		},
+		{
+			name:            "nine-hole post-event missing only last stage is incomplete",
+			input:           models.ScoringInput{VerifiedScores: 8, UnverifiedScores: 0, LatestScoredStageNumber: 8},
+			required:        9,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
+		},
+
+		// Post-event five-hole scenarios (eventEnded=true; required=5, currentStageNum=9)
+		{
+			name:            "five-hole post-event all verified is finalized",
+			input:           models.ScoringInput{VerifiedScores: 5, UnverifiedScores: 0, LatestScoredStageNumber: 9},
+			required:        5,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_FINALIZED,
+		},
+		{
+			name:            "five-hole post-event all unverified is pending verification",
+			input:           models.ScoringInput{VerifiedScores: 0, UnverifiedScores: 5, LatestScoredStageNumber: 9},
+			required:        5,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_VERIFICATION,
+		},
+		{
+			name:            "five-hole post-event missing middle scoring hole is incomplete",
+			input:           models.ScoringInput{VerifiedScores: 4, UnverifiedScores: 0, LatestScoredStageNumber: 9},
+			required:        5,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
+		},
+		{
+			name:            "five-hole post-event missing only last scoring hole is incomplete",
+			input:           models.ScoringInput{VerifiedScores: 4, UnverifiedScores: 0, LatestScoredStageNumber: 7},
+			required:        5,
+			currentStageNum: 9,
+			eventEnded:      true,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_INCOMPLETE,
+		},
+
+		// Mid-event regression check — at last venue PENDING_SUBMISSION must still work
+		{
+			name:            "nine-hole mid-event at last venue pending submission",
+			input:           models.ScoringInput{VerifiedScores: 8, UnverifiedScores: 0, LatestScoredStageNumber: 8},
+			required:        9,
+			currentStageNum: 9,
+			eventEnded:      false,
+			want:            apiv1.ScoreBoard_SCORE_STATUS_PENDING_SUBMISSION,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := categoryScoreStatus(tc.input, tc.required, tc.currentStageNum)
+			got := categoryScoreStatus(tc.input, tc.required, tc.currentStageNum, tc.eventEnded)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestCurrentScoringStageNumber(t *testing.T) {
+	t.Parallel()
+
+	const numVenues = 9
+
+	testCases := []struct {
+		name     string
+		venueIdx int
+		fiveHole bool
+		want     int64
+	}{
+		{name: "pre-event returns zero", venueIdx: -1, fiveHole: false, want: 0},
+		{name: "first venue nine-hole", venueIdx: 0, fiveHole: false, want: 1},
+		{name: "mid-event nine-hole", venueIdx: 4, fiveHole: false, want: 5},
+		{name: "post-event nine-hole caps at last stage", venueIdx: numVenues, fiveHole: false, want: 9},
+		{name: "first venue five-hole at odd stage", venueIdx: 0, fiveHole: true, want: 1},
+		{name: "five-hole at even venue holds last odd", venueIdx: 1, fiveHole: true, want: 1},
+		{name: "five-hole at next odd venue", venueIdx: 2, fiveHole: true, want: 3},
+		{name: "five-hole mid-event at odd venue", venueIdx: 4, fiveHole: true, want: 5},
+		{name: "post-event five-hole caps at last odd stage", venueIdx: numVenues, fiveHole: true, want: 9},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := currentScoringStageNumber(tc.venueIdx, numVenues, tc.fiveHole)
 			assert.Equal(t, tc.want, got)
 		})
 	}
@@ -329,7 +432,7 @@ func TestScoredStages(t *testing.T) {
 		{name: "second venue five-hole unchanged", venueIdx: 1, everyOther: true, want: 1},
 		{name: "third venue five-hole", venueIdx: 2, everyOther: true, want: 2},
 		{name: "mid-event five-hole", venueIdx: 4, everyOther: true, want: 3},
-		{name: "post-event five-hole", venueIdx: numVenues, everyOther: true, want: numVenues},
+		{name: "post-event five-hole", venueIdx: numVenues, everyOther: true, want: 5},
 	}
 
 	for _, tc := range testCases {
@@ -358,7 +461,7 @@ func TestBuildCategoryScoreBoard(t *testing.T) {
 			{PlayerID: p3, Name: "Carol", TotalPoints: 15, VerifiedScores: 5, LatestScoredStageNumber: 5},
 		}
 
-		sb := buildCategoryScoreBoard(scores, 5, 5)
+		sb := buildCategoryScoreBoard(scores, 5, 5, false)
 		require.Len(t, sb, 3)
 
 		assert.Equal(t, uint32(1), sb[0].GetRank())
@@ -374,7 +477,7 @@ func TestBuildCategoryScoreBoard(t *testing.T) {
 			{PlayerID: p1, Name: "Alice", TotalPoints: 10, VerifiedScores: 5, LatestScoredStageNumber: 5},
 		}
 
-		sb := buildCategoryScoreBoard(scores, 5, 5)
+		sb := buildCategoryScoreBoard(scores, 5, 5, false)
 		require.Len(t, sb, 1)
 		assert.Equal(t, uint32(1), sb[0].GetRank())
 	})
@@ -382,7 +485,7 @@ func TestBuildCategoryScoreBoard(t *testing.T) {
 	t.Run("empty scores returns empty board", func(t *testing.T) {
 		t.Parallel()
 
-		sb := buildCategoryScoreBoard(nil, 5, 5)
+		sb := buildCategoryScoreBoard(nil, 5, 5, false)
 		assert.Empty(t, sb)
 	})
 
@@ -395,7 +498,7 @@ func TestBuildCategoryScoreBoard(t *testing.T) {
 			{PlayerID: p1, Name: name, TotalPoints: 10, VerifiedScores: 5, LatestScoredStageNumber: 5},
 		}
 
-		sb := buildCategoryScoreBoard(scores, 5, 5)
+		sb := buildCategoryScoreBoard(scores, 5, 5, false)
 		require.Len(t, sb, 1)
 		assert.Equal(t, p1.String(), sb[0].GetEntityId())
 		assert.Equal(t, name, sb[0].GetLabel())
