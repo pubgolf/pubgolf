@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -19,18 +22,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
-      - name: Download Buf CLI
-        uses: bufbuild/buf-setup-action@v1
+      - name: Setup Buf CLI
+        uses: bufbuild/buf-action@v1
         with:
-          github_token: ${{ github.token }}
+          setup_only: true
       - name: Lint .proto Files
-        uses: bufbuild/buf-lint-action@v1
+        run: buf lint
       - name: Format .proto Files
         run: buf format ./proto/ --diff --exit-code
       - name: Check Breaking Changes
-        uses: bufbuild/buf-breaking-action@v1
-        with:
-          against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+        run: buf breaking --against "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
       - name: Generate Client Libs
         run: |
           buf generate --template buf.gen.ci.yaml
@@ -132,7 +133,7 @@ jobs:
           cache-dependency-path: web-app/package-lock.json
       - name: Cache devctrl binary
         id: devctrl-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: pubgolf-devctrl
           key: devctrl-${{ runner.os }}-${{ hashFiles('go.sum', 'tools/**') }}
@@ -150,7 +151,7 @@ jobs:
         run: echo "week=$(date +%Y-%W)" >> "$GITHUB_OUTPUT"
       - name: Cache node_modules
         id: node-modules-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: web-app/node_modules
           key: node-modules-${{ runner.os }}-${{ steps.cache-date.outputs.week }}-${{ hashFiles('web-app/package-lock.json') }}
@@ -165,15 +166,14 @@ jobs:
         run: ./pubgolf-devctrl build web
       - name: Upload Assets to R2
         if: github.ref == 'refs/heads/main'
-        # Repo archived 2025; consider migrating to aws-actions/configure-aws-credentials + aws s3 sync if needed
-        uses: jakejarvis/s3-sync-action@v0.5.1
+        run: |
+          aws s3 sync web-app/build/_app/immutable/ \
+            s3://pubgolf-web-app-assets/_app/immutable/ \
+            --endpoint-url "$AWS_S3_ENDPOINT"
         env:
           AWS_S3_ENDPOINT: https://cc720e9866469bbe052e0c3d90b4c016.r2.cloudflarestorage.com
-          AWS_S3_BUCKET: pubgolf-web-app-assets
           AWS_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: web-app/build/_app/immutable/
-          DEST_DIR: _app/immutable/
       - name: Upload Web App Dynamic Files as CI Artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v5
@@ -190,6 +190,8 @@ jobs:
       - proto_build_and_check
       - tools_build_and_check
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download Generated RPC Client Libs
         uses: actions/download-artifact@v5
@@ -202,12 +204,12 @@ jobs:
       - name: Get short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Upload as GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            swift-client-lib.zip
+        run: |
+          gh release create "sha-${{ env.SHORT_SHA }}" \
+            swift-client-lib.zip \
             pubgolf-devctrl
-          tag_name: sha-${{ env.SHORT_SHA }}
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   api_publish_docker_image:
     name: Publish API Server
@@ -269,9 +271,8 @@ jobs:
       - name: Get short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Trigger Deployment Workflow
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: deploy-staging.yaml
-          # Disable auto-format to prevent replacing the outer quotes with single quotes
-          # prettier-ignore
-          inputs: "{ \"version\": \"sha-${{ env.SHORT_SHA }}\" }"
+        run: |
+          gh workflow run deploy-staging.yaml \
+            -f version=sha-${{ env.SHORT_SHA }}
+        env:
+          GH_TOKEN: ${{ github.token }}
