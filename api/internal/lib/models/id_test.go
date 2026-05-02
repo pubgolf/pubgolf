@@ -26,7 +26,7 @@ func TestIDTypes_ScanValue(t *testing.T) {
 		{"EventID", &EventID{}, EventID{DatabaseULID{ulid.Make()}}},
 		{"VenueID", &VenueID{}, VenueID{DatabaseULID{ulid.Make()}}},
 		{"PlayerID", &PlayerID{}, PlayerID{DatabaseULID{ulid.Make()}}},
-		{"RuleID", &RuleID{}, RuleID{DatabaseULID{ulid.Make()}}},
+		{"RuleItemID", &RuleItemID{}, RuleItemID{DatabaseULID{ulid.Make()}}},
 		{"ScoreID", &ScoreID{}, ScoreID{DatabaseULID{ulid.Make()}}},
 		{"StageID", &StageID{}, StageID{DatabaseULID{ulid.Make()}}},
 		{"IdempotencyKey", &IdempotencyKey{}, IdempotencyKey{DatabaseULID{ulid.Make()}}},

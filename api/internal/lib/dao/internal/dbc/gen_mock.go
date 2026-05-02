@@ -228,6 +228,24 @@ func (_m *MockQuerier) CreatePlayer(ctx context.Context, arg CreatePlayerParams)
 	return r0, r1
 }
 
+// CreateRuleItem provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateRuleItem(ctx context.Context, arg CreateRuleItemParams) error {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateRuleItem")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, CreateRuleItemParams) error); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeactivateAuthTokens provides a mock function with given fields: ctx, phoneNumber
 func (_m *MockQuerier) DeactivateAuthTokens(ctx context.Context, phoneNumber models.PhoneNum) (bool, error) {
 	ret := _m.Called(ctx, phoneNumber)
@@ -331,6 +349,24 @@ func (_m *MockQuerier) DeletePlayer(ctx context.Context, id models.PlayerID) err
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, models.PlayerID) error); ok {
 		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// DeleteRuleItemsByStageID provides a mock function with given fields: ctx, stagesID
+func (_m *MockQuerier) DeleteRuleItemsByStageID(ctx context.Context, stagesID models.StageID) error {
+	ret := _m.Called(ctx, stagesID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteRuleItemsByStageID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.StageID) error); ok {
+		r0 = rf(ctx, stagesID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -906,6 +942,36 @@ func (_m *MockQuerier) PlayerScores(ctx context.Context, arg PlayerScoresParams)
 	return r0, r1
 }
 
+// RuleItemsByStageIDs provides a mock function with given fields: ctx, stageIds
+func (_m *MockQuerier) RuleItemsByStageIDs(ctx context.Context, stageIds []models.DatabaseULID) ([]RuleItemsByStageIDsRow, error) {
+	ret := _m.Called(ctx, stageIds)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RuleItemsByStageIDs")
+	}
+
+	var r0 []RuleItemsByStageIDsRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, []models.DatabaseULID) ([]RuleItemsByStageIDsRow, error)); ok {
+		return rf(ctx, stageIds)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, []models.DatabaseULID) []RuleItemsByStageIDsRow); ok {
+		r0 = rf(ctx, stageIds)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]RuleItemsByStageIDsRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, []models.DatabaseULID) error); ok {
+		r1 = rf(ctx, stageIds)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ScoreByPlayerStage provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) ScoreByPlayerStage(ctx context.Context, arg ScoreByPlayerStageParams) (ScoreByPlayerStageRow, error) {
 	ret := _m.Called(ctx, arg)
@@ -1084,24 +1150,6 @@ func (_m *MockQuerier) UpdatePlayer(ctx context.Context, arg UpdatePlayerParams)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, UpdatePlayerParams) error); ok {
-		r0 = rf(ctx, arg)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// UpdateRuleByStage provides a mock function with given fields: ctx, arg
-func (_m *MockQuerier) UpdateRuleByStage(ctx context.Context, arg UpdateRuleByStageParams) error {
-	ret := _m.Called(ctx, arg)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateRuleByStage")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, UpdateRuleByStageParams) error); ok {
 		r0 = rf(ctx, arg)
 	} else {
 		r0 = ret.Error(0)

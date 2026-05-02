@@ -55,24 +55,22 @@ func (q *Queries) EventIDByKey(ctx context.Context, key string) (models.EventID,
 
 const eventSchedule = `-- name: EventSchedule :many
 SELECT
+  s.id AS stage_id,
   s.venue_key,
-  s.duration_minutes,
-  r.description
+  s.duration_minutes
 FROM
   stages s
-  LEFT JOIN rules r ON s.rule_id = r.id
 WHERE
   s.event_id = $1
   AND s.deleted_at IS NULL
-  AND r.deleted_at IS NULL
 ORDER BY
   s.rank ASC
 `
 
 type EventScheduleRow struct {
+	StageID         models.StageID
 	VenueKey        models.VenueKey
 	DurationMinutes uint32
-	Description     sql.NullString
 }
 
 func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]EventScheduleRow, error) {
@@ -84,7 +82,7 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 	var items []EventScheduleRow
 	for rows.Next() {
 		var i EventScheduleRow
-		if err := rows.Scan(&i.VenueKey, &i.DurationMinutes, &i.Description); err != nil {
+		if err := rows.Scan(&i.StageID, &i.VenueKey, &i.DurationMinutes); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -101,8 +99,6 @@ func (q *Queries) EventSchedule(ctx context.Context, eventID models.EventID) ([]
 const eventScheduleWithDetails = `-- name: EventScheduleWithDetails :many
 SELECT
   s.id,
-  r.id AS rule_id,
-  r.description,
   v.id AS venue_id,
   v.name,
   v.address,
@@ -111,12 +107,10 @@ SELECT
   s.duration_minutes
 FROM
   stages s
-  LEFT JOIN rules r ON s.rule_id = r.id
   LEFT JOIN venues v ON s.venue_id = v.id
 WHERE
   s.event_id = $1
   AND s.deleted_at IS NULL
-  AND r.deleted_at IS NULL
   AND v.deleted_at IS NULL
 ORDER BY
   s.rank ASC
@@ -124,8 +118,6 @@ ORDER BY
 
 type EventScheduleWithDetailsRow struct {
 	ID              models.StageID
-	RuleID          models.DatabaseULID
-	Description     sql.NullString
 	VenueID         models.VenueID
 	Name            sql.NullString
 	Address         sql.NullString
@@ -145,8 +137,6 @@ func (q *Queries) EventScheduleWithDetails(ctx context.Context, eventID models.E
 		var i EventScheduleWithDetailsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.RuleID,
-			&i.Description,
 			&i.VenueID,
 			&i.Name,
 			&i.Address,

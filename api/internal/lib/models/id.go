@@ -114,22 +114,22 @@ func PlayerIDFromString(s string) (PlayerID, error) {
 	return PlayerID{DatabaseULID{u}}, nil
 }
 
-// RuleID uniquely identifies an event description.
-type RuleID struct{ DatabaseULID }
+// RuleItemID uniquely identifies a rule item.
+type RuleItemID struct{ DatabaseULID }
 
-// RuleIDFromULID parses an RuleID from a ULID.
-func RuleIDFromULID(u ulid.ULID) RuleID {
-	return RuleID{DatabaseULID{u}}
+// RuleItemIDFromULID parses a RuleItemID from a ULID.
+func RuleItemIDFromULID(u ulid.ULID) RuleItemID {
+	return RuleItemID{DatabaseULID{u}}
 }
 
-// RuleIDFromString parses an RuleID from a string.
-func RuleIDFromString(s string) (RuleID, error) {
+// RuleItemIDFromString parses a RuleItemID from a string.
+func RuleItemIDFromString(s string) (RuleItemID, error) {
 	u, err := ulid.Parse(s)
 	if err != nil {
-		return RuleID{}, fmt.Errorf("parse RuleID from string: %w", err)
+		return RuleItemID{}, fmt.Errorf("parse RuleItemID from string: %w", err)
 	}
 
-	return RuleID{DatabaseULID{u}}, nil
+	return RuleItemID{DatabaseULID{u}}, nil
 }
 
 // ScoreID uniquely identifies a score.
