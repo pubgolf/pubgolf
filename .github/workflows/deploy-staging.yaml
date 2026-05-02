@@ -8,6 +8,9 @@ on:
         type: string
         required: true
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy_app:
     name: Trigger Fly.io Deploy
