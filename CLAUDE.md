@@ -21,7 +21,7 @@ shorthand for permission grouping, not the actual CLI syntax.
 | DB migrations | `pubgolf-devctrl migrate *` | auto-approved |
 | Run full-stack or individual servers | `pubgolf-devctrl run [api|web|bg|api-db]` | auto-approved |
 | Build targets | `pubgolf-devctrl build [web]` | auto-approved |
-| Run tests (Go + web + e2e) | `pubgolf-devctrl test [web|e2e [api|web]]` | auto-approved |
+| Run tests (Go + web + e2e) | `pubgolf-devctrl test [go|web|e2e [api|web]]` | auto-approved |
 | Lint/check all packages | `pubgolf-devctrl check go` | auto-approved |
 | Lint/check proto files | `pubgolf-devctrl check proto` | auto-approved |
 | Check web app (lint + type-check) | `pubgolf-devctrl check web` | auto-approved |
@@ -35,8 +35,9 @@ shorthand for permission grouping, not the actual CLI syntax.
 | Update devctrl itself | `pubgolf-devctrl update *` | requires approval |
 | Force cleanup | `pubgolf-devctrl clean --force` | requires approval |
 
-**Single-package Go tests**: `pubgolf-devctrl test` always runs the full suite with
-Doppler secrets. For iterating on a single package (no DB/secrets needed), use
+**Single-package Go tests**: `pubgolf-devctrl test go` runs the full Go suite with
+Doppler secrets (and `pubgolf-devctrl test` runs Go + web in parallel). For
+iterating on a single package (no DB/secrets needed), use
 `go test ./api/internal/lib/your/pkg/...` directly — this is pre-approved.
 
 ## Code Exploration
