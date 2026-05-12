@@ -31,6 +31,7 @@ shorthand for permission grouping, not the actual CLI syntax.
 | Inspect all worktrees | `pubgolf-devctrl status --all` | auto-approved |
 | Check dev environment | `pubgolf-devctrl doctor` | auto-approved |
 | Preview cleanup | `pubgolf-devctrl clean` | auto-approved |
+| Seed database | `pubgolf-devctrl seed *` | auto-approved |
 | Dry-run any command | `pubgolf-devctrl --dry-run <cmd>` | auto-approved |
 | Update devctrl itself | `pubgolf-devctrl update *` | requires approval |
 | Force cleanup | `pubgolf-devctrl clean --force` | requires approval |
